@@ -27,6 +27,21 @@
     </header>
 
     <div class="cols">
+      <div id="surface" class="surface" hidden>
+        <div id="sv-canvas" class="sv-canvas"></div>
+        <div class="sv-top">
+          <div><b id="sv-title"></b><span id="sv-time"></span></div>
+          <div class="sv-ctl">
+            <span>DETAIL</span><div class="seg" id="sv-quality"></div>
+            <span>EYE HEIGHT</span><div class="seg" id="sv-eye"></div>
+            <span>LUNO SKYLINE</span><div class="seg" id="sv-skyline"></div>
+            <button id="sv-sun">FACE THE SUN</button><button id="sv-earth">FACE EARTH</button>
+            <button id="sv-save">SAVE IMAGE</button><button id="sv-full">FULL SCREEN</button><button id="sv-close">✕ CLOSE</button>
+          </div>
+        </div>
+        <div id="sv-status" class="sv-status" hidden></div>
+        <div class="sv-bottom"><div id="sv-look"></div><div id="sv-info"></div><div class="sv-key"><i></i> <span id="sv-keytext"></span> · DRAG TO LOOK AROUND · USE PLAY OR ← → TO RUN THE MISSION CLOCK</div></div>
+      </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">
         <h3><b class="step">1</b>WHERE · CLICK A SITE</h3>
@@ -112,7 +127,7 @@
 
 
 
-        <h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND, WITH THE SUN AND EARTH</h3>
+        <div class="tiles-head"><h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
 
         <h3>FIRST 30 DAYS AFTER LANDING · CLICK OR DRAG TO MOVE THE MISSION CLOCK</h3>

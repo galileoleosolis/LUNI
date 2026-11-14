@@ -7,6 +7,7 @@ import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
 import { sampleSite, siteEclipses } from "./model.js";
 import { createScanPanel } from "./ui-scan.js";
 import { initTestMode } from "./testmode.js";
+import { createSurfacePanel } from "./ui-surface.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -27,7 +28,7 @@ const state = {
   req: { ...DEFAULT_REQ },       // mission needs
   cal: null,                     // year of landing-window data for the current site + needs
 };
-let globe = null, scan = null;
+let globe = null, scan = null, surface = null;
 
 // ---------- sizing ----------
 // Wide windows: lay the unit out at a design size and scale it to fit. Narrow windows: stacked layout.
@@ -193,6 +194,7 @@ function recompute({ keepIdx = false } = {}) {
   renderMission();
   renderMoment();
   scan?.refresh();
+  surface?.refresh();
   window.dispatchEvent(new Event("luno:state"));
 }
 
@@ -338,6 +340,7 @@ function renderMoment() {
   renderTimelineCursor();
   const sp = subPoints(cur.t);
   globe?.setBodies(sp.sun, sp.earth);
+  surface?.update();
 }
 
 // A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNO's.
@@ -545,6 +548,11 @@ async function init() {
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());
+  surface = createSurfacePanel({
+    getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
+    fmt: { site: siteName, stamp },
+  });
+  $("surface-btn").addEventListener("click", () => surface.toggle(true));
   buildNeeds();
   $("calendar").addEventListener("click", (e) => {
     const d = dayFromEvent($("calendar"), e, state.cal.days);
@@ -570,6 +578,8 @@ async function init() {
     else if (k === "p" || k === "P") pinCurrent();
     else if (k === "n" || k === "N") nextWindow();
     else if (k === "a" || k === "A") scan.toggle();
+    else if (k === "v" || k === "V") surface.toggle();
+    else if (k === "Escape" && surface.isOpen()) surface.toggle(false);
     else if (k === "Escape" && scan.isOpen()) scan.toggle(false);
     else if (k === "Home") setIdx(0);
     else return;

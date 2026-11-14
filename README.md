@@ -19,6 +19,9 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   the next windows, and a NEXT WINDOW key.
 - **Area scan:** checks a grid of points around the site (in Web Workers) against the needs and maps where sunlight and
   Earth link are best; click a cell to move the site there.
+- **3D surface view:** stand at the site and look around. The ground is built from LOLA elevation data (40 m detail
+  near the polar presets, coarser out to 260 km, with the Moon's curvature), lit from the Sun's real direction with cast
+  shadows, and LUNO's calculated skyline is drawn over it as a check. Detail settings from LOW to ULTRA.
 - **Eclipses and partial Sun:** eclipses (Earth in front of the Sun) are detected and flagged on the verdict, the
   timeline and the Sun readout; the Sun readout shows the share of the disc in view when it is partly hidden.
 - **Sun and Earth positions:** NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
@@ -48,6 +51,7 @@ pip install spiceypy numpy
 tools/fetch_kernels.sh && python3 tools/build_ephemeris.py      # Sun/Earth table
 tools/fetch_dem.sh && python3 tools/build_horizons.py           # terrain skylines (downloads about 620 MB)
 python3 tools/build_web_dem.py                                  # reduced maps for custom points
+python3 tools/build_patches.py                                  # detailed patches for the 3D surface view
 python3 tools/find_best_lit.py -86.0 0.0 5 200                  # best-lit point near a rough region center
 python3 tools/fetch_horizons_fixtures.py                        # refresh the JPL Horizons reference values
 ```

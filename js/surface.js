@@ -29,7 +29,7 @@ function buildSheet(site, h0, half, n, hole, sample) {
       let h = sample(lat2, lon2); if (!Number.isFinite(h)) h = h0;
       const rr = R + h, hz = rr * Math.sin(ang);
       pos[p] = hz * Math.sin(a); pos[p + 1] = rr * Math.cos(ang) - (R + h0); pos[p + 2] = -hz * Math.cos(a);
-      uv[q] = east / 60; uv[q + 1] = north / 60;
+      uv[q] = east / 9; uv[q + 1] = north / 9;
     }
   }
   const idx = [];
@@ -105,7 +105,7 @@ export async function createSurfaceView(container, { site, quality = "medium", e
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
   const camera = new THREE.PerspectiveCamera(60, 1, 1, 720e3);
   const bump = noiseTexture();
-  const ground = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0, bumpMap: bump, bumpScale: 0.6 });
+  const ground = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0, bumpMap: bump, bumpScale: 0.12 });
   const groundFar = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0 });
   sheets.forEach((s, k) => {
     const m = new THREE.Mesh(buildSheet(site, h0, s.half, s.n, k ? sheets[k - 1].half : 0, s.sample), k ? groundFar : ground);

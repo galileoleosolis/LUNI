@@ -262,6 +262,28 @@ input[type=number] { font-size: 14px; }
 .mini { font-size: 11.5px; margin-top: 0; }
 .horizon { margin-bottom: 10px; }
 
+/* 3D surface view: covers the three columns */
+.cols { position: relative; }
+.surface { position: absolute; inset: 0; z-index: 8; background: #000; }
+.surface[hidden] { display: none; }
+.surface:fullscreen { inset: 0; width: 100vw; height: 100vh; font-family: var(--mono); color: var(--amb); font-size: 14px; }
+.sv-canvas { position: absolute; inset: 0; }
+.sv-top { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 16px; padding: 8px 10px; background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,0)); pointer-events: none; font-size: 12px; }
+.sv-top > * { pointer-events: auto; }
+.sv-top b { color: var(--wht); margin-right: 12px; }
+.sv-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; color: var(--dim); font-size: 11px; }
+.sv-ctl .seg button { font-size: 11.5px; padding: 2px 6px; min-width: 0; background: rgba(0,0,0,.6); }
+.sv-ctl .seg button.on { background: var(--amb); }
+.sv-ctl > button, .mini-btn { background: rgba(0,0,0,.6); color: var(--wht); border: 1px solid var(--dim); font: inherit; font-size: 11.5px; padding: 2px 8px; cursor: pointer; white-space: nowrap; }
+.sv-ctl > button:hover, .mini-btn:hover { background: var(--wht); color: #000; }
+.mini-btn { flex: none; background: var(--wht); color: #000; border-color: var(--wht); font-weight: 600; }
+.sv-status { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #000; border: 1px solid var(--amb); padding: 10px 18px; color: var(--wht); font-weight: 600; }
+.sv-bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 10px 7px; background: linear-gradient(0deg, rgba(0,0,0,.75), rgba(0,0,0,0)); font-size: 11px; line-height: 1.5; color: var(--amb); pointer-events: none; }
+#sv-look { color: var(--wht); font-size: 12px; }
+#sv-info { color: var(--dim); }
+.sv-key { color: var(--dim); } .sv-key i { display: inline-block; width: 22px; border-top: 2px solid #35d6c4; vertical-align: middle; margin-right: 4px; }
+html.flow .surface { position: fixed; }
+
 /* right column */
 .need { font-size: 12px; letter-spacing: .04em; }
 .seg button { font-size: 13px; padding: 3px 6px; min-width: 30px; }
