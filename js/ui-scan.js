@@ -6,8 +6,8 @@ import { mapResFor } from "./terrain.js";
 
 const $ = (id) => document.getElementById(id);
 const METRICS = {
-  sun:   { label: "SUNLIGHT", unit: "% OF MISSION IN SUNLIGHT", value: (c) => c.sunPct, ramp: [[18, 12, 2], [255, 176, 0], [255, 244, 200]] },
-  earth: { label: "EARTH LINK", unit: "% OF MISSION WITH EARTH IN VIEW", value: (c) => c.earthPct, ramp: [[4, 14, 22], [40, 130, 190], [190, 235, 255]] },
+  sun:   { label: "SUNLIGHT", ends: ["DARK = NO SUNLIGHT", "BRIGHT = ALWAYS SUNLIT"], unit: "% OF MISSION IN SUNLIGHT", value: (c) => c.sunPct, ramp: [[18, 12, 2], [255, 176, 0], [255, 244, 200]] },
+  earth: { label: "EARTH LINK", ends: ["DARK = NO EARTH LINK", "BRIGHT = ALWAYS IN VIEW"], unit: "% OF MISSION WITH EARTH IN VIEW", value: (c) => c.earthPct, ramp: [[4, 14, 22], [40, 130, 190], [190, 235, 255]] },
   needs: { label: "MEETS NEEDS", unit: "", value: (c) => (c.ok ? 100 : 0), ramp: null },
 };
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -16,8 +16,19 @@ function rampColor(ramp, v) {            // v in 0..100
   return ramp[k].map((x, i) => Math.round(lerp(x, ramp[k + 1][i], f)));
 }
 
+const GO_RGB = [33, 224, 122], NOGO_RGB = [70, 14, 14];
+
 export function createScanPanel({ getContext, onPick, fmt }) {
   const panel = $("scan"), canvas = $("scan-canvas"), ctx = canvas.getContext("2d");
+  const tile = document.createElement("canvas"), tctx = tile.getContext("2d");
+  // BIG MAP: the panel moves from the middle column to the whole screen area, and back.
+  const home = panel.parentElement, wide = document.querySelector(".cols");
+  const setBig = (on) => {
+    (on ? wide : home).appendChild(panel); panel.classList.toggle("big", on);
+    $("scan-big").textContent = on ? "⤡ SMALL MAP" : "⤢ BIG MAP"; $("scan-big").classList.toggle("on", on);
+    try { localStorage.setItem("luno-scan-big", on ? "1" : ""); } catch {}
+    schedule();
+  };
   let st = { metric: "sun", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null, engine: "" };
   // The graphics chip, if this computer has a usable one: made on first use, dropped for good if it ever fails a check.
   let gpu;
@@ -85,15 +96,20 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
 
+    // One image pixel per scan point, then stretched: quick even for tens of thousands of points.
+    if (tile.width !== n) tile.width = tile.height = n;
+    const img = tctx.createImageData(n, n), px = img.data, inv = 1 / (st.grid.stepM * 1.6);
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) {
-      const c = st.cells[r * n + k]; if (!c) continue;
-      let rgb = m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? [33, 224, 122] : [70, 14, 14];
+      const c = st.cells[r * n + k], o = (r * n + k) * 4;
+      if (!c) { px[o] = 5; px[o + 1] = 4; px[o + 2] = 2; px[o + 3] = 255; continue; }
+      const rgb = m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? GO_RGB : NOGO_RGB;
       // light hill shading from the neighbors' heights, so ridges and crater walls show through the colors
       const w = H(r, k - 1) ?? c.heightM, e = H(r, k + 1) ?? c.heightM, no = H(r - 1, k) ?? c.heightM, so = H(r + 1, k) ?? c.heightM;
-      const shade = Math.max(0.72, Math.min(1.18, 1 + ((w - e) + (no - so)) / (st.grid.stepM * 1.6)));
-      ctx.fillStyle = `rgb(${rgb.map((x) => Math.min(255, Math.round(x * shade))).join(",")})`;
-      ctx.fillRect(k * cw, r * cw, cw + 0.5, cw + 0.5);
+      const shade = Math.max(0.72, Math.min(1.18, 1 + ((w - e) + (no - so)) * inv));
+      px[o] = Math.min(255, rgb[0] * shade); px[o + 1] = Math.min(255, rgb[1] * shade); px[o + 2] = Math.min(255, rgb[2] * shade); px[o + 3] = 255;
     }
+    tctx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(tile, 0, 0, size, size);
     ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1;
     if (cw >= 7) for (let i = 1; i < n; i++) { ctx.beginPath(); ctx.moveTo(i * cw, 0); ctx.lineTo(i * cw, size); ctx.moveTo(0, i * cw); ctx.lineTo(size, i * cw); ctx.stroke(); }
 
@@ -103,6 +119,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       if (star) { ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, m * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
       else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
+    // distance bar, bottom left: a round number of km close to a fifth of the map
+    const across = st.grid.radiusKm * 2 * (n / (n - 1)), barKm = [50, 20, 10, 5, 2, 1, 0.5, 0.2].find((v) => v <= across / 4.5) || 0.2, barPx = barKm / across * size;
+    ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.fillRect(8, size - 30, Math.max(barPx, 46) + 12, 23);
+    ctx.fillStyle = "#fff"; ctx.fillRect(14, size - 14, barPx, 3); ctx.fillRect(14, size - 18, 1.5, 7); ctx.fillRect(14 + barPx - 1.5, size - 18, 1.5, 7);
+    ctx.font = "600 10px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(`${barKm} KM`, 14, size - 19);
     const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
     if (best && st.done === st.total) mark(best, "#000", true), mark(best, "#fff", true);
     mark(center, "#fff", false);
@@ -113,10 +134,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-progress").textContent = finished ? `${st.total.toLocaleString("en-US")} POINTS CHECKED${st.took ? " IN " + st.took + " S" : ""}` : `SCANNING ${st.done.toLocaleString("en-US")} / ${st.total.toLocaleString("en-US")}`;
     $("scan-engine").textContent = st.onChip ? `COMPUTED ON THE GRAPHICS CHIP (GPU)${chipName() ? ": " + chipName() : ""}` : "COMPUTED ON THE PROCESSOR";
     $("scan-progress").className = finished ? "ok" : "";
-    $("scan-scale").textContent = `${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ✛ = CURRENT SITE · ★ = BEST`;
+    const sq = st.grid.stepM / 1000, sqTxt = `${+sq.toFixed(2)} KM`;
+    $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ✛ = CURRENT SITE · ★ = BEST`;
     $("scan-legend").classList.toggle("flat", !m.ramp);
     $("scan-legend").innerHTML = m.ramp
-      ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span>`
+      ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span><div class="ends"><span>◀ ${m.ends[0]}</span><span>${m.ends[1]} ▶</span></div>`
       : `<b style="background:#21e07a"></b> MEETS THE MISSION NEEDS &nbsp; <b style="background:#460e0e"></b> DOES NOT`;
     const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? "" : "<br>" + c.reason}`;
     const cur = st.cells[center.r * n + center.k];
@@ -137,6 +159,8 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   canvas.addEventListener("click", (e) => { const c = cellAt(e); if (c) pick(c); });
   $("scan-go-best").addEventListener("click", () => { const b = bestCell(st.cells); if (b) pick(b); });
   $("scan-close").addEventListener("click", () => toggle(false));
+  $("scan-big").addEventListener("click", () => setBig(!panel.classList.contains("big")));
+  try { if (localStorage.getItem("luno-scan-big")) setBig(true); } catch {}
   buildSeg($("scan-metric"), Object.entries(METRICS).map(([k, v]) => [k, v.label]), () => st.metric, (v) => { st.metric = v; draw(); });
   new ResizeObserver(() => schedule()).observe(canvas.parentElement);
 

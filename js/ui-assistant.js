@@ -1,4 +1,5 @@
-// "ASK LUNO" panel: a command line you can type into or talk to, and LUNO's answer in text and speech.
+// "ASK LUNI" panel (LUNI = Lunar Utility Navigational Intelligence, the assistant inside the LUNO unit):
+// a command line you can type into or talk to, and LUNI's answer in text and speech.
 // Understanding the command is done on the unit (js/assistant.js). Turning speech into text is done by the browser:
 // on the device where the browser offers that, otherwise through the browser's online service. The panel says which.
 
@@ -7,7 +8,7 @@ import { PRESETS } from "./assistant-llm.js";
 
 const $ = (id) => document.getElementById(id);
 const SR = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
-const WAKE = /^\s*(?:hey |ok |okay |yo )?(?:luno|luna|lunar|loono|you know|uno)\b[\s,.:!]*/i;
+const WAKE = /^\s*(?:hey |ok |okay |yo )?(?:luni|lunie|luny|lunee|looney|loony|loonie|loonee|lunny|luno|luna|lunar|loono|you know|uno)\b[\s,.:!]*/i;      // LUNI, and what recognizers hear instead
 const TIPS = ["NEXT GOOD TIME", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BETTER SPOT", "HELP"];
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
@@ -32,7 +33,7 @@ export function createAssistantPanel({ assistant, model }) {
     });
     syncOpts(); note();
   }).catch(() => {});
-  // A press on TALK cuts LUNO off mid-sentence and listens straight away.
+  // A press on TALK cuts LUNI off mid-sentence and listens straight away.
   function hush() { globalThis.speechSynthesis?.cancel(); st.speaking = false; }
   function startDictation() { hush(); dict.start({ language: "en" }).catch((e) => { if (e?.code === "not_granted" || e?.code === "unavailable") { st.micBlocked = true; syncOpts(); note(); input.focus(); } }); }
 
@@ -42,7 +43,7 @@ export function createAssistantPanel({ assistant, model }) {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(forSpeech(text));
     u.lang = "en-US"; u.rate = 1.05;
-    // In hands-free mode the microphone would hear LUNO's own voice, so it waits until LUNO has finished.
+    // In hands-free mode the microphone would hear LUNI's own voice, so it waits until LUNI has finished.
     u.onstart = () => { st.speaking = true; if (st.hands) st.rec?.abort(); };
     u.onend = u.onerror = () => { setTimeout(() => { st.speaking = false; if (st.hands && !st.listening && !dict) listen(); }, 400); };
     speechSynthesis.speak(u);
@@ -123,7 +124,7 @@ export function createAssistantPanel({ assistant, model }) {
       : st.micBlocked ? "VOICE: THE MICROPHONE IS BLOCKED ON THIS PAGE. TYPE INSTEAD, OR ALLOW THE MICROPHONE AND RELOAD."
       : st.local ? "VOICE: SPEECH IS TURNED INTO TEXT ON THIS DEVICE."
       : "VOICE: THIS BROWSER USES ITS ONLINE SERVICE TO TURN SPEECH INTO TEXT.";
-    $("comms-note").textContent = `COMMANDS ARE UNDERSTOOD ON THIS UNIT, WITH NO EARTH LINK. ${voice}`;
+    $("comms-note").textContent = `LUNI = LUNAR UTILITY NAVIGATIONAL INTELLIGENCE. IT UNDERSTANDS COMMANDS ON THIS UNIT, WITH NO EARTH LINK. ${voice}`;
     $("comms-local").hidden = !st.canInstall;
   }
   // Prefer on-device speech recognition where the browser has it (no internet needed). Asked once, and only when
@@ -148,7 +149,7 @@ export function createAssistantPanel({ assistant, model }) {
   function setListening(on) {
     st.listening = on;
     mic.classList.toggle("on", on); key.classList.toggle("on", on || st.hands);
-    mic.textContent = on ? (st.hands ? "● LISTENING FOR “LUNO…”" : "● LISTENING… SPEAK NOW") : "● TALK";
+    mic.textContent = on ? (st.hands ? "● LISTENING FOR “LUNI…”" : "● LISTENING… SPEAK NOW") : "● TALK";
   }
   function heard(text) {
     if (!st.hands) return run(text, "voice");
@@ -185,7 +186,7 @@ export function createAssistantPanel({ assistant, model }) {
   // ---------- options ----------
   function syncOpts() {
     $("comms-voice").textContent = `SPOKEN ANSWERS ${st.speak ? "ON" : "OFF"}`; $("comms-voice").classList.toggle("on", st.speak);
-    $("comms-hands").textContent = `HANDS-FREE ${st.hands ? "ON · SAY “LUNO, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
+    $("comms-hands").textContent = `HANDS-FREE ${st.hands ? "ON · SAY “LUNI, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
     $("comms-hands").hidden = !canListen(); mic.classList.toggle("off", !canListen());
     key.classList.toggle("on", st.listening || st.hands);
   }
@@ -202,7 +203,7 @@ export function createAssistantPanel({ assistant, model }) {
     if (!show) { thinking?.abort(); thinking = null; st.hands = false; stopListening(); globalThis.speechSynthesis?.cancel(); syncOpts(); input.blur(); }
     else { note(); syncOpts(); }
   }
-  // T key / ASK LUNO key: open and listen (or put the cursor in the box when the browser cannot listen).
+  // T key / ASK LUNI key: open and listen (or put the cursor in the box when the browser cannot listen).
   function talk() {
     if (panel.hidden) toggle(true);
     if (!canListen()) input.focus();

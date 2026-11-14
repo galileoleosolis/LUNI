@@ -149,7 +149,7 @@ const FEATURES = {      // click targets -> the feature they belong to
   "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
   "launch-slip keys": /^slip/, "NEXT WINDOW": /^(next-window-btn|side-next)/, "AREA SCAN": /^(scan|side-scan)/, "mission needs": /^need:/,
   "verdict-block buttons": /^mission-/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
-  "ASK LUNO (typed or spoken commands)": /^(talk-btn|comms:|typed:|voice:)/,
+  "ASK LUNI (typed or spoken commands)": /^(talk-btn|comms:|typed:|voice:)/,
 };
 
 let T = null, api = null;       // T = test state, api = hooks from app.js

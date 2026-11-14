@@ -75,7 +75,7 @@
       <!-- CENTER: the answer -->
       <section class="col col-main">
         <div id="scan" class="scan" hidden>
-          <div class="scan-head"><span id="scan-title"></span><button id="scan-close" title="Close (Esc)">✕ CLOSE</button></div>
+          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-big" title="Use the whole screen for the map">⤢ BIG MAP</button><button id="scan-close" title="Close (Esc)">✕ CLOSE</button></span></div>
           <div class="scan-body">
             <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
             <div class="scan-side">
@@ -167,17 +167,17 @@
       </section>
     </div>
 
-    <!-- ASK LUNO: typed or spoken commands -->
+    <!-- ASK LUNI (Lunar Utility Navigational Intelligence): typed or spoken commands -->
     <div id="comms" class="comms" hidden>
       <div class="comms-row">
-        <button id="comms-mic" class="comms-mic" title="Talk to LUNO (T)">● TALK</button>
-        <input id="comms-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="160" placeholder="TYPE WHAT YOU WANT AND PRESS ENTER, OR PRESS TALK AND SAY IT" aria-label="Command for LUNO">
+        <button id="comms-mic" class="comms-mic" title="Talk to LUNI (T)">● TALK</button>
+        <input id="comms-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="160" placeholder="TYPE WHAT YOU WANT AND PRESS ENTER, OR PRESS TALK AND SAY IT" aria-label="Command for LUNI">
         <button id="comms-send" class="comms-opt">SEND ▸</button>
         <button id="comms-voice" class="comms-opt"></button>
-        <button id="comms-hands" class="comms-opt" title="Keeps listening. Start each command with the word LUNO."></button>
+        <button id="comms-hands" class="comms-opt" title="Keeps listening. Start each command with the word LUNI."></button>
         <button id="comms-close" class="comms-opt" title="Close (Esc)">✕ CLOSE</button>
       </div>
-      <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">Ask in plain words. Try one of these:</div></div>
+      <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">I am LUNI, the Lunar Utility Navigational Intelligence. Ask in plain words, or try one of these:</div></div>
       <div id="comms-tips" class="comms-tips"></div>
       <div id="comms-ai-row" class="comms-ai" hidden>
         <span>AI MODEL RUNNING ON THIS COMPUTER:</span>
@@ -198,7 +198,7 @@
     <button class="key" id="play-btn"><small>MISSION CLOCK</small><span id="play-label">▶ PLAY</span></button>
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
-    <button class="key c" id="talk-btn" title="Talk to LUNO (T). Type instead with the / key."><small>TALK OR TYPE</small>ASK LUNO</button>
+    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key."><small>TALK OR TYPE</small>ASK LUNI</button>
     <button class="key g" id="next-window-btn"><small>JUMP TO THE</small>NEXT GOOD TIME</button>
     <button class="key g" id="scan-btn"><small>FIND A NEARBY</small>BETTER SPOT</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>

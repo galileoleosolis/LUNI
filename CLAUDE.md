@@ -28,18 +28,22 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   map position as an offset from the point's own pixel, angles from height differences and 1 - cos, and
   azimuth sines from a texture (a chip's own sin/cos cost 0.003 deg). Measured here on an emulated chip only
   (SwiftShader): skylines within 0.001 deg of the processor, no verdict differing in 1,085 points. Real GPU speed
-  is not measured yet; the user has to try it.
+  is not measured yet in numbers; the user reports it is fast on a Core Ultra 9 275HX integrated chip and on the
+  sibling's discrete GPU. The scan panel has a BIG MAP toggle (the panel moves into `.cols`), scan sizes up to
+  60 km (241 x 241 points), a distance bar, and a legend saying what bright, dark and one square mean.
+  Finer than the 240 m map pixel is only real where 40 m data exists (`data/patch/`, the 7 polar presets): not built.
 - `js/surface.js`, `js/ui-surface.js` — 3D first-person surface view (three.js): nested terrain sheets from `data/patch/`
   (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNO skyline overlay at 2 m.
   On the preview page the patches are served as base64 text copies (see the artifact build step).
-- `js/assistant.js`, `js/ui-assistant.js` — ASK LUNO: typed or spoken commands. `parse` turns a sentence into tool calls
+- `js/assistant.js`, `js/ui-assistant.js` — ASK LUNI: typed or spoken commands. The assistant is named LUNI (Lunar
+  Utility Navigational Intelligence; the user's sibling's idea); the unit and the project stay LUNO. `parse` turns a sentence into tool calls
   (`TOOLS`, `runTool`), answers are built only from LUNO's own numbers. Rules, not a language model, so it works with no
   Earth link; the tool list is the hand-over point if a language model is added. The app side is `assistantApi` in
   `js/app.js`. Speech uses the browser (Web Speech API). Never call `SpeechRecognition.available()` at page load: it
   crashes headless test browsers; it runs only when someone first presses TALK.
 - `js/assistant-llm.js` — optional link to a language model running on the user's own computer (any server that
   speaks the OpenAI-style "chat completions with tools" protocol: Ollama, LM Studio, Lemonade, llama.cpp). Off until
-  the user connects it in the ASK LUNO panel. Exact commands stay with the rules; open questions (`isOpenQuestion`)
+  the user connects it in the ASK LUNI panel. Exact commands stay with the rules; open questions (`isOpenQuestion`)
   and anything the rules miss go to the model, which may only call LUNO's tools. Tested against a scripted stand-in
   server only; never with a real model. Hidden on the preview page (it cannot reach other addresses).
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
@@ -97,7 +101,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    month as a number and its year was slow to scroll; Moon zoom slightly too fast.
    Fixed since: the two shortcuts are repeated as buttons in the left column (`#side-scan` under the site list,
    `#side-next` under the landing time); the test's date answer is three pickers like the app's; zoom speed 1.9.
-   ASK LUNO (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
+   ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
    LUNO's side is built; still needed from the user: which program runs the model, which model, which chip, and a

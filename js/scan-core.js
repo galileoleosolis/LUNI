@@ -10,8 +10,8 @@ export const SCAN_AZ_STEP = 3;      // degrees between skyline samples during a 
 // fine = the skylines come from the graphics chip, which is fast enough for a point on every map pixel.
 export function scanOptions(lat, fine = false) {
   const res = mapResFor(lat);
-  if (fine && res <= 240) return [{ radiusKm: 2, n: 17 }, { radiusKm: 5, n: 41 }, { radiusKm: 15, n: 121 }, { radiusKm: 30, n: 121 }];
-  if (fine && res <= 960) return [{ radiusKm: 10, n: 21 }, { radiusKm: 25, n: 53 }, { radiusKm: 50, n: 105 }];
+  if (fine && res <= 240) return [{ radiusKm: 2, n: 17 }, { radiusKm: 5, n: 41 }, { radiusKm: 15, n: 121 }, { radiusKm: 30, n: 241 }, { radiusKm: 60, n: 241 }];
+  if (fine && res <= 960) return [{ radiusKm: 10, n: 21 }, { radiusKm: 25, n: 53 }, { radiusKm: 50, n: 105 }, { radiusKm: 100, n: 209 }];
   if (res <= 240) return [{ radiusKm: 2, n: 17 }, { radiusKm: 5, n: 21 }, { radiusKm: 15, n: 21 }];
   if (res <= 960) return [{ radiusKm: 10, n: 21 }, { radiusKm: 25, n: 21 }, { radiusKm: 50, n: 21 }];
   return [{ radiusKm: 40, n: 21 }, { radiusKm: 100, n: 21 }, { radiusKm: 250, n: 21 }];

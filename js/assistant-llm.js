@@ -9,7 +9,7 @@ import { TOOLS } from "./assistant.js";
 export const PRESETS = [["OLLAMA", "http://localhost:11434/v1"], ["LM STUDIO", "http://localhost:1234/v1"], ["LEMONADE", "http://localhost:8000/api/v1"]];
 const KEY = "luno-llm", MAX_ROUNDS = 12, TIMEOUT_MS = 90000;
 
-const SYSTEM = (sites, needs) => `You are the on-board assistant of LUNO, a lunar landing planning unit. You control LUNO only through the tools you are given.
+const SYSTEM = (sites, needs) => `You are LUNI (Lunar Utility Navigational Intelligence), the on-board assistant of LUNO, a lunar landing planning unit. You control LUNO only through the tools you are given.
 Rules:
 - Every number, date and GO / NO-GO you state must come from a tool result in this conversation. If the tools did not give it, say you do not have it. Never estimate.
 - To answer a question about a site, a time or the mission needs, set them with the tools first, then read the result. The "report" tool reads the current screen without changing it.

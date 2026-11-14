@@ -149,6 +149,9 @@ svg text { font-family: var(--mono); }
 .scan-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; border-bottom: 1px solid var(--dim); padding-bottom: 8px; color: var(--wht); font-weight: 600; text-transform: uppercase; }
 .scan-head button { background: none; border: 1px solid var(--dim); color: var(--amb); font: inherit; padding: 2px 8px; cursor: pointer; white-space: nowrap; }
 .scan-head button:hover { background: var(--faint); }
+.scan-head-btns { display: flex; gap: 8px; flex: none; } .scan-head button.on { border-color: var(--cy); color: var(--cy); }
+.scan.big { z-index: 7; padding-bottom: 10px; } .scan.big .scan-body { grid-template-columns: minmax(0, 1fr) 300px; }
+html.flow #scan-big { display: none; }
 .scan-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 16px; padding-top: 12px; }
 .scan-map { min-width: 0; min-height: 0; display: grid; place-items: center; }
 .scan-map canvas { border: 1px solid var(--dim); cursor: crosshair; image-rendering: pixelated; }
@@ -162,6 +165,8 @@ svg text { font-family: var(--mono); }
 .scan-legend i { grid-column: 1 / -1; height: 9px; display: block; }
 .scan-legend span:nth-child(3) { text-align: center; }
 .scan-legend b { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }
+.scan-legend .ends { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 8px; color: var(--amb); }
+#scan-scale b { color: var(--wht); font-weight: 600; }
 #scan-progress { margin-top: 8px; color: var(--key-y); font-weight: 600; } #scan-progress.ok { color: var(--grn); }
 .dimtxt { color: var(--dim); font-size: 10.5px; }
 .scan-cell { font-size: 11.5px; line-height: 1.5; color: var(--amb); min-height: 3em; }

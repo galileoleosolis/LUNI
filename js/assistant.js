@@ -1,4 +1,4 @@
-// LUNO's built-in command assistant. It turns a typed or spoken sentence into "tool calls" (the same actions the
+// LUNI (Lunar Utility Navigational Intelligence): the command assistant built into LUNO. It turns a typed or spoken sentence into "tool calls" (the same actions the
 // keys and buttons do) and writes a short answer from LUNO's own numbers. It is a fixed set of rules, not a
 // language model: it runs on the unit with no Earth link, and it never states anything LUNO did not compute.
 //
@@ -47,7 +47,7 @@ export const TOOLS = [
   { name: "pin", description: "Pin the current site and landing time to the compare list.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "report", description: "Read out LUNO's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, help.",
-    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "help"] } }, required: ["topic"], additionalProperties: false } },
+    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
 ];
 
 // ---------- understanding a sentence ----------
@@ -72,7 +72,7 @@ export function normalize(text) {
   }
   t = out.map((x) => (typeof x === "string" ? x : String(x.v))).join(" ");
   t = t.replace(/\b20 (\d{2})\b/g, "20$1").replace(/\b(\d+)(st|nd|rd|th)\b/g, "$1").replace(/\b(\d{1,2}) hundred(?: hours)?\b/g, "$1:00").replace(/\b(an?) (day|week|hour|month)\b/g, "1 $2");
-  t = t.replace(/^(?:(?:hey|ok|okay|yo) )?(?:luno|luna|lunar)\b/, "").replace(/\b(?:please|thanks|thank you)\b/g, " ");
+  t = t.replace(/^(?:(?:hey|ok|okay|yo) )?(?:luni|lunie|luny|looney|loony|loonie|luno|luna|lunar)\b/, "").replace(/\b(?:please|thanks|thank you)\b/g, " ");
   return t.replace(/\s+/g, " ").trim();
 }
 
@@ -112,6 +112,7 @@ export function parse(text, sites = []) {
   let m;
 
   if (/^ (help|commands|examples|what can (i|you|we) (say|do|ask)|what do you (do|understand)) /.test(t)) return [{ tool: "report", input: { topic: "help" } }];
+  if (/^ (who|what) are you |^ what(?: is| s| does) (?:your name|luni|luno)(?: stand for| mean)? |^ (?:your )?name /.test(t)) return [{ tool: "report", input: { topic: "who" } }];
 
   // --- where ---
   if ((m = take(/\b(?:lat(?:itude)?) (minus |-)?(\d+(?:\.\d+)?)(?: degrees?)?(?: (north|south|n|s))?(?: and)? (?:lon(?:g|gitude)?) (minus |-)?(\d+(?:\.\d+)?)(?: degrees?)?(?: (east|west|e|w))?\b/))
@@ -273,6 +274,7 @@ export function createAssistant(api) {
     if (!s.options.length) return "No simple way to a GO from here. Try another site.";
     return "Ways to get a GO: " + s.options.map((o, i) => `${i + 1}: ${o.toLowerCase()}`).join(". ") + `. Say OPTION ${s.options.map((_, i) => i + 1).join(" or ")}.`;
   }
+  const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence: the assistant built into this LUNO unit. I work its controls and read out its numbers.";
   const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
@@ -356,7 +358,7 @@ export function createAssistant(api) {
       }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "report":
-        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP,
+        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO,
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
           eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
           time: () => `Landing time ${stamp(s.t0)}. The mission clock shows ${s.idx ? dur(s.idx) + " after landing, " + stamp(s.cur.t) : "the landing time"}.` }[input.topic]?.(s) ?? HELP };
