@@ -65,8 +65,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   procedural Earth with a glow, name tags that follow the Sun and Earth, the lander's dish aimed at Earth and its
   panels at the Sun. Everything smaller than the 40 m data is illustrative and the view says so on screen.
   The user approved it from the picture ("put it on") and it is on the preview page and in `next/`.
-- Built late on 14 Nov ("do them all", after the rubric talk). **On `main` only until the user says "go"**: the user
-  was doing a demo and asked for nothing to be published (not the preview page, not `next/`, not the public site).
+- Built late on 14 Nov ("do them all", after the rubric talk). The user said "go" for the pre-release only: it is on
+  the preview page (Version 33) and in `next/` (main 2156736). **Not released**: the public site is still r2.
   - `js/stories.js` — real landings with sourced facts (IM-2, Blue Ghost 1, Chandrayaan-3). LUNI **opens on IM-2
     Athena, 6 Mar 2025 17:00 UTC** (`OPENING`), with a one-line story strip (`#story`, `renderStory` in `js/app.js`)
     shown only while the site and landing hour match a story. Facts were checked by web search on 14 Nov; do not add a
