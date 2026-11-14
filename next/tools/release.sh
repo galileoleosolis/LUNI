@@ -38,6 +38,6 @@ git -C "$tmp" add -A
 if git -C "$tmp" diff --cached --quiet; then echo "nothing to publish: release already has $short"; exit 0; fi
 n=$(git log --format=%s origin/release 2>/dev/null | sed -n 's/^Release r\([0-9]*\) .*/\1/p' | sort -n | tail -1); n=${n:-0}
 if [[ "$mode" == "promote" ]]; then n=$((n + 1)); msg="Release r$n from main $short"; else msg="Work in progress (next/) from main $short"; fi
-git -C "$tmp" -c user.name="LUNO team" -c user.email="luno@users.noreply.github.com" commit -q -m "$msg"
+git -C "$tmp" -c user.name="LUNI team" -c user.email="luno@users.noreply.github.com" commit -q -m "$msg"
 git push -q origin "$(git -C "$tmp" rev-parse HEAD):refs/heads/release"
 echo "$msg -> pushed to the release branch"

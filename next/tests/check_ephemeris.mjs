@@ -1,4 +1,4 @@
-// Compare LUNO's Sun/Earth azimuth and elevation with JPL Horizons reference values.
+// Compare LUNI's Sun/Earth azimuth and elevation with JPL Horizons reference values.
 // Run: node tests/check_ephemeris.mjs
 import { readFileSync } from "node:fs";
 import { initEphemeris, siteFrame, sunEarthAltAz } from "../js/ephem.js";

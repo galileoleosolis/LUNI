@@ -1,6 +1,12 @@
-# LUNO — project notes for Claude
+# LUNI — project notes for Claude
 
-LUNO (Lunar Utility for Navigational Operations) is a team entry for the NASA Space Apps Challenge 2026,
+**Name:** the product is **LUNI, Lunar Utility Navigational Intelligence** (renamed by the user on 14 Nov 2026 from
+LUNO, "Lunar Utility for Navigational Operations"; the idea came from the sibling). Everything a person can read says
+LUNI. Internal names were left alone on purpose and still say LUNO: `window.LUNO_B64`, `LUNO_TEST`, `LUNO_NO_GPU`,
+the `luno:state` / `luno:command` events, the `luno-*` storage keys, the artifact file `luno.html`, and the pictures
+in `docs/figures/`. Do not "fix" those in passing; a rename there has to be done everywhere at once.
+
+LUNI (Lunar Utility Navigational Intelligence) is a team entry for the NASA Space Apps Challenge 2026,
 challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to Sun 15 Nov 2026 23:59 local time.
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
@@ -33,21 +39,20 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   60 km (241 x 241 points), a distance bar, and a legend saying what bright, dark and one square mean.
   Finer than the 240 m map pixel is only real where 40 m data exists (`data/patch/`, the 7 polar presets): not built.
 - `js/surface.js`, `js/ui-surface.js` — 3D first-person surface view (three.js): nested terrain sheets from `data/patch/`
-  (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNO skyline overlay at 2 m.
+  (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNI skyline overlay at 2 m.
   On the preview page the patches are served as base64 text copies (see the artifact build step).
-- `js/assistant.js`, `js/ui-assistant.js` — ASK LUNI: typed or spoken commands. The assistant is named LUNI (Lunar
-  Utility Navigational Intelligence; the user's sibling's idea); the unit and the project stay LUNO. `parse` turns a sentence into tool calls
-  (`TOOLS`, `runTool`), answers are built only from LUNO's own numbers. Rules, not a language model, so it works with no
+- `js/assistant.js`, `js/ui-assistant.js` — ASK LUNI: typed or spoken commands. The whole product is named LUNI now, so "ASK LUNI" is talking to the unit itself. `parse` turns a sentence into tool calls
+  (`TOOLS`, `runTool`), answers are built only from LUNI's own numbers. Rules, not a language model, so it works with no
   Earth link; the tool list is the hand-over point if a language model is added. The app side is `assistantApi` in
   `js/app.js`. Speech uses the browser (Web Speech API). Never call `SpeechRecognition.available()` at page load: it
   crashes headless test browsers; it runs only when someone first presses TALK.
 - `js/assistant-llm.js` — optional link to a language model running on the user's own computer (any server that
   speaks the OpenAI-style "chat completions with tools" protocol: Ollama, LM Studio, Lemonade, llama.cpp). Off until
   the user connects it in the ASK LUNI panel. Exact commands stay with the rules; open questions (`isOpenQuestion`)
-  and anything the rules miss go to the model, which may only call LUNO's tools. Tested against a scripted stand-in
+  and anything the rules miss go to the model, which may only call LUNI's tools. Tested against a scripted stand-in
   server only; never with a real model. Hidden on the preview page (it cannot reach other addresses).
 - `js/openspace.js` — optional link to OpenSpace on the same computer (WebSocket, port 4682, the protocol of
-  openspace-api-js 1.0.2: an `apiHandshake`, then `luascript` messages). OpenSpace follows LUNO's site
+  openspace-api-js 1.0.2: an `apiHandshake`, then `luascript` messages). OpenSpace follows LUNI's site
   (`flyToGeo("Moon", lat, lon, height)`, navigation or globebrowsing library, whichever exists) and mission clock
   (`time.setTime`). Send-only. Tested against a stand-in server only, never against real OpenSpace. Hidden on the
   preview page.
@@ -89,8 +94,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
-3. OpenSpace link: LUNO's side is built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column). Still to do:
-   the user tries it with real OpenSpace, with LUNO opened from their own computer or GitHub Pages (not the preview).
+3. OpenSpace link: LUNI's side is built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column). Still to do:
+   the user tries it with real OpenSpace, with LUNI opened from their own computer or GitHub Pages (not the preview).
    Likely trouble spots: the camera height and facing after `flyToGeo`, and the browser asking for local-network access.
 4. Windows .exe wrapper (Electron) if still wanted.
 5. Test mode is built (`js/testmode.js`, on with `#test` or `window.LUNO_TEST`): intro, six tasks, local usage log,
@@ -116,7 +121,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    month as a number and its year was slow to scroll; Moon zoom slightly too fast.
    Fixed since: the two shortcuts are repeated as buttons in the left column (`#side-scan` under the site list,
    `#side-next` under the landing time); the test's date answer is three pickers like the app's; zoom speed 1.9.
-   The user's own run (15 Nov, big screen about 2000 x 1250): "the landing site selection is very hidden, and
+   The user's own look (14 Nov, big screen about 2000 x 1250): "the landing site selection is very hidden, and
    everything is very big". Fixed since: `fitStage` gives a tall window a taller layout (up to `dhMax`) before it
    magnifies; the left column now starts with the site list (framed, with a "more sites" marker), the Moon sits under
    it, and the two shortcut buttons live in the step 1 and step 2 headers (`#side-scan`, `#side-next`). Sites visible
@@ -128,7 +133,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    the site from the scan he was not sure it had moved. Fixed since: a refused microphone says so in the answer
    line and the button reads NO MICROPHONE · TYPE; the better-spot button sits on the Moon picture; moving the site
    from the scan shows a fading confirmation with distance and direction (`toast` in `js/app.js`).
-   The user (15 Nov) had only just discovered the mission-clock slider and said it and the Moon must be far more
+   The user (14 Nov) had only just discovered the mission-clock slider and said it and the Moon must be far more
    obvious. Fixed since: the 30-day chart has a labeled slider rail with a large handle that shows the moment it
    stands on and pulses until first used; the Moon box says DRAG / SCROLL / CLICK and has a BIG MOON button that
    moves it over the middle column (`setBigMoon` in `js/app.js`), with a short GO / NO-GO tag on it.
@@ -141,9 +146,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    while open, labeled SCAN FOR BETTER SPOT. All "find a better spot" buttons use that wording.
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
-   restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
-   LUNO's side is built; still needed from the user: which program runs the model, which model, which chip, and a
-   test with LUNO opened from the laptop itself (localhost or GitHub Pages; Ollama needs OLLAMA_ORIGINS for Pages).
+   restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNI).
+   LUNI's side is built; still needed from the user: which program runs the model, which model, which chip, and a
+   test with LUNI opened from the laptop itself (localhost or GitHub Pages; Ollama needs OLLAMA_ORIGINS for Pages).
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
-   Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).
+   Artemis III candidate regions (current polar presets are LUNI-selected best-lit points near rough centers).

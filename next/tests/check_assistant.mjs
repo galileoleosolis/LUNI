@@ -15,7 +15,7 @@ const site = (id) => ["select_site", { id }], need = (k, value) => ["set_mission
 
 // where
 expect("go to Shackleton", [site("shackleton")]);
-expect("Hey LUNO, select the Malapert Massif please.", [site("malapert")]);
+expect("Hey LUNI, select the Malapert Massif please.", [site("malapert")]);
 expect("Luni, go to Haworth", [site("haworth")]);
 expect("looney next good time", [["next_good_time", {}]]);
 expect("who are you", [rep("who")]);
@@ -138,7 +138,7 @@ check("site change answers GO", fake.site.id === "malapert" && /GO for a 10-day 
 
 check("speech text", forSpeech("NO-GO. Landing 14 JAN 2027 05:00 UTC, height −1.2°") === "no go. Landing 14 January 2027 5 hundred U T C, height minus 1.2°", forSpeech("NO-GO. Landing 14 JAN 2027 05:00 UTC, height −1.2°"));
 check("durations", dur(133) === "5 days 13 hours" && dur(24) === "1 day" && dur(1) === "1 hour");
-check("normalize", normalize("Okay LUNO, twenty-five days!") === "25 days", normalize("Okay LUNO, twenty-five days!"));
+check("normalize", normalize("Okay LUNI, twenty-five days!") === "25 days", normalize("Okay LUNI, twenty-five days!"));
 check("every tool has a schema", TOOLS.every((t) => t.name && t.description && t.input_schema?.type === "object"));
 
 console.log(fail ? `${fail} of ${n} checks FAILED` : `All ${n} assistant checks passed`);

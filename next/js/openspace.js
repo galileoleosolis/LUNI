@@ -1,6 +1,6 @@
-// Optional link to OpenSpace (openspaceproject.com) running on the same computer: OpenSpace follows LUNO's site
-// and time, so its rendered Moon, Sun and Earth show the moment LUNO is judging. LUNO only sends; it reads nothing
-// back, and OpenSpace's picture is a companion view, not a check of LUNO's numbers.
+// Optional link to OpenSpace (openspaceproject.com) running on the same computer: OpenSpace follows LUNI's site
+// and time, so its rendered Moon, Sun and Earth show the moment LUNI is judging. LUNI only sends; it reads nothing
+// back, and OpenSpace's picture is a companion view, not a check of LUNI's numbers.
 //
 // Protocol (same as OpenSpace's own openspace-api-js 1.0.2): a WebSocket on port 4682, an "apiHandshake" message,
 // then { topic, type: "luascript", payload: { script } } messages. Nothing here runs until the user presses the button.
@@ -19,7 +19,7 @@ export function createOpenSpaceLink({ onStatus }) {
     status("connecting", "LOOKING FOR OPENSPACE ON THIS COMPUTER…");
     let s;
     try { s = new WebSocket(`ws://localhost:${PORT}${paths[0]}`); }
-    catch { return status("off", "THIS PAGE IS NOT ALLOWED TO REACH PROGRAMS ON THIS COMPUTER. OPEN LUNO FROM THIS COMPUTER INSTEAD."); }
+    catch { return status("off", "THIS PAGE IS NOT ALLOWED TO REACH PROGRAMS ON THIS COMPUTER. OPEN LUNI FROM THIS COMPUTER INSTEAD."); }
     let opened = false;
     s.onopen = () => {
       opened = true; ws = s; sent = { site: "", time: "", alt: 0 };
@@ -36,7 +36,7 @@ export function createOpenSpaceLink({ onStatus }) {
   }
   function disconnect(quiet) { const s = ws; ws = null; try { s?.close(); } catch {} if (!quiet) status("off", "OFF."); }
 
-  // What LUNO is showing now: { site: { lat, lon }, t: Date }. Sent at most 8 times a second (PLAY moves the clock fast).
+  // What LUNI is showing now: { site: { lat, lon }, t: Date }. Sent at most 8 times a second (PLAY moves the clock fast).
   function update(state) { pending = state; if (ws && !timer) timer = setTimeout(() => { timer = 0; flush(); }, 120); }
   function flush() {
     if (!ws || ws.readyState !== 1 || !pending) return;

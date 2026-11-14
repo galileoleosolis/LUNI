@@ -1,9 +1,9 @@
-// LUNI (Lunar Utility Navigational Intelligence): the command assistant built into LUNO. It turns a typed or spoken sentence into "tool calls" (the same actions the
-// keys and buttons do) and writes a short answer from LUNO's own numbers. It is a fixed set of rules, not a
-// language model: it runs on the unit with no Earth link, and it never states anything LUNO did not compute.
+// LUNI's command assistant (LUNI = Lunar Utility Navigational Intelligence, the name of the whole unit). It turns a typed or spoken sentence into "tool calls" (the same actions the
+// keys and buttons do) and writes a short answer from LUNI's own numbers. It is a fixed set of rules, not a
+// language model: it runs on the unit with no Earth link, and it never states anything LUNI did not compute.
 //
 // The tool list (TOOLS + runTool) is also the hand-over point for a language model: a model that can call these
-// tools can drive LUNO the same way.
+// tools can drive LUNI the same way.
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 const MONTH_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -22,9 +22,9 @@ const COMPASS = ["north", "northeast", "east", "southeast", "south", "southwest"
 const compass = (az) => COMPASS[Math.round((((az % 360) + 360) % 360) / 45) % 8];
 const deg = (v) => `${v <= -0.05 ? "−" : ""}${Math.abs(v).toFixed(1)}°`;
 
-// What a language model (or anything else) can ask LUNO to do.
+// What a language model (or anything else) can ask LUNI to do.
 export const TOOLS = [
-  { name: "select_site", description: "Select one of LUNO's preset landing sites by id, or by its number in the site list (1 = first).",
+  { name: "select_site", description: "Select one of LUNI's preset landing sites by id, or by its number in the site list (1 = first).",
     input_schema: { type: "object", properties: { id: { type: "string" }, number: { type: "integer" } }, additionalProperties: false } },
   { name: "select_point", description: "Select a custom point on the Moon. Latitude in degrees (south negative), longitude in degrees east (west negative).",
     input_schema: { type: "object", properties: { lat: { type: "number" }, lon: { type: "number" } }, required: ["lat", "lon"], additionalProperties: false } },
@@ -42,11 +42,11 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { to_hours: { type: "number" }, by_hours: { type: "number" }, play: { type: "boolean" } }, additionalProperties: false } },
   { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view) or 'main' (close both).",
     input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "main"] } }, required: ["view"], additionalProperties: false } },
-  { name: "take_option", description: "After a NO-GO, LUNO offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
+  { name: "take_option", description: "After a NO-GO, LUNI offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
     input_schema: { type: "object", properties: { number: { type: "integer" }, best_point: { type: "boolean" } }, additionalProperties: false } },
   { name: "pin", description: "Pin the current site and landing time to the compare list.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
-  { name: "report", description: "Read out LUNO's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, help.",
+  { name: "report", description: "Read out LUNI's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, help.",
     input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
 ];
 
@@ -199,7 +199,7 @@ export function parse(text, sites = []) {
 
   // --- questions ---
   const q = (re) => re.test(t);
-  if (q(/\b(?:go to|select|switch to|fly to|land at|take me to|move to)\b/) || q(/\b(?:which|what|list)(?: are)?(?: the)? sites\b/)) call("report", { topic: "sites" });   // a place LUNO does not know, or asking for the list
+  if (q(/\b(?:go to|select|switch to|fly to|land at|take me to|move to)\b/) || q(/\b(?:which|what|list)(?: are)?(?: the)? sites\b/)) call("report", { topic: "sites" });   // a place LUNI does not know, or asking for the list
   else if (q(/\beclipse/)) call("report", { topic: "eclipse" });
   else if (q(/\bhow (?:do|can|could|would) (?:i|we) (?:get|make|fix|turn)\b|\bwhat (?:can|could|should) (?:i|we) (?:do|change|try)\b|\bways\b|\bfix (?:it|this)\b|\boptions\b|\bsuggest/)) call("report", { topic: "options" });
   else if (q(/\bwhy\b|\bwhat s wrong\b|\bwhat is wrong\b|\breasons?\b|\bproblem\b/)) call("report", { topic: "status" });
@@ -274,7 +274,7 @@ export function createAssistant(api) {
     if (!s.options.length) return "No simple way to a GO from here. Try another site.";
     return "Ways to get a GO: " + s.options.map((o, i) => `${i + 1}: ${o.toLowerCase()}`).join(". ") + `. Say OPTION ${s.options.map((_, i) => i + 1).join(" or ")}.`;
   }
-  const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence: the assistant built into this LUNO unit. I work its controls and read out its numbers.";
+  const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
   const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
@@ -307,7 +307,7 @@ export function createAssistant(api) {
         t.setUTCMinutes(0, 0, 0);
         api.setT0(t);
         const got = snap().t0;
-        return { say: +got === +t ? `Landing set to ${stamp(got)}.` : `LUNO's Sun and Earth data runs from ${day(s.coverage.start)} to ${day(s.coverage.last)}. Landing set to ${stamp(got)}.`, changed: true };
+        return { say: +got === +t ? `Landing set to ${stamp(got)}.` : `The Sun and Earth data on this unit runs from ${day(s.coverage.start)} to ${day(s.coverage.last)}. Landing set to ${stamp(got)}.`, changed: true };
       }
       case "shift_landing_time": {
         api.setT0(new Date(+s.t0 + input.hours * 3600000));
@@ -321,7 +321,7 @@ export function createAssistant(api) {
       case "set_mission_need": {
         const k = input.need, opts = api.needOptions();
         if (k === "earthAtLanding") { const on = input.required ?? !!input.value; api.setReq(k, on); return { say: `Earth link at landing: ${on ? "required" : "not required"}.`, changed: true }; }
-        if (!opts[k]) return { say: "LUNO has no such mission need." };
+        if (!opts[k]) return { say: "There is no such mission need." };
         let v = input.value;
         if (input.step) {
           const i = opts[k].indexOf(s.req[k]) + Math.sign(input.step);
@@ -362,7 +362,7 @@ export function createAssistant(api) {
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
           eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
           time: () => `Landing time ${stamp(s.t0)}. The mission clock shows ${s.idx ? dur(s.idx) + " after landing, " + stamp(s.cur.t) : "the landing time"}.` }[input.topic]?.(s) ?? HELP };
-      default: return { say: `LUNO has no tool called ${tool}.` };
+      default: return { say: `There is no tool called ${tool}.` };
     }
   }
 

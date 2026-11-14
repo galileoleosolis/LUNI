@@ -1,4 +1,4 @@
-// "ASK LUNI" panel (LUNI = Lunar Utility Navigational Intelligence, the assistant inside the LUNO unit):
+// "ASK LUNI" panel (LUNI = Lunar Utility Navigational Intelligence):
 // a command line you can type into or talk to, and LUNI's answer in text and speech.
 // Understanding the command is done on the unit (js/assistant.js). Turning speech into text is done by the browser:
 // on the device where the browser offers that, otherwise through the browser's online service. The panel says which.
@@ -74,7 +74,7 @@ export function createAssistantPanel({ assistant, model }) {
     const ctl = thinking = new AbortController(), out = $("comms-reply"), name = model.config.model;
     out.classList.remove("bad"); out.textContent = "Asking the AI model on this computer…"; $("comms-tips").hidden = true;
     model.ask(text, { signal: ctl.signal, onStep: (tool, n) => { if (thinking === ctl) out.textContent = `Asking the AI model on this computer… step ${n}: ${tool.replace(/_/g, " ")}`; } })
-      .then((a) => { if (thinking === ctl) show(text, { ok: true, reply: a.reply, calls: a.tools }, via, `ANSWER FROM THE AI MODEL ON THIS COMPUTER (${name}) · ` + (a.tools.length ? `IT WORKED LUNO'S CONTROLS ${a.tools.length} TIME${a.tools.length === 1 ? "" : "S"} · THE SCREEN HAS THE EXACT NUMBERS` : "IT DID NOT USE LUNO'S CONTROLS, SO THIS IS NOT FROM LUNO'S DATA")); })
+      .then((a) => { if (thinking === ctl) show(text, { ok: true, reply: a.reply, calls: a.tools }, via, `ANSWER FROM THE AI MODEL ON THIS COMPUTER (${name}) · ` + (a.tools.length ? `IT WORKED LUNI'S CONTROLS ${a.tools.length} TIME${a.tools.length === 1 ? "" : "S"} · THE SCREEN HAS THE EXACT NUMBERS` : "IT DID NOT USE LUNI'S CONTROLS, SO THIS IS NOT FROM LUNI'S DATA")); })
       .catch((e) => {      // no answer from the model: the built-in commands do what they can with the sentence
         if (thinking !== ctl || e.message === "stopped") return;
         const b = assistant.handle(text);

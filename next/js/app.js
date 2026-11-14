@@ -161,7 +161,7 @@ function syncSiteUI() {
   else note.textContent = s.tag || "";
 }
 
-// Site details: values LUNO computed from LOLA, then the team's research notes.
+// Site details: values LUNI computed from LOLA, then the team's research notes.
 function renderBrief() {
   const s = state.site, t = state.scenario.terrain;
   const row = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
@@ -378,7 +378,7 @@ function renderMoment() {
   openspace?.update({ site: state.site, t: cur.t });
 }
 
-// A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNO's.
+// A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNI's.
 // (Horizons does not let other web pages read its answers, so this opens it in a new tab.)
 function horizonsUrl(body, t) {
   const tr = state.scenario.terrain, lonE = ((state.site.lon % 360) + 360) % 360, altKm = (tr.heightM + tr.mastM) / 1000;
