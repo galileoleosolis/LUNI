@@ -30,8 +30,9 @@ class Grid {
   }
   height(lat, lon) {
     if (this.kind === "cylindrical") return this.sample((90 - lat) * this.ppd - 0.5, ((lon % 360) + 360) % 360 * this.ppd - 0.5);
-    const r = 2 * R * Math.tan((90 + lat) * DEG / 2), c = (this.rows - 1) / 2;
-    return this.sample(c - r * Math.cos(lon * DEG) / this.scale_m, c + r * Math.sin(lon * DEG) / this.scale_m);
+    // south polar stereographic; the pole sits at the grid center unless the map is a patch cut from elsewhere
+    const r = 2 * R * Math.tan((90 + lat) * DEG / 2), pr = this.pole_row ?? (this.rows - 1) / 2, pc = this.pole_col ?? (this.cols - 1) / 2;
+    return this.sample(pr - r * Math.cos(lon * DEG) / this.scale_m, pc + r * Math.sin(lon * DEG) / this.scale_m);
   }
   get res() { return this.kind === "cylindrical" ? R * DEG / this.ppd : this.scale_m; }
 }
@@ -51,6 +52,19 @@ async function loadGrid(name) {
   return makeGrid(meta, new Int16Array(await gunzip(await fetchBytes(base + meta.file))));
 }
 const grid = (name) => (grids[name] ||= loadGrid(name));
+export const getGrid = grid;
+
+// Detailed patch around a preset site (data/patch, built by tools/build_patches.py), or null if there is none.
+let patchIndex = null;
+const patches = {};
+export function loadPatch(siteId) {
+  return (patches[siteId] ||= (async () => {
+    const dir = base.replace(/dem\/$/, "patch/");
+    patchIndex ||= await fetch(dir + "index.json").then((r) => r.json()).catch(() => ({}));
+    const meta = patchIndex[siteId];
+    return meta ? makeGrid(meta, new Int16Array(await gunzip(await fetchBytes(dir + meta.file)))) : null;
+  })());
+}
 
 // Which maps a point needs: [near (or null), far].
 export function mapsFor(lat) {
