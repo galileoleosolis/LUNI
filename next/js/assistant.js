@@ -349,7 +349,7 @@ export function createAssistant(api) {
         return { say: "Back to the main screen." };
       }
       case "take_option": {
-        if (input.best_point) return api.pickBest() ? { say: "Moved to the best point the scan found.", changed: true, wait: true } : { say: "The scan has no best point yet. Say BETTER SPOT and wait for it to finish." };
+        if (input.best_point) return api.pickBest() ? { say: "Moved to the best point the scan found.", changed: true, wait: true } : { say: "There is no better point to move to: the scan is still running, has not been opened, or found nothing nearby that meets the mission needs." };
         if (s.verdict.ok) return { say: "This is already a GO, so there are no options to take." };
         const o = s.options[input.number - 1];
         if (!o) return { say: optionsText(s) };
