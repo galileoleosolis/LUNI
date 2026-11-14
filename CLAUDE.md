@@ -11,6 +11,9 @@ challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to S
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
 
+The challenge's own wording is in `docs/challenge.md`, the judging sheet's five criteria are above: read them before
+scoring or pitching, do not work from memory (the user asked for this).
+
 ## What it is
 A static web app (no build step, no backend). Pick a lunar landing site and landing time; it shows the Sun and Earth
 against the terrain skyline, GO / NO-GO for power and Earth link, countdowns, a 30-day timeline, a 12-month
@@ -93,6 +96,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
+   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
