@@ -16,6 +16,7 @@ import { OPENING, storyAt } from "./stories.js";
 import { createProofPanel } from "./ui-proof.js";
 import { encodeShare, decodeShare, copyText } from "./share.js";
 import { startGuide } from "./guide.js";
+import { createHistoryPanel } from "./ui-history.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -36,7 +37,7 @@ const state = {
   req: { ...DEFAULT_REQ },       // mission needs
   cal: null,                     // year of landing-window data for the current site + needs
 };
-let globe = null, scan = null, surface = null, openspace = null, proof = null;
+let globe = null, scan = null, surface = null, openspace = null, proof = null, past = null;
 
 // ---------- sizing ----------
 // Wide windows: lay the unit out at a design size and scale it to fit. Narrow windows: stacked layout.
@@ -184,9 +185,10 @@ function renderStory() {
   $("story-now").addEventListener("click", () => setT0(roundToHour(new Date())));
   $("story-x").addEventListener("click", () => { state.storyOff = st.id; box.hidden = true; relayout(); });
 }
-// Open LUNI on a scene: { site (id), t0, days }. Used for the opening scene and for REPLAY in the proof panel.
+// Open LUNI on a scene: { site (id), t0, days, needs }. Used by REPLAY in the proof panel and LOAD in mission history.
+// The mission needs go back to LUNI's usual ones, with the mission's own length and any need it is known to differ in.
 function applyScene(sc) {
-  state.req = { ...state.req, days: sc.days }; syncNeeds();
+  state.req = { ...DEFAULT_REQ, days: sc.days, ...(sc.needs || {}) }; syncNeeds();
   state.t0 = new Date(sc.t0); state.storyOff = null;
   selectSite(SITES.find((s) => s.id === sc.site) || SITES[0]);
 }
@@ -758,6 +760,7 @@ const assistantApi = {
   pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
   takeOption: (i) => state.mission.fixes[i]?.[2](),
   openProof: (show) => { if (proof.isOpen() !== show) proof.toggle(show); },
+  openHistory: (show) => { if (past.isOpen() !== show) past.toggle(show); },
   share: () => shareLink(),
   versus: () => versus(),
   pin: () => pinCurrent(),
@@ -830,6 +833,7 @@ async function init() {
   $("pin-btn").addEventListener("click", pinCurrent);
   $("more-btn").addEventListener("click", () => setMore());
   $("share-btn").addEventListener("click", shareLink);
+  past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
@@ -887,6 +891,8 @@ async function init() {
     else if (k === " ") togglePlay();
     else if (k === "t" || k === "T") comms.talk();
     else if (k === "/") comms.type();
+    else if (k === "Escape" && past.isOpen()) past.toggle(false);
+    else if (k === "h" || k === "H") past.toggle();
     else if (k === "Escape" && proof.isOpen()) proof.toggle(false);
     else if (k === "Escape" && !$("more-panel").hidden) setMore(false);
     else if (k === "Escape" && comms.isOpen()) comms.toggle(false);

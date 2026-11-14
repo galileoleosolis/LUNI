@@ -123,6 +123,25 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - The crowded case to check after any layout change in the middle column: a NO-GO with three "ways to get a GO"
   buttons (Nobile Rim 1, 14 NOV 2026 20:00). The landing-day strip must stay fully visible at 1100 x 700 and up.
 
+## Next batch (asked for on 14 Nov, not started): work ONE TASK AT A TIME
+The user: "one task at a time, and then let me confirm before moving onto the next task". Build one, show it on the
+pre-release (preview page and `next/`), stop, and wait for the user's confirmation before starting the next.
+Planned order: (1) custom coordinates out in the open: **skipped by the user**; (2) HISTORY tab: **built 14 Nov,
+on the pre-release, waiting for the user's confirmation** (see below); (3) Big Moon as its own screen with
+layer buttons: elevation and slope first; (4) sunlight, Earth link and PSR layers (south polar region); (5) the same
+layers in the scan map plus a "data profile" card for a point; (6) stack layers with weights into one combined map
+and send it to the scan; (7) temperature, only if NASA's LRO Diviner data can be fetched and reduced: never invented.
+Every layer names its data source on screen and shows good / bad visually. Still unanswered by the user: what "data
+profiles" means (assumed: a card of every layer's value at a point), and whether polar-only coverage is fine.
+HISTORY tab as built: screen tabs MAIN SCREEN / MISSION HISTORY in the unit's top strip (`.tabs`; key H; "open
+mission history" in ASK LUNI). `js/ui-history.js` covers `.cols` with a flat Moon map with numbered markers, the
+chosen mission's sourced account, and a table of six landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6,
+Blue Ghost 1, IM-2) with LUNI's live numbers (Sun height at landing, sunlight left, Earth at landing, slope) and a
+30-day Sun / Earth strip with the real end marked. LOAD calls `applyScene` (site, landing hour, mission length, and
+`needs` such as no direct Earth link for Chang'e 6; other needs go back to the defaults). SLIM (Shioli crater) was
+added as a 14th preset for it. Stories carry `proof: true` when they also belong on the PROOF panel.
+Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
+
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment
    record shows "success" for https://galileoleosolis.github.io/LUNI/). This session cannot open github.io or change

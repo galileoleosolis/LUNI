@@ -78,6 +78,15 @@
    "src": "https://lroc.im-ldi.com/images/1400"
   },
   {
+   "id": "slim",
+   "name": "SLIM · Shioli crater",
+   "tag": "JAPAN 2024",
+   "group": "Reference sites",
+   "lat": -13.316,
+   "lon": 25.251,
+   "src": "https://www.lroc.asu.edu/images/1358"
+  },
+  {
    "id": "ce6",
    "name": "Chang'e 6 · Apollo basin",
    "tag": "CHINA 2024",
