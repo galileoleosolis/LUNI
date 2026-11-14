@@ -506,9 +506,9 @@ function renderHorizon(cur) {
     const cy = k >= 1 ? Math.min(clampY(elv), ySky - r - 1) : k <= -1 ? Math.max(clampY(elv), ySky + r + 3) : ySky - k * r;
     return { cx: x(az), cy: Math.max(T + r, Math.min(H - B - 2, cy)), ySky, k };
   };
-  const label = (cx, cy, text, color, dy = -12) => {
+  const label = (cx, cy, text, color, dy = -12, off = 14) => {
     const right = cx < W - 170;
-    const t = el("text", { x: cx + (right ? 14 : -14), y: Math.max(T + 11, cy + dy), fill: color, "font-size": 13.5, "font-weight": 700, "text-anchor": right ? "start" : "end", stroke: "#000", "stroke-width": 3, "paint-order": "stroke" }, svg, text);
+    const t = el("text", { x: cx + (right ? off : -off), y: Math.max(T + 11, cy + dy), fill: color, "font-size": 13.5, "font-weight": 700, "text-anchor": right ? "start" : "end", stroke: "#000", "stroke-width": 3, "paint-order": "stroke" }, svg, text);
     return t;
   };
   const clipAbove = (id, p) => { const c = el("clipPath", { id }, defs); el("rect", { x: 0, y: 0, width: W, height: Math.max(0, p.ySky) }, c); };
@@ -525,10 +525,10 @@ function renderHorizon(cur) {
     el("circle", { cx: sp.cx, cy: sp.cy, r: RS, fill: "none", stroke: "#ffd23c", "stroke-width": 1.5, "stroke-dasharray": "3 3", opacity: 0.8 }, svg);
   }
   const sunPct = Math.round(cur.sunFrac * 100);
-  label(sp.cx, sp.cy, sp.k <= -1 ? "SUN · BEHIND THE GROUND" : cur.eclipse > 0.01 && cur.sunTerrain > 0 ? `SUN · EARTH HIDES ${Math.round(cur.eclipse * 100)}%` : sp.k < 1 ? `SUN · ${sunPct}% IN VIEW` : `SUN ${sgn(cur.sunEl)}°`, cur.sunUp ? "#ffe27a" : C.red);
 
   // Earth, with its real phase: the lit side faces the Sun.
-  const RE = 9, ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
+  // Earth is drawn bigger than the Sun because it is: seen from the Moon its disc is about 3.6 times as wide.
+  const RE = Math.round(Math.max(13, Math.min(20, H * 0.11))), ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
   if (ep.k > -1) {
     clipAbove("hz-clip-earth", ep);
     const g = el("g", ep.k < 1 ? { "clip-path": "url(#hz-clip-earth)" } : {}, svg), e = el("g", { transform: `translate(${ep.cx},${ep.cy})` }, g);
@@ -536,8 +536,9 @@ function renderHorizon(cur) {
     el("circle", { r: RE + 2.5, fill: "#6fb7ff", opacity: 0.28 }, e);
     const face = el("g", { "clip-path": "url(#hz-earth-disc)" }, e);
     el("circle", { r: RE, fill: "#2a6fd8" }, face);
-    el("path", { d: "M-6,-3q3,-4 6,-1t3,5q-4,3 -7,1z M2,3q3,-1 5,2l-2,4q-4,0 -3,-6z", fill: "#3fae6a" }, face);
-    el("path", { d: "M-9,-5q6,3 12,-1 M-8,4q7,-3 15,1 M-4,-8q5,2 9,0", fill: "none", stroke: "#fff", "stroke-width": 1.6, opacity: 0.85 }, face);
+    const art = el("g", { transform: `scale(${(RE / 9).toFixed(3)})` }, face);      // land and cloud shapes are drawn for a radius of 9
+    el("path", { d: "M-6,-3q3,-4 6,-1t3,5q-4,3 -7,1z M2,3q3,-1 5,2l-2,4q-4,0 -3,-6z", fill: "#3fae6a" }, art);
+    el("path", { d: "M-9,-5q6,3 12,-1 M-8,4q7,-3 15,1 M-4,-8q5,2 9,0", fill: "none", stroke: "#fff", "stroke-width": 1.6, opacity: 0.85 }, art);
     const kLit = (1 - Math.cos((cur.sepDeg ?? 90) * Math.PI / 180)) / 2;                       // share of Earth's face that is lit, as seen from the Moon
     let dAz = cur.sunAz - cur.earthAz; dAz = ((dAz + 540) % 360) - 180;
     const toSun = Math.atan2(clampY(cur.sunEl) - clampY(cur.earthEl), dAz * (W - L - 4) / 360) * 180 / Math.PI;
@@ -547,7 +548,18 @@ function renderHorizon(cur) {
   } else {
     el("circle", { cx: ep.cx, cy: ep.cy, r: RE, fill: "none", stroke: C.cy, "stroke-width": 1.5, "stroke-dasharray": "3 3", opacity: 0.8 }, svg);
   }
-  label(ep.cx, ep.cy, ep.k <= -1 ? "EARTH · BEHIND THE GROUND" : cur.earthUp ? `EARTH ${sgn(cur.earthEl)}°` : "EARTH · NO LINK", cur.earthUp ? C.cy : C.red, Math.abs(ep.cx - sp.cx) < 150 && Math.abs(ep.cy - sp.cy) < 20 ? 22 : -12);
+  const sunText = sp.k <= -1 ? "SUN · BEHIND THE GROUND" : cur.eclipse > 0.01 && cur.sunTerrain > 0 ? `SUN · EARTH HIDES ${Math.round(cur.eclipse * 100)}%` : sp.k < 1 ? `SUN · ${sunPct}% IN VIEW` : `SUN ${sgn(cur.sunEl)}°`, sunCol = cur.sunUp ? "#ffe27a" : C.red;
+  const earthText = ep.k <= -1 ? "EARTH · BEHIND THE GROUND" : cur.earthUp ? `EARTH ${sgn(cur.earthEl)}°` : "EARTH · NO LINK", earthCol = cur.earthUp ? C.cy : C.red;
+  if (Math.abs(ep.cx - sp.cx) < 190 && Math.abs(ep.cy - sp.cy) < 50) {
+    // The two are close together: stack both names beside the pair, so neither name lands on the other body.
+    const right = Math.max(sp.cx, ep.cx) < W - 190, xx = right ? Math.max(sp.cx + 24, ep.cx + RE + 7) : Math.min(sp.cx - 24, ep.cx - RE - 7);
+    const y0 = Math.max(T + 11, Math.min(H - B - 22, Math.min(sp.cy, ep.cy) + 2));
+    for (const [text, color, dy] of [[sunText, sunCol, 0], [earthText, earthCol, 17]])
+      el("text", { x: xx, y: y0 + dy, fill: color, "font-size": 13.5, "font-weight": 700, "text-anchor": right ? "start" : "end", stroke: "#000", "stroke-width": 3, "paint-order": "stroke" }, svg, text);
+  } else {
+    label(sp.cx, sp.cy, sunText, sunCol);
+    label(ep.cx, ep.cy, earthText, earthCol, -RE - 1, RE + 6);
+  }
 
   el("title", {}, svg, "The Sun and Earth are drawn larger than life. Their positions, and how much of each the ground hides, are exact.");
 }
