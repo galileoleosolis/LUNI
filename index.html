@@ -5,131 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LUNO · Lunar Utility for Navigational Operations</title>
   <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo" aria-hidden="true"></span>
-      <div>
-        <h1>LUNO</h1>
-        <p class="tagline">Lunar Utility for Navigational Operations</p>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <span id="data-badge" class="badge badge-warn" title="Placeholder geometry and terrain — real SPICE + LOLA data coming">DEMO DATA</span>
-    </div>
-  </header>
+<div class="unit">
+  <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
+  <div class="unit-top">
+    <span><i class="led"></i>LUNO PLANNING UNIT</span>
+    <span id="data-badge" class="demo" title="Placeholder geometry and terrain. Real SPICE + LOLA data coming.">DEMO DATA · PLACEHOLDER MODEL</span>
+  </div>
 
-  <main class="layout">
-    <!-- LEFT: scenario controls -->
-    <aside class="panel controls">
-      <section>
-        <h2>Landing site</h2>
-        <label class="field">
-          <span>Preset</span>
-          <select id="site-select"></select>
-        </label>
-        <div class="row">
-          <label class="field">
-            <span>Latitude °</span>
-            <input id="lat-input" type="number" step="0.01" min="-90" max="90">
-          </label>
-          <label class="field">
-            <span>Longitude °E</span>
-            <input id="lon-input" type="number" step="0.01" min="-180" max="360">
-          </label>
+  <div class="screen">
+    <header class="bar">
+      <span class="name">LUNO // LUNAR UTILITY FOR NAVIGATIONAL OPERATIONS</span>
+      <span>SITE <b id="bar-site"></b></span>
+      <span>T0 <b id="bar-t0"></b></span>
+      <span class="r">NOW <b id="bar-now"></b> <span id="bar-tplus"></span></span>
+    </header>
+
+    <div class="cols">
+      <!-- LEFT: site + date -->
+      <section class="col col-site">
+        <h3>SITE SELECT · DRAG / CLICK THE MOON</h3>
+        <div class="globe-wrap">
+          <div id="globe" class="globe"></div>
+          <div id="globe-tip" class="globe-tip" hidden></div>
+          <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
         </div>
-        <p id="site-note" class="hint"></p>
-      </section>
-
-      <section>
-        <h2>Landing date</h2>
-        <label class="field">
-          <span>Date &amp; time (UTC)</span>
-          <input id="date-input" type="datetime-local">
-        </label>
-        <div class="slip">
-          <span class="slip-label">Launch slip</span>
-          <button data-slip="-7">−7 d</button>
-          <button data-slip="-1">−1 d</button>
-          <button data-slip="1">+1 d</button>
-          <button data-slip="7">+7 d</button>
+        <div id="site-list" class="site-list"></div>
+        <div class="fields">
+          <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
+          <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
         </div>
+        <p id="site-note" class="note"></p>
+        <h3 style="margin-top:12px">LANDING TIME T0 · UTC</h3>
+        <input id="date-input" class="date" type="datetime-local">
       </section>
 
-      <section>
-        <button id="pin-btn" class="primary">＋ Add to comparison</button>
-        <p class="hint">Pin this site + date to compare it side by side.</p>
-      </section>
-    </aside>
-
-    <!-- CENTER: the answer -->
-    <section class="main">
-      <div class="verdict" id="verdict"></div>
-
-      <div class="cards">
-        <article class="card sun">
-          <header><span class="dot sun-dot"></span>Sun · power</header>
-          <div class="big" id="sun-state">—</div>
-          <div class="kv"><span>Elevation</span><b id="sun-el">—</b></div>
-          <div class="kv"><span>Azimuth</span><b id="sun-az">—</b></div>
-          <div class="kv"><span id="sun-next-label">Sunset in</span><b id="sun-next">—</b></div>
-        </article>
-        <article class="card earth">
-          <header><span class="dot earth-dot"></span>Earth · comms</header>
-          <div class="big" id="earth-state">—</div>
-          <div class="kv"><span>Elevation</span><b id="earth-el">—</b></div>
-          <div class="kv"><span>Azimuth</span><b id="earth-az">—</b></div>
-          <div class="kv"><span id="earth-next-label">Earthset in</span><b id="earth-next">—</b></div>
-        </article>
-        <article class="card score">
-          <header>Next 30 days</header>
-          <div class="kv"><span>Sunlight</span><b id="pct-sun">—</b></div>
-          <div class="kv"><span>Earth in view</span><b id="pct-earth">—</b></div>
-          <div class="kv"><span>Both at once</span><b id="pct-both">—</b></div>
-          <div class="kv"><span>Longest darkness</span><b id="max-dark">—</b></div>
-        </article>
-      </div>
-
-      <div class="panel view">
-        <div class="view-head">
-          <h2>Horizon view <span class="sub">— what you'd see standing at the site, all the way around</span></h2>
-          <div class="legend">
-            <span><i class="sw sun-sw"></i>Sun</span>
-            <span><i class="sw earth-sw"></i>Earth</span>
-            <span><i class="sw terrain-sw"></i>Terrain</span>
+      <!-- CENTER: the answer -->
+      <section class="col col-main">
+        <div class="readouts">
+          <div class="ro">
+            <div class="lab">☀ POWER</div>
+            <div class="st" id="sun-state"></div>
+            <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b></div>
+            <div class="mini">EL <b id="sun-el"></b> &nbsp; AZ <b id="sun-az"></b></div>
+          </div>
+          <div class="ro">
+            <div class="lab">⊕ EARTH LINK</div>
+            <div class="st" id="earth-state"></div>
+            <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b></div>
+            <div class="mini">EL <b id="earth-el"></b> &nbsp; AZ <b id="earth-az"></b></div>
           </div>
         </div>
+        <div id="verdict" class="verdict"></div>
+
+        <h3>LOCAL HORIZON · LOOKING OUT FROM THE SITE · AZ 000–360 · EL DEG</h3>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
-      </div>
 
-      <div class="panel view">
-        <div class="view-head">
-          <h2>30-day timeline <span class="sub">— click anywhere to jump to that time</span></h2>
-          <div class="playback">
-            <button id="play-btn" title="Play / pause">▶</button>
-            <span id="time-label" class="mono"></span>
-          </div>
-        </div>
+        <h3>VISIBILITY · T0 → T0+30D · CLICK OR DRAG TO SCRUB</h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
-        <input id="time-slider" type="range" min="0" max="719" value="0" aria-label="Time offset">
-      </div>
-    </section>
+      </section>
 
-    <!-- RIGHT: comparison -->
-    <aside class="panel compare">
-      <h2>Compare</h2>
-      <div id="compare-list" class="compare-list">
-        <p class="hint">No scenarios pinned yet. Use “Add to comparison”.</p>
-      </div>
-    </aside>
-  </main>
+      <!-- RIGHT: summary + compare -->
+      <section class="col col-side">
+        <h3>30-DAY SUMMARY FROM T0</h3>
+        <table class="sum">
+          <tr><td>SUNLIT</td><td id="pct-sun"></td></tr>
+          <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
+          <tr><td>BOTH</td><td id="pct-both"></td></tr>
+          <tr><td>MAX DARK</td><td id="max-dark"></td></tr>
+        </table>
+        <h3 style="margin-top:14px">COMPARE</h3>
+        <div id="compare-list" class="compare"></div>
+        <h3 style="margin-top:14px">KEYBOARD</h3>
+        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
+        <div class="credit">MOON IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA NASA MOON TREK. POSITIONS: NASA SPICE (PLANNED). TERRAIN: LRO LOLA (PLANNED).</div>
+      </section>
+    </div>
+  </div>
 
-  <footer class="foot">
-    Positions from NASA SPICE · terrain from LRO LOLA · checked against JPL Horizons
-    <span class="muted">(demo build: placeholder model)</span>
-  </footer>
-
-  <script type="module" src="js/app.js"></script>
+  <div class="keys">
+    <button class="key" data-slip="-7"><small>LAUNCH SLIP</small>◀◀ 7 D</button>
+    <button class="key" data-slip="-1"><small>LAUNCH SLIP</small>◀ 1 D</button>
+    <button class="key" id="play-btn"><small>MISSION CLOCK</small><span id="play-label">▶ PLAY</span></button>
+    <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
+    <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
+    <span class="key-gap"></span>
+    <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
+    <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
+  </div>
+</div>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -1,350 +1,353 @@
 import { SITES, CUSTOM_ID } from "./sites.js";
-import { getScenario, summarize, hoursUntilChange, horizonAt, STEP_HOURS, IS_DEMO } from "./model.js";
+import { getScenario, summarize, hoursUntilChange, horizonAt, subPoints, STEP_HOURS, IS_DEMO } from "./model.js";
+import { createGlobe } from "./globe.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
+const C = { amb: "#ffb000", dim: "#8a6614", faint: "#2a1f06", grn: "#21e07a", red: "#ff3d3d", cy: "#5ac8ff", wht: "#f4f4f4" };
 
 const state = {
   site: SITES[0],
-  start: roundToHour(new Date()),
-  idx: 0,
+  t0: roundToHour(new Date()),   // landing time
+  idx: 0,                        // hours after landing (mission clock)
   scenario: null,
   summary: null,
   pinned: [],
   playing: null,
 };
+let globe = null;
 
-// ---------- helpers ----------
+// ---------- formatting ----------
 function roundToHour(d) { const x = new Date(d); x.setUTCMinutes(0, 0, 0); return x; }
-function toInputValue(d) { return d.toISOString().slice(0, 16); }
-function fromInputValue(v) { return new Date(v + ":00Z"); }
-function fmtDate(d) {
-  return d.toLocaleString("en-GB", { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " UTC";
-}
-function fmtShortDate(d) { return d.toLocaleDateString("en-GB", { timeZone: "UTC", day: "2-digit", month: "short" }); }
-function fmtDur(h) {
-  if (h == null) return "> 30 d";
-  const d = Math.floor(h / 24), r = Math.round(h % 24);
-  return d > 0 ? `${d} d ${r} h` : `${r} h`;
-}
-function fmtDeg(x) { return `${x.toFixed(2)}°`; }
-function pct(x) { return `${Math.round(x * 100)}%`; }
-function el(tag, attrs = {}, parent) {
+const pad = (n, w = 2) => String(n).padStart(w, "0");
+const toInputValue = (d) => d.toISOString().slice(0, 16);
+const fromInputValue = (v) => new Date(v + ":00Z");
+const stamp = (d) => d.toISOString().slice(0, 16).replace("T", " ") + "Z";
+const fmtBig = (h) => h == null ? "30D+" : `${Math.floor(h / 24)}D ${pad(Math.round(h % 24))}H`;
+const fmtT = (h) => h == null ? ">30D" : `${pad(Math.floor(h / 24))}D${pad(Math.round(h % 24))}H`;
+const sgn = (x) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2);
+const pct = (x) => `${Math.round(x * 100)}%`;
+const fmtLat = (v) => `${Math.abs(v).toFixed(2)}${v < 0 ? "S" : "N"}`;
+const normLon = (v) => ((v + 180) % 360 + 360) % 360 - 180;
+const fmtLon = (v) => { const l = normLon(v); return `${Math.abs(l).toFixed(2)}${l < 0 ? "W" : "E"}`; };
+const siteName = (s) => (s.id === CUSTOM_ID ? "CUSTOM POINT" : s.name).toUpperCase();
+function el(tag, attrs = {}, parent, text) {
   const n = document.createElementNS(SVGNS, tag);
   for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (text != null) n.textContent = text;
   if (parent) parent.appendChild(n);
   return n;
 }
-function siteLabel(site) { return site.id === CUSTOM_ID ? `Custom (${site.lat.toFixed(2)}°, ${site.lon.toFixed(2)}°E)` : site.name; }
 
-// ---------- controls ----------
-function initControls() {
-  const sel = $("site-select");
-  const groups = {};
-  for (const s of SITES) (groups[s.group] ||= []).push(s);
-  for (const [g, list] of Object.entries(groups)) {
-    const og = document.createElement("optgroup"); og.label = g;
-    for (const s of list) { const o = document.createElement("option"); o.value = s.id; o.textContent = s.name; og.appendChild(o); }
-    sel.appendChild(og);
+// ---------- site selection ----------
+function buildSiteList() {
+  const box = $("site-list");
+  let grp = null, n = 0;
+  for (const s of SITES) {
+    if (s.group !== grp) { grp = s.group; const g = document.createElement("div"); g.className = "grp"; g.textContent = grp.toUpperCase(); box.appendChild(g); }
+    const b = document.createElement("button");
+    b.className = "site-row"; b.dataset.id = s.id;
+    b.innerHTML = `<span>${pad(++n)} ${s.name}</span><span>${fmtLat(s.lat)}</span>`;
+    b.addEventListener("click", () => selectSite(s));
+    box.appendChild(b);
   }
-  const oc = document.createElement("option"); oc.value = CUSTOM_ID; oc.textContent = "Custom coordinates…"; sel.appendChild(oc);
-
-  sel.addEventListener("change", () => {
-    if (sel.value === CUSTOM_ID) {
-      state.site = { id: CUSTOM_ID, name: "Custom", lat: +$("lat-input").value, lon: +$("lon-input").value };
-    } else {
-      state.site = SITES.find((s) => s.id === sel.value);
-    }
-    recompute();
-  });
-
-  const onCoord = () => {
-    const lat = parseFloat($("lat-input").value), lon = parseFloat($("lon-input").value);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
-    state.site = { id: CUSTOM_ID, name: "Custom", lat, lon };
-    sel.value = CUSTOM_ID;
-    recompute();
-  };
-  $("lat-input").addEventListener("change", onCoord);
-  $("lon-input").addEventListener("change", onCoord);
-
-  $("date-input").addEventListener("change", (e) => {
-    if (!e.target.value) return;
-    state.start = fromInputValue(e.target.value);
-    recompute();
-  });
-  document.querySelectorAll("[data-slip]").forEach((b) =>
-    b.addEventListener("click", () => {
-      state.start = new Date(state.start.getTime() + Number(b.dataset.slip) * 86400000);
-      recompute();
-    }));
-
-  $("time-slider").addEventListener("input", (e) => { state.idx = +e.target.value; renderMoment(); });
-  $("play-btn").addEventListener("click", togglePlay);
-  $("pin-btn").addEventListener("click", pinCurrent);
-
-  $("timeline").addEventListener("click", (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const f = (e.clientX - r.left - TL.left) / (r.width - TL.left - TL.right);
-    if (f < 0 || f > 1) return;
-    state.idx = Math.round(f * (state.scenario.samples.length - 1));
-    renderMoment();
-  });
-
-  if (!IS_DEMO) $("data-badge").remove();
-  window.addEventListener("resize", () => { renderTimeline(); renderMoment(); });
 }
 
-function syncInputs() {
-  $("site-select").value = state.site.id;
-  $("lat-input").value = state.site.lat;
-  $("lon-input").value = state.site.lon;
-  $("date-input").value = toInputValue(state.start);
-  $("site-note").textContent = state.site.approx ? "Approximate coordinates (to be verified)." : "";
+function selectSite(site, { fly = true } = {}) {
+  state.site = site;
+  globe?.select(site, { fly });
+  recompute();
 }
 
-function togglePlay() {
-  if (state.playing) { clearInterval(state.playing); state.playing = null; $("play-btn").textContent = "▶"; return; }
-  $("play-btn").textContent = "⏸";
-  state.playing = setInterval(() => {
-    state.idx = (state.idx + 1) % state.scenario.samples.length;
-    renderMoment();
-  }, 50);
+function nextSite() {
+  const i = SITES.findIndex((s) => s.id === state.site.id);
+  selectSite(SITES[(i + 1) % SITES.length]);
+}
+
+function syncSiteUI() {
+  const s = state.site;
+  document.querySelectorAll(".site-row").forEach((b) => b.classList.toggle("sel", b.dataset.id === s.id));
+  document.querySelector(".site-row.sel")?.scrollIntoView({ block: "nearest" });
+  $("lat-input").value = s.lat; $("lon-input").value = s.lon;
+  $("date-input").value = toInputValue(state.t0);
+  $("bar-site").textContent = `${siteName(s)} ${fmtLat(s.lat)} ${fmtLon(s.lon)}`;
+  $("bar-t0").textContent = stamp(state.t0);
+  const note = $("site-note");
+  if (s.id === CUSTOM_ID) note.textContent = "CUSTOM POINT";
+  else if (s.approx) note.textContent = "APPROXIMATE REGION CENTRE — TO BE VERIFIED";
+  else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>`;
+  else note.textContent = s.tag || "";
 }
 
 // ---------- compute ----------
-function recompute() {
-  state.scenario = getScenario(state.site, state.start);
+function recompute({ keepIdx = false } = {}) {
+  state.scenario = getScenario(state.site, state.t0);
   state.summary = summarize(state.scenario.samples);
-  state.idx = 0;
-  $("time-slider").max = state.scenario.samples.length - 1;
-  syncInputs();
-  renderSummary();
-  renderTimeline();
-  renderMoment();
-}
-
-// ---------- summary + verdict ----------
-function renderSummary() {
+  if (!keepIdx) state.idx = 0;
+  syncSiteUI();
   const s = state.summary;
   $("pct-sun").textContent = pct(s.pctSun);
   $("pct-earth").textContent = pct(s.pctEarth);
   $("pct-both").textContent = pct(s.pctBoth);
-  $("max-dark").textContent = s.maxDarkHours === 0 ? "none" : fmtDur(s.maxDarkHours);
+  $("max-dark").textContent = s.maxDarkHours ? fmtT(s.maxDarkHours) : "NONE";
+  renderTimeline();
+  renderMoment();
 }
 
-function renderVerdict(cur, sunLeft, earthLeft) {
-  const v = $("verdict");
-  let cls, icon, title, sub;
-  if (!cur.sunUp) {
-    cls = "bad"; icon = "🌑"; title = "No sunlight at this moment";
-    const back = sunLeft == null ? "not within 30 days" : `in ${fmtDur(sunLeft)}`;
-    sub = `Solar power unavailable. Sun returns ${back}.`;
-  } else if (!cur.earthUp) {
-    cls = "warn"; icon = "📡"; title = "Sunlit, but no direct Earth link";
-    sub = `Power OK for ${fmtDur(sunLeft)}. Earth rises ${earthLeft == null ? "not within 30 days" : `in ${fmtDur(earthLeft)}`} (relay needed until then).`;
-  } else if (sunLeft != null && sunLeft < 72) {
-    cls = "warn"; icon = "⏳"; title = "Good now, but sunset is close";
-    sub = `Sunset in ${fmtDur(sunLeft)}, Earthset in ${fmtDur(earthLeft)}.`;
-  } else {
-    cls = "good"; icon = "✅"; title = "Good landing window";
-    sub = `Sunlight for ${fmtDur(sunLeft)} and Earth contact for ${fmtDur(earthLeft)}.`;
+function slip(days) {
+  state.t0 = new Date(state.t0.getTime() + days * 86400000);
+  recompute({ keepIdx: true });
+}
+
+function setIdx(i) {
+  const n = state.scenario.samples.length;
+  state.idx = Math.max(0, Math.min(n - 1, i));
+  renderMoment();
+}
+
+function togglePlay() {
+  const btn = $("play-btn");
+  if (state.playing) {
+    clearInterval(state.playing); state.playing = null;
+    $("play-label").textContent = "▶ PLAY"; btn.classList.remove("on");
+    return;
   }
-  v.className = `verdict ${cls}`;
-  v.innerHTML = `<span class="v-icon">${icon}</span><div><div class="v-title">${title}</div><div class="v-sub">${siteLabel(state.site)} · ${fmtDate(cur.t)} — ${sub}</div></div>`;
+  $("play-label").textContent = "❚❚ PAUSE"; btn.classList.add("on");
+  state.playing = setInterval(() => setIdx((state.idx + 2) % state.scenario.samples.length), 60);
 }
 
-// ---------- moment (cards + horizon) ----------
+// ---------- moment: readouts, verdict, horizon, globe ----------
 function renderMoment() {
   const { samples } = state.scenario;
   const cur = samples[state.idx];
-  $("time-slider").value = state.idx;
-  const dayN = Math.floor(state.idx * STEP_HOURS / 24), hr = (state.idx * STEP_HOURS) % 24;
-  $("time-label").textContent = `Day ${dayN} +${hr}h · ${fmtDate(cur.t)}`;
-
   const sunLeft = hoursUntilChange(samples, state.idx, "sunUp");
   const earthLeft = hoursUntilChange(samples, state.idx, "earthUp");
+  const h = state.idx * STEP_HOURS;
 
-  setState("sun-state", cur.sunUp, "Sunlit", "In shadow");
-  $("sun-el").textContent = fmtDeg(cur.sunEl);
-  $("sun-az").textContent = fmtDeg(cur.sunAz);
-  $("sun-next-label").textContent = cur.sunUp ? "Sunset in" : "Sunrise in";
-  $("sun-next").textContent = fmtDur(sunLeft);
+  $("bar-now").textContent = stamp(cur.t);
+  $("bar-tplus").textContent = `T+${pad(Math.floor(h / 24))}D${pad(h % 24)}H`;
 
-  setState("earth-state", cur.earthUp, "In view", "Below horizon");
-  $("earth-el").textContent = fmtDeg(cur.earthEl);
-  $("earth-az").textContent = fmtDeg(cur.earthAz);
-  $("earth-next-label").textContent = cur.earthUp ? "Earthset in" : "Earthrise in";
-  $("earth-next").textContent = fmtDur(earthLeft);
+  const set = (id, on, yes, no) => { const n = $(id); n.textContent = on ? yes : no; n.className = "st " + (on ? "go" : "nogo"); };
+  set("sun-state", cur.sunUp, "SUN — GO", "NO SUN");
+  $("sun-next-label").textContent = cur.sunUp ? "SUNSET IN" : "SUNRISE IN";
+  $("sun-next").textContent = fmtBig(sunLeft);
+  $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1).padStart(5, "0") + "°";
+  set("earth-state", cur.earthUp, "LINK — GO", "NO LINK");
+  $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
+  $("earth-next").textContent = fmtBig(earthLeft);
+  $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1).padStart(5, "0") + "°";
 
-  renderVerdict(cur, sunLeft, earthLeft);
-  renderHorizon();
+  const v = $("verdict");
+  let cls, head, tail;
+  if (!cur.sunUp) { cls = "nogo"; head = "NO-GO"; tail = `NO SOLAR INPUT · SUNRISE IN ${fmtT(sunLeft)}`; }
+  else if (!cur.earthUp) { cls = "caution"; head = "LIMITED"; tail = `SUNLIT, NO DIRECT-TO-EARTH LINK · RELAY NEEDED · EARTHRISE IN ${fmtT(earthLeft)}`; }
+  else if (sunLeft != null && sunLeft < 72) { cls = "caution"; head = "CAUTION"; tail = `SUNSET IN ${fmtT(sunLeft)} · EARTHSET IN ${fmtT(earthLeft)}`; }
+  else { cls = "go"; head = "GO"; tail = `POWER FOR ${fmtT(sunLeft)} · DIRECT-TO-EARTH LINK FOR ${fmtT(earthLeft)}`; }
+  v.className = "verdict " + cls;
+  v.innerHTML = `&gt; STATUS: ${head} <span>— ${tail}</span>`;
+
+  renderHorizon(cur);
   renderTimelineCursor();
+  const sp = subPoints(cur.t);
+  globe?.setBodies(sp.sun, sp.earth);
 }
 
-function setState(id, on, yes, no) {
-  const n = $(id);
-  n.textContent = on ? yes : no;
-  n.className = `big ${on ? "on" : "off"}`;
-}
-
-function renderHorizon() {
+function renderHorizon(cur) {
   const svg = $("horizon");
-  const W = svg.clientWidth || 800, H = svg.clientHeight || 260;
-  const P = { l: 44, r: 12, t: 12, b: 26 };
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 230, L = 34, B = 18, T = 6;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.replaceChildren();
-
   const { horizon, samples } = state.scenario;
-  const win = 72 / STEP_HOURS; // ±3 days of path
-  const lo = Math.max(0, state.idx - win), hi = Math.min(samples.length - 1, state.idx + win);
-  const pathPts = samples.slice(lo, hi + 1);
-  let yMax = Math.max(8, ...horizon) + 2;
-  for (const s of pathPts) yMax = Math.max(yMax, s.sunEl + 2, s.earthEl + 2);
-  yMax = Math.min(90, Math.ceil(yMax));
-  const yMin = Math.min(-3, Math.floor(Math.min(...horizon) - 1));
+  const lo = Math.max(0, state.idx - 72), hi = Math.min(samples.length - 1, state.idx + 72);
+  const win = samples.slice(lo, hi + 1);
 
-  const x = (az) => P.l + (az / 360) * (W - P.l - P.r);
-  const y = (e) => P.t + (1 - (e - yMin) / (yMax - yMin)) * (H - P.t - P.b);
+  let yMax = Math.max(6, ...horizon) + 2, yMin = Math.min(-4, Math.min(...horizon) - 1);
+  for (const s of win) { yMax = Math.max(yMax, s.sunEl + 2, s.earthEl + 2); yMin = Math.min(yMin, Math.max(-12, Math.min(s.sunEl, s.earthEl) - 1)); }
+  yMax = Math.min(90, Math.ceil(yMax)); yMin = Math.floor(yMin);
+  const x = (a) => L + (a / 360) * (W - L - 4);
+  const y = (e) => T + (1 - (e - yMin) / (yMax - yMin)) * (H - B - T);
+  const clampY = (e) => y(Math.max(yMin, Math.min(yMax, e)));
 
-  // sky gradient
-  const defs = el("defs", {}, svg);
-  const g = el("linearGradient", { id: "sky", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
-  el("stop", { offset: "0%", "stop-color": "#05070c" }, g);
-  el("stop", { offset: "100%", "stop-color": "#0d1322" }, g);
-  const glow = el("filter", { id: "glow", x: "-50%", y: "-50%", width: "200%", height: "200%" }, defs);
-  el("feGaussianBlur", { stdDeviation: 3, result: "b" }, glow);
-  const m = el("feMerge", {}, glow); el("feMergeNode", { in: "b" }, m); el("feMergeNode", { in: "SourceGraphic" }, m);
-  el("rect", { x: P.l, y: P.t, width: W - P.l - P.r, height: H - P.t - P.b, fill: "url(#sky)" }, svg);
-
-  // grid
-  const step = yMax - yMin > 30 ? 15 : yMax - yMin > 12 ? 5 : 2;
+  const span = yMax - yMin, step = span > 60 ? 15 : span > 24 ? 10 : span > 12 ? 5 : 2;
   for (let e = Math.ceil(yMin / step) * step; e <= yMax; e += step) {
-    el("line", { x1: P.l, x2: W - P.r, y1: y(e), y2: y(e), stroke: e === 0 ? "#3b4763" : "#18202f", "stroke-dasharray": e === 0 ? "4 4" : "" }, svg);
-    const t = el("text", { x: P.l - 6, y: y(e) + 4, "text-anchor": "end", fill: "#5f6b82", "font-size": 11 }, svg); t.textContent = `${e}°`;
+    el("line", { x1: L, x2: W, y1: y(e), y2: y(e), stroke: e === 0 ? "#5a430c" : "#1d1606" }, svg);
+    el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 10, "text-anchor": "end" }, svg, e);
   }
-  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
-  dirs.forEach((d, i) => {
-    const az = i * 45;
-    el("line", { x1: x(az), x2: x(az), y1: P.t, y2: H - P.b, stroke: "#18202f" }, svg);
-    const t = el("text", { x: x(az), y: H - 8, "text-anchor": "middle", fill: "#8a96ad", "font-size": 11, "font-weight": 600 }, svg); t.textContent = d;
+  const narrow = W < 520;
+  ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].forEach((d, i) => {
+    el("line", { x1: x(i * 45), x2: x(i * 45), y1: T, y2: H - B, stroke: "#1d1606" }, svg);
+    if (narrow && i % 2) return;
+    el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 10, "text-anchor": "middle" }, svg, narrow ? d : `${pad(i * 45, 3)} ${d}`);
   });
 
-  // body paths (break where azimuth wraps)
-  const drawPath = (key, color) => {
+  const track = (key, color) => {
     let d = "", prev = null;
-    for (const s of pathPts) {
-      const az = s[`${key}Az`], e = s[`${key}El`];
-      d += (prev == null || Math.abs(az - prev) > 180 ? "M" : "L") + x(az).toFixed(1) + "," + y(e).toFixed(1);
+    for (const s of win) {
+      const az = s[key + "Az"];
+      d += (prev == null || Math.abs(az - prev) > 180 ? "M" : "L") + x(az).toFixed(1) + "," + clampY(s[key + "El"]).toFixed(1);
       prev = az;
     }
-    el("path", { d, fill: "none", stroke: color, "stroke-width": 1.5, "stroke-opacity": 0.5, "stroke-dasharray": "3 3" }, svg);
+    el("path", { d, fill: "none", stroke: color, "stroke-dasharray": "2 4", opacity: 0.75 }, svg);
   };
-  drawPath("sun", "var(--sun)");
-  drawPath("earth", "var(--earth)");
+  track("sun", C.wht); track("earth", C.cy);
 
-  // terrain (drawn over paths so it visibly blocks them)
-  let td = `M${x(0)},${y(yMin)}`;
-  for (let az = 0; az <= 360; az++) td += `L${x(az).toFixed(1)},${y(horizonAt(horizon, az % 360)).toFixed(1)}`;
-  td += `L${x(360)},${y(yMin)}Z`;
-  el("path", { d: td, fill: "var(--terrain)", stroke: "var(--terrain-edge)", "stroke-width": 1.2 }, svg);
+  // terrain: filled so it visibly hides whatever is behind it
+  let d = `M${x(0)},${H - B}`;
+  for (let az = 0; az <= 360; az++) d += `L${x(az).toFixed(1)},${y(horizonAt(horizon, az % 360)).toFixed(1)}`;
+  el("path", { d: d + `L${x(360)},${H - B}Z`, fill: "#120d02", stroke: "none" }, svg);
+  let ln = "";
+  for (let az = 0; az <= 360; az++) ln += `${az ? "L" : "M"}${x(az).toFixed(1)},${y(horizonAt(horizon, az % 360)).toFixed(1)}`;
+  el("path", { d: ln, fill: "none", stroke: C.amb, "stroke-width": 1.6 }, svg);
 
-  // current positions
-  const cur = samples[state.idx];
-  const drawBody = (az, e, up, color, r, label) => {
-    const cx = x(az), cy = y(Math.max(yMin, Math.min(yMax, e)));
-    el("circle", { cx, cy, r, fill: up ? color : "none", stroke: color, "stroke-width": 2, filter: up ? "url(#glow)" : "", opacity: up ? 1 : 0.6 }, svg);
-    const t = el("text", { x: cx, y: cy - r - 6, "text-anchor": "middle", fill: color, "font-size": 11, "font-weight": 700 }, svg);
-    t.textContent = up ? label : `${label} (blocked)`;
+  // bodies
+  const label = (cx, cy, text, color) => {
+    const right = cx < W - 130;
+    el("text", { x: cx + (right ? 12 : -12), y: Math.max(T + 10, cy - 9), fill: color, "font-size": 11, "font-weight": 600, "text-anchor": right ? "start" : "end" }, svg, text);
   };
-  drawBody(cur.earthAz, cur.earthEl, cur.earthUp, "var(--earth)", 6, "Earth");
-  drawBody(cur.sunAz, cur.sunEl, cur.sunUp, "var(--sun)", 8, "Sun");
+  const sx = x(cur.sunAz), sy = clampY(cur.sunEl);
+  const g = el("g", { transform: `translate(${sx},${sy})`, opacity: cur.sunUp ? 1 : 0.55 }, svg);
+  el("circle", { r: 6, fill: cur.sunUp ? "#ffd23c" : "none", stroke: C.wht, "stroke-width": 1.5 }, g);
+  el("line", { x1: -11, x2: 11, stroke: C.wht }, g); el("line", { y1: -11, y2: 11, stroke: C.wht }, g);
+  label(sx, sy, cur.sunUp ? `SUN ${sgn(cur.sunEl)}` : "SUN [BLOCKED]", cur.sunUp ? C.wht : C.red);
+  const ex = x(cur.earthAz), ey = clampY(cur.earthEl);
+  el("rect", { x: ex - 6, y: ey - 6, width: 12, height: 12, fill: cur.earthUp ? C.cy : "none", stroke: C.cy, "stroke-width": 1.5, opacity: cur.earthUp ? 1 : 0.55 }, svg);
+  label(ex, ey + 26, cur.earthUp ? `EARTH ${sgn(cur.earthEl)}` : "EARTH [BLOCKED]", cur.earthUp ? C.cy : C.red);
 }
 
 // ---------- timeline ----------
-const TL = { left: 56, right: 8, top: 8, rowH: 22, gap: 8 };
+const TL = { left: 52, right: 4, top: 14, rowH: 17, gap: 6 };
 
 function renderTimeline() {
   const svg = $("timeline");
-  const W = svg.clientWidth || 800, H = svg.clientHeight || 120;
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 104;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.replaceChildren();
   const { samples } = state.scenario;
   const n = samples.length, w = (W - TL.left - TL.right) / n;
-  const rows = [["Sun", (s) => s.sunUp, "var(--sun)"], ["Earth", (s) => s.earthUp, "var(--earth)"], ["Both", (s) => s.sunUp && s.earthUp, "var(--both)"]];
-
+  const rows = [["SUN", (s) => s.sunUp, C.grn], ["EARTH", (s) => s.earthUp, C.cy], ["BOTH", (s) => s.sunUp && s.earthUp, C.wht]];
   rows.forEach(([name, fn, color], r) => {
     const yy = TL.top + r * (TL.rowH + TL.gap);
-    el("rect", { x: TL.left, y: yy, width: W - TL.left - TL.right, height: TL.rowH, fill: "var(--dark)", rx: 3 }, svg);
-    let i = 0;
-    while (i < n) {
+    el("rect", { x: TL.left, y: yy + TL.rowH / 2 - 0.5, width: W - TL.left - TL.right, height: 1, fill: C.dim, opacity: 0.6 }, svg);
+    for (let i = 0; i < n;) {
       if (!fn(samples[i])) { i++; continue; }
       let j = i; while (j < n && fn(samples[j])) j++;
-      el("rect", { x: TL.left + i * w, y: yy, width: (j - i) * w, height: TL.rowH, fill: color, rx: 2 }, svg);
+      el("rect", { x: TL.left + i * w, y: yy, width: Math.max(1, (j - i) * w), height: TL.rowH, fill: color }, svg);
       i = j;
     }
-    const t = el("text", { x: TL.left - 8, y: yy + TL.rowH / 2 + 4, "text-anchor": "end", fill: "#8a96ad", "font-size": 11 }, svg); t.textContent = name;
+    el("text", { x: 0, y: yy + TL.rowH / 2 + 4, fill: color, "font-size": 11 }, svg, name);
   });
-
-  const yAxis = TL.top + 3 * (TL.rowH + TL.gap) + 2;
-  const tickEvery = W < 520 ? 10 : 5;
-  for (let day = 0; day <= 30; day += tickEvery) {
-    const xx = TL.left + (day * 24 / STEP_HOURS) * w;
-    el("line", { x1: xx, x2: xx, y1: TL.top, y2: yAxis - 4, stroke: "#07090f", "stroke-width": 1 }, svg);
-    const idx = Math.min(n - 1, day * 24 / STEP_HOURS);
-    const t = el("text", { x: xx, y: yAxis + 10, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle", fill: "#5f6b82", "font-size": 10 }, svg);
-    t.textContent = `${fmtShortDate(samples[idx].t)}`;
+  const yAxis = TL.top + 3 * (TL.rowH + TL.gap);
+  const every = W < 520 ? 10 : 5;
+  for (let day = 0; day <= 30; day += every) {
+    const xx = TL.left + Math.min(n, day * 24 / STEP_HOURS) * w;
+    el("line", { x1: xx, x2: xx, y1: TL.top - 4, y2: yAxis, stroke: "#000", "stroke-width": 1 }, svg);
+    const d = samples[Math.min(n - 1, day * 24 / STEP_HOURS)].t;
+    el("text", { x: xx, y: yAxis + 11, fill: C.dim, "font-size": 10, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
+      `${day ? "+" + day + "D" : "T0"}${W < 520 && day ? "" : ` ${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}`}`);
   }
-  el("line", { id: "tl-cursor", x1: 0, x2: 0, y1: TL.top - 4, y2: yAxis - 2, stroke: "#fff", "stroke-width": 2 }, svg);
+  el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
+  el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
 }
 
 function renderTimelineCursor() {
-  const svg = $("timeline");
-  const c = svg.querySelector("#tl-cursor"); if (!c) return;
-  const W = svg.clientWidth || 800, n = state.scenario.samples.length;
-  const xx = TL.left + (state.idx + 0.5) * (W - TL.left - TL.right) / n;
-  c.setAttribute("x1", xx); c.setAttribute("x2", xx);
+  const svg = $("timeline"), c = svg.querySelector("#tl-cursor"); if (!c) return;
+  const W = svg.clientWidth || 700, n = state.scenario.samples.length;
+  const xx = TL.left + (state.idx + 0.5) * (W - TL.left - TL.right) / n, y1 = TL.top + 3 * (TL.rowH + TL.gap) - 4;
+  c.setAttribute("d", `M${xx},6V${y1}`);
+  svg.querySelector("#tl-cursor-top").setAttribute("d", `M${xx - 5},0H${xx + 5}L${xx},7Z`);
 }
 
-// ---------- comparison ----------
+function scrubFromEvent(e) {
+  const svg = $("timeline"), r = svg.getBoundingClientRect();
+  const f = (e.clientX - r.left - TL.left) / (r.width - TL.left - TL.right);
+  setIdx(Math.round(Math.max(0, Math.min(1, f)) * (state.scenario.samples.length - 1)));
+}
+
+// ---------- compare ----------
 function pinCurrent() {
-  const key = `${state.site.lat},${state.site.lon},${state.start.toISOString()}`;
-  if (state.pinned.some((p) => p.key === key)) return;
-  state.pinned.push({ key, site: { ...state.site }, start: new Date(state.start), summary: state.summary });
+  const key = `${state.site.lat},${state.site.lon},${state.t0.toISOString()}`;
+  if (!state.pinned.some((p) => p.key === key))
+    state.pinned.push({ key, site: { ...state.site }, t0: new Date(state.t0), summary: state.summary });
   renderCompare();
 }
 
 function renderCompare() {
-  const list = $("compare-list");
-  list.replaceChildren();
-  if (!state.pinned.length) { list.innerHTML = `<p class="hint">No scenarios pinned yet. Use “Add to comparison”.</p>`; return; }
+  const box = $("compare-list");
+  box.replaceChildren();
+  if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. PRESS [PIN] TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
   const score = (p) => p.summary.pctSun * 0.6 + p.summary.pctEarth * 0.4;
   const best = state.pinned.length > 1 ? state.pinned.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
   for (const p of state.pinned) {
     const d = document.createElement("div");
     d.className = "cmp" + (p === best ? " best" : "");
-    const bar = (v, c) => `<div class="bar"><i style="width:${Math.round(v * 100)}%;background:${c}"></i></div>`;
-    d.innerHTML = `
-      ${p === best ? '<div class="tag">BEST OPTION</div>' : ""}
-      <div class="cmp-title">${siteLabel(p.site)}</div>
-      <div class="cmp-date">${fmtDate(p.start)}</div>
-      <div class="bars">
-        <span>Sunlight</span>${bar(p.summary.pctSun, "var(--sun)")}<b>${pct(p.summary.pctSun)}</b>
-        <span>Earth</span>${bar(p.summary.pctEarth, "var(--earth)")}<b>${pct(p.summary.pctEarth)}</b>
-        <span>Both</span>${bar(p.summary.pctBoth, "var(--both)")}<b>${pct(p.summary.pctBoth)}</b>
-      </div>
-      <div class="kv"><span>Longest dark</span><b>${p.summary.maxDarkHours ? fmtDur(p.summary.maxDarkHours) : "none"}</b></div>
+    const bar = (name, v, col) => `<div class="rowb"><span>${name}</span><i><b style="width:${Math.round(v * 100)}%;background:${col}"></b></i><span>${pct(v)}</span></div>`;
+    d.innerHTML = `<div class="nm">${p === best ? '<span class="best-tag">BEST</span>' : ""}${siteName(p.site)}</div>
+      <div class="dt">T0 ${stamp(p.t0)} · DARK ${p.summary.maxDarkHours ? fmtT(p.summary.maxDarkHours) : "NONE"}</div>
+      ${bar("SUN", p.summary.pctSun, C.grn)}${bar("EARTH", p.summary.pctEarth, C.cy)}${bar("BOTH", p.summary.pctBoth, C.wht)}
       <button class="x" title="Remove">✕</button>`;
-    d.querySelector(".x").addEventListener("click", (e) => {
-      e.stopPropagation();
-      state.pinned = state.pinned.filter((q) => q !== p);
-      renderCompare();
-    });
-    d.addEventListener("click", () => { state.site = p.site; state.start = new Date(p.start); recompute(); });
-    list.appendChild(d);
+    d.querySelector(".x").addEventListener("click", (e) => { e.stopPropagation(); state.pinned = state.pinned.filter((q) => q !== p); renderCompare(); });
+    d.addEventListener("click", () => { state.t0 = new Date(p.t0); selectSite(p.site); });
+    box.appendChild(d);
   }
 }
 
-// ---------- go ----------
-initControls();
-recompute();
+// ---------- wiring ----------
+function init() {
+  buildSiteList();
+
+  const tip = $("globe-tip");
+  globe = createGlobe($("globe"), {
+    sites: SITES,
+    onPickSite: (s) => selectSite(s),
+    onPickCoord: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }, { fly: false }),
+    onHover: (s, e) => {
+      if (!s) { tip.hidden = true; return; }
+      const r = $("globe").getBoundingClientRect();
+      tip.hidden = false; tip.textContent = s.name.toUpperCase();
+      tip.style.left = e.clientX - r.left + "px"; tip.style.top = e.clientY - r.top + "px";
+    },
+  });
+
+  const onCoord = () => {
+    const lat = parseFloat($("lat-input").value), lon = parseFloat($("lon-input").value);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
+    selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
+  };
+  $("lat-input").addEventListener("change", onCoord);
+  $("lon-input").addEventListener("change", onCoord);
+  $("date-input").addEventListener("change", (e) => { if (e.target.value) { state.t0 = fromInputValue(e.target.value); recompute(); } });
+
+  document.querySelectorAll("[data-slip]").forEach((b) => b.addEventListener("click", () => slip(Number(b.dataset.slip))));
+  $("play-btn").addEventListener("click", togglePlay);
+  $("next-site-btn").addEventListener("click", nextSite);
+  $("pin-btn").addEventListener("click", pinCurrent);
+
+  const tl = $("timeline");
+  let dragging = false;
+  tl.addEventListener("pointerdown", (e) => { dragging = true; tl.setPointerCapture(e.pointerId); scrubFromEvent(e); });
+  tl.addEventListener("pointermove", (e) => { if (dragging) scrubFromEvent(e); });
+  tl.addEventListener("pointerup", () => { dragging = false; });
+
+  window.addEventListener("keydown", (e) => {
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key;
+    if (k === "ArrowRight") e.shiftKey ? slip(1) : setIdx(state.idx + 1);
+    else if (k === "ArrowLeft") e.shiftKey ? slip(-1) : setIdx(state.idx - 1);
+    else if (k === " ") togglePlay();
+    else if (k === "s" || k === "S") nextSite();
+    else if (k === "p" || k === "P") pinCurrent();
+    else if (k === "Home") setIdx(0);
+    else return;
+    e.preventDefault();
+  });
+
+  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); renderMoment(); }, 80); });
+  if (!IS_DEMO) $("data-badge").remove();
+
+  renderCompare();
+  globe?.select(state.site);
+  recompute();
+  document.fonts?.ready.then(() => { renderTimeline(); renderMoment(); });
+}
+
+init();

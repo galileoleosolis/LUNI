@@ -33,6 +33,16 @@ function altAz(lat, dec, H) {
   return { el: el / DEG, az: ((az / DEG) % 360 + 360) % 360 };
 }
 
+// Sub-solar and sub-Earth points (degrees) for the 3D globe: where each body is straight overhead.
+export function subPoints(t) {
+  const d = days(t);
+  const wrap = (x) => ((x + 180) % 360 + 360) % 360 - 180;
+  return {
+    sun:   { lat: -1.54 * Math.cos(2 * Math.PI * (d - D_REF) / 346.6), lon: wrap(-360 * d / SYNODIC + 180) },
+    earth: { lat: -6.7 * Math.cos(2 * Math.PI * (d - D_REF) / LIB_LAT_P), lon: 7.9 * Math.sin(2 * Math.PI * d / LIB_LON_P) },
+  };
+}
+
 function placeholderSun(d, lat, lon) {
   // Sub-solar point: latitude wobbles ±1.54° over a year; longitude sweeps once per synodic month.
   // Phase tuned so late Nov 2026 has the Sun north-of-pole-negative (south pole lit), matching Horizons.
