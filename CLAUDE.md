@@ -39,12 +39,19 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - Keep plain-language explanations for the user; they are not a programmer.
 
 ## Open work, roughly in priority order
-1. Public GitHub repo + GitHub Pages link (judges need a URL). Not created yet.
+1. **TURN ON GITHUB PAGES — NOT DONE YET, DO NOT FORGET.** The code is pushed to
+   https://github.com/galileoleosolis/LUNI (branch `main`), but Pages is still off, so there is no public link
+   for the judges. To finish: repo Settings → Pages → "Deploy from a branch" → `main`, `/ (root)` → Save
+   (or `gh api -X POST repos/galileoleosolis/LUNI/pages -f 'source[branch]=main' -f 'source[path]=/'` once the
+   user says to). Then check `https://galileoleosolis.github.io/LUNI/` loads, add an empty `.nojekyll` file if
+   anything is missing, and put the link in the README and the project submission. The user asked to do this later.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link (user has OpenSpace installed): send Lua over its local WebSocket server to follow LUNO's site and
    time. Must be tested on the user's PC; works only when LUNO is served locally, not from a sandboxed preview.
 4. Windows .exe wrapper (Electron) if still wanted.
-5. Test mode (`?test=1`): task card + local usage log for a first-time-user test by the user's sibling.
+5. Test mode is built (`js/testmode.js`, on with `#test` or `window.LUNO_TEST`): intro, six tasks, local usage log,
+   review, copyable report. The user's sibling is running it on the preview page and has found some errors:
+   get the report, then fix what it shows.
 6. Quick wins: eclipse alerts, share link, real-mission replays, explainer mode, partial-Sun power.
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centres).
