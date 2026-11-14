@@ -17,6 +17,17 @@ function rampColor(ramp, v) {            // v in 0..100
 }
 
 const GO_RGB = [33, 224, 122], NOGO_RGB = [70, 14, 14];
+// A small lander: the mark for "where you are now" on the map and in the side panel.
+const LANDER_SVG = `<svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+function drawLander(ctx, x, y, s) {
+  const p = new Path2D("M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3");
+  ctx.save(); ctx.translate(x, y); ctx.scale(s / 20, s / 20); ctx.lineJoin = ctx.lineCap = "round";
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 4.6; ctx.stroke(p); ctx.fillStyle = "#fff"; ctx.fill(new Path2D("M-4.5-7h9l2 6h-13z"));
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.8; ctx.stroke(p); ctx.restore();
+}
+const DIRS = ["NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "WEST", "NORTHWEST"];
+// "2.76 KM" and "WEST" for a point's offset from the site
+const away = (c) => { const d = Math.hypot(c.eastKm, c.northKm); return [d < 10 ? d.toFixed(2) : d.toFixed(1), DIRS[Math.round(((Math.atan2(c.eastKm, c.northKm) * 180 / Math.PI + 360) % 360) / 45) % 8]]; };
 
 export function createScanPanel({ getContext, onPick, fmt }) {
   const panel = $("scan"), canvas = $("scan-canvas"), ctx = canvas.getContext("2d");
@@ -125,8 +136,24 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     ctx.fillStyle = "#fff"; ctx.fillRect(14, size - 14, barPx, 3); ctx.fillRect(14, size - 18, 1.5, 7); ctx.fillRect(14 + barPx - 1.5, size - 18, 1.5, 7);
     ctx.font = "600 10px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(`${barKm} KM`, 14, size - 19);
     const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
-    if (best && st.done === st.total) mark(best, "#000", true), mark(best, "#fff", true);
-    mark(center, "#fff", false);
+    // a label on a dark plate, kept inside the map
+    const tag = (text, x, y) => {
+      ctx.font = "700 11px sans-serif"; const w = ctx.measureText(text).width + 10;
+      const tx = Math.max(3, Math.min(size - w - 3, x - w / 2)), ty = Math.max(3, Math.min(size - 19, y));
+      ctx.fillStyle = "rgba(0,0,0,.78)"; ctx.fillRect(tx, ty, w, 16); ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, tx + 5, ty + 8.5);
+    };
+    const cx = (center.k + 0.5) * cw, cy = (center.r + 0.5) * cw, here = 26, moved = best && !(best.r === center.r && best.k === center.k);
+    if (best && st.done === st.total) {
+      const bx = (best.k + 0.5) * cw, by = (best.r + 0.5) * cw;
+      if (moved) {      // the way from here to the best point, with its length
+        ctx.setLineDash([6, 4]); ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.lineWidth = 1.8; ctx.strokeStyle = "#fff"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
+      }
+      mark(best, "#000", true), mark(best, "#fff", true);
+      tag(moved ? `★ BEST · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST POINT", bx, by + (by > cy ? 12 : -30));
+    }
+    drawLander(ctx, cx, cy, here);
+    if (moved || !(best && st.done === st.total)) tag("YOU ARE HERE", cx, cy + (best && st.done === st.total && (best.r + 0.5) * cw > cy ? -32 : 16));
     if (st.hover) { const m = Math.max(cw, 9); ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect((st.hover.k + 0.5) * cw - m / 2 + 1, (st.hover.r + 0.5) * cw - m / 2 + 1, m - 2, m - 2); }
 
     // side readouts
@@ -135,7 +162,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-engine").textContent = st.onChip ? `COMPUTED ON THE GRAPHICS CHIP (GPU)${chipName() ? ": " + chipName() : ""}` : "COMPUTED ON THE PROCESSOR";
     $("scan-progress").className = finished ? "ok" : "";
     const sq = st.grid.stepM / 1000, sqTxt = `${+sq.toFixed(2)} KM`;
-    $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ✛ = CURRENT SITE · ★ = BEST`;
+    $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
     $("scan-legend").classList.toggle("flat", !m.ramp);
     $("scan-legend").innerHTML = m.ramp
       ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span><div class="ends"><span>◀ ${m.ends[0]}</span><span>${m.ends[1]} ▶</span></div>`
@@ -143,9 +170,10 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? "" : "<br>" + c.reason}`;
     const cur = st.cells[center.r * n + center.k];
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
-    $("scan-best").innerHTML = finished && best ? cellText(best) : "…";
+    const far = best && away(best);
+    $("scan-best").innerHTML = !(finished && best) ? "…" : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
     $("scan-go-best").disabled = !(finished && best && !(best.r === center.r && best.k === center.k));
-    $("scan-hover").innerHTML = st.hover ? cellText(st.hover) + "<br>CLICK TO MOVE THE SITE HERE" : "MOVE OVER THE MAP TO INSPECT A POINT. CLICK TO MOVE THE SITE THERE.";
+    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + "<br>CLICK TO MOVE THE SITE HERE" : "MOVE OVER THE MAP TO INSPECT A POINT. CLICK TO MOVE THE SITE THERE.";
   }
 
   const cellAt = (e) => {

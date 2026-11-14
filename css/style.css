@@ -167,6 +167,8 @@ html.flow #scan-big { display: none; }
 .scan-legend b { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }
 .scan-legend .ends { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 8px; color: var(--amb); }
 #scan-scale b { color: var(--wht); font-weight: 600; }
+svg.lander { display: inline-block; width: 15px; height: 15px; vertical-align: -3px; color: var(--wht); }
+.scan-cell .dist { color: var(--wht); font-size: 13px; }
 #scan-progress { margin-top: 8px; color: var(--key-y); font-weight: 600; } #scan-progress.ok { color: var(--grn); }
 .dimtxt { color: var(--dim); font-size: 10.5px; }
 .scan-cell { font-size: 11.5px; line-height: 1.5; color: var(--amb); min-height: 3em; }
