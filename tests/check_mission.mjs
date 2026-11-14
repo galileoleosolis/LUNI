@@ -28,6 +28,16 @@ const req = (o) => ({ ...DEFAULT_REQ, ...o });
   assert.equal(analyze(s, req({ days: 1, maxDarkH: 0 })).at(0).ok, true);   // mission over before the gap begins
   assert.equal(analyze(s, req({ days: 1, maxDarkH: 6 })).at(0).marginOpen, true);   // gap of exactly 6 h is allowed
 }
+{ // slope rule: a limit is only applied when one is set and the slope is known; it fails every hour alike
+  const s = mk(day("B") + day("B") + day("B") + day("B"));
+  assert.equal(analyze(s, req({ days: 2 }), 1, { slopeDeg: 13.3 }).at(0).ok, true);                    // no limit set
+  assert.equal(analyze(s, req({ days: 2, maxSlopeDeg: 15 }), 1, { slopeDeg: 13.3 }).at(0).ok, true);
+  const a = analyze(s, req({ days: 2, maxSlopeDeg: 10 }), 1, { slopeDeg: 13.3 });
+  assert.equal(a.at(0).ok, false); assert.equal(a.at(0).steep, true); assert.match(a.at(0).reasons[0], /GROUND SLOPE 13\.3° \(LIMIT 10°\)/);
+  assert.equal(a.mask.reduce((x, y) => x + y, 0), 0);                                                  // no landing hour is offered
+  assert.equal(analyze(s, req({ days: 2, maxSlopeDeg: 10 }), 1, { slopeDeg: null }).at(0).ok, true);    // slope unknown: not judged
+  assert.equal(analyze(s, req({ days: 2, maxSlopeDeg: 10 })).at(0).ok, true);
+}
 { // Earth rules
   const s = mk(day("S") + day("B") + day("S") + day("S"));
   assert.equal(analyze(s, req({ days: 2, earthAtLanding: true })).at(0).ok, false);
