@@ -149,6 +149,7 @@ const FEATURES = {      // click targets -> the feature they belong to
   "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
   "launch-slip keys": /^slip/, "NEXT WINDOW": /^next-window-btn/, "AREA SCAN": /^scan/, "mission needs": /^need:/,
   "verdict-block buttons": /^mission-/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
+  "ASK LUNO (typed or spoken commands)": /^(talk-btn|comms:|typed:|voice:)/,
 };
 
 let T = null, api = null;       // T = test state, api = hooks from app.js
@@ -170,6 +171,7 @@ function describe(el) {
   if (n.dataset.slip) return "slip:" + n.dataset.slip + "d";
   const seg = n.closest(".seg[data-req]"); if (seg) return `need:${seg.dataset.req}=${n.textContent.trim()}`;
   if (n.closest("#scan")) return "scan:" + (n.id || n.textContent.trim().slice(0, 24) || n.tagName.toLowerCase());
+  if (n.closest("#comms")) return "comms:" + (n.id || n.textContent.trim().slice(0, 24));
   if (n.closest("#windows")) return "windows:" + n.textContent.trim().slice(0, 22);
   if (n.closest("#globe")) return "globe";
   if (n.closest(".cmp")) return "compare:card";
@@ -181,8 +183,9 @@ function wireTracking() {
   document.addEventListener("change", (e) => { if (/^(lat-input|lon-input|t0-day|t0-month|t0-year|t0-hour)$/.test(e.target.id)) log("input", `${e.target.id}=${e.target.value}`); }, true);
   window.addEventListener("keydown", (e) => {
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (/^(Arrow|Home| |Escape)/.test(e.key) || /^[spnaSPNA]$/.test(e.key)) log("key", (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key));
+    if (/^(Arrow|Home| |Escape)/.test(e.key) || /^[spnatvSPNATV/]$/.test(e.key)) log("key", (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key));
   }, true);
+  window.addEventListener("luno:command", (e) => log("input", `${e.detail.via}:"${e.detail.text.slice(0, 60)}" -> ${e.detail.ok ? e.detail.tools.join("+") : "NOT UNDERSTOOD"}`));
   let last = "";
   window.addEventListener("luno:state", () => {
     const s = api.snapshot(), k = `${s.site.id}@${s.site.lat.toFixed(3)},${s.site.lon.toFixed(3)} T0=${s.t0.toISOString().slice(0, 16)} needs=${s.req.days}d/${s.req.maxDarkH}h/${s.req.earthMinPct}%/${s.req.earthAtLanding ? "E" : "-"} ${s.missionOk ? "GO" : "NO-GO"}`;

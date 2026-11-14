@@ -24,6 +24,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - `js/surface.js`, `js/ui-surface.js` — 3D first-person surface view (three.js): nested terrain sheets from `data/patch/`
   (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNO skyline overlay at 2 m.
   On the preview page the patches are served as base64 text copies (see the artifact build step).
+- `js/assistant.js`, `js/ui-assistant.js` — ASK LUNO: typed or spoken commands. `parse` turns a sentence into tool calls
+  (`TOOLS`, `runTool`), answers are built only from LUNO's own numbers. Rules, not a language model, so it works with no
+  Earth link; the tool list is the hand-over point if a language model is added. The app side is `assistantApi` in
+  `js/app.js`. Speech uses the browser (Web Speech API). Never call `SpeechRecognition.available()` at page load: it
+  crashes headless test browsers; it runs only when someone first presses TALK.
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -31,7 +36,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   `build_web_dem.py`, `find_best_lit.py`, `fetch_horizons_fixtures.py`; `fetch_kernels.sh` and `fetch_dem.sh`
   download the NASA inputs (about 45 MB and 620 MB; not in git).
 - `tests/` — run with Node 22: `check_ephemeris` (0.0007° vs JPL Horizons), `check_terrain`, `check_mission`,
-  `check_scan`, `real_missions`.
+  `check_scan`, `check_eclipses`, `check_assistant`, `real_missions`.
 
 ## Rules of the road
 - Only real, sourced data in the app. Unsourced notes were removed on purpose; do not re-add figures without a source.
@@ -73,6 +78,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
    Task set C (next good time, mission length, dark, Earth link, eclipse, better spot) is now the default; sets A and B
    run with `#test-a` and `#test-b`.
+   ASK LUNO (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
+   the user must test it in Chrome or Edge from localhost or GitHub Pages. Open decision: add a language model on top
+   (online with an API key, or a local model on the user's laptop).
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

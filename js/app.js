@@ -8,6 +8,8 @@ import { sampleSite, siteEclipses } from "./model.js";
 import { createScanPanel } from "./ui-scan.js";
 import { initTestMode } from "./testmode.js";
 import { createSurfacePanel } from "./ui-surface.js";
+import { createAssistant } from "./assistant.js";
+import { createAssistantPanel } from "./ui-assistant.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -131,9 +133,9 @@ function syncT0() {
   day.value = t.getUTCDate(); $("t0-month").value = t.getUTCMonth(); $("t0-year").value = t.getUTCFullYear(); $("t0-hour").value = t.getUTCHours();
 }
 
-function nextSite() {
+function nextSite(by = 1) {
   const i = SITES.findIndex((s) => s.id === state.site.id);
-  selectSite(SITES[(i + 1) % SITES.length]);
+  selectSite(SITES[(Math.max(i, by > 0 ? -1 : 0) + by + SITES.length) % SITES.length]);
 }
 
 function syncSiteUI() {
@@ -257,6 +259,7 @@ function renderMission() {
   });
   for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
     `<div class="warn">⚠ ECLIPSE ON ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</div>`);
+  state.mission = { v, next: nx ? nx.start : null, fixes, eclipses: hit };      // kept for the command assistant
   return v;
 }
 
@@ -315,8 +318,9 @@ function setIdx(i) {
   renderMoment();
 }
 
-function togglePlay() {
+function togglePlay(on = !state.playing) {
   const btn = $("play-btn");
+  if (on === !!state.playing) return;
   if (state.playing) {
     clearInterval(state.playing); state.playing = null;
     $("play-label").textContent = "▶ PLAY"; btn.classList.remove("on");
@@ -515,7 +519,7 @@ function renderCompare() {
     d.className = "cmp" + (p === best ? " best" : "");
     const bar = (name, v, col) => `<div class="rowb"><span>${name}</span><i><b style="width:${Math.round(v * 100)}%;background:${col}"></b></i><span>${pct(v)}</span></div>`;
     d.innerHTML = `<div class="nm">${p === best ? '<span class="best-tag">BEST</span>' : ""}${siteName(p.site)}</div>
-      <div class="dt">T0 ${stamp(p.t0)}</div>
+      <div class="dt">LANDING ${stamp(p.t0)}</div>
       <div class="dt"><span class="${p.mission.ok ? "tag-go" : "tag-nogo"}">${p.days}D ${p.mission.ok ? "GO" : "NO-GO"}</span>${p.mission.ok ? `MARGIN ${p.mission.marginOpen ? ">" : "+"}${fmtDH(Math.max(0, p.mission.marginHours))}` : p.mission.reasons[0]}</div>
       ${bar("SUN", p.summary.pctSun, C.grn)}${bar("EARTH", p.summary.pctEarth, C.cy)}${bar("BOTH", p.summary.pctBoth, C.wht)}
       <button class="x" title="Remove">✕</button>`;
@@ -524,6 +528,36 @@ function renderCompare() {
     box.appendChild(d);
   }
 }
+
+// ---------- command assistant ----------
+// Everything the assistant (typed or spoken commands) may read or do. It goes through the same functions as the keys.
+const assistantApi = {
+  sites: () => SITES,
+  needOptions: () => REQ_OPTIONS,
+  snapshot() {
+    const { samples, terrain } = state.scenario, cur = samples[state.idx], cov = coverage();
+    const sunLeft = hoursUntilChange(samples, state.idx, "sunUp"), earthLeft = hoursUntilChange(samples, state.idx, "earthUp");
+    const sunNext = sunLeft == null ? null : samples[state.idx + sunLeft / STEP_HOURS];
+    return {
+      site: state.site, siteName: state.site.id === CUSTOM_ID ? "Custom point" : state.site.name.replace(/ · /g, ", "), t0: state.t0, idx: state.idx * STEP_HOURS, maxIdx: (samples.length - 1) * STEP_HOURS,
+      req: state.req, landing: samples[0], cur, sunLeft, earthLeft, sunNextIsEclipse: !!(sunNext && sunNext.eclipse > 0.4),
+      verdict: state.mission.v, next: state.mission.next, options: state.mission.fixes.map((f) => f[1]), eclipses: state.mission.eclipses,
+      terrain, terrainBusy: !!state.terrainBusy, coverage: { start: cov.start, last: new Date(cov.end.getTime() - 70 * 86400000) },
+    };
+  },
+  selectSite: (site) => selectSite(site),
+  selectPoint: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
+  stepSite: (by) => nextSite(by),
+  setT0: (d) => setT0(d),
+  setReq: (k, v) => setReq(k, v),
+  setIdx: (hours) => setIdx(Math.round(hours / STEP_HOURS)),
+  play: (on) => togglePlay(on),
+  openScan: (show) => { if (scan.isOpen() !== show) scan.toggle(show); },
+  openSurface: (show) => { if (surface.isOpen() !== show) surface.toggle(show); },
+  pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
+  takeOption: (i) => state.mission.fixes[i]?.[2](),
+  pin: () => pinCurrent(),
+};
 
 // ---------- wiring ----------
 async function init() {
@@ -556,7 +590,7 @@ async function init() {
   $("lon-input").addEventListener("change", onCoord);
 
   document.querySelectorAll("[data-slip]").forEach((b) => b.addEventListener("click", () => slip(Number(b.dataset.slip))));
-  $("play-btn").addEventListener("click", togglePlay);
+  $("play-btn").addEventListener("click", () => togglePlay());
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
@@ -572,6 +606,7 @@ async function init() {
   });
   $("surface-btn").addEventListener("click", () => surface.toggle(true));
   buildNeeds();
+  const comms = createAssistantPanel({ assistant: createAssistant(assistantApi) });
   $("calendar").addEventListener("click", (e) => {
     const d = dayFromEvent($("calendar"), e, state.cal.days);
     if (d < 0) return;
@@ -592,6 +627,9 @@ async function init() {
     if (k === "ArrowRight") e.shiftKey ? slip(1) : setIdx(state.idx + 1);
     else if (k === "ArrowLeft") e.shiftKey ? slip(-1) : setIdx(state.idx - 1);
     else if (k === " ") togglePlay();
+    else if (k === "t" || k === "T") comms.talk();
+    else if (k === "/") comms.type();
+    else if (k === "Escape" && comms.isOpen()) comms.toggle(false);
     else if (k === "s" || k === "S") nextSite();
     else if (k === "p" || k === "P") pinCurrent();
     else if (k === "n" || k === "N") nextWindow();
