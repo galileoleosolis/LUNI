@@ -13,6 +13,27 @@ const store = { get: (k) => { try { return localStorage.getItem(k); } catch { re
 export function createAssistantPanel({ assistant }) {
   const panel = $("comms"), input = $("comms-input"), mic = $("comms-mic"), key = $("talk-btn");
   const st = { speak: store.get("luno-speak") !== "off", hands: false, listening: false, rec: null, local: false, armedUntil: 0, speaking: false, micBlocked: false };
+  // On the Claude preview page the browser's own microphone is blocked; the page host offers dictation instead.
+  let dict = null, phrase = "", phraseTimer = 0;
+  const canListen = () => !!dict || (!!SR && !st.micBlocked);
+  globalThis.claude?.use?.("dictation").then((d) => {
+    if (!d) return;
+    dict = d;
+    const flush = () => { const text = phrase.trim(); phrase = ""; if (!text) return; if (!st.speaking) heard(text); if (!st.hands) dict.stop().catch(() => {}); };
+    d.onPartial(({ text }) => { if (text) { clearTimeout(phraseTimer); $("comms-you").textContent = `HEARING: ${phrase}${text}`; } });
+    d.onFinal(({ text }) => { phrase += text; clearTimeout(phraseTimer); phraseTimer = setTimeout(flush, 900); });      // a pause ends the command
+    d.onState(({ state, reason }) => {
+      setListening(state !== "idle");
+      if (state !== "idle") return;
+      if (st.hands) { st.hands = false; }
+      if (reason === "not_granted" || reason === "unavailable") { st.micBlocked = true; }
+      syncOpts(); note();
+    });
+    syncOpts(); note();
+  }).catch(() => {});
+  // A press on TALK cuts LUNO off mid-sentence and listens straight away.
+  function hush() { globalThis.speechSynthesis?.cancel(); st.speaking = false; }
+  function startDictation() { hush(); dict.start({ language: "en" }).catch((e) => { if (e?.code === "not_granted" || e?.code === "unavailable") { st.micBlocked = true; syncOpts(); note(); input.focus(); } }); }
 
   // ---------- answers ----------
   function say(text) {
@@ -22,7 +43,7 @@ export function createAssistantPanel({ assistant }) {
     u.lang = "en-US"; u.rate = 1.05;
     // In hands-free mode the microphone would hear LUNO's own voice, so it waits until LUNO has finished.
     u.onstart = () => { st.speaking = true; if (st.hands) st.rec?.abort(); };
-    u.onend = u.onerror = () => { st.speaking = false; if (st.hands && !st.listening) listen(); };
+    u.onend = u.onerror = () => { setTimeout(() => { st.speaking = false; if (st.hands && !st.listening && !dict) listen(); }, 400); };
     speechSynthesis.speak(u);
   }
   function run(text, via) {
@@ -49,7 +70,8 @@ export function createAssistantPanel({ assistant }) {
 
   // ---------- talking ----------
   function note() {
-    const voice = !SR ? "VOICE: THIS BROWSER CANNOT LISTEN. TYPE INSTEAD (CHROME AND EDGE CAN LISTEN)."
+    const voice = dict && !st.micBlocked ? "VOICE: ON THIS PREVIEW PAGE, SPEECH IS TURNED INTO TEXT BY THE PAGE HOST'S ONLINE SERVICE."
+      : !SR ? "VOICE: THIS BROWSER CANNOT LISTEN. TYPE INSTEAD (CHROME AND EDGE CAN LISTEN)."
       : st.micBlocked ? "VOICE: THE MICROPHONE IS BLOCKED ON THIS PAGE. TYPE INSTEAD, OR ALLOW THE MICROPHONE AND RELOAD."
       : st.local ? "VOICE: SPEECH IS TURNED INTO TEXT ON THIS DEVICE."
       : "VOICE: THIS BROWSER USES ITS ONLINE SERVICE TO TURN SPEECH INTO TEXT.";
@@ -88,7 +110,7 @@ export function createAssistantPanel({ assistant }) {
     else if (Date.now() < st.armedUntil) { st.armedUntil = 0; run(text, "voice"); }
   }
   async function listen() {
-    if (!SR || st.listening || st.speaking || st.starting) return;
+    if (dict || !SR || st.listening || st.speaking || st.starting) return;
     st.starting = true; await checkLocal(); st.starting = false;
     if (panel.hidden) return;
     const rec = new SR();
@@ -108,19 +130,23 @@ export function createAssistantPanel({ assistant }) {
     rec.onend = () => { if (st.rec === rec) st.rec = null; setListening(false); if (st.hands && !st.speaking && !panel.hidden) setTimeout(listen, 250); };
     try { rec.start(); st.rec = rec; setListening(true); } catch { setListening(false); }
   }
-  function stopListening() { st.rec?.abort(); setListening(false); }
+  function stopListening() { if (dict) { phrase = ""; clearTimeout(phraseTimer); dict.stop().catch(() => {}); } st.rec?.abort(); setListening(false); }
 
-  mic.addEventListener("click", () => { if (!SR || st.micBlocked) { input.focus(); return; } st.listening ? stopListening() : (globalThis.speechSynthesis?.cancel(), listen()); });
+  mic.addEventListener("click", () => { if (!canListen()) { input.focus(); return; } if (st.listening) stopListening(); else if (dict) startDictation(); else { hush(); listen(); } });
 
   // ---------- options ----------
   function syncOpts() {
     $("comms-voice").textContent = `SPOKEN ANSWERS ${st.speak ? "ON" : "OFF"}`; $("comms-voice").classList.toggle("on", st.speak);
     $("comms-hands").textContent = `HANDS-FREE ${st.hands ? "ON · SAY “LUNO, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
-    $("comms-hands").hidden = !SR; mic.disabled = false; mic.classList.toggle("off", !SR || st.micBlocked);
+    $("comms-hands").hidden = !canListen(); mic.classList.toggle("off", !canListen());
     key.classList.toggle("on", st.listening || st.hands);
   }
   $("comms-voice").addEventListener("click", () => { st.speak = !st.speak; store.set("luno-speak", st.speak ? "on" : "off"); if (!st.speak) globalThis.speechSynthesis?.cancel(); syncOpts(); });
-  $("comms-hands").addEventListener("click", () => { st.hands = !st.hands; stopListening(); syncOpts(); if (st.hands) listen(); });
+  $("comms-hands").addEventListener("click", () => {
+    st.hands = !st.hands;
+    if (dict) { if (st.hands) { if (!st.listening) startDictation(); } else stopListening(); syncOpts(); setListening(st.listening); return; }
+    stopListening(); syncOpts(); if (st.hands) listen();
+  });
   $("comms-close").addEventListener("click", () => toggle(false));
 
   function toggle(show = panel.hidden) {
@@ -131,7 +157,8 @@ export function createAssistantPanel({ assistant }) {
   // T key / ASK LUNO key: open and listen (or put the cursor in the box when the browser cannot listen).
   function talk() {
     if (panel.hidden) toggle(true);
-    if (SR && !st.micBlocked) { if (!st.listening) { globalThis.speechSynthesis?.cancel(); listen(); } } else input.focus();
+    if (!canListen()) input.focus();
+    else if (!st.listening) { if (dict) startDictation(); else { hush(); listen(); } }
   }
   function type() { if (panel.hidden) toggle(true); input.focus(); }
   key.addEventListener("click", () => { if (st.listening) stopListening(); else talk(); });
