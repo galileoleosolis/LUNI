@@ -1,0 +1,18 @@
+{
+ "start_utc": "2023-01-01T00:00:00Z",
+ "step_hours": 2,
+ "count": 56977,
+ "frame": "MOON_ME (MOON_ME_DE440_ME421)",
+ "aberration": "LT+S",
+ "observer": "Moon center",
+ "layout": "float32 LE x6 per step: sunUnit(x,y,z), earthKm(x,y,z)",
+ "moon_radius_km": 1737.4,
+ "kernels": [
+  "naif0012.tls",
+  "pck00011.tpc",
+  "moon_pa_de440_200625.bpc",
+  "moon_de440_250416.tf",
+  "de440s.bsp"
+ ],
+ "source": "NASA NAIF SPICE generic kernels, https://naif.jpl.nasa.gov/naif/data_generic.html"
+}

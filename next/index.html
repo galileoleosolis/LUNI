@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LUNO · Lunar Utility for Navigational Operations</title>
+  <script>(() => { const p = new URLSearchParams(location.search).get("palette"); if (p) document.documentElement.dataset.palette = p; })();</script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="test-bar" class="test-bar" hidden></div>
+<div id="test-overlay" class="test-overlay" hidden></div>
+<div class="stage" id="stage">
+<div class="unit">
+  <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
+  <div class="unit-top">
+    <span><i class="led"></i>LUNO PLANNING UNIT</span>
+    <span id="data-badge" class="demo" >LOADING DATA</span>
+  </div>
+
+  <div class="screen">
+    <header class="bar">
+      <span class="name">LUNO</span>
+      <span>SITE <b id="bar-site"></b></span>
+      <span>LANDING <b id="bar-t0"></b></span>
+      <span class="r">MISSION CLOCK <b id="bar-now"></b> <span id="bar-tplus"></span></span>
+    </header>
+
+    <div class="cols">
+      <div id="surface" class="surface" hidden>
+        <div id="sv-canvas" class="sv-canvas"></div>
+        <div class="sv-top">
+          <div><b id="sv-title"></b><span id="sv-time"></span></div>
+          <div class="sv-ctl">
+            <span>DETAIL</span><div class="seg" id="sv-quality"></div>
+            <span>EYE HEIGHT</span><div class="seg" id="sv-eye"></div>
+            <span>LUNO SKYLINE</span><div class="seg" id="sv-skyline"></div>
+            <button id="sv-sun">FACE THE SUN</button><button id="sv-earth">FACE EARTH</button>
+            <button id="sv-save">SAVE IMAGE</button><button id="sv-full">FULL SCREEN</button><button id="sv-close">✕ CLOSE</button>
+          </div>
+        </div>
+        <div id="sv-status" class="sv-status" hidden></div>
+        <div class="sv-bottom"><div id="sv-look"></div><div id="sv-info"></div><div class="sv-key"><i></i> <span id="sv-keytext"></span> · DRAG TO LOOK AROUND · USE PLAY OR ← → TO RUN THE MISSION CLOCK</div></div>
+      </div>
+      <!-- LEFT: site + date -->
+      <section class="col col-site">
+        <h3 class="step-head"><span><b class="step">1</b>WHERE · PICK A SITE</span><button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">BETTER SPOT ▸</button></h3>
+        <div id="site-list" class="site-list"></div>
+        <div class="globe-wrap">
+          <div id="globe" class="globe"></div>
+          <div id="globe-tip" class="globe-tip" hidden></div>
+          <div id="globe-labels" class="globe-labels"></div>
+          <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
+          <div class="k-hint">NUMBERED DOTS = THE SITES ABOVE</div>
+        </div>
+        <h3 class="gap step-head"><span><b class="step">2</b>WHEN · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
+        <div class="t0">
+          <select id="t0-day" aria-label="Day"></select>
+          <select id="t0-month" aria-label="Month"></select>
+          <select id="t0-year" aria-label="Year"></select>
+          <select id="t0-hour" aria-label="Hour, UTC"></select>
+        </div>
+        <p class="note">UTC = WORLD TIME (SAME AS GMT)</p>
+        <h3 class="gap"><b class="step">3</b>WHAT THE MISSION NEEDS</h3>
+        <div class="needs">
+          <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
+          <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
+          <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
+          <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+        </div>
+      </section>
+
+      <!-- CENTER: the answer -->
+      <section class="col col-main">
+        <div id="scan" class="scan" hidden>
+          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-big" title="Use the whole screen for the map">⤢ BIG MAP</button><button id="scan-close" title="Close (Esc)">✕ CLOSE</button></span></div>
+          <div class="scan-body">
+            <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
+            <div class="scan-side">
+              <h3>SCAN SIZE (HALF-WIDTH)</h3><div class="seg" id="scan-radius"></div>
+              <h3>SHOW</h3><div class="seg" id="scan-metric"></div>
+              <div id="scan-legend" class="scan-legend"></div>
+              <div id="scan-progress"></div>
+              <div id="scan-engine" class="dimtxt"></div>
+              <div id="scan-scale" class="dimtxt"></div>
+              <h3>WHERE YOU ARE NOW <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell"></div>
+              <h3>BEST POINT FOUND ★</h3><div id="scan-best" class="scan-cell"></div>
+              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
+              <h3>INSPECT</h3><div id="scan-hover" class="scan-cell"></div>
+              <div id="scan-note" class="credit"></div>
+            </div>
+          </div>
+        </div>
+        <h3><b class="step">4</b>THE ANSWER · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <div id="mission" class="hero">
+          <div class="hero-word" id="mission-word"></div>
+          <div class="hero-text">
+            <div class="hero-title" id="mission-title"></div>
+            <div class="hero-why" id="mission-why"></div>
+          </div>
+          <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
+        </div>
+
+        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
+        <div class="nasa-check">CHECK WITH NASA JPL HORIZONS:
+          <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">SUN ↗</a>
+          <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">EARTH ↗</a></div></div>
+        <div class="readouts">
+          <div class="ro">
+            <div class="ro-a">
+              <div class="lab">☀ POWER</div>
+              <div class="st" id="sun-state"></div>
+              <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
+              <div class="mini warn" id="sun-eclipse" hidden></div>
+            </div>
+            <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
+          </div>
+          <div class="ro">
+            <div class="ro-a">
+              <div class="lab">⊕ EARTH LINK</div>
+              <div class="st" id="earth-state"></div>
+              <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
+            </div>
+            <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
+          </div>
+        </div>
+
+
+
+        <div class="tiles-head"><h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
+
+        <h3>FIRST 30 DAYS AFTER LANDING · CLICK OR DRAG TO MOVE THE MISSION CLOCK</h3>
+        <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
+
+        <h3 id="cal-title">GOOD LANDING DAYS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
+        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
+      </section>
+
+      <!-- RIGHT: summary + compare -->
+      <section class="col col-side">
+        <h3>NEXT GOOD LANDING TIMES · CLICK ONE TO GO THERE</h3>
+        <div id="windows" class="windows"></div>
+        <h3 class="gap">COMPARE · OPTIONS YOU PINNED</h3>
+        <div id="compare-list" class="compare"></div>
+        <details class="more">
+          <summary>MORE NUMBERS</summary>
+          <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
+          <table class="sum">
+            <tr><td>IN SUNLIGHT</td><td id="pct-sun"></td></tr>
+            <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
+            <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
+            <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
+          </table>
+          <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
+          <table class="sum" id="brief-lola"></table>
+          <p id="site-note" class="note"></p>
+          <h3 class="gap">A CUSTOM POINT · LATITUDE AND LONGITUDE</h3>
+          <div class="fields">
+            <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
+            <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
+          </div>
+        </details>
+        <div id="os-box" class="os-box">
+          <h3 class="gap">OPENSPACE · 3D VIEW THAT FOLLOWS LUNO</h3>
+          <div class="os-row"><button id="os-btn" class="mini-btn">CONNECT TO OPENSPACE</button><div class="seg" id="os-view"></div></div>
+          <div id="os-status" class="dimtxt">NEEDS OPENSPACE RUNNING ON THIS COMPUTER.</div>
+        </div>
+        <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
+      </section>
+    </div>
+
+    <!-- ASK LUNI (Lunar Utility Navigational Intelligence): typed or spoken commands -->
+    <div id="comms" class="comms" hidden>
+      <div class="comms-row">
+        <button id="comms-mic" class="comms-mic" title="Talk to LUNI (T)">● TALK</button>
+        <input id="comms-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="160" placeholder="TYPE WHAT YOU WANT AND PRESS ENTER, OR PRESS TALK AND SAY IT" aria-label="Command for LUNI">
+        <button id="comms-send" class="comms-opt">SEND ▸</button>
+        <button id="comms-voice" class="comms-opt"></button>
+        <button id="comms-hands" class="comms-opt" title="Keeps listening. Start each command with the word LUNI."></button>
+        <button id="comms-close" class="comms-opt" title="Close (Esc)">✕ CLOSE</button>
+      </div>
+      <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">I am LUNI, the Lunar Utility Navigational Intelligence. Ask in plain words, or try one of these:</div></div>
+      <div id="comms-tips" class="comms-tips"></div>
+      <div id="comms-ai-row" class="comms-ai" hidden>
+        <span>AI MODEL RUNNING ON THIS COMPUTER:</span>
+        <select id="ai-preset" aria-label="Model program"></select>
+        <input id="ai-base" type="text" autocomplete="off" spellcheck="false" aria-label="Address of the model server" placeholder="http://localhost:11434/v1">
+        <button id="ai-connect" class="comms-opt">CONNECT</button>
+        <select id="ai-model" aria-label="Model" hidden></select>
+        <button id="ai-off" class="comms-opt" hidden>TURN OFF</button>
+        <span id="ai-status"></span>
+      </div>
+      <div class="comms-foot"><span id="comms-note"></span><button id="comms-local" class="comms-opt" hidden>MAKE VOICE WORK WITHOUT INTERNET (ONE DOWNLOAD)</button><button id="comms-ai" class="comms-opt" title="Lets a language model on this computer answer what the built-in commands cannot">LOCAL AI MODEL: OFF</button></div>
+    </div>
+  </div>
+
+  <div class="keys">
+    <button class="key" data-slip="-7"><small>LAUNCH SLIP</small>◀◀ 7 D</button>
+    <button class="key" data-slip="-1"><small>LAUNCH SLIP</small>◀ 1 D</button>
+    <button class="key" id="play-btn"><small>MISSION CLOCK</small><span id="play-label">▶ PLAY</span></button>
+    <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
+    <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
+    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key."><small>TALK OR TYPE</small>ASK LUNI</button>
+    <button class="key g" id="next-window-btn"><small>JUMP TO THE</small>NEXT GOOD TIME</button>
+    <button class="key g" id="scan-btn"><small>FIND A NEARBY</small>BETTER SPOT</button>
+    <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
+    <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
+  </div>
+</div>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
