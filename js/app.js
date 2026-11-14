@@ -492,7 +492,13 @@ function renderTimeline() {
   }
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
-  el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, state.req.days < 30 ? `THE ${state.req.days}-DAY MISSION` : "");
+  // The bracket's label sits to the right of the bracket; when there is no room there (a 28-day mission), it moves inside.
+  const mLabel = `THE ${state.req.days}-DAY MISSION`, mW = mLabel.length * 6.9 + 6;
+  if (mEnd + 5 + mW <= W - TL.right) el("text", { x: mEnd + 5, y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, mLabel);
+  else {
+    el("rect", { x: mEnd - 10 - mW, y: TL.top - 15, width: mW + 4, height: 12, fill: "#000" }, svg);
+    el("text", { x: mEnd - 9, y: TL.top - 5, fill: C.wht, "font-size": 11, "text-anchor": "end" }, svg, mLabel);
+  }
   // The slider: a rail under the chart and a handle that carries the moment it stands on.
   const yRail = yAxis + TL.rail;
   el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
