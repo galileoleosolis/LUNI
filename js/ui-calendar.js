@@ -34,7 +34,7 @@ export function renderCalendar(svg, days, { t0Day, missionDays }) {
     if (d.t.getUTCDate() === 1) {
       el("line", { x1: x, x2: x, y1: yLand - 3, y2: yAxis + 3, stroke: C.dim, "stroke-width": 1 }, svg);
       if (x < W - 30) el("text", { x: x + 3, y: yAxis + 12, fill: C.dim, "font-size": 10 }, svg,
-        MON[d.t.getUTCMonth()] + (d.t.getUTCMonth() === 0 || i === 0 ? " '" + String(d.t.getUTCFullYear()).slice(2) : ""));
+        MON[d.t.getUTCMonth()] + (d.t.getUTCMonth() === 0 ? " '" + String(d.t.getUTCFullYear()).slice(2) : ""));
     }
   });
 
@@ -47,7 +47,7 @@ export function renderCalendar(svg, days, { t0Day, missionDays }) {
 
 // Which day index an x position (client coordinates) falls on, or -1.
 export function dayFromEvent(svg, e, nDays) {
-  const r = svg.getBoundingClientRect();
-  const f = (e.clientX - r.left - CAL.left) / (r.width - CAL.left - CAL.right);
+  const r = svg.getBoundingClientRect(), z = r.width / (svg.clientWidth || 1) || 1;      // the stage may be scaled
+  const f = ((e.clientX - r.left) / z - CAL.left) / (svg.clientWidth - CAL.left - CAL.right);
   return f < 0 || f >= 1 ? -1 : Math.floor(f * nDays);
 }

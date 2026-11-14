@@ -52,8 +52,8 @@ export function createScanPanel({ getContext, onPick, fmt }) {
 
   function draw() {
     if (panel.hidden || !st.grid) return;
-    const n = st.grid.n, box = canvas.parentElement.getBoundingClientRect();
-    const size = Math.max(160, Math.floor(Math.min(box.width, box.height))), dpr = Math.min(2, window.devicePixelRatio || 1);
+    const n = st.grid.n, box = canvas.parentElement;
+    const size = Math.max(160, Math.floor(Math.min(box.clientWidth, box.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.style.width = canvas.style.height = size + "px";
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);

@@ -24,6 +24,27 @@ const state = {
 };
 let globe = null, scan = null;
 
+// ---------- sizing ----------
+// Wide windows: lay the unit out at a design size and scale it to fit. Narrow windows: stacked layout.
+const FIT = { flowBelow: 900, dhMin: 872, dhMax: 1120, dwMin: 1252, dwMax: 1732, sMin: 0.72, sMax: 1.6 };
+function fitStage() {
+  const root = document.documentElement, cs = getComputedStyle(document.body);
+  const vw = root.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const vh = window.innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const flow = root.clientWidth < FIT.flowBelow;
+  root.classList.toggle("flow", flow);
+  if (flow) return;
+  // Fit the height first (never smaller than sMin: a very short window scrolls instead of shrinking the text away),
+  // then let the unit use the window's width, within the range of widths the layout is designed for.
+  let s = Math.max(FIT.sMin, Math.min(FIT.sMax, vh / FIT.dhMin)), dw = vw / s, dh = FIT.dhMin;
+  if (dw < FIT.dwMin) { dw = FIT.dwMin; s = vw / dw; dh = Math.max(FIT.dhMin, Math.min(FIT.dhMax, vh / s)); }   // narrow window: width decides, use spare height
+  dw = Math.min(dw, FIT.dwMax);
+  const st = $("stage").style;
+  st.setProperty("--dw", Math.round(dw)); st.setProperty("--dh", Math.round(dh)); st.setProperty("--s", s.toFixed(4));
+}
+// Ratio of on-screen pixels to layout pixels for an element (the stage may be scaled).
+const zoomOf = (node) => (node.getBoundingClientRect().width / (node.clientWidth || 1)) || 1;
+
 // ---------- formatting ----------
 function roundToHour(d) { const x = new Date(d); x.setUTCMinutes(0, 0, 0); return x; }
 const pad = (n, w = 2) => String(n).padStart(w, "0");
@@ -396,8 +417,8 @@ function renderTimelineCursor() {
 }
 
 function scrubFromEvent(e) {
-  const svg = $("timeline"), r = svg.getBoundingClientRect();
-  const f = (e.clientX - r.left - TL.left) / (r.width - TL.left - TL.right);
+  const svg = $("timeline"), r = svg.getBoundingClientRect(), z = zoomOf(svg);
+  const f = ((e.clientX - r.left) / z - TL.left) / (svg.clientWidth - TL.left - TL.right);
   setIdx(Math.round(Math.max(0, Math.min(1, f)) * (state.scenario.samples.length - 1)));
 }
 
@@ -432,6 +453,7 @@ function renderCompare() {
 
 // ---------- wiring ----------
 async function init() {
+  fitStage();
   await Promise.all([loadSites(), initModel()]);
   state.site = SITES[0];
   const cov = coverage();
@@ -445,9 +467,9 @@ async function init() {
     onPickCoord: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }, { fly: false }),
     onHover: (s, e) => {
       if (!s) { tip.hidden = true; return; }
-      const r = $("globe").getBoundingClientRect();
+      const r = $("globe").getBoundingClientRect(), z = zoomOf($("globe"));
       tip.hidden = false; tip.textContent = s.name.toUpperCase();
-      tip.style.left = e.clientX - r.left + "px"; tip.style.top = e.clientY - r.top + "px";
+      tip.style.left = (e.clientX - r.left) / z + "px"; tip.style.top = (e.clientY - r.top) / z + "px";
     },
   });
 
@@ -502,7 +524,7 @@ async function init() {
     e.preventDefault();
   });
 
-  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); updateCalendar(); renderMoment(); }, 80); });
+  let rz; window.addEventListener("resize", () => { fitStage(); clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); updateCalendar(); renderMoment(); }, 80); });
 
   renderCompare();
   globe?.select(state.site);

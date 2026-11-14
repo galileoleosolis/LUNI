@@ -13,11 +13,13 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #232427; }
+body { overflow-x: hidden; }
 body { font-family: var(--mono); color: var(--amb); padding: 14px; }
 
 /* ---------- hardware shell ---------- */
-.unit { position: relative; max-width: 1560px; margin: 0 auto; padding: 16px 22px 20px; border-radius: 22px;
-  height: calc(100vh - 28px); min-height: 850px; display: flex; flex-direction: column;
+.unit { position: relative; padding: 16px 22px 20px; border-radius: 22px;
+  width: calc(var(--dw, 1412) * 1px); height: calc(var(--dh, 872) * 1px); transform: scale(var(--s, 1)); transform-origin: 0 0;
+  display: flex; flex-direction: column;
   background: linear-gradient(160deg, #3b3d42, #1c1d20); border: 3px solid #0e0e0f;
   box-shadow: 0 24px 50px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.08); }
 .bolt { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #a0a0a0, #303030); box-shadow: inset 0 0 0 2px #1a1a1a; }
@@ -85,7 +87,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--cy); outlin
 
 svg { display: block; width: 100%; }
 svg text { font-family: var(--mono); }
-.horizon { flex: 1 1 0 !important; min-height: 120px; margin-bottom: 8px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; box-sizing: content-box; }
+.horizon { flex: 1 1 0 !important; min-height: 84px; margin-bottom: 8px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; box-sizing: content-box; }
 .verdict.mission { margin-bottom: 8px; }
 .timeline { height: 96px; margin-bottom: 8px; cursor: ew-resize; touch-action: none; }
 
@@ -171,37 +173,34 @@ svg text { font-family: var(--mono); }
 
 .credit { margin-top: auto !important; padding-top: 14px; font-size: 9.5px; line-height: 1.5; color: #5c4410; letter-spacing: .06em; }
 
-/* ---------- responsive ---------- */
-@media (max-width: 1180px) {
-  .unit { height: auto; }
-  .cols { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: auto; }
-  .globe-wrap { flex: none !important; height: 300px; }
-  .site-list { flex: none !important; max-height: 220px; }
-  .horizon { flex: none !important; height: 230px; }
-  .key { font-size: 18px; } .key small { font-size: 9px; letter-spacing: .14em; }
-  .col-side { grid-column: 1 / -1; border-left: none; border-top: 1px solid var(--dim); padding: 12px 0 0; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
-  .col-side > h3:nth-of-type(3), .help { display: none; }
-  .st { font-size: 38px; } .cd b { font-size: 46px; }
-}
-@media (max-width: 760px) {
-  body { padding: 6px; }
-  .unit { padding: 12px 10px 14px; border-radius: 14px; }
-  .unit-top { font-size: 11px; letter-spacing: .18em; margin: 0 8px 8px; } .demo { font-size: 10px; }
-  .screen { padding: 10px; }
-  .cols { grid-template-columns: 1fr; }
-  .col { padding: 12px 0 0; }
-  .col-site { border-right: none; border-bottom: 1px solid var(--dim); padding-bottom: 12px; }
-  .col-side { display: block; }
-  .globe-wrap { height: 270px; }
-  .site-list { max-height: 154px; }
-  .bar .name { display: none; } .bar .r { margin-left: 0; }
-  .st { font-size: 30px; } .cd b { font-size: 38px; } .lab, .cd { font-size: 14px; } .ro + .ro { padding-left: 12px; }
-  .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .key { height: 60px; font-size: 18px; } .key small { font-size: 8.5px; letter-spacing: .14em; }
-  .key-gap { display: none; }
-  .scan { position: fixed; padding: 10px; }
-  .scan-body { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
-  .scan-side { max-height: 38vh; }
-  #play-btn { order: 5; } #next-window-btn { order: 6; grid-column: span 2; } #pin-btn { order: 7; } #scan-btn { order: 8; grid-column: span 2; } #next-site-btn { order: 9; grid-column: span 2; }
-  .mini { font-size: 11px; white-space: nowrap; }
-}
+/* ---------- sizing ----------
+   Wide windows: the unit is laid out at a fixed design size (--dw x --dh) and scaled as one piece to fit the
+   window (set by fitStage() in app.js), so its proportions hold and nothing can collide.
+   Narrow windows (html.flow): one stacked column at natural height. */
+.stage { margin: 0 auto; width: calc(var(--dw, 1412) * var(--s, 1) * 1px); height: calc(var(--dh, 872) * var(--s, 1) * 1px); }
+
+html.flow body { padding: 6px; }
+html.flow .stage { width: auto; height: auto; }
+html.flow .unit { width: auto; height: auto; transform: none; padding: 12px 10px 14px; border-radius: 14px; }
+html.flow .unit-top { font-size: 11px; letter-spacing: .18em; margin: 0 8px 8px; } html.flow .demo { font-size: 10px; }
+html.flow .screen { padding: 10px; }
+html.flow .cols { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+html.flow .col { padding: 12px 0 0; }
+html.flow .col-site { border-right: none; border-bottom: 1px solid var(--dim); padding-bottom: 12px; }
+html.flow .col-side { border-left: none; border-top: 1px solid var(--dim); margin-top: 12px; overflow: visible; }
+html.flow .globe-wrap { flex: none !important; height: 270px; max-height: none; }
+html.flow .site-list { flex: none !important; max-height: 154px; }
+html.flow .horizon { flex: none !important; height: 230px; }
+html.flow .bar .name { display: none; } html.flow .bar .r { margin-left: 0; }
+html.flow .st { font-size: 30px; } html.flow .cd b { font-size: 38px; } html.flow .lab, html.flow .cd { font-size: 14px; } html.flow .ro + .ro { padding-left: 12px; }
+html.flow .mini { font-size: 11px; white-space: nowrap; }
+html.flow .help { display: none; }
+html.flow .keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+html.flow .key { height: 60px; font-size: 18px; } html.flow .key small { font-size: 8.5px; letter-spacing: .14em; }
+html.flow .key-gap { display: none; }
+html.flow #play-btn { order: 5; } html.flow #next-window-btn { order: 6; grid-column: span 2; } html.flow #pin-btn { order: 7; }
+html.flow #scan-btn { order: 8; grid-column: span 2; } html.flow #next-site-btn { order: 9; grid-column: span 2; }
+html.flow .scan { position: fixed; inset: 0; padding: 10px; overflow-y: auto; }
+html.flow .scan-body { display: block; }
+html.flow .scan-map { height: min(92vw, 60vh); margin-bottom: 12px; }
+html.flow .scan-side { overflow: visible; }
