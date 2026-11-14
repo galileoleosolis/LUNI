@@ -58,7 +58,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    review, copyable report. First run (the user's sibling, 14 Nov): 2/6, ease 2/5. The native date box reset itself
    while he typed the year and blocked the whole test; he never found the site list and read "05Z" as a year.
    Fixed since: click-only UTC pickers, one date format with year, numbered step headers, numbered tags on the Moon,
-   clearer task wording. Needs a re-test with someone who has NOT seen the app.
+   clearer task wording. Second run (same person, so a re-check only): 4/6, ease 4/5, "looked broken: not anymore".
+   He still never changed the mission length, stepped +1 day 21 times instead of using NEXT WINDOW, and never opened
+   the area scan. Fixed since: mission length sits inside the verdict block, and a NO-GO shows two buttons there
+   (next good landing time, better spot nearby). Still needs a test with someone who has NOT seen the app.
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

@@ -77,13 +77,19 @@
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
           <div class="hero-text">
-            <div class="hero-title" id="mission-title"></div>
+            <div class="hero-title"><span id="mission-title"></span> <span class="hero-len">MISSION LENGTH <span class="seg" data-req="days"></span> DAYS</span></div>
             <div class="hero-why" id="mission-why"></div>
           </div>
-          <button id="mission-next" class="hero-next" hidden>GO TO THE NEXT<br>GOOD WINDOW ▸</button>
+          <div class="hero-actions" id="mission-actions" hidden>
+            <button id="mission-next" class="hero-next">NEXT GOOD LANDING TIME ▸</button>
+            <button id="mission-scan" class="hero-next alt">BETTER SPOT NEARBY ▸</button>
+          </div>
         </div>
 
-        <h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
+        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
+        <div class="nasa-check">CHECK WITH NASA JPL HORIZONS:
+          <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">SUN ↗</a>
+          <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">EARTH ↗</a></div></div>
         <div class="readouts">
           <div class="ro">
             <div class="ro-a">
@@ -104,9 +110,7 @@
           </div>
         </div>
 
-        <div class="nasa-check">CHECK WITH NASA JPL HORIZONS:
-          <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">SUN ↗</a>
-          <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNO's direction and its elevation is LUNO's height.">EARTH ↗</a></div>
+
 
         <h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND, WITH THE SUN AND EARTH</h3>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>

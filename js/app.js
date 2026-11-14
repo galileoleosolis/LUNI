@@ -46,6 +46,7 @@ function fitStage() {
   if (dw < FIT.dwMin) { dw = FIT.dwMin; s = vw / dw; dh = Math.max(FIT.dhMin, Math.min(FIT.dhMax, vh / s)); }   // narrow window: width decides, use spare height
   dw = Math.min(dw, FIT.dwMax);
   const st = $("stage").style;
+  $("stage").classList.toggle("tight", dw < 1500);
   st.setProperty("--dw", Math.round(dw)); st.setProperty("--dh", Math.round(dh)); st.setProperty("--s", s.toFixed(4));
 }
 // Ratio of on-screen pixels to layout pixels for an element (the stage may be scaled).
@@ -224,12 +225,13 @@ function renderMission() {
   const r = state.req, v = state.cal.a.at(calIdx()), nx = state.cal.windows.find((w) => w.start > state.t0);
   $("mission").className = "hero " + (v.ok ? "go" : "nogo");
   $("mission-word").textContent = v.ok ? "GO" : "NO-GO";
-  $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
+  $("mission-title").textContent = `LANDING ${stamp(state.t0)} ·`;
   const line = (s) => `<div>${s}</div>`;
   $("mission-why").innerHTML = v.ok
     ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
-    : v.reasons.map(line).join("") + line(nx ? `NEXT GOOD WINDOW: ${stamp(nx.start)}` : "NO GOOD WINDOW IN THE NEXT 12 MONTHS");
-  $("mission-next").hidden = v.ok || !nx;
+    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT GOOD LANDING TIME: ${stamp(nx.start)}` : "NO GOOD LANDING TIME IN THE NEXT 12 MONTHS"}</div>`;
+  $("mission-actions").hidden = v.ok;
+  $("mission-next").hidden = !nx;
   // Eclipses during the mission (Earth passing in front of the Sun), if the Sun would otherwise be in view.
   const end = new Date(+state.t0 + r.days * DAY), i0 = calIdx();
   const hit = siteEclipses(state.site, state.t0, end, state.scenario.terrain).filter((e) => {
@@ -271,10 +273,11 @@ function buildNeeds() {
     const opts = k === "earthAtLanding" ? [[true, "REQUIRED"], [false, "NO"]] : REQ_OPTIONS[k].map((v) => [v, k === "earthMinPct" && v === 0 ? "ANY" : String(v)]);
     for (const [val, label] of opts) {
       const b = document.createElement("button");
-      b.textContent = label; b.classList.toggle("on", state.req[k] === val);
+      b.textContent = label; b.dataset.v = String(val); b.classList.toggle("on", state.req[k] === val);
       b.addEventListener("click", () => {
         state.req = { ...state.req, [k]: val };
-        seg.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+        // the same need can appear in two places (the verdict block and the needs panel): keep them in step
+        document.querySelectorAll(`.seg[data-req="${k}"] button`).forEach((x) => x.classList.toggle("on", x.dataset.v === String(val)));
         recompute({ keepIdx: true });
       });
       seg.appendChild(b);
@@ -535,6 +538,7 @@ async function init() {
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
   $("mission-next").addEventListener("click", nextWindow);
+  $("mission-scan").addEventListener("click", () => scan.toggle(true));
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
     onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
