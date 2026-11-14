@@ -3,37 +3,39 @@
  "sites": [
   {
    "id": "nobile1",
-   "name": "Nobile Rim 1",
+   "name": "Nobile Rim 1 · best-lit point",
    "tag": "ARTEMIS III",
-   "group": "South pole — Artemis III candidates",
-   "lat": -85.45,
-   "lon": 36.36,
+   "group": "South pole — candidate regions",
+   "lat": -85.2979,
+   "lon": 37.0841,
    "approx": true,
-   "src": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/"
+   "srcText": "LUNO-selected: best-lit point within 5 km of the rough region centre (LOLA, full year 2027). Region centre still to be verified."
   },
   {
    "id": "malapert",
-   "name": "Malapert Massif",
+   "name": "Malapert Massif · best-lit point",
    "tag": "ARTEMIS III",
-   "group": "South pole — Artemis III candidates",
-   "lat": -86.0,
-   "lon": 0.0,
-   "approx": true
+   "group": "South pole — candidate regions",
+   "lat": -85.9908,
+   "lon": 2.0758,
+   "approx": true,
+   "srcText": "LUNO-selected: best-lit point within 5 km of the rough region centre (LOLA, full year 2027). Region centre still to be verified."
   },
   {
    "id": "haworth",
-   "name": "Haworth",
-   "tag": "ARTEMIS III",
-   "group": "South pole — Artemis III candidates",
+   "name": "Haworth crater floor (shadowed)",
+   "tag": "CONTRAST SITE",
+   "group": "South pole — candidate regions",
    "lat": -87.0,
    "lon": -5.0,
-   "approx": true
+   "approx": true,
+   "srcText": "Inside Haworth crater: a permanently shadowed floor, shown for contrast. Approximate point."
   },
   {
    "id": "shackleton",
    "name": "Shackleton connecting ridge",
    "tag": "SOUTH POLE · HIGH-ILLUMINATION POINT",
-   "group": "South pole — Artemis III candidates",
+   "group": "South pole — candidate regions",
    "lat": -89.45,
    "lon": -137.31,
    "approx": false,

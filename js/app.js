@@ -97,9 +97,9 @@ function syncSiteUI() {
   $("bar-t0").textContent = stamp(state.t0);
   const note = $("site-note");
   if (s.id === CUSTOM_ID) note.textContent = "CUSTOM POINT";
+  else if (s.srcText) note.textContent = s.srcText.toUpperCase();
   else if (s.approx) note.textContent = "APPROXIMATE REGION CENTRE — TO BE VERIFIED";
   else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>`;
-  else if (s.srcText) note.textContent = s.srcText.toUpperCase();
   else note.textContent = s.tag || "";
 }
 

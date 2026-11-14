@@ -126,7 +126,7 @@ def distances(near_res, d_max=250e3, d_min=15.0, growth=0.0015):
     return np.array(out)
 
 
-def horizon(lat, lon, mast_m=2.0, az_step=0.5, d_max=250e3):
+def horizon(lat, lon, mast_m=2.0, az_step=0.5, d_max=250e3, growth=0.0015):
     """Terrain horizon seen from a site: elevation angle (deg) of the skyline for each azimuth.
 
     Walks outward along every azimuth, samples the LOLA height, and keeps the steepest upward angle,
@@ -138,7 +138,7 @@ def horizon(lat, lon, mast_m=2.0, az_step=0.5, d_max=250e3):
     near = dem("near") if lat <= -80.0 else None
     far = dem("far") if polar else dem("global")
     az = np.arange(0, 360, az_step)
-    dist = distances(near.res if near else far.res, d_max)
+    dist = distances(near.res if near else far.res, d_max, growth=growth)
     A, D = np.meshgrid(az, dist, indexing="ij")
     la, lo = destination(lat, lon, A, D)
 
