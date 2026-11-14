@@ -6,6 +6,8 @@ import { fetchBytes } from "./bin.js";
 
 const DEG = Math.PI / 180;
 export const MOON_RADIUS_KM = 1737.4;
+export const EARTH_RADIUS_KM = 6378.137;
+export const SUN_RADIUS_DEG = 0.2666;      // apparent radius of the Sun from the Moon (varies by about 1.7% over the year)
 let E = null;
 
 export function initEphemeris(buffer, meta) {
@@ -62,7 +64,39 @@ export function sunEarthAltAz(frame, t) {
   const ex = s[3] - frame.pos[0], ey = s[4] - frame.pos[1], ez = s[5] - frame.pos[2], r = Math.hypot(ex, ey, ez);
   const earthEl = Math.asin(dot(frame.up, ex, ey, ez) / r) / DEG;
   const earthAz = Math.atan2(dot(frame.east, ex, ey, ez), dot(frame.north, ex, ey, ez)) / DEG;
-  return { sunAz: (sunAz + 360) % 360, sunEl, earthAz: (earthAz + 360) % 360, earthEl, earthDistKm: r };
+  // Angle between the Sun and the Earth in the site's sky, and how big the Earth looks: used to spot eclipses.
+  const sepDeg = Math.acos(Math.max(-1, Math.min(1, (s[0] * ex + s[1] * ey + s[2] * ez) / r))) / DEG;
+  const earthRadDeg = Math.asin(EARTH_RADIUS_KM / r) / DEG;
+  return { sunAz: (sunAz + 360) % 360, sunEl, earthAz: (earthAz + 360) % 360, earthEl, earthDistKm: r, sepDeg, earthRadDeg };
+}
+
+// Share of the Sun's disc hidden behind the Earth (0 = none, 1 = total eclipse), from the overlap of two circles.
+export function eclipseCover(sepDeg, earthRadDeg, sunRadDeg = SUN_RADIUS_DEG) {
+  const d = sepDeg, R = earthRadDeg, r = sunRadDeg;
+  if (d >= R + r) return 0;
+  if (d <= R - r) return 1;
+  const a = r * r * Math.acos((d * d + r * r - R * R) / (2 * d * r));
+  const b = R * R * Math.acos((d * d + R * R - r * r) / (2 * d * R));
+  const c = 0.5 * Math.sqrt((-d + r + R) * (d + r - R) * (d - r + R) * (d + r + R));
+  return Math.max(0, Math.min(1, (a + b - c) / (Math.PI * r * r)));
+}
+
+// Eclipses seen from a site between two times: Earth passing in front of the Sun (on Earth, a lunar eclipse).
+// Returns [{ start, end, peak, maxCover }], stepping every 5 minutes.
+export function eclipsesBetween(frame, t0, t1, stepMin = 5) {
+  const out = [], step = stepMin * 60000;
+  let cur = null;
+  for (let t = +t0; t <= +t1; t += step) {
+    const s = sunEarthAltAz(frame, t), c = s.sepDeg < 1.5 ? eclipseCover(s.sepDeg, s.earthRadDeg) : 0;
+    if (c > 0) {
+      if (!cur) cur = { start: new Date(t), end: new Date(t), peak: new Date(t), maxCover: c };
+      cur.end = new Date(t);
+      if (c > cur.maxCover) { cur.maxCover = c; cur.peak = new Date(t); }
+    } else if (cur) { out.push(cur); cur = null; }
+    if (!cur && s.sepDeg > 20) t += Math.floor((s.sepDeg - 15) / 0.6) * 3600000;      // Sun and Earth far apart: skip ahead (they close at about 0.5 deg/hour)
+  }
+  if (cur) out.push(cur);
+  return out;
 }
 
 // Points on the Moon where the Sun / Earth are straight overhead (deg).

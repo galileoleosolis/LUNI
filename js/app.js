@@ -4,7 +4,7 @@ import { hasTerrain, setCustomTerrain, initModel, getScenario, summarize, hoursU
 import { createGlobe } from "./globe.js";
 import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
-import { sampleSite } from "./model.js";
+import { sampleSite, siteEclipses } from "./model.js";
 import { createScanPanel } from "./ui-scan.js";
 import { initTestMode } from "./testmode.js";
 
@@ -230,6 +230,14 @@ function renderMission() {
     ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
     : v.reasons.map(line).join("") + line(nx ? `NEXT GOOD WINDOW: ${stamp(nx.start)}` : "NO GOOD WINDOW IN THE NEXT 12 MONTHS");
   $("mission-next").hidden = v.ok || !nx;
+  // Eclipses during the mission (Earth passing in front of the Sun), if the Sun would otherwise be in view.
+  const end = new Date(+state.t0 + r.days * DAY), i0 = calIdx();
+  const hit = siteEclipses(state.site, state.t0, end, state.scenario.terrain).filter((e) => {
+    const s = state.cal.samples[i0 + Math.round((e.peak - state.t0) / 3600000 / STEP_HOURS)];
+    return s && s.sunTerrain > 0 && e.maxCover >= 0.05;
+  });
+  for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
+    `<div class="warn">ECLIPSE ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${fmtDH(Math.round((e.end - e.start) / 3600000))}</div>`);
   return v;
 }
 
@@ -309,7 +317,10 @@ function renderMoment() {
   $("clock-head").textContent = h ? `SUN AND EARTH ${fmtT(h)} AFTER LANDING · ${stamp(cur.t)}` : "SUN AND EARTH AT THE LANDING TIME";
 
   const set = (id, on, yes, no) => { const n = $(id); n.textContent = on ? yes : no; n.className = "st " + (on ? "go" : "nogo"); };
-  set("sun-state", cur.sunUp, "SUNLIT", "NO SUN");
+  set("sun-state", cur.sunUp, cur.sunFrac >= 0.995 ? "SUNLIT" : `SUN ${Math.round(cur.sunFrac * 100)}%`, cur.sunFrac <= 0.005 ? "NO SUN" : `SUN ${Math.round(cur.sunFrac * 100)}%`);
+  const ecl = $("sun-eclipse");
+  ecl.hidden = !(cur.eclipse > 0.01 && cur.sunTerrain > 0);
+  if (!ecl.hidden) ecl.textContent = `ECLIPSE: EARTH HIDES ${Math.round(cur.eclipse * 100)}% OF THE SUN`;
   $("sun-next-label").textContent = cur.sunUp ? "SUNSET IN" : "SUNRISE IN";
   $("sun-next").textContent = fmtBig(sunLeft);
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1).padStart(5, "0") + "°";
@@ -318,10 +329,22 @@ function renderMoment() {
   $("earth-next").textContent = fmtBig(earthLeft);
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1).padStart(5, "0") + "°";
 
+  $("hz-sun").href = horizonsUrl(10, cur.t);
+  $("hz-earth").href = horizonsUrl(399, cur.t);
   renderHorizon(cur);
   renderTimelineCursor();
   const sp = subPoints(cur.t);
   globe?.setBodies(sp.sun, sp.earth);
+}
+
+// A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNO's.
+// (Horizons does not let other web pages read its answers, so this opens it in a new tab.)
+function horizonsUrl(body, t) {
+  const tr = state.scenario.terrain, lonE = ((state.site.lon % 360) + 360) % 360, altKm = (tr.heightM + tr.mastM) / 1000;
+  const q = { format: "text", COMMAND: `'${body}'`, CENTER: "'coord@301'", COORD_TYPE: "'GEODETIC'",
+              SITE_COORD: `'${lonE.toFixed(4)},${state.site.lat.toFixed(4)},${altKm.toFixed(4)}'`,
+              TLIST: `'${t.toISOString().slice(0, 16).replace("T", " ")}'`, QUANTITIES: "'4'", MAKE_EPHEM: "'YES'", OBJ_DATA: "'NO'" };
+  return "https://ssd.jpl.nasa.gov/api/horizons.api?" + new URLSearchParams(q).toString();
 }
 
 function renderHorizon(cur) {
@@ -418,6 +441,13 @@ function renderTimeline() {
     const d = samples[Math.min(n - 1, day * 24 / STEP_HOURS)].t;
     el("text", { x: xx, y: yAxis + 12, fill: C.dim, "font-size": 11.5, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
       W < 520 || day === 30 ? (day ? `+${day}D` : "LANDING") : `${day ? "+" + day + "D · " : ""}${pad(d.getUTCDate())} ${MONTHS[d.getUTCMonth()]}`);
+  }
+  for (let i = 0; i < n; i++) {                                                  // eclipse hours: a yellow notch on the SUN row
+    if (!(samples[i].eclipse > 0.05 && samples[i].sunTerrain > 0)) continue;
+    let j = i; while (j < n && samples[j].eclipse > 0.05) j++;
+    const r = el("rect", { x: TL.left + i * w - 1, y: TL.top - 1, width: Math.max(4, (j - i) * w + 2), height: TL.rowH + 2, fill: cssVar("--key-y") }, svg);
+    el("title", {}, r, "Eclipse: Earth passes in front of the Sun");
+    i = j;
   }
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);

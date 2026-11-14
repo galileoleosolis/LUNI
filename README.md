@@ -19,6 +19,8 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   the next windows, and a NEXT WINDOW key.
 - **Area scan:** checks a grid of points around the site (in Web Workers) against the needs and maps where sunlight and
   Earth link are best; click a cell to move the site there.
+- **Eclipses and partial Sun:** eclipses (Earth in front of the Sun) are detected and flagged on the verdict, the
+  timeline and the Sun readout; the Sun readout shows the share of the disc in view when it is partly hidden.
 - **Sun and Earth positions:** NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
 - **Terrain:** skylines for the preset sites are pre-computed from LRO LOLA elevation maps (`data/horizons.json`),
   with the observer 2 m above the surface. Custom points and the area scan compute skylines in the browser from reduced
@@ -29,13 +31,15 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
 - `node tests/check_terrain.mjs` compares the in-browser terrain method with the full-resolution skylines (mean difference 0.04–1.0°).
 - `node tests/check_mission.mjs` tests the mission-needs rules (synthetic cases, plus 9,680 real landing hours re-checked the long way).
 - `node tests/check_scan.mjs` tests the area scan (grid geometry, agreement with a direct evaluation, finds the Shackleton ridge).
+- `node tests/check_eclipses.mjs` lists every eclipse in 2023–2035 as seen from the Moon and checks the partial-Sun math.
 - `node tests/real_missions.mjs` prints LUNO's sunrise/sunset for the Chandrayaan-3, IM-1 and IM-2 landing sites.
 - At 89.45°S 222.69°E (a well-known high-illumination ridge near Shackleton) LUNO gets about 81% sunlight over 2026 at 2 m
   and 93% at 10 m, in line with published LOLA illumination studies.
 
 ## Known limits
-- Sun counts as "up" when the center of its disc clears the skyline (no partial-disc power yet).
-- Eclipses (Earth blocking the Sun) are not modeled.
+- The Sun counts as available when at least half of its disc is usable: the part above the skyline, less any part
+  hidden behind the Earth during an eclipse. The skyline is treated as level across the width of the Sun's disc.
+- Solar power is not modeled beyond that (no panel angle, no dust, no temperature).
 - Sites outside the south polar maps use the coarser global LOLA map (about 1.9 km per pixel).
 
 ## Rebuilding the data

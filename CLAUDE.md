@@ -33,7 +33,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 ## Rules of the road
 - Only real, sourced data in the app. Unsourced notes were removed on purpose; do not re-add figures without a source.
 - Label reduced-detail results honestly (custom points and scans use 240 m – 3.8 km maps; presets use 40 m + 240 m).
-- Known limits: Sun counts as up when its disc center clears the skyline; eclipses are not modeled.
+- Sun rule: `sunUp` = at least half the disc usable (`sunFrac`: part above the skyline, less eclipse cover). Eclipses are
+  detected in `js/ephem.js` (`eclipsesBetween`) and flagged in the verdict, timeline and Sun readout.
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
@@ -58,6 +59,6 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    while he typed the year and blocked the whole test; he never found the site list and read "05Z" as a year.
    Fixed since: click-only UTC pickers, one date format with year, numbered step headers, numbered tags on the Moon,
    clearer task wording. Needs a re-test with someone who has NOT seen the app.
-6. Quick wins: eclipse alerts, share link, real-mission replays, explainer mode, partial-Sun power.
+6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

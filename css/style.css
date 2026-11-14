@@ -224,12 +224,17 @@ input[type=number] { font-size: 14px; }
 .hero-text { min-width: 0; flex: 1 1 240px; }
 .hero-title { font-size: 12px; letter-spacing: .08em; color: var(--amb); margin-bottom: 3px; }
 .hero-why { font-size: 15px; font-weight: 600; color: var(--wht); line-height: 1.4; }
+.hero-why .warn, .mini.warn { color: var(--key-y); font-weight: 600; }
 .hero-next { margin-left: auto; flex: none; background: var(--wht); color: #000; border: none; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.35; padding: 8px 14px; cursor: pointer; text-align: left; }
 .hero-next[hidden] { display: none; }
 .hero-next:hover { background: var(--amb); }
 
 /* Sun and Earth: supporting detail */
-.readouts { gap: 0; margin-bottom: 10px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; }
+.readouts { gap: 0; margin-bottom: 0; padding-bottom: 6px; }
+.nasa-check { font-size: 11px; letter-spacing: .04em; color: var(--dim); border-bottom: 1px solid var(--dim); padding-bottom: 7px; margin-bottom: 10px; }
+.nasa-check a { color: var(--wht); font-weight: 600; margin: 0 4px; }
+.nasa-check a:hover { color: var(--amb); }
+.nasa-check span { color: var(--quiet); }
 .ro { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; padding: 0 16px 0 0; min-width: 0; }
 .ro-a { min-width: 0; }
 .ro + .ro { padding: 0 0 0 18px; border-left-width: 2px; }

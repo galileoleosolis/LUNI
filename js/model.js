@@ -6,7 +6,7 @@
 //     terrain: { real, heightM, slopeDeg, slopeBaseM, maps, mastM, min, max }
 //     samples: [{ t, sunAz, sunEl, earthAz, earthEl, sunUp, earthUp }]   hourly, 30 days
 //   }
-import { loadEphemeris, siteFrame, sunEarthAltAz, coverage, inCoverage, MOON_RADIUS_KM } from "./ephem.js";
+import { loadEphemeris, siteFrame, sunEarthAltAz, eclipseCover, eclipsesBetween, coverage, inCoverage, MOON_RADIUS_KM, SUN_RADIUS_DEG } from "./ephem.js";
 export { subPoints, coverage, inCoverage } from "./ephem.js";
 
 export const STEP_HOURS = 1;
@@ -54,6 +54,18 @@ export function horizonAt(horizon, az) {
   return horizon[i] * (1 - k) + horizon[j] * k;
 }
 
+// Share of a disc above a straight skyline, where d = (height of the disc's center above the skyline) / (disc radius).
+export function discAbove(d) {
+  if (d >= 1) return 1;
+  if (d <= -1) return 0;
+  return 0.5 + (d * Math.sqrt(1 - d * d) + Math.asin(d)) / Math.PI;
+}
+
+// Eclipses at a site between two times (Earth in front of the Sun), using the site's real height.
+export function siteEclipses(site, t0, t1, terrain = terrainFor(site)) {
+  return eclipsesBetween(siteFrame(site.lat, site.lon, MOON_RADIUS_KM + (terrain.heightM + terrain.mastM) / 1000), t0, t1);
+}
+
 // Hourly Sun/Earth samples for a site over `hours`, judged against its terrain skyline.
 export function sampleSite(site, startDate, hours, terrain = terrainFor(site)) {
   const horizon = terrain.horizon;
@@ -64,7 +76,11 @@ export function sampleSite(site, startDate, hours, terrain = terrainFor(site)) {
     const t = new Date(t0 + i * STEP_HOURS * 3600000);
     const s = sunEarthAltAz(frame, t);
     s.t = t;
-    s.sunUp = s.sunEl > horizonAt(horizon, s.sunAz);       // center of the Sun's disc above the skyline
+    // How much of the Sun's disc is usable: the part above the skyline, less any part hidden behind the Earth.
+    s.eclipse = s.sepDeg < 1.5 ? eclipseCover(s.sepDeg, s.earthRadDeg) : 0;
+    s.sunTerrain = discAbove((s.sunEl - horizonAt(horizon, s.sunAz)) / SUN_RADIUS_DEG);
+    s.sunFrac = s.sunTerrain * (1 - s.eclipse);
+    s.sunUp = s.sunFrac >= 0.5;                             // at least half the Sun available
     s.earthUp = s.earthEl > horizonAt(horizon, s.earthAz);
     samples[i] = s;
   }

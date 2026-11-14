@@ -90,6 +90,7 @@
               <div class="lab">☀ POWER</div>
               <div class="st" id="sun-state"></div>
               <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
+              <div class="mini warn" id="sun-eclipse" hidden></div>
             </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b></div>
           </div>
@@ -102,6 +103,10 @@
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b></div>
           </div>
         </div>
+
+        <div class="nasa-check">CHECK THESE NUMBERS WITH NASA'S JPL HORIZONS:
+          <a id="hz-sun" target="_blank" rel="noopener">SUN ↗</a> <a id="hz-earth" target="_blank" rel="noopener">EARTH ↗</a>
+          <span>(OPENS NASA'S ANSWER FOR THIS SITE AND TIME: AZIMUTH = DIRECTION, ELEVATION = HEIGHT)</span></div>
 
         <h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND, WITH THE SUN AND EARTH</h3>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
