@@ -40,7 +40,7 @@ function pin(color) {
   return g;
 }
 
-export function createGlobe(container, { sites, onPickSite, onPickCoord, onHover }) {
+export function createGlobe(container, { sites, labels, onPickSite, onPickCoord, onHover }) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -149,6 +149,34 @@ export function createGlobe(container, { sites, onPickSite, onPickCoord, onHover
   };
   new ResizeObserver(resize).observe(container); resize();
 
+  // Number tags beside the site dots (same numbers as the list). Tags that would overlap are left out until you zoom in.
+  const tags = labels ? sites.map((s, i) => {
+    const el = document.createElement("span");
+    el.textContent = String(i + 1).padStart(2, "0");
+    labels.appendChild(el);
+    return { site: s, el, pos: llToVec(s.lat, s.lon, 1.004), num: el.textContent };
+  }) : [];
+  let selId = null;
+  const v = new THREE.Vector3();
+  function placeTags() {
+    const w = container.clientWidth, h = container.clientHeight, cam = camera.position.clone().normalize(), placed = [];
+    const order = [...tags].sort((a, b) => (b.site.id === selId) - (a.site.id === selId));
+    for (const t of order) {
+      const sel = t.site.id === selId, front = t.pos.clone().normalize().dot(cam) > 0.25;
+      v.copy(t.pos).project(camera);
+      const x = (v.x * 0.5 + 0.5) * w, y = (-v.y * 0.5 + 0.5) * h, tw = sel ? 26 + t.site.name.length * 6.2 : 20;
+      const clash = placed.some((p) => Math.abs(p.y - y) < 14 && x < p.x + p.w && p.x < x + tw);
+      const show = front && x > 0 && x < w - 16 && y > 6 && y < h - 24 && (sel || !clash);
+      t.el.style.display = show ? "" : "none";
+      if (!show) continue;
+      placed.push({ x, y, w: tw });
+      t.el.style.left = x + "px"; t.el.style.top = y + "px";
+      t.el.className = sel ? "sel" : "";
+      const text = sel ? `${t.num} ${t.site.name.split(" · ")[0].toUpperCase()}` : t.num;
+      if (t.el.textContent !== text) t.el.textContent = text;
+    }
+  }
+
   let selPos = llToVec(0, 0);
   function frame(now) {
     if (tween) {
@@ -162,6 +190,7 @@ export function createGlobe(container, { sites, onPickSite, onPickCoord, onHover
     const pulse = 1 + 0.25 * Math.sin(now / 350);
     ring2.scale.setScalar(pulse);
     renderer.render(scene, camera);
+    if (tags.length) placeTags();
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -169,6 +198,7 @@ export function createGlobe(container, { sites, onPickSite, onPickCoord, onHover
   return {
     // Highlight a site; fly the camera there unless `fly` is false.
     select(site, { fly = true } = {}) {
+      selId = site.id;
       for (const [id, d] of dots) d.material.color.set(id === site.id ? 0xffffff : AMBER);
       if (customDot) { markers.remove(customDot); customDot = null; }
       if (!dots.has(site.id)) customDot = addMarker(site, 0xffffff, false);

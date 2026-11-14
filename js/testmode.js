@@ -7,7 +7,7 @@ import { sampleSite, hoursUntilChange } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v1";
+const KEY = "luno-test-v2";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -24,32 +24,36 @@ const day = (d) => d.toISOString().slice(0, 10);
 // the tester happens to have on screen.
 const TASKS = [
   { id: "go-10d", short: "GO for 10 days at IM-2 on 18 Dec?",
-    text: "Choose the landing site IM-2 ATHENA and set the landing time to 18 December 2026, 00:00 UTC. Is this a GO for a 10-day mission?",
+    text: "First choose the landing site IM-2 ATHENA. Then set the landing time to 18 December 2026, 00:00 UTC. Question: is this a GO for a 10-day mission?",
+    setup: { site: "im2", t0: "2026-12-18T00:00" },
     type: "choice", options: ["GO", "NO-GO"],
     expected: () => (mission("im2", "2026-12-18T00:00:00Z").v.ok ? "GO" : "NO-GO") },
   { id: "sunset", short: "Days until sunset",
-    text: "Same site and landing time. How many days until sunset? Give a whole number.",
+    text: "Keep the same site (IM-2 ATHENA) and landing time (18 December 2026, 00:00 UTC). Question: how many days until sunset? Give a whole number.",
+    setup: { site: "im2", t0: "2026-12-18T00:00" },
     type: "number", unit: "DAYS",
     expected: () => { const m = mission("im2", "2026-12-18T00:00:00Z"); return +(hoursUntilChange(m.samples, 0, "sunUp") / 24).toFixed(1); },
     check: (ans, exp) => Math.abs(ans - exp) <= 1 },
   { id: "slip", short: "Still GO after a 7-day slip?",
-    text: "The launch slips 7 days later than that. Is the site still a GO for the 10-day mission?",
+    text: "The launch slips 7 days, so the landing moves to 25 December 2026, 00:00 UTC at the same site. Question: is it still a GO for the 10-day mission?",
+    setup: { site: "im2", t0: "2026-12-25T00:00" },
     type: "choice", options: ["GO", "NO-GO"],
     expected: () => (mission("im2", "2026-12-25T00:00:00Z").v.ok ? "GO" : "NO-GO") },
   { id: "next-window", short: "Date the next window opens",
-    text: "Staying on that slipped date: on what date does the next good landing window open at this site?",
+    text: "Stay on IM-2 ATHENA, landing 25 December 2026. Question: on what date does the next good landing window open at this site?",
+    setup: { site: "im2", t0: "2026-12-25T00:00" },
     type: "date",
     expected: () => day(mission("im2", "2026-12-25T00:00:00Z").next.start),
     check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
   { id: "compare-14d", short: "14-day mission: which site is GO?",
-    text: "New question. A 14-day mission lands on 18 December 2026, 00:00 UTC. Which of these sites is a GO: IM-2 ATHENA or MALAPERT MASSIF?",
+    text: "New situation: the mission is now 14 days long and lands on 18 December 2026, 00:00 UTC. Question: which of these sites is a GO for it, IM-2 ATHENA or MALAPERT MASSIF?",
     type: "choice", options: ["IM-2 ATHENA", "MALAPERT MASSIF", "BOTH", "NEITHER"],
     expected: () => {
       const a = mission("im2", "2026-12-18T00:00:00Z", { days: 14 }).v.ok, b = mission("malapert", "2026-12-18T00:00:00Z", { days: 14 }).v.ok;
       return a && b ? "BOTH" : a ? "IM-2 ATHENA" : b ? "MALAPERT MASSIF" : "NEITHER";
     } },
   { id: "find-go", short: "Find a GO point near Nobile Rim 1",
-    text: "Set the mission back to 10 days. Go to NOBILE RIM 1 and set the landing time to 14 November 2026, 16:00 UTC. It is a NO-GO there. Find a point nearby that IS a GO and move the site to it. Press DONE when the screen shows GO for the mission.",
+    text: "Set the mission length back to 10 days. Choose the site NOBILE RIM 1 and set the landing time to 14 November 2026, 16:00 UTC. It is a NO-GO there. Find a point nearby that IS a GO and move the site to it. Press DONE when the screen shows GO for the mission.",
     type: "done",
     expected: () => "a GO point within 25 km of Nobile Rim 1",
     answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"}`,
@@ -57,7 +61,7 @@ const TASKS = [
 ];
 
 const FEATURES = {      // click targets -> the feature they belong to
-  "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "date box": /^date-input/,
+  "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
   "launch-slip keys": /^slip/, "NEXT WINDOW": /^next-window-btn/, "AREA SCAN": /^scan/, "mission needs": /^need:/,
   "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
 };
@@ -89,7 +93,7 @@ function describe(el) {
 
 function wireTracking() {
   document.addEventListener("click", (e) => { const d = describe(e.target); if (d) log("click", d); }, true);
-  document.addEventListener("change", (e) => { if (/^(lat-input|lon-input|date-input)$/.test(e.target.id)) log("input", `${e.target.id}=${e.target.value}`); }, true);
+  document.addEventListener("change", (e) => { if (/^(lat-input|lon-input|t0-day|t0-month|t0-year|t0-hour)$/.test(e.target.id)) log("input", `${e.target.id}=${e.target.value}`); }, true);
   window.addEventListener("keydown", (e) => {
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
     if (/^(Arrow|Home| |Escape)/.test(e.key) || /^[spnaSPNA]$/.test(e.key)) log("key", (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key));
@@ -158,7 +162,9 @@ function finishTask(answer, skipped) {
   const ev = T.events.filter((e) => e[1] === T.task + 1);
   T.results.push({ id: t.id, short: t.short, answer: skipped ? "(skipped)" : String(given), expected: String(exp), correct, skipped,
                    seconds: Math.round(now() - T.taskStart), clicks: ev.filter((e) => e[2] === "click").length,
-                   screen: `${snap.site.id} T0=${snap.t0.toISOString().slice(0, 16)} ${snap.req.days}d ${snap.missionOk ? "GO" : "NO-GO"}` });
+                   screen: `${snap.site.id} T0=${snap.t0.toISOString().slice(0, 16)} ${snap.req.days}d ${snap.missionOk ? "GO" : "NO-GO"}`,
+                   // Was the screen actually showing the site and date the task asked for? Tells skill from a lucky answer.
+                   matched: t.setup ? snap.site.id === t.setup.site && snap.t0.toISOString().slice(0, 16) === t.setup.t0 : null });
   log(skipped ? "task-skipped" : "task-answered", skipped ? "" : String(given));
   T.task++;
   if (T.task < TASKS.length) return showTask();
@@ -201,7 +207,7 @@ export function buildReport(S, env) {
   S.results.forEach((r, i) => {
     L.push(`${i + 1}. ${r.short}`);
     L.push(`   answer: ${r.answer} | expected: ${r.expected} | ${r.skipped ? "SKIPPED" : r.correct ? "CORRECT" : "WRONG"} | time ${mmss(r.seconds)} | ${r.clicks} clicks`);
-    L.push(`   screen at the end: ${r.screen}`);
+    L.push(`   screen at the end: ${r.screen}${r.matched == null ? "" : r.matched ? " | screen matched the task: YES" : " | screen matched the task: NO (answered without setting it up)"}`);
   });
   L.push("", "FEATURES USED (clicks and edits)");
   L.push(used.filter((u) => u[1]).map((u) => `${u[0]} ${u[1]}`).join(" · ") || "(none)");

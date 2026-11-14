@@ -86,5 +86,5 @@ export function dailyStats(samples, mask, days, stepsPerDay = 24) {
 
 export function fmtDH(h) {
   const d = Math.floor(h / 24), r = Math.round(h % 24);
-  return `${String(d).padStart(2, "0")}D${String(r).padStart(2, "0")}H`;
+  return `${d}D ${String(r).padStart(2, "0")}H`;
 }

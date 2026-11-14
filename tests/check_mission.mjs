@@ -16,7 +16,7 @@ const req = (o) => ({ ...DEFAULT_REQ, ...o });
   const a = analyze(s, req({ days: 2, maxDarkH: 12 }));
   assert.equal(a.at(0).ok, true); assert.equal(a.at(0).sunHeldHours, 72); assert.equal(a.at(0).marginHours, 24);
   assert.equal(a.at(24).ok, true); assert.equal(a.at(24).marginHours, 0);
-  assert.equal(a.at(25).ok, false); assert.match(a.at(25).reasons[0], /SUN LOST AFTER 01D23H/);
+  assert.equal(a.at(25).ok, false); assert.match(a.at(25).reasons[0], /SUN LOST AFTER 1D 23H/);
   assert.equal(a.at(80).ok, false); assert.equal(a.at(80).reasons[0], "NO SUN AT LANDING");
   const w = windowsFrom(a.mask, s);
   assert.deepEqual(w.map((x) => [x.i0, x.i1]), [[0, 25]]);   // the last day cannot fit a 2-day mission before the data ends

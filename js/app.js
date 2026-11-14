@@ -50,11 +50,12 @@ const zoomOf = (node) => (node.getBoundingClientRect().width / (node.clientWidth
 // ---------- formatting ----------
 function roundToHour(d) { const x = new Date(d); x.setUTCMinutes(0, 0, 0); return x; }
 const pad = (n, w = 2) => String(n).padStart(w, "0");
-const toInputValue = (d) => d.toISOString().slice(0, 16);
-const fromInputValue = (v) => new Date(v + ":00Z");
-const stamp = (d) => d.toISOString().slice(0, 16).replace("T", " ") + "Z";
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+// One date format everywhere, always with the year and "UTC" spelled out: 18 DEC 2026 00:00 UTC
+const dayStamp = (d) => `${pad(d.getUTCDate())} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+const stamp = (d) => `${dayStamp(d)} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
 const fmtBig = (h) => h == null ? "30D+" : `${Math.floor(h / 24)}D ${pad(Math.round(h % 24))}H`;
-const fmtT = (h) => h == null ? ">30D" : `${pad(Math.floor(h / 24))}D${pad(Math.round(h % 24))}H`;
+const fmtT = (h) => h == null ? "OVER 30D" : `${Math.floor(h / 24)}D ${pad(Math.round(h % 24))}H`;
 const sgn = (x) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(2);
 const pct = (x) => `${Math.round(x * 100)}%`;
 const fmtLat = (v) => `${Math.abs(v).toFixed(2)}${v < 0 ? "S" : "N"}`;
@@ -105,6 +106,25 @@ async function loadCustomTerrain(site) {
   if (state.site === site) recompute({ keepIdx: true });
 }
 
+// Landing time: four pickers (day, month, year, hour), all UTC. Nothing to type, so it cannot be half-entered.
+const daysIn = (y, m) => new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+function buildT0() {
+  const cov = coverage(), opt = (sel, list) => { sel.replaceChildren(...list.map(([v, t]) => new Option(t, v))); };
+  opt($("t0-month"), MONTHS.map((m, i) => [i, m]));
+  opt($("t0-year"), Array.from({ length: cov.end.getUTCFullYear() - cov.start.getUTCFullYear() }, (_, i) => [cov.start.getUTCFullYear() + i, cov.start.getUTCFullYear() + i]));
+  opt($("t0-hour"), Array.from({ length: 24 }, (_, h) => [h, `${pad(h)}:00 UTC`]));
+  for (const id of ["t0-day", "t0-month", "t0-year", "t0-hour"]) $(id).addEventListener("change", () => {
+    const y = +$("t0-year").value, m = +$("t0-month").value, d = Math.min(+$("t0-day").value, daysIn(y, m));
+    state.t0 = new Date(Date.UTC(y, m, d, +$("t0-hour").value));
+    recompute();
+  });
+}
+function syncT0() {
+  const t = state.t0, n = daysIn(t.getUTCFullYear(), t.getUTCMonth()), day = $("t0-day");
+  if (day.options.length !== n) day.replaceChildren(...Array.from({ length: n }, (_, i) => new Option(pad(i + 1), i + 1)));
+  day.value = t.getUTCDate(); $("t0-month").value = t.getUTCMonth(); $("t0-year").value = t.getUTCFullYear(); $("t0-hour").value = t.getUTCHours();
+}
+
 function nextSite() {
   const i = SITES.findIndex((s) => s.id === state.site.id);
   selectSite(SITES[(i + 1) % SITES.length]);
@@ -115,7 +135,7 @@ function syncSiteUI() {
   document.querySelectorAll(".site-row").forEach((b) => b.classList.toggle("sel", b.dataset.id === s.id));
   document.querySelector(".site-row.sel")?.scrollIntoView({ block: "nearest" });
   $("lat-input").value = s.lat; $("lon-input").value = s.lon;
-  $("date-input").value = toInputValue(state.t0);
+  syncT0();
   $("bar-site").textContent = `${siteName(s)} ${fmtLat(s.lat)} ${fmtLon(s.lon)}`;
   $("bar-t0").textContent = stamp(state.t0);
   const note = $("site-note");
@@ -215,12 +235,11 @@ function renderWindows() {
   const list = from < 0 ? [] : all.slice(from, from + 4);
   box.replaceChildren();
   if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. RELAX THE NEEDS OR TRY ANOTHER SITE.</div>`; return; }
-  const day = (d) => `${pad(d.getUTCDate())} ${["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][d.getUTCMonth()]} ${pad(d.getUTCHours())}Z`;
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
-    b.innerHTML = `<span>${cur ? "▶ " : ""}${day(w.start)} → ${day(w.end)}</span><span>${fmtDH((w.i1 - w.i0) * STEP_HOURS)}</span>`;
-    b.title = "Land at the start of this window";
+    b.innerHTML = `<span>${cur ? "▶ " : ""}${dayStamp(w.start)} <b>${pad(w.start.getUTCHours())}:00 UTC</b></span><span>OPEN ${fmtDH((w.i1 - w.i0) * STEP_HOURS)}</span>`;
+    b.title = `Window opens ${stamp(w.start)} and closes ${stamp(w.end)}. Click to land at its start.`;
     b.addEventListener("click", () => setT0(w.start));
     box.appendChild(b);
   }
@@ -459,13 +478,13 @@ async function init() {
   fitStage();
   await Promise.all([loadSites(), initModel()]);
   state.site = SITES[0];
-  const cov = coverage();
-  $("date-input").min = toInputValue(cov.start); $("date-input").max = toInputValue(new Date(cov.end.getTime() - 70 * 86400000));
+  buildT0();
   buildSiteList();
 
   const tip = $("globe-tip");
   globe = createGlobe($("globe"), {
     sites: SITES,
+    labels: $("globe-labels"),
     onPickSite: (s) => selectSite(s),
     onPickCoord: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }, { fly: false }),
     onHover: (s, e) => {
@@ -483,7 +502,6 @@ async function init() {
   };
   $("lat-input").addEventListener("change", onCoord);
   $("lon-input").addEventListener("change", onCoord);
-  $("date-input").addEventListener("change", (e) => { if (e.target.value) { state.t0 = fromInputValue(e.target.value); recompute(); } });
 
   document.querySelectorAll("[data-slip]").forEach((b) => b.addEventListener("click", () => slip(Number(b.dataset.slip))));
   $("play-btn").addEventListener("click", togglePlay);

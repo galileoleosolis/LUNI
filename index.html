@@ -28,20 +28,27 @@
     <div class="cols">
       <!-- LEFT: site + date -->
       <section class="col col-site">
-        <h3>SITE SELECT · DRAG / CLICK THE MOON</h3>
+        <h3><b class="step">1</b>WHERE · CLICK A SITE IN THE LIST OR ON THE MOON</h3>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
           <div id="globe-tip" class="globe-tip" hidden></div>
+          <div id="globe-labels" class="globe-labels"></div>
           <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
         </div>
+        <div class="k-hint">NUMBERED DOTS = THE SITES BELOW · DRAG TO TURN · SCROLL TO ZOOM</div>
         <div id="site-list" class="site-list"></div>
         <div class="fields">
           <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
           <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
         </div>
         <p id="site-note" class="note"></p>
-        <h3 style="margin-top:12px">LANDING TIME T0 · UTC</h3>
-        <input id="date-input" class="date" type="datetime-local">
+        <h3 style="margin-top:12px"><b class="step">2</b>WHEN · LANDING TIME (UTC)</h3>
+        <div class="t0">
+          <select id="t0-day" aria-label="Day"></select>
+          <select id="t0-month" aria-label="Month"></select>
+          <select id="t0-year" aria-label="Year"></select>
+          <select id="t0-hour" aria-label="Hour, UTC"></select>
+        </div>
       </section>
 
       <!-- CENTER: the answer -->
@@ -64,6 +71,7 @@
             </div>
           </div>
         </div>
+        <h3><b class="step">3</b>RESULT · AT THE LANDING TIME, THEN AS THE MISSION CLOCK RUNS</h3>
         <div class="readouts">
           <div class="ro">
             <div class="lab">☀ POWER</div>
@@ -87,20 +95,20 @@
         <h3>VISIBILITY · T0 → T0+30D · CLICK OR DRAG TO SCRUB</h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
 
-        <h3 id="cal-title">LANDING WINDOWS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
+        <h3 id="cal-title">GOOD LANDING DAYS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
         <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
       </section>
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side">
-        <h3>MISSION NEEDS</h3>
+        <h3><b class="step">4</b>MISSION NEEDS · WHAT COUNTS AS A GOOD LANDING</h3>
         <div class="needs">
           <div class="need"><span>LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
           <div class="need"><span>DARK GAP ≤</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
           <div class="need"><span>EARTH LINK ≥</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
           <div class="need"><span>EARTH AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
         </div>
-        <h3 style="margin-top:12px">NEXT LANDING WINDOWS</h3>
+        <h3 style="margin-top:12px">NEXT GOOD LANDING WINDOWS · CLICK TO GO THERE</h3>
         <div id="windows" class="windows"></div>
         <h3 style="margin-top:14px">30-DAY SUMMARY FROM T0</h3>
         <table class="sum">

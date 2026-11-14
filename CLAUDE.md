@@ -50,8 +50,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    time. Must be tested on the user's PC; works only when LUNO is served locally, not from a sandboxed preview.
 4. Windows .exe wrapper (Electron) if still wanted.
 5. Test mode is built (`js/testmode.js`, on with `#test` or `window.LUNO_TEST`): intro, six tasks, local usage log,
-   review, copyable report. The user's sibling is running it on the preview page and has found some errors:
-   get the report, then fix what it shows.
+   review, copyable report. First run (the user's sibling, 14 Nov): 2/6, ease 2/5. The native date box reset itself
+   while he typed the year and blocked the whole test; he never found the site list and read "05Z" as a year.
+   Fixed since: click-only UTC pickers, one date format with year, numbered step headers, numbered tags on the Moon,
+   clearer task wording. Needs a re-test with someone who has NOT seen the app.
 6. Quick wins: eclipse alerts, share link, real-mission replays, explainer mode, partial-Sun power.
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centres).
