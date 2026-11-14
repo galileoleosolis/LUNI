@@ -64,8 +64,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   with long shadows drawn as strips on the ground (the shadow map is too coarse for small things), a Sun flare, a
   procedural Earth with a glow, name tags that follow the Sun and Earth, the lander's dish aimed at Earth and its
   panels at the Sun. Everything smaller than the 40 m data is illustrative and the view says so on screen.
-  **On `main` only until the user approves it**: do not run `tools/release.sh next` or republish the preview for it
-  before they say so.
+  The user approved it from the picture ("put it on") and it is on the preview page and in `next/`.
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
