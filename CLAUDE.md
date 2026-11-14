@@ -160,6 +160,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    pinned down (possibly an old cached copy). A key that moved to the best spot instead of closing the scan was
    tried and rejected: the user wants the bottom key as a plain open / close toggle for the scan menu, lit green
    while open, labeled SCAN FOR BETTER SPOT. All "find a better spot" buttons use that wording.
+   The user reported the scan sometimes "picks the worst site as the best". Measured: with no GO point it crowned
+   a tied NO-GO corner, and among GO points it ranked by mission sunlight, which is 100% for nearly all of them.
+   Now (`bestCell` in `js/scan-core.js`, checked in `tests/check_scan.mjs`): only a GO point can be best, else the
+   panel says no point meets the needs; GO points rank by sunlight margin, then slope in whole degrees, then the
+   shortest move, then Earth link. Slope is a tie-breaker only: there is no slope limit, because no sourced limit
+   has been chosen (a "max slope" mission need was offered to the user, not built).
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNI).

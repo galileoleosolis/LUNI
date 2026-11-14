@@ -45,10 +45,23 @@ const t = performance.now();
 const cells = [];
 for (const p of g2.points) cells.push({ ...p, ...(await evaluatePoint(p.lat, p.lon, t0, req)) });
 const ms = (performance.now() - t) / cells.length;
-const best = bestCell(cells), center = cells[8 * 17 + 8];
+const center = cells[8 * 17 + 8], lit = cells.reduce((a, b) => (b.sunPct > a.sunPct ? b : a));
 const sorted = cells.map((c) => c.sunPct).sort((a, b) => a - b);
 console.log(`scan 17x17: ${ms.toFixed(0)} ms per point; sunlight over the 28-day window: min ${sorted[0].toFixed(0)}%, median ${sorted[144].toFixed(0)}%, max ${sorted[288].toFixed(0)}%`);
-console.log(`start point: ${center.sunPct.toFixed(0)}% sun at ${center.heightM.toFixed(0)} m; best cell: ${best.sunPct.toFixed(0)}% sun at ${best.heightM.toFixed(0)} m, ${best.eastKm} km E / ${best.northKm} km N`);
-assert.ok(best.sunPct >= center.sunPct + 10, "the best cell should be clearly better lit than the off-ridge start");
-assert.ok(best.heightM > center.heightM, "and on higher ground");
+console.log(`start point: ${center.sunPct.toFixed(0)}% sun at ${center.heightM.toFixed(0)} m; best-lit cell: ${lit.sunPct.toFixed(0)}% sun at ${lit.heightM.toFixed(0)} m, ${lit.eastKm} km E / ${lit.northKm} km N`);
+assert.ok(lit.sunPct >= center.sunPct + 10, "the best-lit cell should be clearly better lit than the off-ridge start");
+assert.ok(lit.heightM > center.heightM, "and on higher ground");
+
+// 4. choosing the best point
+// No point meets the needs in that winter scan, so there must be no "best point" at all (it used to crown a NO-GO corner).
+assert.ok(cells.every((c) => !c.ok) && bestCell(cells) === null, "no GO point -> no best point");
+const mk = (o) => ({ ok: true, marginHours: 50, slopeDeg: 5, eastKm: 1, northKm: 0, earthPct: 80, sunPct: 100, ...o });
+const pick = (list) => list.indexOf(bestCell(list));
+assert.equal(pick([mk({ ok: false, sunPct: 100, marginHours: 500 }), mk({ marginHours: 1 })]), 1, "a NO-GO point never wins, whatever its sunlight");
+assert.equal(pick([mk({ marginHours: 0 }), mk({ marginHours: 31 }), mk({ marginHours: 12 })]), 1, "the longest sunlight margin wins");
+assert.equal(pick([mk({ slopeDeg: 18 }), mk({ slopeDeg: 2 }), mk({ slopeDeg: 9 })]), 1, "same margin: the gentlest slope wins");
+assert.equal(pick([mk({ eastKm: 5 }), mk({ eastKm: 0, northKm: 0 }), mk({ eastKm: 2 })]), 1, "same margin and slope: the shortest move wins (staying put if possible)");
+assert.equal(pick([mk({ earthPct: 40 }), mk({ earthPct: 95 })]), 1, "all else equal: more Earth link wins");
+assert.equal(pick([mk({ slopeDeg: 2.2 }), mk({ slopeDeg: 1.8, eastKm: 4 })]), 0, "a slope difference under a degree does not justify a longer move");
+assert.equal(bestCell([null, null]), null);
 console.log("area scan OK");

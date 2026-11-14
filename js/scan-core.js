@@ -44,10 +44,21 @@ export function judgePoint(lat, lon, terrain, t0, req) {
            ok: v.ok, marginHours: v.marginHours, reason: v.reasons[0] || "" };
 }
 
-// Best cell: among points that meet the needs, the most sunlight then the most Earth link; otherwise the most sunlight.
+// Best cell: only a point that meets the mission needs can be "best"; if none does, there is no best point (null).
+// Among those that do, in this order:
+//   1. the longest sunlight margin beyond the mission (how safely it meets the needs),
+//   2. the gentlest ground slope, compared in whole degrees,
+//   3. the shortest move from the current site,
+//   4. the most Earth link.
+// (Sunlight during the mission cannot rank them: it is 100% for almost every point that meets the needs.)
 export function bestCell(cells) {
-  let best = null;
-  const score = (c) => (c.ok ? 1000 : 0) + c.sunPct + c.earthPct / 1000;
-  for (const c of cells) if (c && (!best || score(c) > score(best))) best = c;
+  const key = (c) => [-Math.round(c.marginHours), Math.round(c.slopeDeg ?? 90), Math.round(Math.hypot(c.eastKm, c.northKm) * 100), -Math.round(c.earthPct)];
+  const before = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] < b[i]; return false; };      // lower key wins, first difference decides
+  let best = null, bk = null;
+  for (const c of cells) {
+    if (!c || !c.ok) continue;
+    const k = key(c);
+    if (!best || before(k, bk)) { best = c; bk = k; }
+  }
   return best;
 }
