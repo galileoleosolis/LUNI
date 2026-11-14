@@ -135,6 +135,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    Moving the site from the scan (button or a click on a square) now keeps the scan open and animates it: the
    lander glides to the point, the map slides to re-center, and a new scan starts with the old picture as a dim
    backdrop (`pick` in `js/ui-scan.js`; the site only changes when the animation ends, about 2 s).
+   The user then reported the scan "still jumping off the screen" when moving to the better spot: the bottom key
+   (then labeled BETTER SPOT, lit while the scan was open) closed the scan when pressed again. Now that key never
+   closes the scan: it reads SCAN FOR BETTER SPOT, and while the scan is open it becomes MOVE SITE TO BEST SPOT
+   (`keyPress` in `js/ui-scan.js`). The user's wording for these buttons is "SCAN FOR BETTER SPOT".
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
