@@ -3,6 +3,7 @@
 // on the device where the browser offers that, otherwise through the browser's online service. The panel says which.
 
 import { forSpeech } from "./assistant.js";
+import { PRESETS } from "./assistant-llm.js";
 
 const $ = (id) => document.getElementById(id);
 const SR = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
@@ -10,7 +11,7 @@ const WAKE = /^\s*(?:hey |ok |okay |yo )?(?:luno|luna|lunar|loono|you know|uno)\
 const TIPS = ["NEXT GOOD TIME", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BETTER SPOT", "HELP"];
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
-export function createAssistantPanel({ assistant }) {
+export function createAssistantPanel({ assistant, model }) {
   const panel = $("comms"), input = $("comms-input"), mic = $("comms-mic"), key = $("talk-btn");
   const st = { speak: store.get("luno-speak") !== "off", hands: false, listening: false, rec: null, local: false, armedUntil: 0, speaking: false, micBlocked: false };
   // On the Claude preview page the browser's own microphone is blocked; the page host offers dictation instead.
@@ -46,18 +47,65 @@ export function createAssistantPanel({ assistant }) {
     u.onend = u.onerror = () => { setTimeout(() => { st.speaking = false; if (st.hands && !st.listening && !dict) listen(); }, 400); };
     speechSynthesis.speak(u);
   }
+  let thinking = null;      // the question the local model is working on, if any
+  function show(text, r, via, who) {
+    const out = $("comms-reply");
+    out.textContent = r.reply; out.classList.toggle("bad", !r.ok);
+    if (who) { const tag = document.createElement("span"); tag.className = "who"; tag.textContent = who; out.prepend(tag); }
+    $("comms-tips").hidden = r.ok && !r.calls.some((c) => c.input?.topic === "help");      // examples show at first, after HELP, and after a miss
+    say(r.reply);
+    window.dispatchEvent(new CustomEvent("luno:command", { detail: { text, via: who ? via + "+model" : via, ok: r.ok, tools: r.calls.map((c) => c.tool || c) } }));
+  }
   function run(text, via) {
     text = text.trim();
     if (!text) return;
-    const r = assistant.handle(text);
+    thinking?.abort(); thinking = null;
+    const r = assistant.handle(text, { deferOpen: !!model?.ready });
     $("comms-you").textContent = `${via === "voice" ? "HEARD" : "YOU"}: ${text}`;
-    const out = $("comms-reply");
-    out.textContent = r.reply; out.classList.toggle("bad", !r.ok);
-    $("comms-tips").hidden = r.ok && !r.calls.some((c) => c.input.topic === "help");      // examples show at first, after HELP, and after a miss
-    say(r.reply);
-    window.dispatchEvent(new CustomEvent("luno:command", { detail: { text, via, ok: r.ok, tools: r.calls.map((c) => c.tool) } }));
+    // The built-in commands go first: they are instant and exact. Open questions, and what they do not cover, go to the local model.
+    if (r.ok || !model?.ready) { show(text, r, via); return r; }
+    const ctl = thinking = new AbortController(), out = $("comms-reply"), name = model.config.model;
+    out.classList.remove("bad"); out.textContent = "Asking the AI model on this computer…"; $("comms-tips").hidden = true;
+    model.ask(text, { signal: ctl.signal, onStep: (tool, n) => { if (thinking === ctl) out.textContent = `Asking the AI model on this computer… step ${n}: ${tool.replace(/_/g, " ")}`; } })
+      .then((a) => { if (thinking === ctl) show(text, { ok: true, reply: a.reply, calls: a.tools }, via, `ANSWER FROM THE AI MODEL ON THIS COMPUTER (${name}) · ` + (a.tools.length ? `IT WORKED LUNO'S CONTROLS ${a.tools.length} TIME${a.tools.length === 1 ? "" : "S"} · THE SCREEN HAS THE EXACT NUMBERS` : "IT DID NOT USE LUNO'S CONTROLS, SO THIS IS NOT FROM LUNO'S DATA")); })
+      .catch((e) => {      // no answer from the model: the built-in commands do what they can with the sentence
+        if (thinking !== ctl || e.message === "stopped") return;
+        const b = assistant.handle(text);
+        show(text, { ...b, ok: false, reply: `${b.reply} (The AI model on this computer did not answer: ${e.message}.)` }, via);
+      })
+      .finally(() => { if (thinking === ctl) thinking = null; });
     return r;
   }
+
+  // ---------- optional: a language model on this computer ----------
+  if (model && !globalThis.LUNO_B64) {      // the preview page cannot reach other addresses, so the option is not offered there
+    const row = $("comms-ai-row"), btn = $("comms-ai"), baseIn = $("ai-base"), preset = $("ai-preset"), pick = $("ai-model"), status = $("ai-status");
+    preset.replaceChildren(...PRESETS.map(([label, url]) => new Option(label, url)), new Option("OTHER", ""));
+    const sync = () => {
+      const c = model.config;
+      btn.textContent = model.ready ? `LOCAL AI MODEL: ON · ${c.model}` : "LOCAL AI MODEL: OFF"; btn.classList.toggle("on", model.ready);
+      $("ai-off").hidden = !model.ready; pick.hidden = !pick.options.length;
+    };
+    baseIn.value = model.config.base || PRESETS[0][1]; preset.value = PRESETS.some((p) => p[1] === baseIn.value) ? baseIn.value : "";
+    preset.addEventListener("change", () => { if (preset.value) baseIn.value = preset.value; });
+    baseIn.addEventListener("keydown", (e) => e.stopPropagation());
+    btn.addEventListener("click", () => { row.hidden = !row.hidden; });
+    $("ai-connect").addEventListener("click", async () => {
+      status.textContent = "LOOKING FOR THE MODEL SERVER…";
+      try {
+        const list = await model.listModels(baseIn.value);
+        if (!list.length) throw new Error("the server is running but has no model loaded");
+        pick.replaceChildren(...list.map((m) => new Option(m, m)));
+        pick.value = list.includes(model.config.model) ? model.config.model : list[0];
+        model.set({ on: true, model: pick.value });
+        status.textContent = `CONNECTED. ${list.length} MODEL${list.length === 1 ? "" : "S"} FOUND. NOTHING LEAVES THIS COMPUTER.`;
+      } catch (e) { model.set({ on: false }); status.textContent = `NOT CONNECTED: ${e.message}`; }
+      sync();
+    });
+    pick.addEventListener("change", () => { model.set({ model: pick.value }); sync(); });
+    $("ai-off").addEventListener("click", () => { model.set({ on: false }); status.textContent = "TURNED OFF. THE BUILT-IN COMMANDS STILL WORK."; sync(); });
+    sync();
+  } else $("comms-ai").hidden = true;
 
   // ---------- typing ----------
   input.addEventListener("keydown", (e) => {
@@ -151,7 +199,7 @@ export function createAssistantPanel({ assistant }) {
 
   function toggle(show = panel.hidden) {
     panel.hidden = !show;
-    if (!show) { st.hands = false; stopListening(); globalThis.speechSynthesis?.cancel(); syncOpts(); input.blur(); }
+    if (!show) { thinking?.abort(); thinking = null; st.hands = false; stopListening(); globalThis.speechSynthesis?.cancel(); syncOpts(); input.blur(); }
     else { note(); syncOpts(); }
   }
   // T key / ASK LUNO key: open and listen (or put the cursor in the box when the browser cannot listen).

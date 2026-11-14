@@ -36,8 +36,8 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { hours: { type: "number" } }, required: ["hours"], additionalProperties: false } },
   { name: "next_good_time", description: "Jump the landing time to the start of the next landing window that meets the mission needs.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
-  { name: "set_mission_need", description: "Change one mission need. days: mission length. maxDarkH: longest dark spell the mission can sit out, in hours. earthMinPct: least share of the mission with Earth in view. earthAtLanding: true or false. step (+1 or -1) moves days to the next longer or shorter choice instead of giving a value.",
-    input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "earthAtLanding"] }, value: {}, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
+  { name: "set_mission_need", description: "Change one mission need. days: mission length. maxDarkH: longest dark spell the mission can sit out, in hours. earthMinPct: least share of the mission with Earth in view. earthAtLanding: whether Earth must be in view at landing; give it with 'required' (true or false), the others with 'value' (a number). step (+1 or -1) moves days to the next longer or shorter choice instead of giving a value.",
+    input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "earthAtLanding"] }, value: { type: "number" }, required: { type: "boolean" }, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
   { name: "mission_clock", description: "Move the mission clock (the moment shown for the Sun and Earth). to_hours: hours after landing. by_hours: relative move. play: true starts it running, false pauses it.",
     input_schema: { type: "object", properties: { to_hours: { type: "number" }, by_hours: { type: "number" }, play: { type: "boolean" } }, additionalProperties: false } },
   { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view) or 'main' (close both).",
@@ -193,6 +193,7 @@ export function parse(text, sites = []) {
   if (take(/\b(?:play|resume|run the clock|start the clock|run time)\b/)) call("mission_clock", { play: true });
   else if (take(/\b(?:pause|stop|freeze|hold)\b/)) call("mission_clock", { play: false });
 
+  calls.leftover = t;      // what no rule used
   if (calls.length) return calls;
 
   // --- questions ---
@@ -208,6 +209,14 @@ export function parse(text, sites = []) {
   else if (q(/\bneeds?\b|\bsettings?\b|\brequirements?\b|\bhow long is the mission\b/)) call("report", { topic: "needs" });
   else if (q(/\bstatus\b|\breport\b|\bgo\b|\bverdict\b|\banswer\b|\bsummary\b|\bhow (?:does|is) it look|\bcan (?:i|we) land\b|\bsafe\b|\bok\b|\bokay\b|\bgood\b/)) call("report", { topic: "status" });
   return calls;
+}
+
+// True when a sentence asks for more than the rules did with it: a comparison, a recommendation, a second site.
+// Such sentences are better handed to a language model, when one is connected.
+const OPEN = /\b(?:best|better|worse|worst|compare|comparison|which|recommend|versus|vs|safest|longest|shortest|most|least|instead of|rather|difference|explain|tell me about|what if|how many|how much|how long)\b/;
+export function isOpenQuestion(calls, sites = []) {
+  const rest = calls.leftover || "";
+  return OPEN.test(rest) || aliasList(sites).some(([alias]) => rest.includes(` ${alias} `));
 }
 
 // ---------- doing it, and answering ----------
@@ -309,7 +318,7 @@ export function createAssistant(api) {
       }
       case "set_mission_need": {
         const k = input.need, opts = api.needOptions();
-        if (k === "earthAtLanding") { api.setReq(k, !!input.value); return { say: `Earth link at landing: ${input.value ? "required" : "not required"}.`, changed: true }; }
+        if (k === "earthAtLanding") { const on = input.required ?? !!input.value; api.setReq(k, on); return { say: `Earth link at landing: ${on ? "required" : "not required"}.`, changed: true }; }
         if (!opts[k]) return { say: "LUNO has no such mission need." };
         let v = input.value;
         if (input.step) {
@@ -356,8 +365,10 @@ export function createAssistant(api) {
   }
 
   // A sentence in, an answer out.
-  function handle(text) {
+  // deferOpen: do nothing and say so when the sentence is an open question (the caller will ask a language model).
+  function handle(text, { deferOpen = false } = {}) {
     const calls = parse(text, api.sites());
+    if (deferOpen && calls.length && isOpenQuestion(calls, api.sites())) return { ok: false, defer: true, calls: [], reply: "" };
     if (!calls.length) return { ok: false, calls, reply: `I did not find a command in "${String(text).trim().slice(0, 60)}". Say HELP for examples.` };
     const parts = []; let changed = false, clock = false, wait = false;
     for (const c of calls) { const r = runTool(c.tool, c.input); if (r.say) parts.push(r.say); changed ||= !!r.changed; clock ||= !!r.clock; wait ||= !!r.wait; }
@@ -366,7 +377,28 @@ export function createAssistant(api) {
     return { ok: true, calls, reply: parts.join(" ") };
   }
 
-  return { handle, runTool, tools: TOOLS, verdictText };
+  // For a language model: run a tool by name with loosely typed input, and return everything it needs to read as text.
+  function callTool(name, input) {
+    const def = TOOLS.find((t) => t.name === name);
+    if (!def) return `ERROR: there is no tool called ${name}. The tools are: ${TOOLS.map((t) => t.name).join(", ")}.`;
+    if (!input || typeof input !== "object" || Array.isArray(input)) input = {};
+    const props = def.input_schema.properties, args = {};
+    for (const [k, v] of Object.entries(input)) {
+      if (!(k in props) || v == null) continue;
+      const type = props[k].type;
+      args[k] = type === "integer" || type === "number" ? Number(v) : type === "boolean" ? v === true || v === "true" : v;
+      if ((type === "integer" || type === "number") && !Number.isFinite(args[k])) return `ERROR: ${k} must be a number.`;
+    }
+    for (const k of def.input_schema.required || []) if (!(k in args)) return `ERROR: ${name} needs "${k}".`;
+    const r = runTool(name, args);
+    let out = r.say || "Done.";
+    if (r.wait) out += " The verdict for this point is not ready yet; call report with topic status to read it.";
+    else if (r.changed) out += " " + verdictText();
+    else if (r.clock) out += " " + sunText() + " " + earthText(snap(), false);
+    return out;
+  }
+
+  return { handle, runTool, callTool, tools: TOOLS, verdictText };
 }
 
 // Text for the speech voice: full month names, no symbols it would stumble on.

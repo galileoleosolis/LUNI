@@ -29,6 +29,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   Earth link; the tool list is the hand-over point if a language model is added. The app side is `assistantApi` in
   `js/app.js`. Speech uses the browser (Web Speech API). Never call `SpeechRecognition.available()` at page load: it
   crashes headless test browsers; it runs only when someone first presses TALK.
+- `js/assistant-llm.js` — optional link to a language model running on the user's own computer (any server that
+  speaks the OpenAI-style "chat completions with tools" protocol: Ollama, LM Studio, Lemonade, llama.cpp). Off until
+  the user connects it in the ASK LUNO panel. Exact commands stay with the rules; open questions (`isOpenQuestion`)
+  and anything the rules miss go to the model, which may only call LUNO's tools. Tested against a scripted stand-in
+  server only; never with a real model. Hidden on the preview page (it cannot reach other addresses).
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -85,8 +90,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    Fixed since: the two shortcuts are repeated as buttons in the left column (`#side-scan` under the site list,
    `#side-next` under the landing time); the test's date answer is three pickers like the app's; zoom speed 1.9.
    ASK LUNO (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
-   the user must test it in Chrome or Edge from localhost or GitHub Pages. Open decision: add a language model on top
-   (online with an API key, or a local model on the user's laptop).
+   the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
+   restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
+   LUNO's side is built; still needed from the user: which program runs the model, which model, which chip, and a
+   test with LUNO opened from the laptop itself (localhost or GitHub Pages; Ollama needs OLLAMA_ORIGINS for Pages).
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

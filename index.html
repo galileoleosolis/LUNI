@@ -178,7 +178,16 @@
       </div>
       <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">Ask in plain words. Try one of these:</div></div>
       <div id="comms-tips" class="comms-tips"></div>
-      <div class="comms-foot"><span id="comms-note"></span><button id="comms-local" class="comms-opt" hidden>MAKE VOICE WORK WITHOUT INTERNET (ONE DOWNLOAD)</button></div>
+      <div id="comms-ai-row" class="comms-ai" hidden>
+        <span>AI MODEL RUNNING ON THIS COMPUTER:</span>
+        <select id="ai-preset" aria-label="Model program"></select>
+        <input id="ai-base" type="text" autocomplete="off" spellcheck="false" aria-label="Address of the model server" placeholder="http://localhost:11434/v1">
+        <button id="ai-connect" class="comms-opt">CONNECT</button>
+        <select id="ai-model" aria-label="Model" hidden></select>
+        <button id="ai-off" class="comms-opt" hidden>TURN OFF</button>
+        <span id="ai-status"></span>
+      </div>
+      <div class="comms-foot"><span id="comms-note"></span><button id="comms-local" class="comms-opt" hidden>MAKE VOICE WORK WITHOUT INTERNET (ONE DOWNLOAD)</button><button id="comms-ai" class="comms-opt" title="Lets a language model on this computer answer what the built-in commands cannot">LOCAL AI MODEL: OFF</button></div>
     </div>
   </div>
 

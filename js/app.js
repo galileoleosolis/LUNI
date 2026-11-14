@@ -10,6 +10,7 @@ import { initTestMode } from "./testmode.js";
 import { createSurfacePanel } from "./ui-surface.js";
 import { createAssistant } from "./assistant.js";
 import { createAssistantPanel } from "./ui-assistant.js";
+import { createModelLink } from "./assistant-llm.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -608,7 +609,8 @@ async function init() {
   });
   $("surface-btn").addEventListener("click", () => surface.toggle(true));
   buildNeeds();
-  const comms = createAssistantPanel({ assistant: createAssistant(assistantApi) });
+  const assistant = createAssistant(assistantApi);
+  const comms = createAssistantPanel({ assistant, model: createModelLink({ assistant, sites: assistantApi.sites, needOptions: assistantApi.needOptions }) });
   $("calendar").addEventListener("click", (e) => {
     const d = dayFromEvent($("calendar"), e, state.cal.days);
     if (d < 0) return;
