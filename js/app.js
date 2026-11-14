@@ -537,6 +537,23 @@ function renderCompare() {
   }
 }
 
+// A short confirmation at the top of the screen that fades by itself.
+let toastTimer = 0;
+function toast(text) {
+  const n = $("toast");
+  n.hidden = true; void n.offsetWidth;                 // restart the fade if one is already showing
+  n.textContent = "✓ " + text; n.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { n.hidden = true; }, 4600);
+}
+// "1.90 KM TO THE SOUTHEAST": how far and which way b is from a, on the Moon.
+function moveText(a, b) {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r, la = a.lat * r, lb = b.lat * r;
+  const km = 2 * 1737.4 * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(la) * Math.cos(lb) * Math.sin(dLon / 2) ** 2));
+  const brg = (Math.atan2(Math.sin(dLon) * Math.cos(lb), Math.cos(la) * Math.sin(lb) - Math.sin(la) * Math.cos(lb) * Math.cos(dLon)) / r + 360) % 360;
+  const dir = ["NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "WEST", "NORTHWEST"][Math.round(brg / 45) % 8];
+  return km < 0.005 ? "0 KM" : `${km < 10 ? km.toFixed(2) : km.toFixed(1)} KM TO THE ${dir}`;
+}
+
 // ---------- command assistant ----------
 // Everything the assistant (typed or spoken commands) may read or do. It goes through the same functions as the keys.
 const assistantApi = {
@@ -607,7 +624,11 @@ async function init() {
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
-    onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
+    onPick: (lat, lon) => {
+      const from = state.site;
+      selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
+      toast(`LANDING SITE MOVED ${moveText(from, { lat, lon })} · NOW AT ${fmtLat(lat)} ${fmtLon(lon)}`);
+    },
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());

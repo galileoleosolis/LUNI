@@ -116,6 +116,13 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    magnifies; the left column now starts with the site list (framed, with a "more sites" marker), the Moon sits under
    it, and the two shortcut buttons live in the step 1 and step 2 headers (`#side-scan`, `#side-next`). Sites visible
    without scrolling: 7 of 12 on laptop windows (was 4), 12 of 12 on big screens.
+   Fifth run (set D, same sibling, the new left column): 6/6, ease 5/5, 6:22. He used ASK LUNI 21 times, typed,
+   and it understood every sentence ("The mission will last 28 days likely", "Look for a better spot nearby").
+   Problems: pressing TALK did nothing visible (the microphone is refused for him on the preview page; he pressed it
+   8 times); he did not see the BETTER SPOT button in the step 1 header and asked for one on the left; after moving
+   the site from the scan he was not sure it had moved. Fixed since: a refused microphone says so in the answer
+   line and the button reads NO MICROPHONE · TYPE; the better-spot button sits on the Moon picture; moving the site
+   from the scan shows a fading confirmation with distance and direction (`toast` in `js/app.js`).
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).

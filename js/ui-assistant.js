@@ -28,14 +28,20 @@ export function createAssistantPanel({ assistant, model }) {
       setListening(state !== "idle");
       if (state !== "idle") return;
       if (st.hands) { st.hands = false; }
-      if (reason === "not_granted" || reason === "unavailable") { st.micBlocked = true; }
+      if (reason === "not_granted" || reason === "unavailable") return noMic();
       syncOpts(); note();
     });
     syncOpts(); note();
   }).catch(() => {});
   // A press on TALK cuts LUNI off mid-sentence and listens straight away.
+  // The microphone turned out to be unusable here: say so in the answer line (not only in the small print) and move to typing.
+  function noMic() {
+    st.micBlocked = true; st.hands = false; syncOpts(); note(); setListening(false);
+    const out = $("comms-reply"); out.textContent = "The microphone cannot be used on this page. Type what you want in the box and press Enter."; out.classList.add("bad");
+    input.focus();
+  }
   function hush() { globalThis.speechSynthesis?.cancel(); st.speaking = false; }
-  function startDictation() { hush(); dict.start({ language: "en" }).catch((e) => { if (e?.code === "not_granted" || e?.code === "unavailable") { st.micBlocked = true; syncOpts(); note(); input.focus(); } }); }
+  function startDictation() { hush(); dict.start({ language: "en" }).catch((e) => { if (e?.code === "not_granted" || e?.code === "unavailable") noMic(); }); }
 
   // ---------- answers ----------
   function say(text) {
@@ -149,7 +155,7 @@ export function createAssistantPanel({ assistant, model }) {
   function setListening(on) {
     st.listening = on;
     mic.classList.toggle("on", on); key.classList.toggle("on", on || st.hands);
-    mic.textContent = on ? (st.hands ? "● LISTENING FOR “LUNI…”" : "● LISTENING… SPEAK NOW") : "● TALK";
+    mic.textContent = on ? (st.hands ? "● LISTENING FOR “LUNI…”" : "● LISTENING… SPEAK NOW") : canListen() ? "● TALK" : "NO MICROPHONE · TYPE";
   }
   function heard(text) {
     if (!st.hands) return run(text, "voice");
@@ -172,7 +178,7 @@ export function createAssistantPanel({ assistant, model }) {
       }
     };
     rec.onerror = (e) => {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") { st.micBlocked = true; st.hands = false; syncOpts(); note(); }
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") noMic();
       else if (e.error === "network") { $("comms-reply").textContent = "The browser could not reach its speech service. Type the command instead."; $("comms-reply").classList.add("bad"); st.hands = false; syncOpts(); }
       else if (e.error === "no-speech" && !st.hands) { $("comms-reply").textContent = "I did not hear anything. Press TALK and speak, or type."; $("comms-reply").classList.add("bad"); }
     };
@@ -189,6 +195,7 @@ export function createAssistantPanel({ assistant, model }) {
     $("comms-hands").textContent = `HANDS-FREE ${st.hands ? "ON · SAY “LUNI, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
     $("comms-hands").hidden = !canListen(); mic.classList.toggle("off", !canListen());
     key.classList.toggle("on", st.listening || st.hands);
+    if (!st.listening) mic.textContent = canListen() ? "● TALK" : "NO MICROPHONE · TYPE";
   }
   $("comms-voice").addEventListener("click", () => { st.speak = !st.speak; store.set("luno-speak", st.speak ? "on" : "off"); if (!st.speak) globalThis.speechSynthesis?.cancel(); syncOpts(); });
   $("comms-hands").addEventListener("click", () => {
