@@ -5,6 +5,7 @@ import { createGlobe } from "./globe.js";
 import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
 import { sampleSite } from "./model.js";
+import { createScanPanel } from "./ui-scan.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -21,7 +22,7 @@ const state = {
   req: { ...DEFAULT_REQ },       // mission needs
   cal: null,                     // year of landing-window data for the current site + needs
 };
-let globe = null;
+let globe = null, scan = null;
 
 // ---------- formatting ----------
 function roundToHour(d) { const x = new Date(d); x.setUTCMinutes(0, 0, 0); return x; }
@@ -143,6 +144,7 @@ function recompute({ keepIdx = false } = {}) {
   renderTimeline();
   renderMission();
   renderMoment();
+  scan?.refresh();
 }
 
 // ---------- mission needs, landing windows, calendar ----------
@@ -463,6 +465,12 @@ async function init() {
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
+  scan = createScanPanel({
+    getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
+    onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
+    fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
+  });
+  $("scan-btn").addEventListener("click", () => scan.toggle());
   buildNeeds();
   $("calendar").addEventListener("click", (e) => {
     const d = dayFromEvent($("calendar"), e, state.cal.days);
@@ -487,6 +495,8 @@ async function init() {
     else if (k === "s" || k === "S") nextSite();
     else if (k === "p" || k === "P") pinCurrent();
     else if (k === "n" || k === "N") nextWindow();
+    else if (k === "a" || k === "A") scan.toggle();
+    else if (k === "Escape" && scan.isOpen()) scan.toggle(false);
     else if (k === "Home") setIdx(0);
     else return;
     e.preventDefault();

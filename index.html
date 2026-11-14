@@ -44,6 +44,24 @@
 
       <!-- CENTER: the answer -->
       <section class="col col-main">
+        <div id="scan" class="scan" hidden>
+          <div class="scan-head"><span id="scan-title"></span><button id="scan-close" title="Close (Esc)">✕ CLOSE</button></div>
+          <div class="scan-body">
+            <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
+            <div class="scan-side">
+              <h3>SCAN SIZE (HALF-WIDTH)</h3><div class="seg" id="scan-radius"></div>
+              <h3>SHOW</h3><div class="seg" id="scan-metric"></div>
+              <div id="scan-legend" class="scan-legend"></div>
+              <div id="scan-progress"></div>
+              <div id="scan-scale" class="dimtxt"></div>
+              <h3>CURRENT SITE ✛</h3><div id="scan-here" class="scan-cell"></div>
+              <h3>BEST POINT FOUND ★</h3><div id="scan-best" class="scan-cell"></div>
+              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
+              <h3>INSPECT</h3><div id="scan-hover" class="scan-cell"></div>
+              <div id="scan-note" class="credit"></div>
+            </div>
+          </div>
+        </div>
         <div class="readouts">
           <div class="ro">
             <div class="lab">☀ POWER</div>
@@ -94,7 +112,7 @@
         <h3 style="margin-top:14px">COMPARE</h3>
         <div id="compare-list" class="compare"></div>
         <h3 style="margin-top:14px">KEYBOARD</h3>
-        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D &nbsp; <b>N</b> NEXT WINDOW<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
+        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D &nbsp; <b>N</b> NEXT WINDOW &nbsp; <b>A</b> AREA SCAN<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
         <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
     </div>
@@ -108,6 +126,7 @@
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
     <span class="key-gap"></span>
     <button class="key g" id="next-window-btn"><small>LANDING</small>NEXT WINDOW</button>
+    <button class="key g" id="scan-btn"><small>NEARBY</small>AREA SCAN</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
     <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
   </div>

@@ -59,6 +59,16 @@ export function mapsFor(lat) {
   return [null, "global"];
 }
 
+// Point reached from (lat, lon) going distM metres along azimuth azDeg (clockwise from north) on the sphere.
+export function destination(lat, lon, azDeg, distM) {
+  const la = lat * DEG, a = azDeg * DEG, d = distM / R;
+  const s2 = Math.max(-1, Math.min(1, Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(a)));
+  return { lat: Math.asin(s2) / DEG, lon: lon + Math.atan2(Math.sin(a) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * s2) / DEG };
+}
+
+// Pixel size (m) of the best map available at a latitude, without loading it.
+export function mapResFor(lat) { return lat <= -80.5 ? 240 : lat <= -62 ? 960 : R * DEG / 8; }
+
 function distances(nearRes, dMax = 250e3) {
   const out = [];
   for (let d = Math.max(30, nearRes / 4); d < dMax; d += Math.max(nearRes / 2, 0.0015 * d)) out.push(d);
