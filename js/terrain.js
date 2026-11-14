@@ -83,6 +83,22 @@ export function destination(lat, lon, azDeg, distM) {
 // Pixel size (m) of the best map available at a latitude, without loading it.
 export function mapResFor(lat) { return lat <= -80.5 ? 240 : lat <= -62 ? 960 : R * DEG / 8; }
 
+export const NEAR_LIMIT_M = 60e3;      // the fine map is used out to this distance, the wide map beyond
+export const skylineSteps = (res) => distances(res);
+export const RADIUS_M = R;
+
+// Ground slope (deg) at a point, over two pixels of the given map.
+export function slopeAt(best, lat, lon) {
+  const la = lat * DEG, lo = lon * DEG, sl = Math.sin(la), cl = Math.cos(la);
+  const b = 2 * best.res, step = (az) => {
+    const d = b / 2 / R, a = az * DEG;
+    const s2 = sl * Math.cos(d) + cl * Math.sin(d) * Math.cos(a), l2 = Math.asin(s2);
+    return best.height(l2 / DEG, (lo + Math.atan2(Math.sin(a) * Math.sin(d) * cl, Math.cos(d) - sl * s2)) / DEG);
+  };
+  const slope = Math.atan(Math.hypot((step(0) - step(180)) / b, (step(90) - step(270)) / b)) / DEG;
+  return Number.isFinite(slope) ? slope : null;
+}
+
 function distances(nearRes, dMax = 250e3) {
   const out = [];
   for (let d = Math.max(30, nearRes / 4); d < dMax; d += Math.max(nearRes / 2, 0.0015 * d)) out.push(d);
@@ -102,7 +118,7 @@ export async function computeTerrain(lat, lon, azStep = 1) {
   const rp = R + h0 + MAST_M, P = [rp * up[0], rp * up[1], rp * up[2]];
   const dist = distances(best.res), n = Math.round(360 / azStep);
   const horizon = new Float32Array(n);
-  const nearLimit = near ? 60e3 : 0;
+  const nearLimit = near ? NEAR_LIMIT_M : 0;
   let min = Infinity, max = -Infinity;
 
   for (let i = 0; i < n; i++) {
@@ -126,14 +142,7 @@ export async function computeTerrain(lat, lon, azStep = 1) {
     horizon[i] = e; if (e < min) min = e; if (e > max) max = e;
   }
 
-  // slope over two pixels of the best map
-  const b = 2 * best.res, step = (az) => {
-    const d = b / 2 / R, a = az * DEG;
-    const s2 = sl * Math.cos(d) + cl * Math.sin(d) * Math.cos(a), l2 = Math.asin(s2);
-    return best.height(l2 / DEG, (lo + Math.atan2(Math.sin(a) * Math.sin(d) * cl, Math.cos(d) - sl * s2)) / DEG);
-  };
-  const slope = Math.atan(Math.hypot((step(0) - step(180)) / b, (step(90) - step(270)) / b)) / DEG;
-
-  return { real: true, reduced: true, horizon, heightM: h0, slopeDeg: Number.isFinite(slope) ? slope : null, slopeBaseM: Math.round(b),
+  const b = 2 * best.res;
+  return { real: true, reduced: true, horizon, heightM: h0, slopeDeg: slopeAt(best, lat, lon), slopeBaseM: Math.round(b),
            mastM: MAST_M, maps: [near, far].filter(Boolean).map((g) => (g.res >= 1000 ? (g.res / 1000).toFixed(1) + " KM" : g.res + " M")), min, max };
 }

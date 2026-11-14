@@ -1,5 +1,6 @@
 // Area-scan panel: a north-up heat map of the ground around the site for the current landing time and needs.
-import { runScan } from "./scan.js";
+import { runScan, runScanGpu } from "./scan.js";
+import { createGpuSkyline } from "./scan-gpu.js";
 import { scanOptions, bestCell } from "./scan-core.js";
 import { mapResFor } from "./terrain.js";
 
@@ -17,7 +18,10 @@ function rampColor(ramp, v) {            // v in 0..100
 
 export function createScanPanel({ getContext, onPick, fmt }) {
   const panel = $("scan"), canvas = $("scan-canvas"), ctx = canvas.getContext("2d");
-  let st = { metric: "sun", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null };
+  let st = { metric: "sun", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null, engine: "" };
+  // The graphics chip, if this computer has a usable one: made on first use, dropped for good if it ever fails a check.
+  let gpu;
+  const chipFor = (site) => { if (gpu === undefined) gpu = globalThis.LUNO_NO_GPU ? null : createGpuSkyline(); return gpu && mapResFor(site.lat) <= 960 ? gpu : null; };
 
   function buildSeg(el, items, get, set) {
     el.replaceChildren();
@@ -30,18 +34,33 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   }
 
   function start() {
-    const c = getContext(), opts = scanOptions(c.site.lat), o = opts[st.opt];
-    const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm}`;
+    const c = getContext(), chip = chipFor(c.site), opts = scanOptions(c.site.lat, !!chip);
+    if (st.opt >= opts.length) st.opt = opts.length - 1;
+    const o = opts[st.opt];
+    const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm},${o.n}`;
     buildSeg($("scan-radius"), opts.map((x, i) => [i, `${x.radiusKm} KM`]), () => st.opt, (v) => { st.opt = v; start(); });
     $("scan-title").textContent = `AREA SCAN · ${fmt.site(c.site)} · LAND ${fmt.stamp(c.t0)} · ${c.req.days}D MISSION`;
     const res = mapResFor(c.site.lat);
-    $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. PRESET SITES USE FINER MAPS, SO THEIR NUMBERS CAN DIFFER A LITTLE.`;
+    const note = () => { $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. PRESET SITES USE FINER MAPS, SO THEIR NUMBERS CAN DIFFER A LITTLE. ${st.engine}`; };
+    note();
     if (key === st.key) return draw();
     st.run?.cancel();
-    st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null;
-    st.run = runScan({ site: c.site, radiusKm: o.radiusKm, n: o.n, t0: c.t0, req: c.req,
-      onCell: (p, r, done, total) => { if (r) st.cells[p.r * o.n + p.k] = { ...p, ...r }; st.done = done; st.total = total; schedule(); },
-      onDone: () => draw() });
+    st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
+    const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
+    const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, t0: c.t0, req: c.req,
+      onCell: (p, r, done, total) => { if (r) st.cells[p.r * o.n + p.k] = { ...p, ...r }; st.done = done; st.total = total; schedule(); } };
+    if (chip) {
+      let check = "";
+      st.engine = "SKYLINES: ON THE GRAPHICS CHIP.";
+      st.run = runScanGpu({ ...common, gpu: chip,
+        onCheck: (diff) => { check = ` CHECKED AGAINST THE PROCESSOR AT THE SITE: SAME SKYLINE WITHIN ${diff < 0.001 ? "0.001" : diff.toFixed(3)}°.`; st.engine = `SKYLINES: ON THE GRAPHICS CHIP.${check}`; note(); },
+        onDone: () => { st.took = secs(); note(); draw(); },
+        onFail: (why) => { console.warn("GPU scan dropped:", why); gpu = null; st.key = ""; st.engine = ""; start(); } });      // back to the processor, for good
+    } else {
+      st.engine = "SKYLINES: ON THE PROCESSOR.";
+      st.run = runScan({ ...common, onDone: () => { st.took = secs(); draw(); } });
+    }
+    note();
     st.grid = st.run.grid;
     draw();
   }
@@ -69,22 +88,23 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       ctx.fillRect(k * cw, r * cw, cw + 0.5, cw + 0.5);
     }
     ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1;
-    for (let i = 1; i < n; i++) { ctx.beginPath(); ctx.moveTo(i * cw, 0); ctx.lineTo(i * cw, size); ctx.moveTo(0, i * cw); ctx.lineTo(size, i * cw); ctx.stroke(); }
+    if (cw >= 7) for (let i = 1; i < n; i++) { ctx.beginPath(); ctx.moveTo(i * cw, 0); ctx.lineTo(i * cw, size); ctx.moveTo(0, i * cw); ctx.lineTo(size, i * cw); ctx.stroke(); }
 
     const mark = (c, color, star) => {
-      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw;
+      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw, m = Math.max(cw, 13);      // marks keep a readable size on fine maps
       ctx.strokeStyle = color; ctx.lineWidth = 2;
-      if (star) { ctx.strokeRect(c.k * cw + 1, c.r * cw + 1, cw - 2, cw - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, cw * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
-      else { ctx.beginPath(); ctx.moveTo(x - cw * 0.8, y); ctx.lineTo(x + cw * 0.8, y); ctx.moveTo(x, y - cw * 0.8); ctx.lineTo(x, y + cw * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, cw * 0.45, 0, 7); ctx.stroke(); }
+      if (star) { ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, m * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
+      else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
     const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
     if (best && st.done === st.total) mark(best, "#000", true), mark(best, "#fff", true);
     mark(center, "#fff", false);
-    if (st.hover) { ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect(st.hover.k * cw + 1, st.hover.r * cw + 1, cw - 2, cw - 2); }
+    if (st.hover) { const m = Math.max(cw, 9); ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect((st.hover.k + 0.5) * cw - m / 2 + 1, (st.hover.r + 0.5) * cw - m / 2 + 1, m - 2, m - 2); }
 
     // side readouts
     const finished = st.done === st.total;
-    $("scan-progress").textContent = finished ? `${st.total} POINTS CHECKED` : `SCANNING ${st.done}/${st.total}`;
+    $("scan-progress").textContent = finished ? `${st.total.toLocaleString("en-US")} POINTS CHECKED${st.took ? " IN " + st.took + " S" : ""}` : `SCANNING ${st.done.toLocaleString("en-US")} / ${st.total.toLocaleString("en-US")}`;
+    $("scan-engine").textContent = st.onChip ? "COMPUTED ON THE GRAPHICS CHIP (GPU)" : "COMPUTED ON THE PROCESSOR";
     $("scan-progress").className = finished ? "ok" : "";
     $("scan-scale").textContent = `${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ✛ = CURRENT SITE · ★ = BEST`;
     $("scan-legend").classList.toggle("flat", !m.ramp);

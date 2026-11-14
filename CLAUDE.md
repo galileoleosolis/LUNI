@@ -21,6 +21,14 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - `js/terrain.js` — in-browser skylines from reduced LOLA maps in `data/dem/` (custom points and the scan).
 - `js/mission.js` — mission needs: `analyze`, `windowsFrom`, `dailyStats`. Pure functions.
 - `js/scan-core.js`, `js/scan.js`, `js/scan-worker.js`, `js/ui-scan.js` — area scan in module Web Workers.
+- `js/scan-gpu.js` — the scan's skylines on the graphics chip (WebGL2 fragment shader, R16I height textures), used for
+  south-polar maps only; it allows the fine scan grids (up to 121 x 121). Every run first compares the site's own
+  skyline with the processor version (`GPU_TOLERANCE_DEG` in `js/scan.js`) and drops back to the worker scan if it
+  fails, if WebGL2 float targets are missing, or if `window.LUNO_NO_GPU` is set. Float32 rules that must be kept:
+  map position as an offset from the point's own pixel, angles from height differences and 1 - cos, and
+  azimuth sines from a texture (a chip's own sin/cos cost 0.003 deg). Measured here on an emulated chip only
+  (SwiftShader): skylines within 0.001 deg of the processor, no verdict differing in 1,085 points. Real GPU speed
+  is not measured yet; the user has to try it.
 - `js/surface.js`, `js/ui-surface.js` — 3D first-person surface view (three.js): nested terrain sheets from `data/patch/`
   (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNO skyline overlay at 2 m.
   On the preview page the patches are served as base64 text copies (see the artifact build step).
