@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNO · Draft A · Mission console</title>
+<style>
+  :root { --bg:#000; --amb:#ffb000; --dim:#7a5a12; --grn:#33ff99; --red:#ff3b3b; --cy:#5ac8ff; --grid:#1d1606; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--amb); font:13px/1.45 "IBM Plex Mono","Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace; letter-spacing:.02em; }
+  .scr { align-content:start; padding:14px 18px; display:grid; grid-template-columns: 1fr 330px; gap:0; border:1px solid var(--dim); margin:10px; min-height:calc(100vh - 20px); }
+  .bar { grid-column:1/-1; display:flex; gap:28px; border-bottom:1px solid var(--dim); padding:0 0 8px; text-transform:uppercase; }
+  .bar b { color:#fff; font-weight:600; }
+  .bar .r { margin-left:auto; color:var(--dim); }
+  .blk { border-bottom:1px solid var(--dim); padding:10px 0; }
+  .left { border-right:1px solid var(--dim); padding-right:16px; }
+  .right { padding-left:16px; }
+  h3 { margin:0 0 6px; font-size:11px; font-weight:400; color:var(--dim); letter-spacing:.18em; }
+  table { border-collapse:collapse; width:100%; }
+  td { padding:2px 10px 2px 0; white-space:nowrap; }
+  td.k { color:var(--dim); }
+  .ok { color:var(--grn); } .no { color:var(--red); } .w { color:#fff; }
+  .blink { animation: b 1s steps(1) infinite; } @keyframes b { 50% { opacity:.2; } }
+  svg text { font-family:inherit; }
+  .sel { color:#000; background:var(--amb); padding:0 4px; }
+  .row { display:flex; justify-content:space-between; }
+  .cmd { color:var(--dim); margin-top:8px; }
+  .cmd span { color:var(--amb); }
+  .tl { font-size:12px; white-space:pre; line-height:1.35; }
+</style></head>
+<body>
+<div class="scr">
+  <div class="bar"><span>LUNO // LUNAR UTILITY FOR NAVIGATIONAL OPERATIONS</span><span>SITE <b id="site"></b></span><span>EPOCH <b id="epoch"></b></span><span class="r">DEMO DATA · MODEL v0</span></div>
+  <div class="left">
+    <div class="blk">
+      <h3>STATUS · <span id="tplus"></span></h3>
+      <table id="status"></table>
+    </div>
+    <div class="blk">
+      <h3>LOCAL HORIZON · AZ 000–360 · EL DEG</h3>
+      <svg id="hz" width="100%" height="250"></svg>
+    </div>
+    <div class="blk" style="border:none">
+      <h3>VISIBILITY · T+0 → T+30D · 1 CHAR = 12H</h3>
+      <div class="tl" id="tl"></div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="blk"><h3>SITE SELECT</h3><div id="sites"></div></div>
+    <div class="blk"><h3>30-DAY SUMMARY</h3><table id="sum"></table></div>
+    <div class="blk" style="border:none"><h3>COMMANDS</h3>
+      <div class="cmd"><span>[←][→]</span> STEP 1H &nbsp; <span>[⇧←][⇧→]</span> STEP 1D</div>
+      <div class="cmd"><span>[S]</span> SLIP +1D &nbsp; <span>[P]</span> PIN TO COMPARE</div>
+      <div class="cmd"><span>[SPACE]</span> PLAY &nbsp; <span>[/]</span> CUSTOM LAT/LON</div>
+      <div class="cmd" style="margin-top:14px">&gt; <span class="blink">█</span></div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { load, stamp, SITES, dur, pct, sgn, terrainLine, track } from "./common.js";
+const D = load("shackleton");
+const $ = (id) => document.getElementById(id);
+$("site").textContent = `${D.site.name.toUpperCase()}  ${Math.abs(D.site.lat).toFixed(2)}S ${D.site.lon.toFixed(1)}E`;
+$("epoch").textContent = D.t.toISOString().replace("T", " ").slice(0, 16) + "Z";
+const c = D.cur; $("tplus").textContent = `T+${String(Math.floor(D.idx/24)).padStart(2,"0")}D${String(D.idx%24).padStart(2,"0")}H`;
+$("status").innerHTML = `
+ <tr><td class="k">BODY</td><td class="k">EL</td><td class="k">AZ</td><td class="k">STATE</td><td class="k">NEXT EVENT</td></tr>
+ <tr><td class="w">SUN</td><td>${sgn(c.sunEl)}</td><td>${c.sunAz.toFixed(1).padStart(5,"0")}</td><td class="${c.sunUp?"ok":"no"}">${c.sunUp?"▲ LIT":"▼ SHADOW"}</td><td>${c.sunUp?"SUNSET":"SUNRISE"} T+${dur(D.sunLeft)}</td></tr>
+ <tr><td class="w">EARTH</td><td>${sgn(c.earthEl)}</td><td>${c.earthAz.toFixed(1).padStart(5,"0")}</td><td class="${c.earthUp?"ok":"no"}">${c.earthUp?"▲ AOS":"▼ LOS"}</td><td>${c.earthUp?"LOS":"AOS"} T+${dur(D.earthLeft)}</td></tr>
+ <tr><td class="w">POWER</td><td colspan="4" class="${c.sunUp?"ok":"no"}">${c.sunUp?"NOMINAL":"BATTERY ONLY — NO SOLAR INPUT"}</td></tr>
+ <tr><td class="w">COMMS</td><td colspan="4" class="${c.earthUp?"ok":"no"}">${c.earthUp?"DIRECT-TO-EARTH":"NO DTE — RELAY REQUIRED"}</td></tr>`;
+$("sum").innerHTML = `
+ <tr><td class="k">SUNLIT</td><td class="w">${pct(D.sum.pctSun)}</td></tr>
+ <tr><td class="k">EARTH IN VIEW</td><td class="w">${pct(D.sum.pctEarth)}</td></tr>
+ <tr><td class="k">BOTH</td><td class="w">${pct(D.sum.pctBoth)}</td></tr>
+ <tr><td class="k">MAX DARK</td><td class="w">${dur(D.sum.maxDarkHours)}</td></tr>`;
+$("sites").innerHTML = SITES.slice(0, 7).map((s, i) => `<div class="row"><span class="${s.id===D.site.id?"sel":""}">${String(i+1).padStart(2,"0")} ${s.name.toUpperCase().slice(0,24)}</span><span style="color:var(--dim)">${s.lat.toFixed(1)}</span></div>`).join("");
+// horizon
+const svg = $("hz"); const W = svg.clientWidth, H = 250, L = 34, B = 18;
+const yMin = -5, yMax = 8;
+const x = (a) => L + a / 360 * (W - L - 4), y = (e) => 4 + (1 - (e - yMin) / (yMax - yMin)) * (H - B - 4);
+let g = "";
+for (let e = -4; e <= 8; e += 2) g += `<line x1="${L}" x2="${W}" y1="${y(e)}" y2="${y(e)}" stroke="${e===0?"#4a3608":"#1d1606"}"/><text x="${L-6}" y="${y(e)+4}" fill="#7a5a12" font-size="10" text-anchor="end">${e}</text>`;
+["000","045","090","135","180","225","270","315","360"].forEach((t, i) => { g += `<line x1="${x(i*45)}" x2="${x(i*45)}" y1="4" y2="${H-B}" stroke="#1d1606"/><text x="${x(i*45)}" y="${H-4}" fill="#7a5a12" font-size="10" text-anchor="middle">${t}</text>`; });
+const win = D.sc.samples.slice(Math.max(0, D.idx - 72), D.idx + 72);
+g += `<path d="${track(win,"sun",x,y)}" fill="none" stroke="#ffb000" stroke-dasharray="2 3" opacity=".6"/>`;
+g += `<path d="${track(win,"earth",x,y)}" fill="none" stroke="#5ac8ff" stroke-dasharray="2 3" opacity=".6"/>`;
+g += `<path d="${terrainLine(D.sc.horizon,x,y)}" fill="none" stroke="#ffb000" stroke-width="1.5"/>`;
+g += `<g transform="translate(${x(c.sunAz)},${y(c.sunEl)})"><circle r="5" fill="none" stroke="#fff"/><line x1="-9" x2="9" stroke="#fff"/><line y1="-9" y2="9" stroke="#fff"/></g><text x="${x(c.sunAz)+10}" y="${y(c.sunEl)-8}" fill="#fff" font-size="11">SUN ${c.sunUp?"":"[BLK]"}</text>`;
+g += `<rect x="${x(c.earthAz)-4}" y="${y(c.earthEl)-4}" width="8" height="8" fill="none" stroke="#5ac8ff"/><text x="${x(c.earthAz)+10}" y="${y(c.earthEl)+4}" fill="#5ac8ff" font-size="11">EARTH ${c.earthUp?"":"[BLK]"}</text>`;
+svg.innerHTML = g;
+// text timeline
+const S = D.sc.samples, per = 12;
+const strip = (fn) => { let s = ""; for (let i = 0; i < S.length; i += per) s += fn(S[i]) ? "█" : "·"; return s; };
+const days = Array.from({length: 7}, (_, i) => `D+${String(i*5).padStart(2,"0")}`.padEnd(10)).join("");
+$("tl").innerHTML = `      ${days}\nSUN   <span class="ok">${strip(s=>s.sunUp)}</span>\nEARTH <span style="color:var(--cy)">${strip(s=>s.earthUp)}</span>\nBOTH  <span class="w">${strip(s=>s.sunUp&&s.earthUp)}</span>\n      ^ T+0`;
+</script>
+</body></html>

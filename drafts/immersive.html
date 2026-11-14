@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNO · Draft C · Immersive horizon</title>
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:#000; color:#e9edf5; font:14px/1.4 "Segoe UI",system-ui,sans-serif; overflow:hidden; }
+  svg { position:fixed; inset:0; width:100vw; height:100vh; }
+  .hud { position:fixed; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:rgba(233,237,245,.75); }
+  .tl { top:22px; left:28px; } .tr { top:22px; right:28px; text-align:right; }
+  .tl b { display:block; font-size:22px; letter-spacing:.3em; color:#fff; font-weight:600; }
+  .tag { display:inline-block; border:1px solid rgba(255,160,60,.6); color:#ffa03c; padding:2px 6px; margin-top:6px; font-size:10px; }
+  .dock { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:18px; align-items:center;
+          background:rgba(10,12,18,.55); border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(8px); padding:10px 16px; border-radius:6px; }
+  .dock .site { white-space:nowrap; font-weight:600; letter-spacing:.08em; }
+  .dock button { white-space:nowrap; background:none; border:1px solid rgba(255,255,255,.25); color:#fff; padding:6px 10px; font:inherit; font-size:12px; cursor:pointer; }
+  .dock input[type=range] { width:320px; accent-color:#fff; }
+  .stat { position:fixed; right:28px; bottom:96px; text-align:right; font-size:12px; color:rgba(233,237,245,.7); letter-spacing:.06em; }
+  .stat b { color:#fff; font-size:16px; letter-spacing:0; }
+</style></head>
+<body>
+<svg id="v"></svg>
+<div class="hud tl"><b>LUNO</b><span id="site"></span><br><span class="tag">DEMO DATA</span></div>
+<div class="hud tr"><span id="time"></span><br>vertical scale ×6</div>
+<div class="stat" id="stat"></div>
+<div class="dock">
+  <span class="site" id="site2"></span>
+  <button>−1 d</button><input type="range" min="0" max="719" value="0"><button>+1 d</button><button>▶</button>
+</div>
+<script type="module">
+import { load, durWords, pct, horizonAt, stamp } from "./common.js";
+const D = load("shackleton"), c = D.cur, $ = (i) => document.getElementById(i);
+$("site").textContent = `${D.site.name} · ${Math.abs(D.site.lat).toFixed(2)}°S ${D.site.lon.toFixed(1)}°E`;
+$("site2").textContent = D.site.name;
+$("time").textContent = stamp(D.t);
+$("stat").innerHTML = `next 30 days<br><b>${pct(D.sum.pctSun)}</b> sunlit &nbsp; <b>${pct(D.sum.pctEarth)}</b> Earth link<br>longest night <b>${durWords(D.sum.maxDarkHours)}</b>`;
+const svg = $("v"), W = innerWidth, H = innerHeight;
+// view: 360° across the screen, exaggerated vertical scale. horizon line at 62% height.
+const base = H * 0.62, pxPerDeg = 22;
+const x = (a) => a / 360 * W, y = (e) => base - e * pxPerDeg;
+let g = `<defs>
+  <radialGradient id="sunGlow"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#fff6d8"/><stop offset=".6" stop-color="rgba(255,210,120,.25)"/><stop offset="1" stop-color="rgba(255,200,100,0)"/></radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8c8f96"/><stop offset=".08" stop-color="#4b4e55"/><stop offset="1" stop-color="#0d0e11"/></linearGradient>
+  <radialGradient id="earthG" cx=".35" cy=".35"><stop offset="0" stop-color="#9fd0ff"/><stop offset=".6" stop-color="#2f6fd6"/><stop offset="1" stop-color="#0d2b66"/></radialGradient>
+</defs><rect width="${W}" height="${H}" fill="#000"/>`;
+// stars
+let s = 7; const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+for (let i = 0; i < 260; i++) g += `<circle cx="${r()*W}" cy="${r()*base*0.98}" r="${r()*1.1+.2}" fill="#fff" opacity="${r()*.7+.15}"/>`;
+// compass tape
+for (let a = 0; a <= 360; a += 15) {
+  const big = a % 45 === 0; g += `<line x1="${x(a)}" x2="${x(a)}" y1="${H*0.12}" y2="${H*0.12 + (big?12:6)}" stroke="rgba(255,255,255,.45)"/>`;
+  if (big) g += `<text x="${x(a)}" y="${H*0.12+28}" fill="rgba(255,255,255,.6)" font-size="11" text-anchor="middle" letter-spacing="2">${["N","NE","E","SE","S","SW","W","NW","N"][a/45]}</text>`;
+}
+// Sun & Earth (drawn before terrain so terrain occludes them)
+const sx = x(c.sunAz), sy = y(c.sunEl), ex = x(c.earthAz), ey = y(c.earthEl);
+g += `<circle cx="${sx}" cy="${sy}" r="70" fill="url(#sunGlow)"/><circle cx="${sx}" cy="${sy}" r="11" fill="#fff"/>`;
+g += `<circle cx="${ex}" cy="${ey}" r="16" fill="url(#earthG)"/><path d="M${ex} ${ey-16} A16 16 0 0 0 ${ex} ${ey+16} A9 16 0 0 1 ${ex} ${ey-16}" fill="rgba(0,0,0,.75)"/>`;
+// paths
+const path = (k, col) => { let d = "", p = null; for (const s of D.sc.samples.slice(Math.max(0, D.idx - 72), D.idx + 72)) { const a = s[k+"Az"]; d += (p==null||Math.abs(a-p)>180?"M":"L") + x(a).toFixed(1) + "," + y(s[k+"El"]).toFixed(1); p = a; } return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1" stroke-dasharray="1 5" opacity=".7"/>`; };
+g += path("sun", "#ffd27a") + path("earth", "#7fb6ff");
+// terrain
+let t = `M0,${H}`; for (let a = 0; a <= 360; a += 0.5) t += `L${x(a).toFixed(1)},${y(horizonAt(D.sc.horizon, a % 360)).toFixed(1)}`; t += `L${W},${H}Z`;
+g += `<path d="${t}" fill="url(#ground)"/>`;
+// labels
+const lab = (lx, ly, col, title, line) => `<line x1="${lx}" y1="${ly-18}" x2="${lx}" y2="${ly-52}" stroke="${col}" opacity=".6"/><text x="${lx+6}" y="${ly-62}" fill="${col}" font-size="12" letter-spacing="2">${title}</text><text x="${lx+6}" y="${ly-44}" fill="#fff" font-size="15">${line}</text>`;
+g += lab(sx, sy, "#ffd27a", `SUN ${c.sunEl.toFixed(1)}°${c.sunUp?"":" · BEHIND RIDGE"}`, c.sunUp ? `sets in ${durWords(D.sunLeft)}` : `back in ${durWords(D.sunLeft)}`);
+g += lab(ex, ey, "#7fb6ff", `EARTH ${c.earthEl.toFixed(1)}°${c.earthUp?"":" · BELOW HORIZON"}`, c.earthUp ? `sets in ${durWords(D.earthLeft)}` : `rises in ${durWords(D.earthLeft)}`);
+svg.innerHTML = g;
+</script>
+</body></html>

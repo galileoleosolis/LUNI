@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNO · Draft D · Rugged field device</title>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:#2b2d31; font-family:"Arial Narrow","Roboto Condensed","DejaVu Sans Condensed",Arial,sans-serif; }
+  .dev { width:960px; padding:26px; border-radius:28px; background:linear-gradient(160deg,#3a3c41,#1d1e21); box-shadow: 0 30px 60px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.08); border:3px solid #111; position:relative; }
+  .bolt { position:absolute; width:14px; height:14px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#999,#333); box-shadow: inset 0 0 0 2px #222; }
+  .bolt.a{top:12px;left:12px}.bolt.b{top:12px;right:12px}.bolt.c{bottom:12px;left:12px}.bolt.d{bottom:12px;right:12px}
+  .brand { display:flex; justify-content:space-between; color:#9a9ca3; font-size:13px; letter-spacing:.3em; font-weight:700; margin:0 8px 10px; }
+  .brand .y { color:#f5c400; }
+  .screen { background:#000; border:6px solid #0a0a0a; border-radius:10px; padding:20px 24px; color:#fff; box-shadow: inset 0 0 40px rgba(255,255,255,.04); }
+  .top { display:flex; justify-content:space-between; font-size:20px; font-weight:700; letter-spacing:.06em; border-bottom:3px solid #222; padding-bottom:10px; }
+  .top .site { color:#f5c400; }
+  .readouts { display:grid; grid-template-columns:1fr 1fr; gap:0; margin:6px 0; }
+  .ro { padding:14px 4px; }
+  .ro + .ro { border-left:3px solid #222; padding-left:24px; }
+  .lab { font-size:18px; font-weight:700; letter-spacing:.12em; color:#9a9ca3; }
+  .st { font-size:44px; font-weight:800; line-height:1; margin:6px 0 10px; }
+  .st.go { color:#21e07a; } .st.nogo { color:#ff3d3d; }
+  .cd { font-size:20px; color:#9a9ca3; font-weight:700; letter-spacing:.06em; }
+  .cd b { display:block; color:#fff; font-size:56px; letter-spacing:0; font-variant-numeric:tabular-nums; }
+  .strip { border-top:3px solid #222; padding-top:10px; }
+  .keys { display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:16px; margin-top:20px; }
+  .key { height:86px; border-radius:12px; border:3px solid #0d0d0d; background:linear-gradient(180deg,#4a4c52,#2a2b2f); color:#fff; font:inherit; font-size:26px; font-weight:800; letter-spacing:.08em; box-shadow:0 6px 0 #0d0d0d, inset 0 2px 0 rgba(255,255,255,.12); cursor:pointer; }
+  .key.y { background:linear-gradient(180deg,#ffd52e,#e0a800); color:#111; }
+  .key small { display:block; font-size:12px; font-weight:700; letter-spacing:.2em; opacity:.7; }
+  .demo { color:#ff8a3d; font-size:12px; letter-spacing:.2em; }
+</style></head>
+<body>
+<div class="dev">
+  <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
+  <div class="brand"><span><span class="y">■</span> LUNO FIELD UNIT</span><span class="demo">DEMO DATA</span></div>
+  <div class="screen">
+    <div class="top"><span class="site" id="site"></span><span id="time"></span></div>
+    <div class="readouts">
+      <div class="ro"><div class="lab">☀ POWER</div><div class="st" id="sst"></div><div class="cd" id="scd"></div></div>
+      <div class="ro"><div class="lab">⊕ EARTH LINK</div><div class="st" id="est"></div><div class="cd" id="ecd"></div></div>
+    </div>
+    <div class="strip"><svg id="hz" width="100%" height="110"></svg></div>
+  </div>
+  <div class="keys">
+    <button class="key"><small>HOLD = 1 WEEK</small>◀ DAY</button>
+    <button class="key y"><small>SITE</small>NEXT SITE</button>
+    <button class="key"><small>HOLD = 1 WEEK</small>DAY ▶</button>
+  </div>
+</div>
+<script type="module">
+import { load, horizonAt, stamp } from "./common.js";
+const D = load("shackleton"), c = D.cur, $ = (i) => document.getElementById(i);
+const big = (h) => h == null ? "30D+" : `${Math.floor(h/24)}D ${String(Math.round(h%24)).padStart(2,"0")}H`;
+$("site").textContent = `▲ ${D.site.name.toUpperCase()}`; $("time").textContent = stamp(D.t).toUpperCase();
+$("sst").textContent = c.sunUp ? "SUN — GO" : "NO SUN"; $("sst").className = "st " + (c.sunUp ? "go" : "nogo");
+$("scd").innerHTML = `${c.sunUp ? "SUNSET IN" : "SUNRISE IN"}<b>${big(D.sunLeft)}</b>`;
+$("est").textContent = c.earthUp ? "LINK — GO" : "NO LINK"; $("est").className = "st " + (c.earthUp ? "go" : "nogo");
+$("ecd").innerHTML = `${c.earthUp ? "EARTHSET IN" : "EARTHRISE IN"}<b>${big(D.earthLeft)}</b>`;
+const svg = $("hz"), W = svg.clientWidth, H = 110, x = (a) => a / 360 * W, y = (e) => 70 - e * 9;
+let g = "";
+let t = `M0,${H}`; for (let a = 0; a <= 360; a++) t += `L${x(a)},${y(horizonAt(D.sc.horizon, a % 360))}`; g += `<path d="${t}L${W},${H}Z" fill="#2a2a2a" stroke="#fff" stroke-width="2"/>`;
+["N","E","S","W","N"].forEach((d, i) => g += `<text x="${Math.min(W-12, Math.max(12, x(i*90)))}" y="${H-6}" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">${d}</text>`);
+g += `<circle cx="${x(c.sunAz)}" cy="${y(c.sunEl)}" r="9" fill="${c.sunUp?"#f5c400":"none"}" stroke="#f5c400" stroke-width="3"/>`;
+g += `<circle cx="${x(c.earthAz)}" cy="${y(c.earthEl)}" r="8" fill="${c.earthUp?"#3d9bff":"none"}" stroke="#3d9bff" stroke-width="3"/>`;
+svg.innerHTML = g;
+</script>
+</body></html>
