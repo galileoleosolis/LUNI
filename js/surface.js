@@ -90,10 +90,13 @@ export async function createSurfaceView(container, { site, quality = "medium", e
   const sheets = [];
   if (patch) sheets.push({ half: patch.rows * patch.scale_m / 2 * 0.98, n: Math.min(Q.near, patch.rows), sample: best });
   else if (near) sheets.push({ half: 9e3, n: Q.near, sample: chain(near, far) });
+  else sheets.push({ half: 9e3, n: Q.near, sample: chain(far) });      // only coarse data here: still give the near ground a fine, smooth mesh
   if (near) sheets.push({ half: 60e3, n: Q.mid, sample: chain(near, far) });
-  else sheets.push({ half: 80e3, n: Math.min(Q.mid, 240), sample: chain(far) });
+  else sheets.push({ half: 80e3, n: Math.min(Q.mid, 320), sample: chain(far) });
   sheets.push({ half: 260e3, n: Q.far, sample: chain(far) });
   if (patch && patch.scale_m > 100) sheets.shift(), sheets.unshift({ half: 60e3, n: Q.mid, sample: best }), sheets.splice(1, 1);   // a 240 m patch replaces the middle sheet
+  // An odd point count puts one mesh point exactly under the camera, so the eye can never start below the surface.
+  for (const s of sheets) s.n |= 1;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality === "low" ? 1 : 2));
@@ -105,8 +108,8 @@ export async function createSurfaceView(container, { site, quality = "medium", e
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
   const camera = new THREE.PerspectiveCamera(60, 1, 1, 720e3);
   const bump = noiseTexture();
-  const ground = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0, bumpMap: bump, bumpScale: 0.12 });
-  const groundFar = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0 });
+  const ground = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0, bumpMap: bump, bumpScale: 0.12, side: THREE.DoubleSide });
+  const groundFar = new THREE.MeshStandardMaterial({ color: 0x9c978f, roughness: 1, metalness: 0, side: THREE.DoubleSide });      // both sides: the ground always hides the sky behind it
   sheets.forEach((s, k) => {
     const m = new THREE.Mesh(buildSheet(site, h0, s.half, s.n, k ? sheets[k - 1].half : 0, s.sample), k ? groundFar : ground);
     m.castShadow = m.receiveShadow = true;
