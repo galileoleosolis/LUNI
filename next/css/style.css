@@ -114,8 +114,13 @@ svg { display: block; width: 100%; }
 svg text { font-family: var(--mono); }
 .horizon { flex: 1 1 0 !important; min-height: 64px; margin-bottom: 8px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; box-sizing: content-box; }
 .verdict.mission { margin-bottom: 8px; }
-.timeline { height: 126px; margin-bottom: 8px; cursor: ew-resize; touch-action: none; }
-.h-do { color: var(--wht); font-weight: 600; }
+.timeline { height: 112px; margin-bottom: 8px; cursor: ew-resize; touch-action: none; }
+/* Headings in three voices: the name of the thing (bright), what it is (dim), and what you can do with it (white, bold, with a pointer) */
+.h-t { color: var(--amb); font-weight: 600; }
+.h-do { color: var(--wht); font-weight: 700; }
+.h-do::before { content: "▸ "; }
+#clock-head { color: var(--amb); font-weight: 600; }
+.more summary .h-do { letter-spacing: .06em; }
 .timeline, .timeline text { user-select: none; -webkit-user-select: none; }
 #tl-handle { cursor: grab; } .timeline:active #tl-handle { cursor: grabbing; }
 #tl-handle.nudge #tl-handle-box { animation: tl-nudge 1.4s ease-in-out infinite; }
@@ -149,7 +154,8 @@ svg text { font-family: var(--mono); }
 .tight .hero-word { font-size: 54px; }
 .tight .hero-why { font-size: 13.5px; }
 .tight .hero-next { font-size: 14px; padding: 3px 9px; }
-.tight .timeline { height: 126px; }
+.tight .timeline { height: 112px; margin-bottom: 4px; } .tight .horizon { min-height: 46px; margin-bottom: 6px; padding-bottom: 5px; }
+.tight .hero-fix > span { flex: 1 1 100%; } .tight .hero-fix-list { flex-wrap: nowrap; gap: 6px; } .tight .hero-next { font-size: 12.5px; padding: 3px 7px; letter-spacing: .02em; }
 .tight .st { font-size: 26px; } .tight .cd b { font-size: 32px; }
 .scan { position: absolute; inset: 0; z-index: 5; background: #000; padding: 12px 16px 0; display: flex; flex-direction: column; }
 .scan[hidden] { display: none; }

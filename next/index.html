@@ -44,7 +44,7 @@
       </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">
-        <h3><b class="step">1</b>WHERE · PICK A LANDING SITE</h3>
+        <h3><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
         <div id="site-list" class="site-list"></div>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
@@ -56,7 +56,7 @@
           <button id="globe-big" class="globe-big" title="Make the Moon big, to look around and pick any spot">⤢ BIG MOON</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">FIND A BETTER SPOT NEAR THIS SITE ▸</button>
         </div>
-        <h3 class="gap step-head"><span><b class="step">2</b>WHEN · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
+        <h3 class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
           <select id="t0-month" aria-label="Month"></select>
@@ -64,7 +64,7 @@
           <select id="t0-hour" aria-label="Hour, UTC"></select>
         </div>
         <p class="note">UTC = WORLD TIME (SAME AS GMT)</p>
-        <h3 class="gap"><b class="step">3</b>WHAT THE MISSION NEEDS</h3>
+        <h3 class="gap"><b class="step">3</b><b class="h-t">MISSION NEEDS</b> · <b class="h-do">CLICK TO CHANGE</b></h3>
         <div class="needs">
           <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
           <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
@@ -80,21 +80,21 @@
           <div class="scan-body">
             <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
             <div class="scan-side">
-              <h3>SCAN SIZE (HALF-WIDTH)</h3><div class="seg" id="scan-radius"></div>
-              <h3>SHOW</h3><div class="seg" id="scan-metric"></div>
+              <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
+              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-metric"></div>
               <div id="scan-legend" class="scan-legend"></div>
               <div id="scan-progress"></div>
               <div id="scan-engine" class="dimtxt"></div>
               <div id="scan-scale" class="dimtxt"></div>
-              <h3>WHERE YOU ARE NOW <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell"></div>
-              <h3>BEST POINT FOUND ★</h3><div id="scan-best" class="scan-cell"></div>
+              <h3><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell"></div>
+              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
               <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
-              <h3>INSPECT</h3><div id="scan-hover" class="scan-cell"></div>
+              <h3><b class="h-t">INSPECT</b></h3><div id="scan-hover" class="scan-cell"></div>
               <div id="scan-note" class="credit"></div>
             </div>
           </div>
         </div>
-        <h3><b class="step">4</b>THE ANSWER · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
           <div class="hero-text">
@@ -130,24 +130,24 @@
 
 
 
-        <div class="tiles-head"><h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
 
-        <h3>FIRST 30 DAYS AFTER LANDING · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
+        <h3><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
 
-        <h3 id="cal-title">GOOD LANDING DAYS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
+        <h3 id="cal-title"><b class="h-t">GOOD LANDING DAYS</b> · NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
         <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
       </section>
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side">
-        <h3>NEXT GOOD LANDING TIMES · CLICK ONE TO GO THERE</h3>
+        <h3><b class="h-t">NEXT GOOD LANDING TIMES</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
-        <h3 class="gap">COMPARE · OPTIONS YOU PINNED</h3>
+        <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
         <details class="more">
-          <summary>MORE NUMBERS</summary>
+          <summary><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
           <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
           <table class="sum">
             <tr><td>IN SUNLIGHT</td><td id="pct-sun"></td></tr>
@@ -165,7 +165,7 @@
           </div>
         </details>
         <div id="os-box" class="os-box">
-          <h3 class="gap">OPENSPACE · 3D VIEW THAT FOLLOWS LUNO</h3>
+          <h3 class="gap"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNO</h3>
           <div class="os-row"><button id="os-btn" class="mini-btn">CONNECT TO OPENSPACE</button><div class="seg" id="os-view"></div></div>
           <div id="os-status" class="dimtxt">NEEDS OPENSPACE RUNNING ON THIS COMPUTER.</div>
         </div>
