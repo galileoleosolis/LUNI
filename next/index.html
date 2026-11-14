@@ -44,7 +44,7 @@
       </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">
-        <h3 class="step-head"><span><b class="step">1</b>WHERE · PICK A SITE</span><button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">BETTER SPOT ▸</button></h3>
+        <h3><b class="step">1</b>WHERE · PICK A LANDING SITE</h3>
         <div id="site-list" class="site-list"></div>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
@@ -52,6 +52,7 @@
           <div id="globe-labels" class="globe-labels"></div>
           <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
           <div class="k-hint">NUMBERED DOTS = THE SITES ABOVE</div>
+          <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">FIND A BETTER SPOT NEAR THIS SITE ▸</button>
         </div>
         <h3 class="gap step-head"><span><b class="step">2</b>WHEN · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
         <div class="t0">
@@ -169,6 +170,8 @@
         <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
     </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
     <!-- ASK LUNI (Lunar Utility Navigational Intelligence): typed or spoken commands -->
     <div id="comms" class="comms" hidden>
