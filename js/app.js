@@ -408,13 +408,13 @@ function renderHorizon(cur) {
   const span = yMax - yMin, step = span > 60 ? 15 : span > 24 ? 10 : span > 12 ? 5 : 2;
   for (let e = Math.ceil(yMin / step) * step; e <= yMax; e += step) {
     el("line", { x1: L, x2: W, y1: y(e), y2: y(e), stroke: e === 0 ? C.grid0 : C.grid }, svg);
-    el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 11.5, "text-anchor": "end" }, svg, e + "°");
+    el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 12.5, "text-anchor": "end" }, svg, e + "°");
   }
   const narrow = W < 520;
   ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].forEach((d, i) => {
     el("line", { x1: x(i * 45), x2: x(i * 45), y1: T, y2: H - B, stroke: C.grid }, svg);
     if (narrow && i % 2) return;
-    el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 11.5, "text-anchor": "middle" }, svg, d);
+    el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 12.5, "text-anchor": "middle" }, svg, d);
   });
 
   const track = (key, color) => {
@@ -440,7 +440,7 @@ function renderHorizon(cur) {
   // bodies
   const label = (cx, cy, text, color) => {
     const right = cx < W - 130;
-    el("text", { x: cx + (right ? 12 : -12), y: Math.max(T + 10, cy - 9), fill: color, "font-size": 12.5, "font-weight": 600, "text-anchor": right ? "start" : "end" }, svg, text);
+    el("text", { x: cx + (right ? 12 : -12), y: Math.max(T + 10, cy - 9), fill: color, "font-size": 13.5, "font-weight": 600, "text-anchor": right ? "start" : "end" }, svg, text);
   };
   const sx = x(cur.sunAz), sy = clampY(cur.sunEl);
   const g = el("g", { transform: `translate(${sx},${sy})`, opacity: cur.sunUp ? 1 : 0.55 }, svg);
@@ -472,7 +472,7 @@ function renderTimeline() {
       el("rect", { x: TL.left + i * w, y: yy, width: Math.max(1, (j - i) * w), height: TL.rowH, fill: color }, svg);
       i = j;
     }
-    el("text", { x: 0, y: yy + TL.rowH / 2 + 4, fill: color, "font-size": 12.5 }, svg, name);
+    el("text", { x: 0, y: yy + TL.rowH / 2 + 4.5, fill: color, "font-size": 13.5, "font-weight": 600 }, svg, name);
   });
   const yAxis = TL.top + 3 * (TL.rowH + TL.gap);
   const every = W < 520 ? 10 : 5;
@@ -480,7 +480,7 @@ function renderTimeline() {
     const xx = TL.left + Math.min(n, day * 24 / STEP_HOURS) * w;
     el("line", { x1: xx, x2: xx, y1: TL.top - 4, y2: yAxis, stroke: "#000", "stroke-width": 1 }, svg);
     const d = samples[Math.min(n - 1, day * 24 / STEP_HOURS)].t;
-    el("text", { x: xx, y: yAxis + 12, fill: C.dim, "font-size": 11.5, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
+    el("text", { x: xx, y: yAxis + 12, fill: C.dim, "font-size": 12.5, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
       W < 520 || day === 30 ? (day ? `+${day}D` : "LANDING") : `${day ? "+" + day + "D · " : ""}${pad(d.getUTCDate())} ${MONTHS[d.getUTCMonth()]}`);
   }
   for (let i = 0; i < n; i++) {                                                  // eclipse hours: a yellow notch on the SUN row
@@ -493,16 +493,16 @@ function renderTimeline() {
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
   // The bracket's label sits to the right of the bracket; when there is no room there (a 28-day mission), it moves inside.
-  const mLabel = `THE ${state.req.days}-DAY MISSION`, mW = mLabel.length * 6.9 + 6;
-  if (mEnd + 5 + mW <= W - TL.right) el("text", { x: mEnd + 5, y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, mLabel);
+  const mLabel = `THE ${state.req.days}-DAY MISSION`, mW = mLabel.length * 7.5 + 6;
+  if (mEnd + 5 + mW <= W - TL.right) el("text", { x: mEnd + 5, y: TL.top - 5, fill: C.wht, "font-size": 12 }, svg, mLabel);
   else {
     el("rect", { x: mEnd - 10 - mW, y: TL.top - 15, width: mW + 4, height: 12, fill: "#000" }, svg);
-    el("text", { x: mEnd - 9, y: TL.top - 5, fill: C.wht, "font-size": 11, "text-anchor": "end" }, svg, mLabel);
+    el("text", { x: mEnd - 9, y: TL.top - 5, fill: C.wht, "font-size": 12, "text-anchor": "end" }, svg, mLabel);
   }
   // The slider: a rail under the chart and a handle that carries the moment it stands on.
   const yRail = yAxis + TL.rail;
   el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
-  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 11, "font-weight": 600 }, svg, "SLIDER");
+  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 12, "font-weight": 700 }, svg, "SLIDER");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
   const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
@@ -530,11 +530,15 @@ function scrubFromEvent(e) {
 }
 
 // ---------- compare ----------
+// The panel behind COMPARE · MORE (pinned options, next landing times, site numbers, OpenSpace, credits).
+function setMore(show = $("more-panel").hidden) { $("more-panel").hidden = !show; $("more-btn").classList.toggle("on", show); }
+
 function pinCurrent() {
   const key = `${state.site.lat},${state.site.lon},${state.t0.toISOString()}`;
   if (!state.pinned.some((p) => p.key === key))
     state.pinned.push({ key, site: { ...state.site }, t0: new Date(state.t0), summary: state.summary, days: state.req.days, mission: state.cal.a.at(calIdx()) });
   renderCompare();
+  setMore(true);                                       // pinning is asking to compare: show the pinned options
 }
 
 function renderCompare() {
@@ -650,6 +654,8 @@ async function init() {
   $("play-btn").addEventListener("click", () => togglePlay());
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
+  $("more-btn").addEventListener("click", () => setMore());
+  $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
@@ -704,6 +710,7 @@ async function init() {
     else if (k === " ") togglePlay();
     else if (k === "t" || k === "T") comms.talk();
     else if (k === "/") comms.type();
+    else if (k === "Escape" && !$("more-panel").hidden) setMore(false);
     else if (k === "Escape" && comms.isOpen()) comms.toggle(false);
     else if (k === "s" || k === "S") nextSite();
     else if (k === "p" || k === "P") pinCurrent();

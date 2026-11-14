@@ -76,6 +76,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
+- Layout since 14 Nov (the user: "the right panel is mostly wasted space", "the blues are faded and nothing jumps",
+  "too much small text"): TWO columns. Left: site list, Moon, landing time, mission needs. Middle: the answer row
+  (GO / NO-GO block with the Sun and Earth readouts stacked on its right), skyline, 30-day slider, landing-day strip.
+  The old right column (`#more-panel`: next landing times, compare cards, site numbers, custom lat/lon, OpenSpace,
+  credits) is a panel opened by COMPARE · MORE or by pressing PIN; Esc closes it. Palette: `--hi` is the vivid blue
+  for names of things and active frames. Nothing a person has to read is under 12.5 px in the design.
 - Look: blue palette is the default (`:root` in `css/style.css`; `?palette=amber|ice|mono` previews others). The user
   asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
 - American spelling everywhere (center, color, meters, modeled): in the app, the code, the docs and in chat. The user insists.

@@ -94,7 +94,8 @@
             </div>
           </div>
         </div>
-        <h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <div class="tiles-head ans-head"><h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></div>
+        <div class="answer-row">
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
           <div class="hero-text">
@@ -103,9 +104,9 @@
           </div>
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
-
+          <div class="answer-side">
         <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
-        <div class="nasa-check">CHECK WITH NASA JPL HORIZONS:
+        <div class="nasa-check">NASA JPL HORIZONS CHECK:
           <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a>
           <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></div></div>
         <div class="readouts">
@@ -127,8 +128,8 @@
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
           </div>
         </div>
-
-
+          </div>
+        </div>
 
         <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
@@ -141,12 +142,13 @@
       </section>
 
       <!-- RIGHT: summary + compare -->
-      <section class="col col-side">
+      <section class="col col-side" id="more-panel" hidden>
+        <div class="side-head"><b>COMPARE · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
         <h3><b class="h-t">NEXT GOOD LANDING TIMES</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
         <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
-        <details class="more">
+        <details class="more" open>
           <summary><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
           <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
           <table class="sum">
