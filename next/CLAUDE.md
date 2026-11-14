@@ -65,6 +65,31 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   procedural Earth with a glow, name tags that follow the Sun and Earth, the lander's dish aimed at Earth and its
   panels at the Sun. Everything smaller than the 40 m data is illustrative and the view says so on screen.
   The user approved it from the picture ("put it on") and it is on the preview page and in `next/`.
+- Built late on 14 Nov ("do them all", after the rubric talk). **On `main` only until the user says "go"**: the user
+  was doing a demo and asked for nothing to be published (not the preview page, not `next/`, not the public site).
+  - `js/stories.js` — real landings with sourced facts (IM-2, Blue Ghost 1, Chandrayaan-3). LUNI **opens on IM-2
+    Athena, 6 Mar 2025 17:00 UTC** (`OPENING`), with a one-line story strip (`#story`, `renderStory` in `js/app.js`)
+    shown only while the site and landing hour match a story. Facts were checked by web search on 14 Nov; do not add a
+    mission fact without a source. IM-1 was left out (its real end, with the lander tipped, proves nothing either way).
+  - `js/ui-proof.js` — PROOF panel (`#proof`, button in the step 4 heading): Horizons check, the three landings
+    replayed (LUNI's side is computed live; e.g. Blue Ghost: 347 h of daylight vs Firefly's 346, eclipse 05:01 to 09:51
+    UTC with the Sun fully hidden from 06:18, against reported 05:30 / 06:18 / 09:52), terrain notes, limits, AI disclosure.
+  - `js/share.js` — COPY LINK: `#site=im2&t=2025-03-06T17&days=10&dark=12&earth=0&slope=0&link=1` (or `at=lat,lon`).
+    Read at start and on `hashchange`. On the preview page the link points at the public Pages address.
+  - `js/guide.js` — first-visit guide, three cards, remembered under `luno-guide-v1`; never for automated browsers
+    (force with `window.LUNO_GUIDE`), and in a test build only after JUST EXPLORE.
+  - Mission need `maxSlopeDeg` (GROUND SLOPE AT MOST: ANY / 5 / 10 / 15, default ANY). `analyze(samples, req, step,
+    ground)` takes the terrain as a 4th argument; the verdict, calendar, scan and ASK LUNI all respect it. No default
+    limit, because no sourced limit was chosen.
+  - `versus()` in `js/app.js` — THIS SITE NEXT TO EARTH (MORE panel, and "how is this different from Earth" in ASK LUNI).
+  - Skyline picture (`renderHorizon`): gray ground lit or in shadow, Sun with flare, Earth with its real phase, paths
+    for the next 3 days. Bodies are drawn larger than life, so each is placed against the skyline by how much of its
+    real disc the ground hides. It is only about 90 px tall on a laptop window and grows on tall screens (364 px at
+    2000 x 1250): record the demo in a tall window.
+  - Blue Ghost Mission 1 (`bg1`, Mare Crisium) is a preset; `data/horizons.json` was rebuilt, other sites unchanged.
+  - OpenSpace HORIZON view (`OS_HORIZON` in `js/openspace.js`): written from the documented API, **never tried with
+    real OpenSpace**; falls back to the plain fly-to if it fails. FAR / NEAR / LOW are untouched.
+  - The Sun / Earth NASA CHECK links moved onto the POWER and EARTH LINK labels to save a line.
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -171,6 +196,6 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNI).
    LUNI's side is built; still needed from the user: which program runs the model, which model, which chip, and a
    test with LUNI opened from the laptop itself (localhost or GitHub Pages; Ollama needs OLLAMA_ORIGINS for Pages).
-6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
+6. Quick wins: share link, real-mission replays, first-visit guide: done on 14 Nov (see Layout). Left: nothing small.
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNI-selected best-lit points near rough centers).

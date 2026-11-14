@@ -70,6 +70,7 @@
           <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
           <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
           <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+          <div class="need" title="The steepest ground the lander accepts. ANY = slope is not judged. Slope comes from NASA's LOLA elevation maps."><span>GROUND SLOPE AT MOST</span><div class="seg" data-req="maxSlopeDeg"></div><span>°</span></div>
         </div>
       </section>
 
@@ -94,7 +95,13 @@
             </div>
           </div>
         </div>
-        <div class="tiles-head ans-head"><h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></div>
+        <div id="proof" class="scan proof" hidden>
+          <div class="scan-head"><span><b class="h-t">PROOF</b> · HOW YOU CAN TELL LUNI IS RIGHT, AND WHERE IT STOPS</span><span class="scan-head-btns"><button id="proof-close" title="Close (Esc)">✕ CLOSE</button></span></div>
+          <div id="proof-body" class="proof-body"></div>
+        </div>
+        <div id="story" class="story" hidden></div>
+        <div class="tiles-head ans-head"><h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
+          <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></span></div>
         <div class="answer-row">
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
@@ -105,14 +112,11 @@
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
           <div class="answer-side">
-        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
-        <div class="nasa-check">NASA JPL HORIZONS CHECK:
-          <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a>
-          <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></div></div>
+        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3></div>
         <div class="readouts">
           <div class="ro">
             <div class="ro-a">
-              <div class="lab">☀ POWER</div>
+              <div class="lab">☀ POWER <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">NASA CHECK ↗</a></div>
               <div class="st" id="sun-state"></div>
               <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
@@ -121,7 +125,7 @@
           </div>
           <div class="ro">
             <div class="ro-a">
-              <div class="lab">⊕ EARTH LINK</div>
+              <div class="lab">⊕ EARTH LINK <a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">NASA CHECK ↗</a></div>
               <div class="st" id="earth-state"></div>
               <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
             </div>
@@ -131,8 +135,8 @@
           </div>
         </div>
 
-        <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
-        <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
+        <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
         <h3><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
@@ -157,6 +161,9 @@
             <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
             <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
           </table>
+          <h3 class="gap"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
+          <table class="sum versus" id="versus"></table>
+          <p id="versus-note" class="note"></p>
           <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
           <p id="site-note" class="note"></p>

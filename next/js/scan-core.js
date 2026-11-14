@@ -37,7 +37,7 @@ export async function evaluatePoint(lat, lon, t0, req) {
 export function judgePoint(lat, lon, terrain, t0, req) {
   const hours = (req.days + 3) * 24 + req.maxDarkH;
   const samples = sampleSite({ lat, lon }, t0, hours, terrain);
-  const a = analyze(samples, req), v = a.at(0), M = a.missionSteps;
+  const a = analyze(samples, req, 1, terrain), v = a.at(0), M = a.missionSteps;
   let sun = 0;
   for (let i = 0; i < M; i++) sun += samples[i].sunUp ? 1 : 0;
   return { heightM: terrain.heightM, slopeDeg: terrain.slopeDeg, sunPct: sun / M * 100, earthPct: v.earthPct,

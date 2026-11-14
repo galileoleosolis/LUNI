@@ -69,6 +69,15 @@
    "src": "https://planetarynames.wr.usgs.gov/Feature/16272"
   },
   {
+   "id": "bg1",
+   "name": "Blue Ghost 1 · Mare Crisium",
+   "tag": "USA 2025 · NASA CLPS",
+   "group": "Reference sites",
+   "lat": 18.56,
+   "lon": 61.81,
+   "src": "https://lroc.im-ldi.com/images/1400"
+  },
+  {
    "id": "ce6",
    "name": "Chang'e 6 · Apollo basin",
    "tag": "CHINA 2024",
