@@ -54,8 +54,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - `js/openspace.js` — optional link to OpenSpace on the same computer (WebSocket, port 4682, the protocol of
   openspace-api-js 1.0.2: an `apiHandshake`, then `luascript` messages). OpenSpace follows LUNI's site
   (`flyToGeo("Moon", lat, lon, height)`, navigation or globebrowsing library, whichever exists) and mission clock
-  (`time.setTime`). Send-only. Tested against a stand-in server only, never against real OpenSpace. Hidden on the
-  preview page.
+  (`time.setTime`). Send-only. Tested here against a stand-in server; the user confirmed it works with real OpenSpace. Hidden
+  on the preview page.
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -94,9 +94,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
-3. OpenSpace link: LUNI's side is built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column). Still to do:
-   the user tries it with real OpenSpace, with LUNI opened from their own computer or GitHub Pages (not the preview).
-   Likely trouble spots: the camera height and facing after `flyToGeo`, and the browser asking for local-network access.
+3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
+   user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
+   camera height and facing after `flyToGeo` look good for the demo video; tune `OS_VIEWS` if asked.
 4. Windows .exe wrapper (Electron) if still wanted.
 5. Test mode is built (`js/testmode.js`, on with `#test` or `window.LUNO_TEST`): intro, six tasks, local usage log,
    review, copyable report. First run (the user's sibling, 14 Nov): 2/6, ease 2/5. The native date box reset itself
