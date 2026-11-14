@@ -3,8 +3,8 @@
 
 For every 2 hours from START to STOP (UTC) it stores, in the Moon-fixed MOON_ME frame
 (the mean Earth / polar axis frame that LRO and LOLA maps use):
-  - the apparent unit vector from the Moon's centre to the Sun
-  - the apparent position of the Earth relative to the Moon's centre, in km
+  - the apparent unit vector from the Moon's center to the Sun
+  - the apparent position of the Earth relative to the Moon's center, in km
 The web app interpolates this table and converts to azimuth/elevation for any site.
 
 Usage:  tools/fetch_kernels.sh && python3 tools/build_ephemeris.py
@@ -38,7 +38,7 @@ os.makedirs(OUT, exist_ok=True)
 out.tofile(os.path.join(OUT, "ephem.bin"))
 meta = {
     "start_utc": START + "Z", "step_hours": STEP_H, "count": n,
-    "frame": "MOON_ME (MOON_ME_DE440_ME421)", "aberration": "LT+S", "observer": "Moon centre",
+    "frame": "MOON_ME (MOON_ME_DE440_ME421)", "aberration": "LT+S", "observer": "Moon center",
     "layout": "float32 LE x6 per step: sunUnit(x,y,z), earthKm(x,y,z)",
     "moon_radius_km": 1737.4,
     "kernels": KERNELS, "source": "NASA NAIF SPICE generic kernels, https://naif.jpl.nasa.gov/naif/data_generic.html",

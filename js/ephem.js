@@ -55,7 +55,7 @@ const tmp = new Float64Array(6);
 // Azimuth (deg clockwise from north) and elevation (deg above the local horizontal) of Sun and Earth.
 export function sunEarthAltAz(frame, t) {
   const s = sample(t, tmp);
-  // Sun: parallax across the Moon's radius is under 0.001 degrees, so the centre direction is used.
+  // Sun: parallax across the Moon's radius is under 0.001 degrees, so the center direction is used.
   const sunEl = Math.asin(dot(frame.up, s[0], s[1], s[2])) / DEG;
   const sunAz = Math.atan2(dot(frame.east, s[0], s[1], s[2]), dot(frame.north, s[0], s[1], s[2])) / DEG;
   // Earth: subtract the site position (parallax is up to about 0.26 degrees).

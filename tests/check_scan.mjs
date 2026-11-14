@@ -19,7 +19,7 @@ for (const name of ["sp_cap", "sp_wide", "global"]) {
 const bin = read("data/ephem.bin");
 initEphemeris(bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength), JSON.parse(read("data/ephem.json")));
 
-// 1. grid geometry: centre is the site, corners are radius*sqrt(2) away, spacing respects the map pixel
+// 1. grid geometry: center is the site, corners are radius*sqrt(2) away, spacing respects the map pixel
 const ridge = { lat: -89.45, lon: -137.31 };
 const g = scanGrid(ridge, 2, 17);
 const mid = g.points[8 * 17 + 8];
@@ -28,7 +28,7 @@ assert.ok(Math.abs(g.points[0].dist - 2000 * Math.SQRT2) < 1e-6);
 assert.equal(g.points[0].northKm, 2); assert.equal(g.points[0].eastKm, -2);
 for (const lat of [-89, -70, 10]) for (const o of scanOptions(lat)) assert.ok(2 * o.radiusKm * 1000 / (o.n - 1) >= (lat < -80.5 ? 240 : lat < -62 ? 960 : 3700));
 
-// 2. the centre cell equals a direct evaluation done the long way
+// 2. the center cell equals a direct evaluation done the long way
 const t0 = new Date("2027-05-01T00:00:00Z"), req = { ...DEFAULT_REQ, days: 28, maxDarkH: 48, earthAtLanding: false };
 const direct = await (async () => {
   const terrain = await computeTerrain(ridge.lat, ridge.lon, SCAN_AZ_STEP);
@@ -45,10 +45,10 @@ const t = performance.now();
 const cells = [];
 for (const p of g2.points) cells.push({ ...p, ...(await evaluatePoint(p.lat, p.lon, t0, req)) });
 const ms = (performance.now() - t) / cells.length;
-const best = bestCell(cells), centre = cells[8 * 17 + 8];
+const best = bestCell(cells), center = cells[8 * 17 + 8];
 const sorted = cells.map((c) => c.sunPct).sort((a, b) => a - b);
 console.log(`scan 17x17: ${ms.toFixed(0)} ms per point; sunlight over the 28-day window: min ${sorted[0].toFixed(0)}%, median ${sorted[144].toFixed(0)}%, max ${sorted[288].toFixed(0)}%`);
-console.log(`start point: ${centre.sunPct.toFixed(0)}% sun at ${centre.heightM.toFixed(0)} m; best cell: ${best.sunPct.toFixed(0)}% sun at ${best.heightM.toFixed(0)} m, ${best.eastKm} km E / ${best.northKm} km N`);
-assert.ok(best.sunPct >= centre.sunPct + 10, "the best cell should be clearly better lit than the off-ridge start");
-assert.ok(best.heightM > centre.heightM, "and on higher ground");
+console.log(`start point: ${center.sunPct.toFixed(0)}% sun at ${center.heightM.toFixed(0)} m; best cell: ${best.sunPct.toFixed(0)}% sun at ${best.heightM.toFixed(0)} m, ${best.eastKm} km E / ${best.northKm} km N`);
+assert.ok(best.sunPct >= center.sunPct + 10, "the best cell should be clearly better lit than the off-ridge start");
+assert.ok(best.heightM > center.heightM, "and on higher ground");
 console.log("area scan OK");

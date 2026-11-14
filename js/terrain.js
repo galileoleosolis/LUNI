@@ -4,7 +4,7 @@
 import { fetchBytes, gunzip } from "./bin.js";
 
 const DEG = Math.PI / 180;
-const R = 1737400;       // metres
+const R = 1737400;       // meters
 export const MAST_M = 2;
 
 let base = "data/dem/";
@@ -13,7 +13,7 @@ const grids = {};        // name -> Promise<grid>
 
 class Grid {
   constructor(meta, data) { Object.assign(this, meta); this.data = data; }
-  // Height in metres at fractional row/col, NaN outside the map.
+  // Height in meters at fractional row/col, NaN outside the map.
   sample(r, c) {
     const { rows, cols, data } = this;
     let r0 = Math.floor(r), c0 = Math.floor(c), c1;
@@ -59,7 +59,7 @@ export function mapsFor(lat) {
   return [null, "global"];
 }
 
-// Point reached from (lat, lon) going distM metres along azimuth azDeg (clockwise from north) on the sphere.
+// Point reached from (lat, lon) going distM meters along azimuth azDeg (clockwise from north) on the sphere.
 export function destination(lat, lon, azDeg, distM) {
   const la = lat * DEG, a = azDeg * DEG, d = distM / R;
   const s2 = Math.max(-1, Math.min(1, Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(a)));

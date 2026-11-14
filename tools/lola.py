@@ -4,7 +4,7 @@ Maps used (downloaded by tools/fetch_dem.sh into tools/dem/):
   ldem_80s_40m   south polar stereographic, 80S to pole, 40 m/pixel   (near field)
   ldem_60s_240m  south polar stereographic, 60S to pole, 240 m/pixel  (far field)
   ldem_16        global cylindrical, 16 pixels/degree (about 1.9 km)  (everywhere else)
-Heights are metres above a 1737.4 km sphere, in the Moon ME frame (same frame as the ephemeris).
+Heights are meters above a 1737.4 km sphere, in the Moon ME frame (same frame as the ephemeris).
 """
 import os
 import numpy as np
@@ -15,11 +15,11 @@ DEG = np.pi / 180
 
 
 class PolarDEM:
-    """South polar stereographic LOLA grid (centre = pole, lon 0 towards the top of the image)."""
+    """South polar stereographic LOLA grid (center = pole, lon 0 toward the top of the image)."""
 
     def __init__(self, name, n, scale_m, min_lat):
         self.name, self.n, self.scale, self.min_lat = name, n, scale_m, min_lat
-        self.c = (n - 1) / 2.0                       # pole sits between the two centre pixels
+        self.c = (n - 1) / 2.0                       # pole sits between the two center pixels
         self.a = np.memmap(os.path.join(DEM_DIR, name + ".img"), dtype="<i2", mode="r", shape=(n, n))
         self.res = scale_m
 
@@ -55,7 +55,7 @@ class GlobalDEM:
 
 
 def _bilinear(a, r, c, wrap_cols=False):
-    """Bilinear sample of an int16 DN grid, returned in metres. NaN outside the grid."""
+    """Bilinear sample of an int16 DN grid, returned in meters. NaN outside the grid."""
     r, c = np.asarray(r, dtype=float), np.asarray(c, dtype=float)
     nr, nc = a.shape
     r0, c0 = np.floor(r).astype(np.int64), np.floor(c).astype(np.int64)
@@ -85,7 +85,7 @@ def dem(name):
 
 
 def destination(lat, lon, az, dist_m):
-    """Point reached from (lat, lon) going dist_m metres along azimuth az (deg clockwise from north) on the sphere."""
+    """Point reached from (lat, lon) going dist_m meters along azimuth az (deg clockwise from north) on the sphere."""
     la, lo, a, d = lat * DEG, lon * DEG, az * DEG, dist_m / R_MOON
     la2 = np.arcsin(np.clip(np.sin(la) * np.cos(d) + np.cos(la) * np.sin(d) * np.cos(a), -1, 1))
     lo2 = lo + np.arctan2(np.sin(a) * np.sin(d) * np.cos(la), np.cos(d) - np.sin(la) * np.sin(la2))

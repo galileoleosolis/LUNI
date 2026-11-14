@@ -6,8 +6,8 @@
 
 :root {
   color-scheme: dark;
-  /* palette: --amb is the main text colour, --dim its quiet version, --faint/--grid/--fill the dark tints,
-     --acc the accent for step numbers, --key-* the highlighted key. Status colours (--grn, --red) stay fixed. */
+  /* palette: --amb is the main text color, --dim its quiet version, --faint/--grid/--fill the dark tints,
+     --acc the accent for step numbers, --key-* the highlighted key. Status colors (--grn, --red) stay fixed. */
   --amb: #a9ccff; --dim: #6a8fca; --faint: #101c33; --grid: #0c1527; --grid0: #2a416b; --fill: #070e1c; --quiet: #46618f;
   --acc: #ffffff; --acc-ink: #06122a; --key-a: #5b9bff; --key-b: #2a66d9; --key-ink: #fff; --glow: 90, 150, 255;
   --grn: #21e07a; --red: #ff3d3d; --cy: #35d6c4; --wht: #f4f4f4; --key-y: #ffd166;

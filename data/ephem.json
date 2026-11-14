@@ -4,7 +4,7 @@
  "count": 56977,
  "frame": "MOON_ME (MOON_ME_DE440_ME421)",
  "aberration": "LT+S",
- "observer": "Moon centre",
+ "observer": "Moon center",
  "layout": "float32 LE x6 per step: sunUnit(x,y,z), earthKm(x,y,z)",
  "moon_radius_km": 1737.4,
  "kernels": [

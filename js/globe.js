@@ -4,11 +4,11 @@ import * as THREE from "../vendor/three.module.min.js";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 
 const DEG = Math.PI / 180;
-// marker and grid colour follows the page palette
+// marker and grid color follows the page palette
 const AMBER = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--amb").trim() || "#ffb000");
 
 // lat/lon (deg, east positive) -> position on a sphere of radius r.
-// Matches three.js SphereGeometry UVs with a texture centred on lon 0.
+// Matches three.js SphereGeometry UVs with a texture centered on lon 0.
 export function llToVec(lat, lon, r = 1) {
   const la = lat * DEG, lo = lon * DEG;
   return new THREE.Vector3(r * Math.cos(la) * Math.cos(lo), r * Math.sin(la), -r * Math.cos(la) * Math.sin(lo));

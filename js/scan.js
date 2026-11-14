@@ -1,4 +1,4 @@
-// Area-scan controller: a small pool of workers, fed grid points from the centre outward.
+// Area-scan controller: a small pool of workers, fed grid points from the center outward.
 import { scanGrid } from "./scan-core.js";
 
 let pool = null, jobSeq = 0;
@@ -19,20 +19,20 @@ function getPool() {
 export function runScan({ site, radiusKm, n, t0, req, onCell, onDone }) {
   const grid = scanGrid(site, radiusKm, n), job = ++jobSeq, workers = getPool();
   const order = grid.points.map((p, i) => i).sort((a, b) => grid.points[a].dist - grid.points[b].dist);
-  let next = 0, done = 0, cancelled = false;
+  let next = 0, done = 0, canceled = false;
   const feed = (w) => {
-    if (cancelled || next >= order.length) return;
+    if (canceled || next >= order.length) return;
     const i = order[next++], p = grid.points[i];
     w.postMessage({ type: "point", job, i, lat: p.lat, lon: p.lon, t0: +t0, req });
   };
   for (const w of workers) {
     w.onmessage = (e) => {
-      if (e.data.job !== job || cancelled) return;
+      if (e.data.job !== job || canceled) return;
       done++;
       onCell(grid.points[e.data.i], e.data.res || null, done, order.length);
       if (done === order.length) onDone?.(grid); else feed(w);
     };
     feed(w);
   }
-  return { grid, cancel() { cancelled = true; } };
+  return { grid, cancel() { canceled = true; } };
 }

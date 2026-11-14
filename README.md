@@ -34,8 +34,8 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   and 93% at 10 m, in line with published LOLA illumination studies.
 
 ## Known limits
-- Sun counts as "up" when the centre of its disc clears the skyline (no partial-disc power yet).
-- Eclipses (Earth blocking the Sun) are not modelled.
+- Sun counts as "up" when the center of its disc clears the skyline (no partial-disc power yet).
+- Eclipses (Earth blocking the Sun) are not modeled.
 - Sites outside the south polar maps use the coarser global LOLA map (about 1.9 km per pixel).
 
 ## Rebuilding the data
@@ -44,7 +44,7 @@ pip install spiceypy numpy
 tools/fetch_kernels.sh && python3 tools/build_ephemeris.py      # Sun/Earth table
 tools/fetch_dem.sh && python3 tools/build_horizons.py           # terrain skylines (downloads about 620 MB)
 python3 tools/build_web_dem.py                                  # reduced maps for custom points
-python3 tools/find_best_lit.py -86.0 0.0 5 200                  # best-lit point near a rough region centre
+python3 tools/find_best_lit.py -86.0 0.0 5 200                  # best-lit point near a rough region center
 python3 tools/fetch_horizons_fixtures.py                        # refresh the JPL Horizons reference values
 ```
 

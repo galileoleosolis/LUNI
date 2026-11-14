@@ -10,7 +10,7 @@ import { initTestMode } from "./testmode.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
-// Chart colours come from the CSS palette, so charts follow whichever palette is active.
+// Chart colors come from the CSS palette, so charts follow whichever palette is active.
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const C = {};
 for (const [k, v] of Object.entries({ amb: "--amb", dim: "--dim", faint: "--faint", grn: "--grn", red: "--red", cy: "--cy", wht: "--wht", grid: "--grid", grid0: "--grid0", fill: "--fill" }))
@@ -145,7 +145,7 @@ function syncSiteUI() {
   const note = $("site-note");
   if (s.id === CUSTOM_ID) note.textContent = "CUSTOM POINT";
   else if (s.srcText) note.textContent = s.srcText.toUpperCase();
-  else if (s.approx) note.textContent = "APPROXIMATE REGION CENTRE — TO BE VERIFIED";
+  else if (s.approx) note.textContent = "APPROXIMATE REGION CENTER — TO BE VERIFIED";
   else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>`;
   else note.textContent = s.tag || "";
 }

@@ -64,7 +64,7 @@ export function sampleSite(site, startDate, hours, terrain = terrainFor(site)) {
     const t = new Date(t0 + i * STEP_HOURS * 3600000);
     const s = sunEarthAltAz(frame, t);
     s.t = t;
-    s.sunUp = s.sunEl > horizonAt(horizon, s.sunAz);       // centre of the Sun's disc above the skyline
+    s.sunUp = s.sunEl > horizonAt(horizon, s.sunAz);       // center of the Sun's disc above the skyline
     s.earthUp = s.earthEl > horizonAt(horizon, s.earthAz);
     samples[i] = s;
   }

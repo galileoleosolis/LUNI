@@ -62,7 +62,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) {
       const c = st.cells[r * n + k]; if (!c) continue;
       let rgb = m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? [33, 224, 122] : [70, 14, 14];
-      // light hill shading from the neighbours' heights, so ridges and crater walls show through the colours
+      // light hill shading from the neighbors' heights, so ridges and crater walls show through the colors
       const w = H(r, k - 1) ?? c.heightM, e = H(r, k + 1) ?? c.heightM, no = H(r - 1, k) ?? c.heightM, so = H(r + 1, k) ?? c.heightM;
       const shade = Math.max(0.72, Math.min(1.18, 1 + ((w - e) + (no - so)) / (st.grid.stepM * 1.6)));
       ctx.fillStyle = `rgb(${rgb.map((x) => Math.min(255, Math.round(x * shade))).join(",")})`;
@@ -77,9 +77,9 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       if (star) { ctx.strokeRect(c.k * cw + 1, c.r * cw + 1, cw - 2, cw - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, cw * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
       else { ctx.beginPath(); ctx.moveTo(x - cw * 0.8, y); ctx.lineTo(x + cw * 0.8, y); ctx.moveTo(x, y - cw * 0.8); ctx.lineTo(x, y + cw * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, cw * 0.45, 0, 7); ctx.stroke(); }
     };
-    const centre = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
+    const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
     if (best && st.done === st.total) mark(best, "#000", true), mark(best, "#fff", true);
-    mark(centre, "#fff", false);
+    mark(center, "#fff", false);
     if (st.hover) { ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect(st.hover.k * cw + 1, st.hover.r * cw + 1, cw - 2, cw - 2); }
 
     // side readouts
@@ -92,10 +92,10 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span>`
       : `<b style="background:#21e07a"></b> MEETS THE MISSION NEEDS &nbsp; <b style="background:#460e0e"></b> DOES NOT`;
     const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? "" : "<br>" + c.reason}`;
-    const cur = st.cells[centre.r * n + centre.k];
+    const cur = st.cells[center.r * n + center.k];
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     $("scan-best").innerHTML = finished && best ? cellText(best) : "…";
-    $("scan-go-best").disabled = !(finished && best && !(best.r === centre.r && best.k === centre.k));
+    $("scan-go-best").disabled = !(finished && best && !(best.r === center.r && best.k === center.k));
     $("scan-hover").innerHTML = st.hover ? cellText(st.hover) + "<br>CLICK TO MOVE THE SITE HERE" : "MOVE OVER THE MAP TO INSPECT A POINT. CLICK TO MOVE THE SITE THERE.";
   }
 

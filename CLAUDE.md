@@ -15,7 +15,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 ## Layout
 - `index.html`, `css/style.css` — one screen styled as a console inside a rugged field unit. Wide windows: the unit is
   laid out at a design size and scaled to fit (`fitStage()` in `js/app.js`, CSS vars `--dw --dh --s` on `#stage`).
-  Under 900 px wide: `html.flow` stacked layout. Pointer maths must divide by the scale (`zoomOf`).
+  Under 900 px wide: `html.flow` stacked layout. Pointer math must divide by the scale (`zoomOf`).
 - `js/ephem.js` — Sun/Earth geometry from `data/ephem.bin` (SPICE DE440, Moon ME frame, every 2 h, 2023–2035).
 - `js/model.js` — `sampleSite`, `getScenario`, `terrainFor` (preset skylines from `data/horizons.json`, custom ones cached).
 - `js/terrain.js` — in-browser skylines from reduced LOLA maps in `data/dem/` (custom points and the scan).
@@ -33,12 +33,13 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 ## Rules of the road
 - Only real, sourced data in the app. Unsourced notes were removed on purpose; do not re-add figures without a source.
 - Label reduced-detail results honestly (custom points and scans use 240 m – 3.8 km maps; presets use 40 m + 240 m).
-- Known limits: Sun counts as up when its disc centre clears the skyline; eclipses are not modelled.
+- Known limits: Sun counts as up when its disc center clears the skyline; eclipses are not modeled.
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
 - Look: blue palette is the default (`:root` in `css/style.css`; `?palette=amber|ice|mono` previews others). The user
   asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
+- American spelling everywhere (center, color, meters, modeled): in the app, the code, the docs and in chat. The user insists.
 - No jargon on screen: say "landing" not "T0", dates as `14 JAN 2027 01:00 UTC`, never a bare "Z".
 
 ## Open work, roughly in priority order
@@ -59,4 +60,4 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    clearer task wording. Needs a re-test with someone who has NOT seen the app.
 6. Quick wins: eclipse alerts, share link, real-mission replays, explainer mode, partial-Sun power.
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
-   Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centres).
+   Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

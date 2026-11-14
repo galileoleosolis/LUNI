@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Find the best-lit point near a rough region centre, using the full-detail LOLA maps.
+"""Find the best-lit point near a rough region center, using the full-detail LOLA maps.
 
-For each candidate on a grid around the centre it computes a coarse skyline and the share of a full year
-(2027) with the Sun's centre above it and with Earth in view, then re-checks the top candidates at full detail.
+For each candidate on a grid around the center it computes a coarse skyline and the share of a full year
+(2027) with the Sun's center above it and with Earth in view, then re-checks the top candidates at full detail.
 Usage: python3 tools/find_best_lit.py <lat> <lon> [radius_km=3] [spacing_m=120]
 """
 import sys, os, json
