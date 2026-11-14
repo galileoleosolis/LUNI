@@ -71,7 +71,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    ("land on <date> instead", "find a better spot nearby", one need to relax); eclipse shown as a yellow tag;
    countdowns show the date; keys renamed NEXT GOOD TIME and BETTER SPOT; Moon zoom is faster.
    Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
-   set A runs with `#test-a`.
+   Task set C (next good time, mission length, dark, Earth link, eclipse, better spot) is now the default; sets A and B
+   run with `#test-a` and `#test-b`.
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).

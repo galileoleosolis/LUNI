@@ -7,7 +7,7 @@ import { sampleSite, hoursUntilChange, siteEclipses } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v6";
+const KEY = "luno-test-v7";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -101,9 +101,48 @@ const SET_B = [
     check: (ans, exp, snap) => snap.missionOk && snap.site.id !== SCAN_CASE.site && kmBetween(snap.site, site(SCAN_CASE.site)) <= 25 && snap.t0.toISOString().slice(0, 16) === SCAN_CASE.t0 },
 ];
 
-// Which set runs: B by default, A with "#test-a" in the address or window.LUNO_TEST_SET = "A".
-const SET_NAME = location.hash === "#test-a" || globalThis.LUNO_TEST_SET === "A" ? "A" : "B";
-const TASKS = SET_NAME === "A" ? SET_A : SET_B;
+// Third set: new sites and dates again; leans on the mission needs, the "ways to get a GO" buttons and the eclipse tag.
+const SET_C = [
+  { id: "c-next-time", short: "Date of the next good landing time",
+    text: "First choose the landing site CHANDRAYAAN-3. Then set the landing time to 1 December 2026, 00:00 UTC. It is a NO-GO. Question: on what date is the next good landing time?",
+    setup: { site: "ch3", t0: "2026-12-01T00:00" },
+    type: "date",
+    expected: () => day(mission("ch3", "2026-12-01T00:00:00Z").next.start),
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "c-length", short: "Longest mission that is still a GO",
+    text: "New situation: choose IM-2 ATHENA, landing 18 December 2026, 00:00 UTC. Question: what is the longest MISSION LENGTH that is still a GO there?",
+    reach: { label: "tried a different MISSION LENGTH", test: (s) => s.req.days !== 10 },
+    type: "choice", options: ["3", "7", "10", "14", "28"],
+    expected: () => String([28, 14, 10, 7, 3].find((d) => mission("im2", "2026-12-18T00:00:00Z", { days: d }).v.ok) ?? "none") },
+  { id: "c-dark", short: "Smallest dark setting that gives GO",
+    text: "Put MISSION LENGTH back to 10. New situation: choose NOBILE RIM 1, landing 23 January 2027, 00:00 UTC. It is a NO-GO because the Sun goes away for too long. Question: what is the smallest CAN SIT IN THE DARK setting that turns it into a GO?",
+    reach: { label: "tried a different CAN SIT IN THE DARK setting", test: (s) => s.req.maxDarkH !== 12 },
+    type: "choice", options: ["12", "24", "48", "NONE OF THEM"],
+    expected: () => [12, 24, 48].find((h) => mission("nobile1", "2027-01-23T00:00:00Z", { maxDarkH: h }).v.ok)?.toString() ?? "NONE OF THEM" },
+  { id: "c-earth", short: "GO once Earth at landing is not needed?",
+    text: "Put CAN SIT IN THE DARK back to 12. New situation: choose SHACKLETON CONNECTING RIDGE, landing 1 February 2027, 00:00 UTC. It is a NO-GO. This lander can land without talking to Earth. Change what the mission needs to allow that. Question: is it a GO now?",
+    reach: { label: "switched EARTH LINK AT LANDING to NO", test: (s) => s.req.earthAtLanding === false },
+    type: "choice", options: ["GO", "STILL NO-GO"],
+    expected: () => (mission("shackleton", "2027-02-01T00:00:00Z", { earthAtLanding: false }).v.ok ? "GO" : "STILL NO-GO") },
+  { id: "c-eclipse", short: "Date of the eclipse during the mission",
+    text: "Put EARTH LINK AT LANDING back to REQUIRED. Stay on SHACKLETON CONNECTING RIDGE and set the landing time to 14 December 2029, 00:00 UTC. During this 10-day mission the Earth passes in front of the Sun (an eclipse). Question: on what date?",
+    setup: { site: "shackleton", t0: "2029-12-14T00:00" },
+    type: "date",
+    expected: () => day(siteEclipses(site("shackleton"), new Date("2029-12-14T00:00:00Z"), new Date("2029-12-24T00:00:00Z"))[0].peak),
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "c-find-go", short: "Find a GO point near IM-2 Athena",
+    text: "Last one: choose IM-2 ATHENA and set the landing time to 21 December 2026, 00:00 UTC, with the mission needs as they started (10 days, 12 hours of dark, Earth link at landing required). It is a NO-GO there. Without changing the date or the needs, find a point nearby that IS a GO and move the site to it. Press DONE when the screen shows GO.",
+    reach: { label: "got IM-2 Athena at 2026-12-21T00:00 (a NO-GO) on screen", test: (s) => s.site.id === "im2" && s.t0.toISOString().slice(0, 16) === "2026-12-21T00:00" },
+    type: "done",
+    expected: () => "a GO point within 25 km of IM-2 Athena, same date and needs",
+    answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"} needs ${snap.req.days}d/${snap.req.maxDarkH}h/${snap.req.earthAtLanding ? "E" : "-"}`,
+    check: (ans, exp, snap) => snap.missionOk && snap.site.id !== "im2" && kmBetween(snap.site, site("im2")) <= 25 && snap.t0.toISOString().slice(0, 16) === "2026-12-21T00:00"
+      && snap.req.days === 10 && snap.req.maxDarkH === 12 && snap.req.earthAtLanding === true },
+];
+
+// Which set runs: C by default; "#test-a" or "#test-b" in the address (or window.LUNO_TEST_SET) picks an earlier one.
+const SET_NAME = (location.hash.match(/^#test-([ab])$/)?.[1] || globalThis.LUNO_TEST_SET || "C").toUpperCase();
+const TASKS = { A: SET_A, B: SET_B, C: SET_C }[SET_NAME] || SET_C;
 
 
 const FEATURES = {      // click targets -> the feature they belong to
@@ -293,7 +332,7 @@ function showReport() {
 }
 
 export function initTestMode(hooks) {
-  const wanted = /^#test(-a)?$/.test(location.hash) || globalThis.LUNO_TEST;
+  const wanted = /^#test(-[ab])?$/.test(location.hash) || globalThis.LUNO_TEST;
   if (!wanted) return;
   api = hooks;
   wireTracking();
