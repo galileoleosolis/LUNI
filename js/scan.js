@@ -9,7 +9,7 @@ function getPool() {
   const base = new URL("data/", document.baseURI).href;
   pool = Array.from({ length: n }, () => {
     const w = new Worker(new URL("./scan-worker.js", import.meta.url), { type: "module" });
-    w.postMessage({ type: "init", base });
+    w.postMessage({ type: "init", base, b64: !!globalThis.LUNO_B64 });
     return w;
   });
   return pool;

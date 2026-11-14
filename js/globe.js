@@ -1,6 +1,6 @@
 // 3D Moon for site selection.
 // Texture: LRO WAC global mosaic (NASA/GSFC/ASU), fetched from NASA Moon Trek tiles.
-import * as THREE from "three";
+import * as THREE from "../vendor/three.module.min.js";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 
 const DEG = Math.PI / 180;

@@ -1,6 +1,8 @@
 // Terrain horizons for custom points, computed in the browser from reduced LRO LOLA elevation maps
 // (data/dem, built by tools/build_web_dem.py). Same method as tools/lola.py, with coarser maps.
 
+import { fetchBytes, gunzip } from "./bin.js";
+
 const DEG = Math.PI / 180;
 const R = 1737400;       // metres
 export const MAST_M = 2;
@@ -46,9 +48,7 @@ export function putGrid(name, grid) { grids[name] = Promise.resolve(grid); }
 async function loadGrid(name) {
   if (!index) index = await fetch(base + "index.json").then((r) => r.json());
   const meta = index[name];
-  const res = await fetch(base + meta.file);
-  const buf = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
-  return makeGrid(meta, new Int16Array(buf));
+  return makeGrid(meta, new Int16Array(await gunzip(await fetchBytes(base + meta.file))));
 }
 const grid = (name) => (grids[name] ||= loadGrid(name));
 

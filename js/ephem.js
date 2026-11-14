@@ -2,6 +2,8 @@
 // data/ephem.bin holds, every 2 hours, the Sun direction and Earth position in the Moon-fixed
 // MOON_ME frame. Here we interpolate it and convert to azimuth/elevation for a surface site.
 
+import { fetchBytes } from "./bin.js";
+
 const DEG = Math.PI / 180;
 export const MOON_RADIUS_KM = 1737.4;
 let E = null;
@@ -14,7 +16,7 @@ export function initEphemeris(buffer, meta) {
 export async function loadEphemeris(base = "data/") {
   const [meta, buf] = await Promise.all([
     fetch(base + "ephem.json").then((r) => r.json()),
-    fetch(base + "ephem.bin").then((r) => r.arrayBuffer()),
+    fetchBytes(base + "ephem.bin"),
   ]);
   return initEphemeris(buf, meta);
 }

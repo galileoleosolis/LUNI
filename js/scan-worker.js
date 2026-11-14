@@ -7,6 +7,7 @@ let ready = null;
 self.onmessage = async (e) => {
   const m = e.data;
   if (m.type === "init") {
+    globalThis.LUNO_B64 = m.b64;
     setIndex(null, m.base + "dem/");
     ready = loadEphemeris(m.base);
     return;

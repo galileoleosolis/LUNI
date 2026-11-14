@@ -5,6 +5,7 @@
 @font-face { font-family: "Barlow Cond"; font-weight: 700; font-display: swap; src: url("../assets/fonts/barlow-condensed-latin-700-normal.woff2") format("woff2"); }
 
 :root {
+  color-scheme: dark;
   --amb: #ffb000; --dim: #8a6614; --faint: #2a1f06; --grn: #21e07a; --red: #ff3d3d; --cy: #5ac8ff; --wht: #f4f4f4;
   --key-y: #f5c400;
   --mono: "Plex Mono", "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
