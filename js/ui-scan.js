@@ -17,6 +17,7 @@ function rampColor(ramp, v) {            // v in 0..100
 }
 
 const GO_RGB = [33, 224, 122], NOGO_RGB = [70, 14, 14];
+const BEST_PX = 26;                                      // least size of the best-point star box on the map
 const GLIDE_MS = 1100, HOLD_MS = 300, PAN_MS = 700;      // moving the site: lander travels, pauses, map slides
 // A small lander: the mark for "where you are now" on the map and in the side panel.
 const LANDER_SVG = `<svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
@@ -137,17 +138,24 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (cw >= 7) for (let i = 1; i < n; i++) { ctx.beginPath(); ctx.moveTo(i * cw, 0); ctx.lineTo(i * cw, size); ctx.moveTo(0, i * cw); ctx.lineTo(size, i * cw); ctx.stroke(); }
 
     const mark = (c, color, star) => {
-      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw, m = Math.max(cw, 13);      // marks keep a readable size on fine maps
-      ctx.strokeStyle = color; ctx.lineWidth = 2;
-      if (star) { ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, m * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
+      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw, m = Math.max(cw, star ? BEST_PX : 13);      // marks keep a readable size on fine maps
+      ctx.strokeStyle = color; ctx.lineWidth = star ? (color === "#000" ? 5 : 2.5) : 2;
+      if (star) {      // a dark box with a white star: readable on bright and on dark ground alike
+        ctx.fillStyle = "#000"; ctx.fillRect(x - m / 2, y - m / 2, m, m); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2.5; ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2);
+        ctx.fillStyle = "#fff"; ctx.font = `700 ${Math.max(10, m * 0.72)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1);
+      }
       else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
     const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
     // a label on a dark plate, kept inside the map
-    const tag = (text, x, y) => {
-      ctx.font = "700 11px sans-serif"; const w = ctx.measureText(text).width + 10;
-      const tx = Math.max(3, Math.min(size - w - 3, x - w / 2)), ty = Math.max(3, Math.min(size - 19, y));
-      ctx.fillStyle = "rgba(0,0,0,.78)"; ctx.fillRect(tx, ty, w, 16); ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, tx + 5, ty + 8.5);
+    // big = the best-point label: larger, black on a white plate, so it is the first thing the eye finds on the map
+    const tag = (text, x, y, big) => {
+      const fs = big ? 16 : 11, hgt = big ? 26 : 16, padX = big ? 9 : 5;
+      ctx.font = `700 ${fs}px sans-serif`; const w = ctx.measureText(text).width + 2 * padX;
+      const tx = Math.max(3, Math.min(size - w - 3, x - w / 2)), ty = Math.max(3, Math.min(size - hgt - 3, y));
+      if (big) { ctx.fillStyle = "#000"; ctx.fillRect(tx - 2, ty - 2, w + 4, hgt + 4); }
+      ctx.fillStyle = big ? "#fff" : "rgba(0,0,0,.78)"; ctx.fillRect(tx, ty, w, hgt);
+      ctx.fillStyle = big ? "#000" : "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, tx + padX, ty + hgt / 2 + 0.5);
     };
     const cx = (center.k + 0.5) * cw, cy = (center.r + 0.5) * cw, here = 26, moved = best && !(best.r === center.r && best.k === center.k);
     if (best && st.done === st.total) {
@@ -156,8 +164,9 @@ export function createScanPanel({ getContext, onPick, fmt }) {
         ctx.setLineDash([6, 4]); ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke();
         ctx.lineWidth = 1.8; ctx.strokeStyle = "#fff"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
       }
-      mark(best, "#000", true), mark(best, "#fff", true);
-      if (!A) tag(moved ? `★ BEST · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST POINT", bx, by + (by > cy ? 12 : -30));
+      mark(best, "#fff", true);
+      const bm = Math.max(cw, BEST_PX) / 2;
+      if (!A) tag(moved ? `★ BEST SPOT · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST SPOT", bx, moved ? (by > cy ? by + bm + 7 : by - bm - 35) : by - bm - 50, true);
     }
     const lx = cx + offX * glide, ly = cy + offY * glide;
     if (A) { ctx.beginPath(); ctx.arc(lx, ly, 17 + 5 * Math.sin(el / 110), 0, 7); ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 2; ctx.stroke(); }
