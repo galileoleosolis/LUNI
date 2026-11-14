@@ -267,6 +267,9 @@ function renderMission() {
   for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
     `<div class="warn">⚠ ECLIPSE ON ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</div>`);
   state.mission = { v, next: nx ? nx.start : null, fixes, eclipses: hit };      // kept for the command assistant
+  // the same answer, short, for the BIG MOON view (which covers the verdict block)
+  $("globe-verdict").className = "globe-verdict" + (v.ok ? " go" : "");
+  $("globe-verdict").innerHTML = `<b>${v.ok ? "GO" : "NO-GO"}</b>${siteName(state.site)} · ${r.days}-DAY MISSION${v.ok ? "" : " · " + v.reasons[0]}`;
   return v;
 }
 
@@ -450,7 +453,7 @@ function renderHorizon(cur) {
 }
 
 // ---------- timeline ----------
-const TL = { left: 58, right: 4, top: 18, rowH: 16, gap: 5 };
+const TL = { left: 58, right: 4, top: 18, rowH: 16, gap: 5, rail: 31 };      // rail = distance from the axis line down to the slider rail
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -490,16 +493,28 @@ function renderTimeline() {
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
   el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, state.req.days < 30 ? `THE ${state.req.days}-DAY MISSION` : "");
+  // The slider: a rail under the chart and a handle that carries the moment it stands on.
+  const yRail = yAxis + TL.rail;
+  el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
+  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 11, "font-weight": 600 }, svg, "SLIDER");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
+  const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
+  el("rect", { id: "tl-handle-box", y: yRail - 11, height: 22, rx: 11, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
+  el("text", { id: "tl-handle-text", y: yRail + 4, fill: "#000", "font-size": 12, "font-weight": 700, "text-anchor": "middle" }, g, "");
 }
 
 function renderTimelineCursor() {
   const svg = $("timeline"), c = svg.querySelector("#tl-cursor"); if (!c) return;
   const W = svg.clientWidth || 700, n = state.scenario.samples.length;
   const xx = TL.left + (state.idx + 0.5) * (W - TL.left - TL.right) / n, y1 = TL.top + 3 * (TL.rowH + TL.gap) - 4;
-  c.setAttribute("d", `M${xx},6V${y1}`);
+  const yRail = y1 + 4 + TL.rail, h = state.idx * STEP_HOURS;
+  c.setAttribute("d", `M${xx},6V${yRail}`);
   svg.querySelector("#tl-cursor-top").setAttribute("d", `M${xx - 5},0H${xx + 5}L${xx},7Z`);
+  // handle: "◀ +9D 00H ▶", kept inside the chart at both ends
+  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 7.6 + 16, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
+  const box = svg.querySelector("#tl-handle-box"), txt = svg.querySelector("#tl-handle-text");
+  box.setAttribute("x", bx); box.setAttribute("width", bw); txt.setAttribute("x", bx + bw / 2); txt.textContent = label;
 }
 
 function scrubFromEvent(e) {
@@ -608,6 +623,15 @@ async function init() {
     },
   });
 
+  // BIG MOON: the picture moves from the left column to the middle of the screen, and back.
+  const gw = document.querySelector(".globe-wrap"), gwHome = gw.parentElement, gwNext = gw.nextElementSibling;
+  const setBigMoon = (on) => {
+    if (on) document.querySelector(".col-main").appendChild(gw); else gwHome.insertBefore(gw, gwNext);
+    gw.classList.toggle("big", on); $("globe-big").classList.toggle("on", on); $("globe-big").textContent = on ? "⤡ SMALL MOON" : "⤢ BIG MOON";
+  };
+  $("globe-big").addEventListener("click", () => setBigMoon(!gw.classList.contains("big")));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && gw.classList.contains("big") && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) setBigMoon(false); });
+
   const onCoord = () => {
     const lat = parseFloat($("lat-input").value), lon = parseFloat($("lon-input").value);
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
@@ -662,7 +686,7 @@ async function init() {
 
   const tl = $("timeline");
   let dragging = false;
-  tl.addEventListener("pointerdown", (e) => { dragging = true; tl.setPointerCapture(e.pointerId); scrubFromEvent(e); });
+  tl.addEventListener("pointerdown", (e) => { dragging = true; state.scrubbed = true; tl.querySelector("#tl-handle")?.classList.remove("nudge"); tl.setPointerCapture(e.pointerId); scrubFromEvent(e); });
   tl.addEventListener("pointermove", (e) => { if (dragging) scrubFromEvent(e); });
   tl.addEventListener("pointerup", () => { dragging = false; });
 

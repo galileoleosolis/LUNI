@@ -123,6 +123,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    the site from the scan he was not sure it had moved. Fixed since: a refused microphone says so in the answer
    line and the button reads NO MICROPHONE · TYPE; the better-spot button sits on the Moon picture; moving the site
    from the scan shows a fading confirmation with distance and direction (`toast` in `js/app.js`).
+   The user (15 Nov) had only just discovered the mission-clock slider and said it and the Moon must be far more
+   obvious. Fixed since: the 30-day chart has a labeled slider rail with a large handle that shows the moment it
+   stands on and pulses until first used; the Moon box says DRAG / SCROLL / CLICK and has a BIG MOON button that
+   moves it over the middle column (`setBigMoon` in `js/app.js`), with a short GO / NO-GO tag on it.
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
