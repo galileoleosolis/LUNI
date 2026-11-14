@@ -51,7 +51,7 @@ export function createSurfacePanel({ getContext, fmt }) {
       if (job !== building) return v.dispose();
       view = v;
       view.onView(({ az, el, fov }) => { $("sv-look").textContent = `LOOKING ${Math.round(az)}° ${DIRS[Math.round(az / 45) % 8]} · ${el >= 0 ? "UP" : "DOWN"} ${Math.abs(el).toFixed(1)}° · FIELD OF VIEW ${Math.round(fov)}° (SCROLL TO ZOOM)`; });
-      $("sv-info").textContent = `TERRAIN: NASA LOLA ELEVATION, ${view.info.detailM < 1000 ? Math.round(view.info.detailM) + " M" : (view.info.detailM / 1000).toFixed(1) + " KM"} DETAIL NEAR THE SITE · ${Math.round(view.info.triangles / 1000).toLocaleString("en-US")}K TRIANGLES · FINER SURFACE TEXTURE AND THE EARTH'S FACE ARE ILLUSTRATIVE`;
+      $("sv-info").textContent = `TERRAIN: NASA LOLA ELEVATION, ${view.info.detailM < 1000 ? Math.round(view.info.detailM) + " M" : (view.info.detailM / 1000).toFixed(1) + " KM"} DETAIL NEAR THE SITE · ${Math.round(view.info.triangles / 1000).toLocaleString("en-US")}K TRIANGLES · ROCKS, SMALL CRATERS, THE LANDER AND THE EARTH'S FACE ARE ILLUSTRATIVE`;
       update(); applySkyline();
       const cur = getContext().cur;
       view.lookAt(cur.sunEl > -3 ? cur.sunAz : cur.earthAz, 2);
