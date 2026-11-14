@@ -11,6 +11,9 @@ challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to S
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
 
+The challenge's own wording is in `docs/challenge.md`, the judging sheet's five criteria are above: read them before
+scoring or pitching, do not work from memory (the user asked for this).
+
 ## What it is
 A static web app (no build step, no backend). Pick a lunar landing site and landing time; it shows the Sun and Earth
 against the terrain skyline, GO / NO-GO for power and Earth link, countdowns, a 30-day timeline, a 12-month
@@ -73,6 +76,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
+- Layout since 14 Nov (the user: "the right panel is mostly wasted space", "the blues are faded and nothing jumps",
+  "too much small text"): TWO columns. Left: site list, Moon, landing time, mission needs. Middle: the answer row
+  (GO / NO-GO block with the Sun and Earth readouts stacked on its right), skyline, 30-day slider, landing-day strip.
+  The old right column (`#more-panel`: next landing times, compare cards, site numbers, custom lat/lon, OpenSpace,
+  credits) is a panel opened by COMPARE · MORE or by pressing PIN; Esc closes it. Palette: `--hi` is the vivid blue
+  for names of things and active frames. Nothing a person has to read is under 12.5 px in the design.
 - Look: blue palette is the default (`:root` in `css/style.css`; `?palette=amber|ice|mono` previews others). The user
   asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
 - American spelling everywhere (center, color, meters, modeled): in the app, the code, the docs and in chat. The user insists.
@@ -93,6 +102,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
+   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

@@ -8,8 +8,9 @@
   color-scheme: dark;
   /* palette: --amb is the main text color, --dim its quiet version, --faint/--grid/--fill the dark tints,
      --acc the accent for step numbers, --key-* the highlighted key. Status colors (--grn, --red) stay fixed. */
-  --amb: #a9ccff; --dim: #6a8fca; --faint: #101c33; --grid: #0c1527; --grid0: #2a416b; --fill: #070e1c; --quiet: #46618f;
-  --acc: #ffffff; --acc-ink: #06122a; --key-a: #5b9bff; --key-b: #2a66d9; --key-ink: #fff; --glow: 90, 150, 255;
+  --amb: #d2e7ff; --dim: #7cb8ff; --faint: #15294f; --grid: #10203f; --grid0: #3f69b0; --fill: #0b1834; --quiet: #5f8fd6;
+  --acc: #ffffff; --acc-ink: #06122a; --key-a: #4aa8ff; --key-b: #1b6cf0; --key-ink: #fff; --glow: 90, 160, 255;
+  --hi: #41b6ff;      /* the vivid blue: names of things, active frames */
   --grn: #21e07a; --red: #ff3d3d; --cy: #35d6c4; --wht: #f4f4f4; --key-y: #ffd166;
   --mono: "Plex Mono", "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
   --cond: "Barlow Cond", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
@@ -468,3 +469,59 @@ html.flow .scan { position: fixed; inset: 0; padding: 10px; overflow-y: auto; }
 html.flow .scan-body { display: block; }
 html.flow .scan-map { height: min(92vw, 60vh); margin-bottom: 12px; }
 html.flow .scan-side { overflow: visible; }
+
+/* ==================== Two columns, brighter, bigger (the user: "the blues are faded, nothing jumps, too much small text") ==================== */
+.cols { grid-template-columns: 350px minmax(0, 1fr); }
+.col-main { padding-right: 0; }
+/* the old right column: a panel that slides over the right edge when COMPARE · MORE or PIN is pressed */
+.col-side { position: absolute; top: 0; right: 0; bottom: 0; width: 400px; z-index: 9; background: #000; border-left: 2px solid var(--hi); padding: 12px 0 10px 18px; box-shadow: -24px 0 50px #000; }
+.col-side[hidden] { display: none; }
+.side-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--dim); color: var(--wht); font-size: 15px; letter-spacing: .08em; }
+.side-head button, .more-btn { background: #000; color: var(--amb); border: 1px solid var(--dim); font: inherit; font-size: 13px; padding: 2px 10px; cursor: pointer; white-space: nowrap; }
+.side-head button:hover, .more-btn:hover { background: var(--faint); color: var(--wht); }
+.more-btn { margin-left: 4px; border-color: var(--hi); color: var(--hi); font-weight: 600; } .more-btn.on { background: var(--hi); color: #000; }
+.more > summary { display: none; }
+html.flow .col-side { position: fixed; inset: 0; width: auto; z-index: 30; padding: 12px; margin: 0; overflow-y: auto; border: none; }
+
+/* color: names of things in the vivid blue, frames a step brighter */
+.h-t { color: var(--hi); font-weight: 700; }
+#clock-head { color: var(--hi); font-weight: 700; }
+h3 .step { background: var(--hi); color: #001326; }
+.bar { border-bottom-color: var(--hi); } .bar .name { color: var(--hi); font-weight: 700; }
+.col-site { border-right-color: var(--grid0); }
+.site-list { border-color: var(--grid0); } .site-row.sel { background: var(--hi); }
+.seg button.on { background: var(--hi); border-color: var(--hi); }
+.screen { box-shadow: inset 0 0 70px rgba(var(--glow), .09); }
+.readouts, .horizon { border-bottom-color: var(--grid0); }
+
+/* size: nothing a person has to read is under 12.5 px any more */
+.screen { font-size: 15px; }
+h3 { font-size: 13px; letter-spacing: .08em; margin-bottom: 8px; }
+.bar { font-size: 15px; }
+.site-list .grp { font-size: 11.5px; } .site-row { font-size: 15px; }
+.note, .k-hint { font-size: 12.5px; } .globe-wrap .k-hint { font-size: 11px; }
+.need { font-size: 13px; } .seg button { font-size: 13px; padding: 3px 7px; } .col-site .seg button { min-width: 30px; padding: 3px 6px; }
+.t0 select { font-size: 15px; }
+.lab { font-size: 14px; } .mini { font-size: 13px; } .cd { font-size: 13.5px; } .cd i { font-size: 12.5px; }
+.nasa-check { font-size: 12.5px; }
+.hero-title { font-size: 13.5px; } .hero-why { font-size: 16.5px; } .hero-fix > span { font-size: 13px; }
+.mini-btn { font-size: 13px; }
+.windows, .cmp, .sum, .credit { font-size: 13px; } .cmp .rowb { font-size: 12.5px; } .credit { font-size: 11.5px; line-height: 1.5; }
+.dimtxt { font-size: 12px; } .scan-cell { font-size: 13px; } .scan-legend { font-size: 11.5px; }
+.tight .hero-why { font-size: 15px; } .tight .hero-next { font-size: 13.5px; padding: 3px 9px; }
+html.flow .screen { font-size: 14px; } html.flow h3 { font-size: 12px; }
+
+/* the answer row: GO / NO-GO on the left, Sun and Earth stacked on its right (the middle column is wide enough now) */
+.ans-head { align-items: center; margin-bottom: 6px; } .ans-head h3 { margin-bottom: 0; }
+.answer-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 0 18px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--grid0); }
+.answer-row .hero { margin-bottom: 0; align-content: center; }
+.answer-side { min-width: 0; display: flex; flex-direction: column; }
+.answer-side .tiles-head { flex-wrap: wrap; gap: 0 12px; } .answer-side .tiles-head h3 { margin-bottom: 3px; }
+.answer-side .readouts { flex: 1; grid-template-columns: minmax(0, 1fr); align-content: space-around; margin: 0; padding: 0; border-bottom: none; }
+.answer-side .ro { padding: 4px 0; } .answer-side .ro + .ro { padding: 6px 0 0; border-left: none; border-top: 1px solid var(--grid0); }
+.answer-side .st { font-size: 28px; } .answer-side .cd b { font-size: 34px; }
+.tight .hero-fix-list { flex-wrap: wrap; }
+html.flow .answer-row { display: block; border-bottom: none; padding-bottom: 0; } html.flow .answer-row .hero { margin-bottom: 12px; }
+/* left column: every pixel of height goes to the site list */
+.site-row { padding: 2px 5px; } .globe-wrap { min-height: 112px; }
+.col-site .need + .need { margin-top: 3px; } .col-site .seg button { padding: 2px 6px; }
