@@ -188,7 +188,10 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     const far = best && away(best);
     $("scan-best").innerHTML = !(finished && best) ? "…" : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
-    $("scan-go-best").disabled = !(finished && best && !(best.r === center.r && best.k === center.k));
+    const canMove = finished && best && !(best.r === center.r && best.k === center.k);
+    $("scan-go-best").disabled = !canMove;
+    // The bottom key follows the scan: it starts one, and while one is open it moves the site to the best spot found.
+    keyLabel(st.anim ? ["MOVING", "THE SITE…"] : canMove ? ["MOVE SITE TO", "BEST SPOT"] : finished ? ["YOU ARE AT THE", "BEST SPOT"] : ["SCANNING", "PLEASE WAIT"]);
     $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + `<br><b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO INSPECT A POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`;
   }
 
@@ -226,11 +229,19 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     };
     requestAnimationFrame(step);
   }
+  const keyLabel = ([small, big]) => { const k = $("scan-btn"); k.querySelector("small").textContent = small; k.querySelector("span").textContent = big; };
+  // The bottom key: opens the scan; in the scan it never closes it (✕ CLOSE and Esc do that), it moves to the best spot.
+  function keyPress() {
+    if (panel.hidden) return toggle(true);
+    const b = st.done === st.total ? bestCell(st.cells) : null, mid = st.grid ? (st.grid.n - 1) / 2 : 0;
+    if (b && !(b.r === mid && b.k === mid)) pick(b);
+  }
   function toggle(show = panel.hidden) {
     panel.hidden = !show;
     $("scan-btn").classList.toggle("on", show);
+    if (!show) keyLabel(["SCAN FOR", "BETTER SPOT"]);
     if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
-  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); } };
+  return { toggle, keyPress, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); } };
 }

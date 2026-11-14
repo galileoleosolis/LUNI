@@ -246,7 +246,7 @@ function renderMission() {
   if (!v.ok) {
     const tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS).at(calIdx()).ok;
     if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
-    fixes.push(["mission-scan", "FIND A BETTER SPOT NEARBY", () => scan.toggle(true)]);
+    fixes.push(["mission-scan", "SCAN FOR BETTER SPOT", () => scan.toggle(true)]);
     const dark = REQ_OPTIONS.maxDarkH.find((hh) => hh > r.maxDarkH && tryReq({ maxDarkH: hh }));
     if (dark) fixes.push(["mission-fix-dark", `LET IT SIT ${dark} H IN THE DARK`, () => setReq("maxDarkH", dark)]);
     if (r.earthAtLanding && tryReq({ earthAtLanding: false })) fixes.push(["mission-fix-earth", "LAND WITHOUT AN EARTH LINK", () => setReq("earthAtLanding", false)]);
@@ -655,7 +655,7 @@ async function init() {
     },
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
-  $("scan-btn").addEventListener("click", () => scan.toggle());
+  $("scan-btn").addEventListener("click", () => scan.keyPress());
   $("side-scan").addEventListener("click", () => scan.toggle(true));
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
