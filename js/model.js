@@ -12,6 +12,7 @@ export { subPoints, coverage, inCoverage } from "./ephem.js";
 export const STEP_HOURS = 1;
 export const SPAN_DAYS = 30;
 const FLAT = new Float32Array(360);
+const MAP_RES = { ldem_80s_40m: "40 M", ldem_60s_240m: "240 M", ldem_16: "1.9 KM" };   // LOLA map -> pixel size
 let HORIZONS = {};
 
 export async function initModel(base = "data/") {
@@ -26,15 +27,23 @@ export function setHorizons(hz) {
   }
 }
 
-// Terrain for a site: the precomputed LOLA skyline for presets, a flat horizon otherwise.
+// Terrain computed in the browser for custom points (see terrain.js), keyed by position.
+const CUSTOM = new Map();
+const key = (site) => `${site.lat},${site.lon}`;
+export function setCustomTerrain(site, terrain) { CUSTOM.set(key(site), terrain); }
+export function hasTerrain(site) { return terrainFor(site).real; }
+
+// Terrain for a site: the precomputed full-resolution LOLA skyline for presets, the in-browser one for
+// custom points once it is ready, and a flat horizon until then.
 export function terrainFor(site) {
   const h = HORIZONS[site.id];
   if (h && Math.abs(h.lat - site.lat) < 1e-6 && Math.abs(h.lon - site.lon) < 1e-6) {
     let min = Infinity, max = -Infinity;
     for (const v of h.el) { if (v < min) min = v; if (v > max) max = v; }
     return { real: true, horizon: h.el, heightM: h.height_m, slopeDeg: h.slope_deg, slopeBaseM: h.slope_baseline_m,
-             mastM: h.mast_m, maps: [h.near_map, h.far_map].filter(Boolean), min, max };
+             mastM: h.mast_m, maps: [h.near_map, h.far_map].filter(Boolean).map((m) => MAP_RES[m] || m), min, max };
   }
+  if (CUSTOM.has(key(site))) return CUSTOM.get(key(site));
   return { real: false, horizon: FLAT, heightM: 0, slopeDeg: null, mastM: 0, maps: [], min: 0, max: 0 };
 }
 

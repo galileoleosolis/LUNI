@@ -1,5 +1,6 @@
 import { SITES, CUSTOM_ID, loadSites } from "./sites.js";
-import { initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
+import { computeTerrain } from "./terrain.js";
+import { hasTerrain, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
 import { createGlobe } from "./globe.js";
 
 const $ = (id) => document.getElementById(id);
@@ -57,6 +58,22 @@ function selectSite(site, { fly = true } = {}) {
   state.site = site;
   globe?.select(site, { fly });
   recompute();
+  if (!hasTerrain(site)) loadCustomTerrain(site);
+}
+
+// Custom points: compute the skyline from the reduced LOLA maps, then redraw.
+let terrainJob = 0;
+async function loadCustomTerrain(site) {
+  const job = ++terrainJob;
+  state.terrainBusy = true; renderBrief();
+  try {
+    setCustomTerrain(site, await computeTerrain(site.lat, site.lon));
+  } catch (e) {
+    console.error(e); state.terrainError = true;
+  }
+  if (job !== terrainJob) return;
+  state.terrainBusy = false;
+  if (state.site === site) recompute({ keepIdx: true });
 }
 
 function nextSite() {
@@ -90,18 +107,16 @@ function renderBrief() {
     h += row("ELEVATION", `${num(t.heightM)} M`);
     h += row("SLOPE", `${t.slopeDeg.toFixed(1)}° OVER ${t.slopeBaseM >= 1000 ? (t.slopeBaseM / 1000).toFixed(1) + " KM" : t.slopeBaseM + " M"}`);
     h += row("SKYLINE", `${sgn(t.min)}° TO ${sgn(t.max)}°`);
-    h += row("TERRAIN MAP", t.maps.map((m) => m.replace("ldem_", "").replace(/_/g, " ").toUpperCase()).join(" + "));
+    h += row("LOLA MAP", t.maps.join(" + ") + " / PIXEL");
+    if (t.reduced) h += row("DETAIL", "REDUCED (CUSTOM POINT)");
   } else {
-    h += row("TERRAIN", "FLAT HORIZON");
+    h += row("TERRAIN", state.terrainBusy ? "LOADING LOLA MAP…" : "FLAT HORIZON");
   }
   $("brief-lola").innerHTML = h;
-  const n = s.notes, box = $("brief-notes");
-  box.hidden = !n;
-  if (n) box.innerHTML = `<h3>TEAM RESEARCH NOTES · SOURCES PENDING</h3>` +
-    [["TERRAIN", n.terrain], ["TEMP", n.temp], ["HAZARD", n.hazard]].filter((r) => r[1]).map(([k, v]) => `<p><b>${k}</b> ${v}</p>`).join("");
   const badge = $("data-badge");
   badge.className = "demo" + (t.real ? " ok" : "");
-  badge.textContent = t.real ? "NASA DATA · SPICE DE440 + LOLA TERRAIN" : "NASA SPICE POSITIONS · FLAT HORIZON (NO TERRAIN FOR CUSTOM POINTS YET)";
+  badge.textContent = t.real ? `NASA DATA · SPICE DE440 + LOLA TERRAIN${t.reduced ? " (REDUCED DETAIL)" : ""}`
+    : state.terrainBusy ? "NASA SPICE POSITIONS · LOADING LOLA TERRAIN…" : "NASA SPICE POSITIONS · FLAT HORIZON (TERRAIN UNAVAILABLE)";
 }
 
 // ---------- compute ----------

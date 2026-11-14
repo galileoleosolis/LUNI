@@ -1,0 +1,32 @@
+{
+ "_about": "Reduced LRO LOLA elevation maps for in-browser terrain horizons. Heights: metres above a 1737.4 km sphere = value * quant_m. Rows are delta-encoded then gzipped.",
+ "sp_cap": {
+  "kind": "polar_south",
+  "scale_m": 240.0,
+  "min_lat": -80.0,
+  "source": "ldem_60s_240m (crop)",
+  "file": "sp_cap.i16.gz",
+  "rows": 2540,
+  "cols": 2540,
+  "quant_m": 2.0
+ },
+ "sp_wide": {
+  "kind": "polar_south",
+  "scale_m": 960.0,
+  "min_lat": -60.0,
+  "source": "ldem_60s_240m (4x4 mean)",
+  "file": "sp_wide.i16.gz",
+  "rows": 1940,
+  "cols": 1940,
+  "quant_m": 4.0
+ },
+ "global": {
+  "kind": "cylindrical",
+  "ppd": 8,
+  "source": "ldem_16 (2x2 mean)",
+  "file": "global.i16.gz",
+  "rows": 1440,
+  "cols": 2880,
+  "quant_m": 8.0
+ }
+}

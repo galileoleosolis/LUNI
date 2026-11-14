@@ -1,5 +1,5 @@
 {
- "_about": "Preset landing sites. lat: deg (south negative); lon: deg east (west negative). approx = rough regional point still needing an official source. notes = team research, not yet sourced.",
+ "_about": "Preset landing sites. lat: deg (south negative); lon: deg east (west negative). approx = rough regional point still needing an official source.",
  "sites": [
   {
    "id": "nobile1",
@@ -9,12 +9,7 @@
    "lat": -85.45,
    "lon": 36.36,
    "approx": true,
-   "src": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/",
-   "notes": {
-    "terrain": "South pole highlands near permanently shadowed regions; slopes under 20° targeted",
-    "temp": "≤ −148 °C in cold traps / PSRs",
-    "hazard": "1.9–4.5 km to PSR edges"
-   }
+   "src": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/"
   },
   {
    "id": "malapert",
@@ -51,12 +46,7 @@
    "group": "South polar landings",
    "lat": -84.7906,
    "lon": 29.1957,
-   "src": "https://en.wikipedia.org/wiki/IM-2",
-   "notes": {
-    "terrain": "High plateau, south pole region (Mons Mouton / Marston crater)",
-    "temp": "about −130 to −20 °C; down to −240 °C in PSRs",
-    "hazard": "~1.5 km to Marston crater PSR"
-   }
+   "src": "https://en.wikipedia.org/wiki/IM-2"
   },
   {
    "id": "im1",
@@ -65,12 +55,7 @@
    "group": "South polar landings",
    "lat": -80.13,
    "lon": 1.44,
-   "src": "https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf",
-   "notes": {
-    "terrain": "South pole highlands near Malapert A crater; landed on a ~12° slope",
-    "temp": "about −130 to −20 °C; down to −200 °C at night",
-    "hazard": "~1.5 km to Malapert A crater walls"
-   }
+   "src": "https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf"
   },
   {
    "id": "ch3",
@@ -79,12 +64,7 @@
    "group": "South polar landings",
    "lat": -69.373,
    "lon": 32.319,
-   "src": "https://planetarynames.wr.usgs.gov/Feature/16272",
-   "notes": {
-    "terrain": "Anorthositic highland soil, smooth topography (slope under 4°)",
-    "temp": "−3 to 17 °C; daytime surface up to 67 °C",
-    "hazard": "under 0.5 km"
-   }
+   "src": "https://planetarynames.wr.usgs.gov/Feature/16272"
   },
   {
    "id": "ce6",
@@ -93,12 +73,7 @@
    "group": "Reference sites",
    "lat": -41.6385,
    "lon": -153.9852,
-   "src": "https://en.wikipedia.org/wiki/Chang%27e_6",
-   "notes": {
-    "terrain": "Southern mare plain in Apollo basin (far side)",
-    "temp": "−190 to 100 °C over the day/night cycle",
-    "hazard": "~1.5 km to local craters"
-   }
+   "src": "https://en.wikipedia.org/wiki/Chang%27e_6"
   },
   {
    "id": "ce4",
@@ -107,12 +82,7 @@
    "group": "Reference sites",
    "lat": -45.4446,
    "lon": 177.5991,
-   "src": "https://en.wikipedia.org/wiki/Chang%27e_4",
-   "notes": {
-    "terrain": "Crater floor in South Pole–Aitken basin (far side)",
-    "temp": "−190 to 100 °C over the day/night cycle",
-    "hazard": "~2.0 km to crater walls and peak"
-   }
+   "src": "https://en.wikipedia.org/wiki/Chang%27e_4"
   },
   {
    "id": "apollo11",
@@ -121,12 +91,7 @@
    "group": "Reference sites",
    "lat": 0.6741,
    "lon": 23.4731,
-   "src": "https://lroc.im-ldi.com/visit/exhibits/1/gallery/8",
-   "notes": {
-    "terrain": "Very flat basaltic plain (Mare Tranquillitatis)",
-    "temp": "−130 to 120 °C over the day/night cycle",
-    "hazard": "~0.4 km (West crater)"
-   }
+   "src": "https://lroc.im-ldi.com/visit/exhibits/1/gallery/8"
   },
   {
    "id": "apollo15",
@@ -135,12 +100,7 @@
    "group": "Reference sites",
    "lat": 26.1322,
    "lon": 3.634,
-   "src": "https://apollojournals.org/alsj/alsjcoords.html",
-   "notes": {
-    "terrain": "Mare plain between Hadley Rille and the Apennine mountains",
-    "temp": "−130 to 120 °C over the day/night cycle",
-    "hazard": "~1.5 km to Hadley Rille edge"
-   }
+   "src": "https://apollojournals.org/alsj/alsjcoords.html"
   },
   {
    "id": "apollo17",
@@ -149,12 +109,7 @@
    "group": "Reference sites",
    "lat": 20.1881,
    "lon": 30.7748,
-   "src": "https://apollojournals.org/alsj/alsjcoords.html",
-   "notes": {
-    "terrain": "Valley floor between highland massifs (Taurus-Littrow)",
-    "temp": "−130 to 120 °C over the day/night cycle",
-    "hazard": "~0.5 km to local craters"
-   }
+   "src": "https://apollojournals.org/alsj/alsjcoords.html"
   }
  ]
 }
