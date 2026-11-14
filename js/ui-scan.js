@@ -21,6 +21,13 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   let st = { metric: "sun", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null, engine: "" };
   // The graphics chip, if this computer has a usable one: made on first use, dropped for good if it ever fails a check.
   let gpu;
+  // The chip's own name as the browser reports it, trimmed to the part a person recognizes.
+  let chipLabel;
+  const chipName = () => chipLabel ??= (() => {
+    const raw = gpu?.info() || "", m = raw.match(/^ANGLE \(([^,]*), ([^,]*)/);
+    if (/swiftshader|llvmpipe|basic render|software/i.test(raw)) return "SOFTWARE STAND-IN, NO REAL GPU IN USE";
+    return (m ? m[2] : raw).replace(/\(0x[0-9a-f]+\)/gi, "").replace(/\b(Direct3D|OpenGL|Vulkan|Metal).*$/i, "").replace(/\((R|TM)\)/gi, "").replace(/\s+/g, " ").trim().toUpperCase().slice(0, 48);
+  })();
   const chipFor = (site) => { if (gpu === undefined) gpu = globalThis.LUNO_NO_GPU ? null : createGpuSkyline(); return gpu && mapResFor(site.lat) <= 960 ? gpu : null; };
 
   function buildSeg(el, items, get, set) {
@@ -104,7 +111,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     // side readouts
     const finished = st.done === st.total;
     $("scan-progress").textContent = finished ? `${st.total.toLocaleString("en-US")} POINTS CHECKED${st.took ? " IN " + st.took + " S" : ""}` : `SCANNING ${st.done.toLocaleString("en-US")} / ${st.total.toLocaleString("en-US")}`;
-    $("scan-engine").textContent = st.onChip ? "COMPUTED ON THE GRAPHICS CHIP (GPU)" : "COMPUTED ON THE PROCESSOR";
+    $("scan-engine").textContent = st.onChip ? `COMPUTED ON THE GRAPHICS CHIP (GPU)${chipName() ? ": " + chipName() : ""}` : "COMPUTED ON THE PROCESSOR";
     $("scan-progress").className = finished ? "ok" : "";
     $("scan-scale").textContent = `${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ✛ = CURRENT SITE · ★ = BEST`;
     $("scan-legend").classList.toggle("flat", !m.ramp);
