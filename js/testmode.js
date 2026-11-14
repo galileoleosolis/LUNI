@@ -147,7 +147,7 @@ const TASKS = { A: SET_A, B: SET_B, C: SET_C }[SET_NAME] || SET_C;
 
 const FEATURES = {      // click targets -> the feature they belong to
   "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
-  "launch-slip keys": /^slip/, "NEXT WINDOW": /^next-window-btn/, "AREA SCAN": /^scan/, "mission needs": /^need:/,
+  "launch-slip keys": /^slip/, "NEXT WINDOW": /^(next-window-btn|side-next)/, "AREA SCAN": /^(scan|side-scan)/, "mission needs": /^need:/,
   "verdict-block buttons": /^mission-/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
   "ASK LUNO (typed or spoken commands)": /^(talk-btn|comms:|typed:|voice:)/,
 };
@@ -229,7 +229,12 @@ function showTask() {
   let ctl = "";
   if (t.type === "choice") ctl = t.options.map((o) => `<button class="test-opt" data-v="${o}">${o}</button>`).join("");
   if (t.type === "number") ctl = `<input id="test-answer" type="number" step="1" min="0" inputmode="numeric" aria-label="Answer"> <span>${t.unit}</span>`;
-  if (t.type === "date") ctl = `<input id="test-answer" type="date" aria-label="Answer">`;
+  if (t.type === "date") {
+    const M = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"], opt = (v, label) => `<option value="${v}">${label}</option>`;
+    ctl = `<span class="test-date"><select id="ta-day" aria-label="Day">${opt("", "DAY")}${Array.from({ length: 31 }, (_, i) => opt(i + 1, String(i + 1).padStart(2, "0"))).join("")}</select>`
+      + `<select id="ta-month" aria-label="Month">${opt("", "MONTH")}${M.map((m, i) => opt(i + 1, m)).join("")}</select>`
+      + `<select id="ta-year" aria-label="Year">${opt("", "YEAR")}${Array.from({ length: 13 }, (_, i) => opt(2023 + i, 2023 + i)).join("")}</select></span>`;
+  }
   bar.innerHTML = `<div class="test-q"><b>TASK ${T.task + 1} OF ${TASKS.length}</b> ${t.text}</div>
     <div class="test-ctl">${ctl}<button class="test-btn go" id="test-submit" ${t.type === "done" ? "" : "disabled"}>${t.type === "done" ? "DONE" : "SUBMIT ANSWER"}</button><button class="test-btn" id="test-stuck">SKIP</button></div>`;
   bar.hidden = false;
@@ -239,6 +244,11 @@ function showTask() {
     answer = b.dataset.v; bar.querySelectorAll(".test-opt").forEach((x) => x.classList.toggle("on", x === b)); submit.disabled = false;
   }));
   $("test-answer")?.addEventListener("input", (e) => { answer = e.target.value; submit.disabled = answer === ""; });
+  bar.querySelectorAll(".test-date select").forEach((sel) => sel.addEventListener("change", () => {
+    const d = $("ta-day").value, m = $("ta-month").value, y = $("ta-year").value;
+    answer = d && m && y ? `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}` : null;
+    submit.disabled = !answer || Number.isNaN(+new Date(answer)) || new Date(answer).getUTCDate() !== +d;      // 31 FEB is not a date
+  }));
   submit.addEventListener("click", () => finishTask(answer, false));
   $("test-stuck").addEventListener("click", () => finishTask(null, true));
   api.relayout();

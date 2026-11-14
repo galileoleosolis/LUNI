@@ -202,6 +202,11 @@ svg text { font-family: var(--mono); }
 .key.flash { background: linear-gradient(180deg, #ff5a5a, #b02020); }
 .key.on { background: linear-gradient(180deg, #2bd47c, #17a05a); color: #06210f; }
 .key-gap { flex: .25; }
+/* the two shortcuts, repeated in the left column where the inputs are */
+.side-go { flex: none; display: block; width: 100%; margin-top: 7px; font-family: var(--cond); font-size: 14.5px; font-weight: 700; letter-spacing: .05em; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b));
+  border: 2px solid #0d0d0d; border-radius: 8px; padding: 3px 8px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.side-go:hover { filter: brightness(1.15); } .side-go:active { transform: translateY(2px); }
+.side-go.flash { background: linear-gradient(180deg, #ff5a5a, #b02020); color: #fff; }
 .key[data-slip] { flex: .8; }
 .key.c { flex: 1.2; background: linear-gradient(180deg, #2f8f86, #17534d); }
 .tight .keys { gap: 10px; } .tight .key { font-size: 19px; letter-spacing: .04em; } .tight .key small { font-size: 10px; letter-spacing: .18em; }
@@ -338,6 +343,8 @@ html.flow .surface { position: fixed; }
 .test-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .test-ctl input { width: 150px; background: #000; color: var(--wht); border: 1px solid var(--amb); font: inherit; padding: 5px 6px; color-scheme: dark; }
 .test-ctl span { color: var(--dim); font-size: 11px; }
+.test-ctl .test-date { display: inline-flex; gap: 5px; }
+.test-date select { background: #000; color: var(--wht); border: 1px solid var(--amb); font: inherit; padding: 5px 4px; color-scheme: dark; border-radius: 0; cursor: pointer; }
 .test-opt { background: #000; color: var(--amb); border: 1px solid var(--dim); font: inherit; padding: 5px 10px; cursor: pointer; }
 .test-opt:hover { background: var(--faint); }
 .test-opt.on { background: var(--amb); color: #000; font-weight: 600; }

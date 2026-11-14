@@ -284,7 +284,7 @@ function setT0(d) { state.t0 = new Date(d); recompute(); }
 function nextWindow() {
   const w = state.cal.windows.find((x) => x.start > state.t0);
   if (w) return setT0(w.start);
-  const b = $("next-window-btn"); b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 500);
+  for (const b of [$("next-window-btn"), $("side-next")]) { b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 500); }
 }
 
 // Change one mission need (from its buttons or from a "way to get a GO" button) and keep the buttons in step.
@@ -594,12 +594,14 @@ async function init() {
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
+  $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
     onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());
+  $("side-scan").addEventListener("click", () => scan.toggle(true));
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
     fmt: { site: siteName, stamp },

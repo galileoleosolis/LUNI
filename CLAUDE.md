@@ -78,6 +78,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
    Task set C (next good time, mission length, dark, Earth link, eclipse, better spot) is now the default; sets A and B
    run with `#test-a` and `#test-b`.
+   Fourth run (set C, same person): 5/6, ease 4/5, 7 minutes. He liked that everything to change is on the left.
+   He still never pressed NEXT GOOD TIME, BETTER SPOT or the verdict-block buttons (stepped +1 day 20 times; for
+   "find a GO point nearby" he clicked through the preset list). Complaints: the test's own date answer box showed the
+   month as a number and its year was slow to scroll; Moon zoom slightly too fast.
+   Fixed since: the two shortcuts are repeated as buttons in the left column (`#side-scan` under the site list,
+   `#side-next` under the landing time); the test's date answer is three pickers like the app's; zoom speed 1.9.
    ASK LUNO (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. Open decision: add a language model on top
    (online with an API key, or a local model on the user's laptop).
