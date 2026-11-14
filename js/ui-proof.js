@@ -53,7 +53,7 @@ export function createProofPanel({ fmt, onReplay, links }) {
       <div class="proof-big"><b>0.0007°</b><span>THE WORST DIFFERENCE BETWEEN LUNI AND NASA JPL HORIZONS IN 1,110 SUN AND EARTH POSITIONS<br>(6 SITES FROM THE EQUATOR TO THE SOUTH POLE, 2023 TO 2035). THE SUN'S DISC IS 0.53° WIDE: THE ERROR IS ABOUT 1/750 OF IT.</span></div>
       <p><b class="h-do">CHECK ANY MOMENT YOURSELF:</b> NASA'S ANSWER FOR THE SITE AND TIME ON SCREEN NOW: <a href="${l.sun}" target="_blank" rel="noopener">SUN ↗</a> <a href="${l.earth}" target="_blank" rel="noopener">EARTH ↗</a> · ITS AZIMUTH IS LUNI'S DIRECTION, ITS ELEVATION IS LUNI'S HEIGHT.</p></section>`;
     h += `<section><h3><b class="step">2</b><b class="h-t">REAL LANDINGS, REPLAYED</b> · WHAT HAPPENED ON THE MOON NEXT TO WHAT LUNI WORKS OUT</h3>`;
-    for (const st of STORIES) {
+    for (const st of STORIES.filter((x) => x.proof)) {
       let rows;
       try { rows = replay(st, fmt); } catch (e) { console.error(e); rows = [["", "", "COULD NOT BE WORKED OUT"]]; }
       h += `<div class="proof-card" data-card="${st.id}"><div class="proof-card-head"><span><b>${st.name}</b> · ${st.when} · ${st.where}</span><button class="mini-btn" data-replay="${st.id}">REPLAY IT IN LUNI ▸</button></div>

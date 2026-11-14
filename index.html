@@ -15,6 +15,7 @@
   <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
+    <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
     <span id="data-badge" class="demo" >LOADING DATA</span>
   </div>
 
@@ -41,6 +42,18 @@
         </div>
         <div id="sv-status" class="sv-status" hidden></div>
         <div class="sv-bottom"><div id="sv-look"></div><div id="sv-info"></div><div class="sv-key"><i></i> <span id="sv-keytext"></span> · DRAG TO LOOK AROUND · USE PLAY OR ← → TO RUN THE MISSION CLOCK</div></div>
+      </div>
+      <div id="history" class="history" hidden>
+        <div class="scan-head"><span><b class="h-t">MISSION HISTORY</b> · REAL LANDINGS SINCE 2023, REPLAYED WITH LUNI'S NASA DATA · <b class="h-do">PICK ONE, THEN LOAD IT</b></span><span class="scan-head-btns"><button id="hist-close" title="Close (Esc)">✕ BACK TO THE MAIN SCREEN</button></span></div>
+        <div class="hist-top">
+          <div class="hist-map"><img src="assets/moon_wac_4k.jpg" alt="Map of the whole Moon with the landing sites marked"><div id="hist-pins"></div><span class="hist-map-note" title="A flat map of the whole Moon: the near side is in the middle, the far side at both edges. Picture: NASA LRO wide-angle camera mosaic.">THE WHOLE MOON · NEAR SIDE IN THE MIDDLE</span></div>
+          <div id="hist-detail" class="hist-detail"></div>
+        </div>
+        <div class="hist-table">
+          <div class="hist-row hist-headrow"><div>MISSION</div><div>SUN HEIGHT AT LANDING</div><div>SUNLIGHT LEFT AFTER LANDING</div><div>EARTH AT LANDING</div><div>GROUND SLOPE</div><div>THE 30 DAYS AFTER LANDING · <i class="k-s">■ SUN</i> <i class="k-e">■ EARTH IN VIEW</i> · <i class="k-m">▼ REAL END</i></div><div>WHAT REALLY HAPPENED</div><div></div></div>
+          <div id="hist-rows"></div>
+        </div>
+        <div class="hist-foot"><span class="hist-sortlab">ORDER:</span><span id="hist-sort" class="seg"></span><span class="dimtxt">NUMBERS AND BARS: LUNI, FROM NASA SPICE AND LOLA DATA. WHAT REALLY HAPPENED: THE SOURCES LISTED FOR EACH MISSION. LUNI'S DATA COVERS 2023 TO 2035, SO EARLIER LANDINGS (APOLLO, CHANG'E 4) CANNOT BE REPLAYED ON THEIR OWN DATES.</span></div>
       </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">

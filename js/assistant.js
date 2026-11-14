@@ -40,8 +40,8 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "maxSlopeDeg", "earthAtLanding"] }, value: { type: "number" }, required: { type: "boolean" }, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
   { name: "mission_clock", description: "Move the mission clock (the moment shown for the Sun and Earth). to_hours: hours after landing. by_hours: relative move. play: true starts it running, false pauses it.",
     input_schema: { type: "object", properties: { to_hours: { type: "number" }, by_hours: { type: "number" }, play: { type: "boolean" } }, additionalProperties: false } },
-  { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view), 'proof' (how LUNI was checked against NASA and real landings, and its limits) or 'main' (close them all).",
-    input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "proof", "main"] } }, required: ["view"], additionalProperties: false } },
+  { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view), 'proof' (how LUNI was checked against NASA and real landings, and its limits), 'history' (real landings since 2023 compared, each loadable into the main screen) or 'main' (close them all).",
+    input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "proof", "history", "main"] } }, required: ["view"], additionalProperties: false } },
   { name: "share_link", description: "Copy a link that opens LUNI on exactly this site, landing time and mission needs.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "take_option", description: "After a NO-GO, LUNI offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
@@ -88,6 +88,7 @@ const ALIASES = {
   im1: ["im 1 odysseus", "im 1", "im1", "i m 1", "odysseus", "malapert a", "intuitive machines 1"],
   ch3: ["chandrayaan 3", "chandrayaan", "chandrayan 3", "chandrayan", "shiv shakti"],
   bg1: ["blue ghost 1", "blue ghost", "mare crisium", "crisium", "firefly"],
+  slim: ["slim", "shioli crater", "shioli", "moon sniper"],
   ce6: ["chang e 6", "change 6", "chang 6", "chang e six", "apollo basin"],
   ce4: ["chang e 4", "change 4", "chang 4", "von karman"],
   apollo11: ["apollo 11", "tranquility base", "tranquility"],
@@ -193,6 +194,7 @@ export function parse(text, sites = []) {
   if ((m = take(/\b(?:option|choice|number|way)(?: number)? ([123])\b/)) || (m = take(/\b(?:the |do the |take the )([123]) (?:1\b|option\b|choice\b|$)/))) call("take_option", { number: +m[1] });
   if (take(/\b(?:move|go|jump|switch)\b[a-z ]{0,12}\bbest (?:point|spot|place|one)\b|\buse the best (?:point|spot|place)\b/)) call("take_option", { best_point: true });
   else if (take(/\b(?:close|exit|leave|hide)\b[a-z ]{0,10}\b(?:scan|map|surface|3d|view)?\b|\bmain screen\b|^ (?:cancel|go back|back) $/)) call("open_view", { view: "main" });
+  else if (take(/\b(?:mission )?history\b|\b(?:past|previous|earlier|real|old) (?:missions?|landings?)\b/)) call("open_view", { view: "history" });
   else if (take(/\b(?:proof|prove it|how accurate|accuracy|can (?:i|we) trust|how do (?:you|we|i) know)\b/)) call("open_view", { view: "proof" });
   else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b/)) call("open_view", { view: "scan" });
   else if (take(/\b(?:surface|3d|3 d|first person|look around|ground view|stand on)\b/)) call("open_view", { view: "surface" });
@@ -356,7 +358,8 @@ export function createAssistant(api) {
         if (input.view === "scan") { api.openScan(true); return { say: "Scanning the ground around this site for a better spot. Bright cells are better. When it finishes, say MOVE TO THE BEST POINT." }; }
         if (input.view === "surface") { api.openSurface(true); return { say: "Opening the 3D view from the surface. Say CLOSE to come back." }; }
         if (input.view === "proof") { api.openProof(true); return { say: "Opening the proof: LUNI against NASA's own calculator, three real landings replayed, and what LUNI does not know. Say CLOSE to come back." }; }
-        api.openScan(false); api.openSurface(false); api.openProof?.(false);
+        if (input.view === "history") { api.openHistory(true); return { say: "Opening mission history: six real landings since 2023, side by side. Pick one and press LOAD to put it on the main screen. Say CLOSE to come back." }; }
+        api.openScan(false); api.openSurface(false); api.openProof?.(false); api.openHistory?.(false);
         return { say: "Back to the main screen." };
       }
       case "take_option": {
