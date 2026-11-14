@@ -10,7 +10,11 @@ import { initTestMode } from "./testmode.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
-const C = { amb: "#ffb000", dim: "#8a6614", faint: "#2a1f06", grn: "#21e07a", red: "#ff3d3d", cy: "#5ac8ff", wht: "#f4f4f4" };
+// Chart colours come from the CSS palette, so charts follow whichever palette is active.
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = {};
+for (const [k, v] of Object.entries({ amb: "--amb", dim: "--dim", faint: "--faint", grn: "--grn", red: "--red", cy: "--cy", wht: "--wht", grid: "--grid", grid0: "--grid0", fill: "--fill" }))
+  Object.defineProperty(C, k, { get: () => cssVar(v) });
 
 const state = {
   site: null,
@@ -153,9 +157,9 @@ function renderBrief() {
   const num = (v) => (v >= 0 ? "+" : "−") + Math.abs(Math.round(v)).toLocaleString("en-US");
   let h = "";
   if (t.real) {
-    h += row("ELEVATION", `${num(t.heightM)} M`);
+    h += row("HEIGHT", `${num(t.heightM)} M`);
     h += row("SLOPE", `${t.slopeDeg.toFixed(1)}° OVER ${t.slopeBaseM >= 1000 ? (t.slopeBaseM / 1000).toFixed(1) + " KM" : t.slopeBaseM + " M"}`);
-    h += row("SKYLINE", `${sgn(t.min)}° TO ${sgn(t.max)}°`);
+    h += row("SKYLINE HEIGHT", `${sgn(t.min)}° TO ${sgn(t.max)}°`);
     h += row("LOLA MAP", t.maps.join(" + ") + " / PIXEL");
     if (t.reduced) h += row("DETAIL", "REDUCED (CUSTOM POINT)");
   } else {
@@ -215,17 +219,17 @@ function updateCalendar() {
 }
 const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HOURS);
 
+// The answer: can this mission land at this site at this time?
 function renderMission() {
-  const r = state.req, v = state.cal.a.at(calIdx()), box = $("mission");
-  const needs = `${r.days}D MISSION`;
-  if (v.ok) {
-    box.className = "verdict mission go";
-    box.innerHTML = `&gt; LAND AT T0, ${needs}: GO <span>— SUNLIGHT MARGIN ${v.marginOpen ? "OVER " : "+"}${fmtDH(Math.max(0, v.marginHours))} · EARTH LINK ${Math.round(v.earthPct)}% OF MISSION</span>`;
-  } else {
-    const nx = state.cal.windows.find((w) => w.start > state.t0);
-    box.className = "verdict mission nogo";
-    box.innerHTML = `&gt; LAND AT T0, ${needs}: NO-GO <span>— ${v.reasons.join(" · ")}${nx ? ` · NEXT WINDOW ${stamp(nx.start)}` : " · NO WINDOW IN THE NEXT 12 MONTHS"}</span>`;
-  }
+  const r = state.req, v = state.cal.a.at(calIdx()), nx = state.cal.windows.find((w) => w.start > state.t0);
+  $("mission").className = "hero " + (v.ok ? "go" : "nogo");
+  $("mission-word").textContent = v.ok ? "GO" : "NO-GO";
+  $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
+  const line = (s) => `<div>${s}</div>`;
+  $("mission-why").innerHTML = v.ok
+    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
+    : v.reasons.map(line).join("") + line(nx ? `NEXT GOOD WINDOW: ${stamp(nx.start)}` : "NO GOOD WINDOW IN THE NEXT 12 MONTHS");
+  $("mission-next").hidden = v.ok || !nx;
   return v;
 }
 
@@ -238,7 +242,7 @@ function renderWindows() {
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
-    b.innerHTML = `<span>${cur ? "▶ " : ""}${dayStamp(w.start)} <b>${pad(w.start.getUTCHours())}:00 UTC</b></span><span>OPEN ${fmtDH((w.i1 - w.i0) * STEP_HOURS)}</span>`;
+    b.innerHTML = `<span>${cur ? "▶ " : ""}${dayStamp(w.start)} <b>${pad(w.start.getUTCHours())}:00</b></span><span>OPEN ${fmtDH((w.i1 - w.i0) * STEP_HOURS)}</span>`;
     b.title = `Window opens ${stamp(w.start)} and closes ${stamp(w.end)}. Click to land at its start.`;
     b.addEventListener("click", () => setT0(w.start));
     box.appendChild(b);
@@ -301,26 +305,18 @@ function renderMoment() {
   const h = state.idx * STEP_HOURS;
 
   $("bar-now").textContent = stamp(cur.t);
-  $("bar-tplus").textContent = `T+${pad(Math.floor(h / 24))}D${pad(h % 24)}H`;
+  $("bar-tplus").textContent = h ? `(${fmtT(h)} AFTER LANDING)` : "(AT LANDING)";
+  $("clock-head").textContent = h ? `SUN AND EARTH ${fmtT(h)} AFTER LANDING · ${stamp(cur.t)}` : "SUN AND EARTH AT THE LANDING TIME";
 
   const set = (id, on, yes, no) => { const n = $(id); n.textContent = on ? yes : no; n.className = "st " + (on ? "go" : "nogo"); };
-  set("sun-state", cur.sunUp, "SUN — GO", "NO SUN");
+  set("sun-state", cur.sunUp, "SUNLIT", "NO SUN");
   $("sun-next-label").textContent = cur.sunUp ? "SUNSET IN" : "SUNRISE IN";
   $("sun-next").textContent = fmtBig(sunLeft);
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1).padStart(5, "0") + "°";
-  set("earth-state", cur.earthUp, "LINK — GO", "NO LINK");
+  set("earth-state", cur.earthUp, "EARTH IN VIEW", "NO LINK");
   $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
   $("earth-next").textContent = fmtBig(earthLeft);
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1).padStart(5, "0") + "°";
-
-  const v = $("verdict");
-  let cls, head, tail;
-  if (!cur.sunUp) { cls = "nogo"; head = "NO-GO"; tail = `NO SOLAR INPUT · SUNRISE IN ${fmtT(sunLeft)}`; }
-  else if (!cur.earthUp) { cls = "caution"; head = "LIMITED"; tail = `SUNLIT, NO DIRECT-TO-EARTH LINK · RELAY NEEDED · EARTHRISE IN ${fmtT(earthLeft)}`; }
-  else if (sunLeft != null && sunLeft < 72) { cls = "caution"; head = "CAUTION"; tail = `SUNSET IN ${fmtT(sunLeft)} · EARTHSET IN ${fmtT(earthLeft)}`; }
-  else { cls = "go"; head = "GO"; tail = `POWER FOR ${fmtT(sunLeft)} · DIRECT-TO-EARTH LINK FOR ${fmtT(earthLeft)}`; }
-  v.className = "verdict " + cls;
-  v.innerHTML = `&gt; STATUS: ${head} <span>— ${tail}</span>`;
 
   renderHorizon(cur);
   renderTimelineCursor();
@@ -330,7 +326,7 @@ function renderMoment() {
 
 function renderHorizon(cur) {
   const svg = $("horizon");
-  const W = svg.clientWidth || 700, H = svg.clientHeight || 230, L = 34, B = 18, T = 6;
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 230, L = 40, B = 20, T = 6;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.replaceChildren();
   const { horizon, samples } = state.scenario;
@@ -347,14 +343,14 @@ function renderHorizon(cur) {
 
   const span = yMax - yMin, step = span > 60 ? 15 : span > 24 ? 10 : span > 12 ? 5 : 2;
   for (let e = Math.ceil(yMin / step) * step; e <= yMax; e += step) {
-    el("line", { x1: L, x2: W, y1: y(e), y2: y(e), stroke: e === 0 ? "#5a430c" : "#1d1606" }, svg);
-    el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 10, "text-anchor": "end" }, svg, e);
+    el("line", { x1: L, x2: W, y1: y(e), y2: y(e), stroke: e === 0 ? C.grid0 : C.grid }, svg);
+    el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 11.5, "text-anchor": "end" }, svg, e + "°");
   }
   const narrow = W < 520;
   ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].forEach((d, i) => {
-    el("line", { x1: x(i * 45), x2: x(i * 45), y1: T, y2: H - B, stroke: "#1d1606" }, svg);
+    el("line", { x1: x(i * 45), x2: x(i * 45), y1: T, y2: H - B, stroke: C.grid }, svg);
     if (narrow && i % 2) return;
-    el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 10, "text-anchor": "middle" }, svg, narrow ? d : `${pad(i * 45, 3)} ${d}`);
+    el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 11.5, "text-anchor": "middle" }, svg, d);
   });
 
   const track = (key, color) => {
@@ -374,13 +370,13 @@ function renderHorizon(cur) {
     const pt = `${x(az).toFixed(1)},${clampY(horizonAt(horizon, az)).toFixed(1)}`;
     d += "L" + pt; ln += (az ? "L" : "M") + pt;
   }
-  el("path", { d: d + `L${x(360)},${H - B}Z`, fill: "#120d02", stroke: "none" }, svg);
+  el("path", { d: d + `L${x(360)},${H - B}Z`, fill: C.fill, stroke: "none" }, svg);
   el("path", { d: ln, fill: "none", stroke: C.amb, "stroke-width": 1.6 }, svg);
 
   // bodies
   const label = (cx, cy, text, color) => {
     const right = cx < W - 130;
-    el("text", { x: cx + (right ? 12 : -12), y: Math.max(T + 10, cy - 9), fill: color, "font-size": 11, "font-weight": 600, "text-anchor": right ? "start" : "end" }, svg, text);
+    el("text", { x: cx + (right ? 12 : -12), y: Math.max(T + 10, cy - 9), fill: color, "font-size": 12.5, "font-weight": 600, "text-anchor": right ? "start" : "end" }, svg, text);
   };
   const sx = x(cur.sunAz), sy = clampY(cur.sunEl);
   const g = el("g", { transform: `translate(${sx},${sy})`, opacity: cur.sunUp ? 1 : 0.55 }, svg);
@@ -393,7 +389,7 @@ function renderHorizon(cur) {
 }
 
 // ---------- timeline ----------
-const TL = { left: 52, right: 4, top: 16, rowH: 16, gap: 5 };
+const TL = { left: 58, right: 4, top: 18, rowH: 16, gap: 5 };
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -412,7 +408,7 @@ function renderTimeline() {
       el("rect", { x: TL.left + i * w, y: yy, width: Math.max(1, (j - i) * w), height: TL.rowH, fill: color }, svg);
       i = j;
     }
-    el("text", { x: 0, y: yy + TL.rowH / 2 + 4, fill: color, "font-size": 11 }, svg, name);
+    el("text", { x: 0, y: yy + TL.rowH / 2 + 4, fill: color, "font-size": 12.5 }, svg, name);
   });
   const yAxis = TL.top + 3 * (TL.rowH + TL.gap);
   const every = W < 520 ? 10 : 5;
@@ -420,12 +416,12 @@ function renderTimeline() {
     const xx = TL.left + Math.min(n, day * 24 / STEP_HOURS) * w;
     el("line", { x1: xx, x2: xx, y1: TL.top - 4, y2: yAxis, stroke: "#000", "stroke-width": 1 }, svg);
     const d = samples[Math.min(n - 1, day * 24 / STEP_HOURS)].t;
-    el("text", { x: xx, y: yAxis + 11, fill: C.dim, "font-size": 10, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
-      `${day ? "+" + day + "D" : "T0"}${W < 520 && day ? "" : ` ${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}`}`);
+    el("text", { x: xx, y: yAxis + 12, fill: C.dim, "font-size": 11.5, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
+      W < 520 || day === 30 ? (day ? `+${day}D` : "LANDING") : `${day ? "+" + day + "D · " : ""}${pad(d.getUTCDate())} ${MONTHS[d.getUTCMonth()]}`);
   }
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
-  el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 9 }, svg, state.req.days < 30 ? `MISSION ${state.req.days}D` : "");
+  el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, state.req.days < 30 ? `THE ${state.req.days}-DAY MISSION` : "");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
 }
@@ -508,6 +504,7 @@ async function init() {
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
+  $("mission-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
     onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
@@ -559,6 +556,7 @@ async function init() {
 
 init().catch((e) => {
   console.error(e);
-  $("verdict").className = "verdict nogo";
-  $("verdict").textContent = "> DATA FAILED TO LOAD. SERVE THE FOLDER OVER HTTP (SEE README) AND RELOAD.";
+  $("mission").className = "hero nogo";
+  $("mission-word").textContent = "ERROR";
+  $("mission-why").textContent = "THE DATA FILES DID NOT LOAD. SERVE THE FOLDER OVER HTTP (SEE THE README) AND RELOAD.";
 });

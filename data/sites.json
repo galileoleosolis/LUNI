@@ -3,7 +3,7 @@
  "sites": [
   {
    "id": "nobile1",
-   "name": "Nobile Rim 1 · best-lit point",
+   "name": "Nobile Rim 1",
    "tag": "ARTEMIS III",
    "group": "South pole — candidate regions",
    "lat": -85.2979,
@@ -13,7 +13,7 @@
   },
   {
    "id": "malapert",
-   "name": "Malapert Massif · best-lit point",
+   "name": "Malapert Massif",
    "tag": "ARTEMIS III",
    "group": "South pole — candidate regions",
    "lat": -85.9908,

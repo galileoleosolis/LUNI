@@ -4,7 +4,8 @@ import * as THREE from "../vendor/three.module.min.js";
 import { OrbitControls } from "../vendor/OrbitControls.js";
 
 const DEG = Math.PI / 180;
-const AMBER = 0xffb000;
+// marker and grid colour follows the page palette
+const AMBER = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--amb").trim() || "#ffb000");
 
 // lat/lon (deg, east positive) -> position on a sphere of radius r.
 // Matches three.js SphereGeometry UVs with a texture centred on lon 0.

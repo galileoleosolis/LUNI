@@ -1,8 +1,10 @@
 // Landing-window calendar: one cell per day for the next 12 months.
 const SVGNS = "http://www.w3.org/2000/svg";
-const C = { amb: "#ffb000", dim: "#8a6614", grn: "#21e07a", cy: "#5ac8ff", wht: "#f4f4f4", off: "#1b1b1b" };
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = { off: "#1b1b1b" };
+for (const [k, v] of Object.entries({ amb: "--key-y", dim: "--dim", grn: "--grn", cy: "--cy", wht: "--wht" })) Object.defineProperty(C, k, { get: () => cssVar(v) });
 const MON = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-export const CAL = { left: 52, right: 4, top: 12, landH: 22, rowH: 6, gap: 3 };
+export const CAL = { left: 58, right: 4, top: 12, landH: 22, rowH: 6, gap: 3 };
 
 function el(tag, attrs, parent, text) {
   const n = document.createElementNS(SVGNS, tag);
@@ -21,9 +23,9 @@ export function renderCalendar(svg, days, { t0Day, missionDays }) {
   const yLand = CAL.top, ySun = yLand + CAL.landH + CAL.gap, yEarth = ySun + CAL.rowH + 2, yAxis = yEarth + CAL.rowH;
   const iso = (d) => d.toISOString().slice(0, 10);
 
-  el("text", { x: 0, y: yLand + CAL.landH / 2 + 4, fill: C.grn, "font-size": 11 }, svg, "LAND");
-  el("text", { x: 0, y: ySun + 6, fill: C.dim, "font-size": 8 }, svg, "SUN");
-  el("text", { x: 0, y: yEarth + 6, fill: C.dim, "font-size": 8 }, svg, "EARTH");
+  el("text", { x: 0, y: yLand + CAL.landH / 2 + 4, fill: C.grn, "font-size": 12.5 }, svg, "LAND");
+  el("text", { x: 0, y: ySun + 6, fill: C.dim, "font-size": 9.5 }, svg, "SUN");
+  el("text", { x: 0, y: yEarth + 6, fill: C.dim, "font-size": 9.5 }, svg, "EARTH");
 
   days.forEach((d, i) => {
     const x = CAL.left + i * w, cw = Math.max(0.6, w - (w > 3 ? 0.6 : 0));
@@ -33,7 +35,7 @@ export function renderCalendar(svg, days, { t0Day, missionDays }) {
     if (d.earth > 0) el("rect", { x, y: yEarth, width: cw, height: CAL.rowH, fill: C.cy, opacity: 0.25 + 0.75 * d.earth }, svg);
     if (d.t.getUTCDate() === 1) {
       el("line", { x1: x, x2: x, y1: yLand - 3, y2: yAxis + 3, stroke: C.dim, "stroke-width": 1 }, svg);
-      if (x < W - 30) el("text", { x: x + 3, y: yAxis + 12, fill: C.dim, "font-size": 10 }, svg,
+      if (x < W - 30) el("text", { x: x + 3, y: yAxis + 13, fill: C.dim, "font-size": 11.5 }, svg,
         MON[d.t.getUTCMonth()] + (d.t.getUTCMonth() === 0 ? " '" + String(d.t.getUTCFullYear()).slice(2) : ""));
     }
   });

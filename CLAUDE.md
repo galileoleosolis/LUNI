@@ -37,6 +37,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
+- Look: blue palette is the default (`:root` in `css/style.css`; `?palette=amber|ice|mono` previews others). The user
+  asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
+- No jargon on screen: say "landing" not "T0", dates as `14 JAN 2027 01:00 UTC`, never a bare "Z".
 
 ## Open work, roughly in priority order
 1. **TURN ON GITHUB PAGES — NOT DONE YET, DO NOT FORGET.** The code is pushed to

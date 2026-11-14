@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>LUNO · Lunar Utility for Navigational Operations</title>
+  <script>(() => { const p = new URLSearchParams(location.search).get("palette"); if (p) document.documentElement.dataset.palette = p; })();</script>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -19,36 +20,37 @@
 
   <div class="screen">
     <header class="bar">
-      <span class="name">LUNO // LUNAR UTILITY FOR NAVIGATIONAL OPERATIONS</span>
+      <span class="name">LUNO</span>
       <span>SITE <b id="bar-site"></b></span>
-      <span>T0 <b id="bar-t0"></b></span>
-      <span class="r">NOW <b id="bar-now"></b> <span id="bar-tplus"></span></span>
+      <span>LANDING <b id="bar-t0"></b></span>
+      <span class="r">MISSION CLOCK <b id="bar-now"></b> <span id="bar-tplus"></span></span>
     </header>
 
     <div class="cols">
       <!-- LEFT: site + date -->
       <section class="col col-site">
-        <h3><b class="step">1</b>WHERE · CLICK A SITE IN THE LIST OR ON THE MOON</h3>
+        <h3><b class="step">1</b>WHERE · CLICK A SITE</h3>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
           <div id="globe-tip" class="globe-tip" hidden></div>
           <div id="globe-labels" class="globe-labels"></div>
           <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
         </div>
-        <div class="k-hint">NUMBERED DOTS = THE SITES BELOW · DRAG TO TURN · SCROLL TO ZOOM</div>
+        <div class="k-hint">NUMBERED DOTS = THE SITES BELOW</div>
         <div id="site-list" class="site-list"></div>
         <div class="fields">
           <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
           <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
         </div>
         <p id="site-note" class="note"></p>
-        <h3 style="margin-top:12px"><b class="step">2</b>WHEN · LANDING TIME (UTC)</h3>
+        <h3 class="gap"><b class="step">2</b>WHEN · PICK THE LANDING TIME</h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
           <select id="t0-month" aria-label="Month"></select>
           <select id="t0-year" aria-label="Year"></select>
           <select id="t0-hour" aria-label="Hour, UTC"></select>
         </div>
+        <p class="note">UTC = WORLD TIME (SAME AS GMT)</p>
       </section>
 
       <!-- CENTER: the answer -->
@@ -71,28 +73,40 @@
             </div>
           </div>
         </div>
-        <h3><b class="step">3</b>RESULT · AT THE LANDING TIME, THEN AS THE MISSION CLOCK RUNS</h3>
+        <h3><b class="step">3</b>THE ANSWER · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <div id="mission" class="hero">
+          <div class="hero-word" id="mission-word"></div>
+          <div class="hero-text">
+            <div class="hero-title" id="mission-title"></div>
+            <div class="hero-why" id="mission-why"></div>
+          </div>
+          <button id="mission-next" class="hero-next" hidden>GO TO THE NEXT<br>GOOD WINDOW ▸</button>
+        </div>
+
+        <h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
         <div class="readouts">
           <div class="ro">
-            <div class="lab">☀ POWER</div>
-            <div class="st" id="sun-state"></div>
+            <div class="ro-a">
+              <div class="lab">☀ POWER</div>
+              <div class="st" id="sun-state"></div>
+              <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
+            </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b></div>
-            <div class="mini">EL <b id="sun-el"></b> &nbsp; AZ <b id="sun-az"></b></div>
           </div>
           <div class="ro">
-            <div class="lab">⊕ EARTH LINK</div>
-            <div class="st" id="earth-state"></div>
+            <div class="ro-a">
+              <div class="lab">⊕ EARTH LINK</div>
+              <div class="st" id="earth-state"></div>
+              <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
+            </div>
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b></div>
-            <div class="mini">EL <b id="earth-el"></b> &nbsp; AZ <b id="earth-az"></b></div>
           </div>
         </div>
-        <div id="verdict" class="verdict"></div>
-        <div id="mission" class="verdict mission"></div>
 
-        <h3>LOCAL HORIZON · LOOKING OUT FROM THE SITE · AZ 000–360 · EL DEG</h3>
+        <h3>VIEW FROM THE SITE · THE SKYLINE ALL THE WAY ROUND, WITH THE SUN AND EARTH</h3>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
 
-        <h3>VISIBILITY · T0 → T0+30D · CLICK OR DRAG TO SCRUB</h3>
+        <h3>FIRST 30 DAYS AFTER LANDING · CLICK OR DRAG TO MOVE THE MISSION CLOCK</h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
 
         <h3 id="cal-title">GOOD LANDING DAYS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
@@ -101,28 +115,29 @@
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side">
-        <h3><b class="step">4</b>MISSION NEEDS · WHAT COUNTS AS A GOOD LANDING</h3>
+        <h3><b class="step">4</b>MISSION NEEDS · WHAT COUNTS AS GOOD</h3>
         <div class="needs">
-          <div class="need"><span>LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
-          <div class="need"><span>DARK GAP ≤</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
-          <div class="need"><span>EARTH LINK ≥</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
-          <div class="need"><span>EARTH AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+          <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
+          <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
+          <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
+          <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
         </div>
-        <h3 style="margin-top:12px">NEXT GOOD LANDING WINDOWS · CLICK TO GO THERE</h3>
+        <h3 class="gap">NEXT GOOD LANDING WINDOWS · CLICK ONE TO GO THERE</h3>
         <div id="windows" class="windows"></div>
-        <h3 style="margin-top:14px">30-DAY SUMMARY FROM T0</h3>
-        <table class="sum">
-          <tr><td>SUNLIT</td><td id="pct-sun"></td></tr>
-          <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
-          <tr><td>BOTH</td><td id="pct-both"></td></tr>
-          <tr><td>MAX DARK</td><td id="max-dark"></td></tr>
-        </table>
-        <h3 style="margin-top:14px">SITE · FROM LOLA ELEVATION DATA</h3>
-        <table class="sum" id="brief-lola"></table>
-        <h3 style="margin-top:14px">COMPARE</h3>
+        <h3 class="gap">COMPARE · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
-        <h3 style="margin-top:14px">KEYBOARD</h3>
-        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D &nbsp; <b>N</b> NEXT WINDOW &nbsp; <b>A</b> AREA SCAN<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
+        <details class="more">
+          <summary>MORE NUMBERS</summary>
+          <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
+          <table class="sum">
+            <tr><td>IN SUNLIGHT</td><td id="pct-sun"></td></tr>
+            <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
+            <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
+            <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
+          </table>
+          <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
+          <table class="sum" id="brief-lola"></table>
+        </details>
         <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
     </div>
