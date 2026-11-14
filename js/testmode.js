@@ -7,7 +7,7 @@ import { sampleSite, hoursUntilChange } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v2";
+const KEY = "luno-test-v3";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -230,7 +230,7 @@ function showReport() {
     <h2>YOUR REPORT IS READY</h2>
     <p>Press COPY, then paste it into a message to the person who asked you to test. Thank you!</p>
     <textarea id="test-report-text" class="test-report" readonly rows="14"></textarea>
-    <div class="test-actions"><button class="test-btn go" id="test-copy">COPY REPORT</button><span id="test-copied" class="test-small"></span><button class="test-btn" id="test-close">CLOSE AND KEEP EXPLORING</button></div>`);
+    <div class="test-actions"><button class="test-btn go" id="test-copy">COPY REPORT</button><span id="test-copied" class="test-small"></span><button class="test-btn" id="test-close">CLOSE AND KEEP EXPLORING</button><button class="test-btn" id="test-again">START A NEW TEST</button></div>`);
   const ta = $("test-report-text"); ta.value = text;
   o.querySelector("#test-copy").addEventListener("click", () => {
     const ok = () => { $("test-copied").textContent = "COPIED. NOW PASTE IT INTO A MESSAGE."; };
@@ -238,6 +238,7 @@ function showReport() {
     try { navigator.clipboard.writeText(text).then(ok, manual); } catch { manual(); }
   });
   o.querySelector("#test-close").addEventListener("click", closeOverlay);
+  o.querySelector("#test-again").addEventListener("click", () => { try { sessionStorage.removeItem(KEY); } catch {} T = null; showIntro(); });
 }
 
 export function initTestMode(hooks) {
