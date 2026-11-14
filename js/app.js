@@ -569,6 +569,8 @@ const assistantApi = {
 
 // ---------- wiring ----------
 async function init() {
+  // The work-in-progress copy on the public site lives under /next/: say so on the unit, so nobody mistakes it for the release.
+  if (/\/next\//.test(location.pathname)) document.querySelector(".unit-top span").insertAdjacentHTML("beforeend", ' <b class="wip">· TEST BUILD, NOT THE RELEASED VERSION</b>');
   fitStage();
   await Promise.all([loadSites(), initModel()]);
   state.site = SITES[0];
