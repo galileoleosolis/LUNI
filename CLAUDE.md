@@ -74,12 +74,15 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - No jargon on screen: say "landing" not "T0", dates as `14 JAN 2027 01:00 UTC`, never a bare "Z".
 
 ## Open work, roughly in priority order
-1. **TURN ON GITHUB PAGES — NOT DONE YET, DO NOT FORGET.** The code is pushed to
-   https://github.com/galileoleosolis/LUNI (branch `main`), but Pages is still off, so there is no public link
-   for the judges. To finish: repo Settings → Pages → "Deploy from a branch" → `main`, `/ (root)` → Save
-   (or `gh api -X POST repos/galileoleosolis/LUNI/pages -f 'source[branch]=main' -f 'source[path]=/'` once the
-   user says to). Then check `https://galileoleosolis.github.io/LUNI/` loads, add an empty `.nojekyll` file if
-   anything is missing, and put the link in the README and the project submission. The user asked to do this later.
+1. **GITHUB PAGES: THE USER STILL HAS TO SWITCH IT ON.** This session cannot change repository settings (the
+   API path is blocked on purpose; do not work around it). The user does: repo Settings → Pages → "Deploy from a
+   branch" → branch **`release`**, folder `/ (root)` → Save. Then check `https://galileoleosolis.github.io/LUNI/` and
+   `.../LUNI/next/` load, and put the link in the README and the project submission.
+   **Branches:** `main` is work in progress and is never served. `release` is what Pages serves: the released
+   version at the root and the newest work in `next/` (the page labels itself TEST BUILD there). Only
+   `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
+   `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
+   Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: LUNO's side is built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column). Still to do:
    the user tries it with real OpenSpace, with LUNO opened from their own computer or GitHub Pages (not the preview).

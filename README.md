@@ -66,3 +66,12 @@ python3 tools/fetch_horizons_fixtures.py                        # refresh the JP
 
 ## AI disclosure
 Code written with the help of Claude (Anthropic), directed and tested by the team.
+
+## Publishing
+
+GitHub Pages serves the `release` branch, not `main`:
+
+- `/LUNI/` is the released version.
+- `/LUNI/next/` is the newest work in progress (it says TEST BUILD at the top).
+
+`tools/release.sh next` copies the current commit into `next/` only. `tools/release.sh promote` also makes it the released version; `tools/release.sh promote <commit>` rolls the released version back to an older commit.
