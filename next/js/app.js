@@ -655,7 +655,7 @@ async function init() {
     },
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
-  $("scan-btn").addEventListener("click", () => scan.keyPress());
+  $("scan-btn").addEventListener("click", () => scan.toggle());      // a plain open / close toggle for the scan menu (the user asked for this)
   $("side-scan").addEventListener("click", () => scan.toggle(true));
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
