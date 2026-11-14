@@ -111,7 +111,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--cy); outlin
 
 svg { display: block; width: 100%; }
 svg text { font-family: var(--mono); }
-.horizon { flex: 1 1 0 !important; min-height: 66px; margin-bottom: 8px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; box-sizing: content-box; }
+.horizon { flex: 1 1 0 !important; min-height: 56px; margin-bottom: 8px; border-bottom: 1px solid var(--dim); padding-bottom: 8px; box-sizing: content-box; }
 .verdict.mission { margin-bottom: 8px; }
 .timeline { height: 96px; margin-bottom: 8px; cursor: ew-resize; touch-action: none; }
 
@@ -136,8 +136,8 @@ svg text { font-family: var(--mono); }
 .cmp .tag-go { background: var(--grn); } .cmp .tag-nogo { background: var(--red); }
 
 /* area scan */
-.col-main { position: relative; }
-.scan { position: absolute; inset: 0 0 -14px 0; z-index: 5; background: #000; padding: 12px 16px 0; display: flex; flex-direction: column; }
+.col-main { position: relative; overflow: hidden; }      /* nothing in the middle column may spill over the keys */
+.scan { position: absolute; inset: 0; z-index: 5; background: #000; padding: 12px 16px 0; display: flex; flex-direction: column; }
 .scan[hidden] { display: none; }
 .scan-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; border-bottom: 1px solid var(--dim); padding-bottom: 8px; color: var(--wht); font-weight: 600; text-transform: uppercase; }
 .scan-head button { background: none; border: 1px solid var(--dim); color: var(--amb); font: inherit; padding: 2px 8px; cursor: pointer; white-space: nowrap; }
@@ -231,7 +231,7 @@ input[type=number] { font-size: 14px; }
 
 /* Sun and Earth: supporting detail */
 .readouts { gap: 0; margin-bottom: 0; padding-bottom: 6px; }
-.nasa-check { font-size: 11px; letter-spacing: .04em; color: var(--dim); border-bottom: 1px solid var(--dim); padding-bottom: 7px; margin-bottom: 10px; }
+.nasa-check { font-size: 11px; letter-spacing: .04em; color: var(--dim); border-bottom: 1px solid var(--dim); padding-bottom: 7px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; }
 .nasa-check a { color: var(--wht); font-weight: 600; margin: 0 4px; }
 .nasa-check a:hover { color: var(--amb); }
 .nasa-check span { color: var(--quiet); }
@@ -300,6 +300,7 @@ html.flow .screen { padding: 10px; }
 html.flow .cols { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
 html.flow .col { padding: 12px 0 0; }
 html.flow .col-site { border-right: none; border-bottom: 1px solid var(--dim); padding-bottom: 12px; }
+html.flow .col-main { overflow: visible; }
 html.flow .col-side { border-left: none; border-top: 1px solid var(--dim); margin-top: 12px; overflow: visible; }
 html.flow .globe-wrap { flex: none !important; height: 270px; max-height: none; }
 html.flow .site-list { flex: none !important; max-height: 154px; }
