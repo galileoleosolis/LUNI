@@ -26,6 +26,13 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   shadows, and LUNI's calculated skyline is drawn over it as a check. Detail settings from LOW to ULTRA.
 - **Eclipses and partial Sun:** eclipses (Earth in front of the Sun) are detected and flagged on the verdict, the
   timeline and the Sun readout; the Sun readout shows the share of the disc in view when it is partly hidden.
+- **Opening scene and proof:** LUNI opens on a real landing (IM-2 Athena, 6 March 2025). The PROOF panel shows the
+  JPL Horizons check, replays three real landings (IM-2, Blue Ghost Mission 1, Chandrayaan-3) next to sourced accounts
+  of what happened, and lists what LUNI does not model. Mission facts and their sources are in `js/stories.js`.
+- **Share link:** COPY LINK puts the site, landing time and mission needs in the address, so a link opens the same question.
+- **Slope need:** an optional limit on ground slope (from LOLA), respected by the verdict, the calendar and the area scan.
+- **This site next to Earth:** longest sunlight and dark spells, the Sun's highest point, how long a sunset takes, and
+  how little Earth moves in the sky, from a year of hourly positions.
 - **Sun and Earth positions:** NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
 - **Terrain:** skylines for the preset sites are pre-computed from LRO LOLA elevation maps (`data/horizons.json`),
   with the observer 2 m above the surface. Custom points and the area scan compute skylines in the browser from reduced

@@ -542,7 +542,7 @@ html.flow .answer-row { display: block; border-bottom: none; padding-bottom: 0; 
 .story-btns button { background: #000; color: var(--wht); border: 1px solid var(--hi); font: inherit; font-size: 13px; font-weight: 700; padding: 1px 8px; cursor: pointer; white-space: nowrap; }
 .story-btns button:hover { background: var(--hi); color: #000; }
 #story-x { border-color: var(--dim); color: var(--dim); padding: 1px 6px; }
-html.flow .story { display: block; } html.flow .story-btns { margin-top: 6px; }
+html.flow .story:not([hidden]) { display: block; } html.flow .story-btns { margin-top: 6px; }
 .proof-card.hot { border-color: var(--hi); box-shadow: 0 0 0 1px var(--hi); }
 /* room for the story strip and the slope need: tighter rows in the left column, one-line Sun / Earth numbers */
 .col-site h3.gap { margin-top: 11px; } .col-site .note { margin-top: 3px; min-height: 0; } .col-site .needs { gap: 1px; } .col-site .need + .need { margin-top: 1px; }
@@ -585,3 +585,4 @@ html.flow .proof { position: fixed; inset: 0; padding: 10px; z-index: 31; } html
 @keyframes guide-pulse { 50% { outline-color: transparent; } }
 a.nasa-check { margin-left: 8px; font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: .02em; color: var(--hi); text-decoration: underline; } a.nasa-check:hover { color: var(--wht); }
 .answer-row { margin-bottom: 7px; padding-bottom: 7px; } .horizon { margin-bottom: 6px; padding-bottom: 5px; }
+.tight .tiles-head .long { display: none; }
