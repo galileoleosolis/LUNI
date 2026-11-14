@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Fetch reference Sun/Earth azimuth+elevation from JPL Horizons for a few lunar surface sites.
-Writes tests/horizons_fixtures.json, which tests/check_ephemeris.mjs compares against LUNO's own numbers."""
+Writes tests/horizons_fixtures.json, which tests/check_ephemeris.mjs compares against LUNI's own numbers."""
 import json, os, re, subprocess, urllib.parse
 
 SITES = [  # name, lat, east lon

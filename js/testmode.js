@@ -168,7 +168,7 @@ const SET_D = [
     type: "choice", options: ["GO", "NO-GO"],
     expected: () => (mission("nobile1", D_LUNI + ":00Z", { days: 28 }).v.ok ? "GO" : "NO-GO") },
   { id: "d-scan-dist", short: "Distance to the best point near Malapert",
-    text: "Put MISSION LENGTH back to 10. New situation: choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC. It is a NO-GO. Have LUNO look for a better spot nearby and wait until it has finished. Question: how far away is the best point it finds, in km?",
+    text: "Put MISSION LENGTH back to 10. New situation: choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC. It is a NO-GO. Have LUNI look for a better spot nearby and wait until it has finished. Question: how far away is the best point it finds, in km?",
     reach: { label: "got Malapert Massif at 2027-02-08T00:00 (a NO-GO) on screen", test: (s) => s.site.id === D_SCAN.site && s.t0.toISOString().slice(0, 16) === D_SCAN.t0 },
     type: "number", unit: "KM", step: 0.01,
     // The best point depends on how fine a map this computer scanned, so the right answer is what its own scan showed.
@@ -250,7 +250,7 @@ const closeOverlay = () => { $("test-overlay").hidden = true; };
 
 function showIntro() {
   const o = overlay(`
-    <h2>LUNO · FIRST-USE TEST</h2>
+    <h2>LUNI · FIRST-USE TEST</h2>
     <p>Thanks for helping. You are testing the tool. The tool is not testing you: if something is hard to find, that is the tool's fault and exactly what we need to know.</p>
     <ul>
       <li>You are a mission planner choosing where and when to land on the Moon.</li>
@@ -344,7 +344,7 @@ export function buildReport(S, env) {
   const acts = S.events.filter((e) => e[2] === "click" || e[2] === "input");
   const used = Object.entries(FEATURES).map(([name, re]) => [name, acts.filter((e) => re.test(e[3])).length]);
   const L = [];
-  L.push("=== LUNO FIRST-USE TEST REPORT ===");
+  L.push("=== LUNI FIRST-USE TEST REPORT ===");
   L.push(`Date: ${new Date(S.started).toISOString().slice(0, 16)}Z | Window: ${env.window} | Layout: ${env.layout} | Browser: ${env.browser}`);
   L.push(`Task set: ${SET_NAME}`);
   L.push(`Total time: ${mmss(S.totalSeconds)} | Clicks in the app: ${clicks.length} | Shortcut keys: ${keys.length}`);

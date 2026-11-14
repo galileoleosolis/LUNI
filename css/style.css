@@ -1,4 +1,4 @@
-/* LUNO — mission-console screen inside a rugged field unit */
+/* LUNI — mission-console screen inside a rugged field unit */
 @font-face { font-family: "Plex Mono"; font-weight: 400; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Plex Mono"; font-weight: 600; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); }
 @font-face { font-family: "Barlow Cond"; font-weight: 600; font-display: swap; src: url("../assets/fonts/barlow-condensed-latin-600-normal.woff2") format("woff2"); }
@@ -266,7 +266,7 @@ html.flow .toast { position: fixed; top: 10px; }
 .col-site .need { margin-top: -1px; }
 html.flow .site-list { max-height: 260px; }
 
-/* ---------- ASK LUNO: command line, talk button, answers ---------- */
+/* ---------- ASK LUNI: command line, talk button, answers ---------- */
 .screen { position: relative; }
 .comms { position: absolute; left: 10px; right: 10px; bottom: 8px; z-index: 12; background: #000; border: 1px solid var(--cy); box-shadow: 0 -10px 30px #000, 0 0 0 4px #000; padding: 10px 12px 8px; display: flex; flex-direction: column; gap: 7px; }
 .comms[hidden] { display: none; }

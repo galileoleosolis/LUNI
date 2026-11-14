@@ -1,21 +1,21 @@
 // Optional: a language model running on this computer, for questions the built-in commands do not cover.
-// LUNO talks to a local model server (Ollama, LM Studio, Lemonade, llama.cpp, OpenVINO model server: they all
+// LUNI talks to a local model server (Ollama, LM Studio, Lemonade, llama.cpp, OpenVINO model server: they all
 // speak the same "chat completions with tools" protocol). The model never gets to make up numbers on its own
-// authority: it can only call LUNO's tools (js/assistant.js) and is told to answer from what they return.
-// Nothing here runs unless the user has set an address and a model in the ASK LUNO panel.
+// authority: it can only call LUNI's tools (js/assistant.js) and is told to answer from what they return.
+// Nothing here runs unless the user has set an address and a model in the ASK LUNI panel.
 
 import { TOOLS } from "./assistant.js";
 
 export const PRESETS = [["OLLAMA", "http://localhost:11434/v1"], ["LM STUDIO", "http://localhost:1234/v1"], ["LEMONADE", "http://localhost:8000/api/v1"]];
 const KEY = "luno-llm", MAX_ROUNDS = 12, TIMEOUT_MS = 90000;
 
-const SYSTEM = (sites, needs) => `You are LUNI (Lunar Utility Navigational Intelligence), the on-board assistant of LUNO, a lunar landing planning unit. You control LUNO only through the tools you are given.
+const SYSTEM = (sites, needs) => `You are LUNI (Lunar Utility Navigational Intelligence), a lunar landing planning unit with a built-in assistant. You control LUNI only through the tools you are given.
 Rules:
 - Every number, date and GO / NO-GO you state must come from a tool result in this conversation. If the tools did not give it, say you do not have it. Never estimate.
 - To answer a question about a site, a time or the mission needs, set them with the tools first, then read the result. The "report" tool reads the current screen without changing it.
-- When comparing several sites or dates, try each one with the tools and report what LUNO returned for each. Leave the screen on the option you recommend.
+- When comparing several sites or dates, try each one with the tools and report what LUNI returned for each. Leave the screen on the option you recommend.
 - Answer in at most three short sentences, plain words, American spelling. Write dates like 14 JAN 2027 01:00 UTC.
-- If the request has nothing to do with choosing a landing site or time on the Moon, say that LUNO cannot help with it.
+- If the request has nothing to do with choosing a landing site or time on the Moon, say that LUNI cannot help with it.
 Preset sites (id: name): ${sites.map((s) => `${s.id}: ${s.name}`).join("; ")}.
 Mission need choices: days ${needs.days.join("/")}; maxDarkH ${needs.maxDarkH.join("/")}; earthMinPct ${needs.earthMinPct.join("/")}; earthAtLanding true/false.`;
 
@@ -48,7 +48,7 @@ export function createModelLink({ assistant, sites, needOptions }) {
     return (j.data || j.models || []).map((m) => m.id || m.name).filter(Boolean);
   }
 
-  // One question: let the model call LUNO's tools until it has an answer.
+  // One question: let the model call LUNI's tools until it has an answer.
   async function ask(text, { onStep, signal } = {}) {
     const tools = TOOLS.map((t) => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.input_schema } }));
     const messages = [{ role: "system", content: SYSTEM(sites(), needOptions()) }, { role: "user", content: text }];

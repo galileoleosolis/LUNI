@@ -187,7 +187,7 @@ export async function createSurfaceView(container, { site, quality = "medium", e
       earth.rotation.y = -0.6;
       dirty = true;
     },
-    // LUNO's computed skyline (elevation per azimuth, deg) drawn as a line in the sky, or null to hide it.
+    // LUNI's computed skyline (elevation per azimuth, deg) drawn as a line in the sky, or null to hide it.
     setSkyline(horizon) {
       if (skyline) { scene.remove(skyline); skyline.geometry.dispose(); skyline = null; }
       if (horizon) {

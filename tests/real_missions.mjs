@@ -1,4 +1,4 @@
-// Real-mission check: when does LUNO say the Sun rose and set at real landing sites?
+// Real-mission check: when does LUNI say the Sun rose and set at real landing sites?
 // Run: node tests/real_missions.mjs
 import { readFileSync } from "node:fs";
 import { initEphemeris } from "../js/ephem.js";

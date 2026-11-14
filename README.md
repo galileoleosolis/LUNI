@@ -1,8 +1,8 @@
-# LUNO — Lunar Utility for Navigational Operations
+# LUNI — Lunar Utility Navigational Intelligence
 
 NASA Space Apps Challenge 2026 · *Lunar Landing Site Navigator*
 
-Pick a lunar landing site and date, and LUNO shows the Sun and Earth against the local terrain horizon:
+Pick a lunar landing site and date, and LUNI shows the Sun and Earth against the local terrain horizon:
 how long you'll have solar power, when direct-to-Earth communication is possible, and how a launch slip changes that.
 
 **Try it: https://galileoleosolis.github.io/LUNI/** (the newest work in progress is at `/LUNI/next/`)
@@ -23,7 +23,7 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   Earth link are best; click a cell to move the site there.
 - **3D surface view:** stand at the site and look around. The ground is built from LOLA elevation data (40 m detail
   near the polar presets, coarser out to 260 km, with the Moon's curvature), lit from the Sun's real direction with cast
-  shadows, and LUNO's calculated skyline is drawn over it as a check. Detail settings from LOW to ULTRA.
+  shadows, and LUNI's calculated skyline is drawn over it as a check. Detail settings from LOW to ULTRA.
 - **Eclipses and partial Sun:** eclipses (Earth in front of the Sun) are detected and flagged on the verdict, the
   timeline and the Sun readout; the Sun readout shows the share of the disc in view when it is partly hidden.
 - **Sun and Earth positions:** NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
@@ -32,14 +32,14 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   LOLA maps (`data/dem`, 240 m to 3.8 km per pixel), so they are less detailed than the presets.
 
 ## Checks
-- `node tests/check_ephemeris.mjs` compares LUNO with 1,110 JPL Horizons values (6 sites, 4 date ranges): worst error 0.0007°.
+- `node tests/check_ephemeris.mjs` compares LUNI with 1,110 JPL Horizons values (6 sites, 4 date ranges): worst error 0.0007°.
 - `node tests/check_terrain.mjs` compares the in-browser terrain method with the full-resolution skylines (mean difference 0.04–1.0°).
 - `node tests/check_mission.mjs` tests the mission-needs rules (synthetic cases, plus 9,680 real landing hours re-checked the long way).
 - `node tests/check_scan.mjs` tests the area scan (grid geometry, agreement with a direct evaluation, finds the Shackleton ridge). At south-polar sites the scan computes its skylines on the graphics chip when the browser has one, which allows a point on every 250 m map pixel (up to 121 x 121). Each run checks the chip against the processor at the site and falls back to the processor if they disagree. Checked so far on an emulated chip only: skylines within 0.001 degrees, no GO / NO-GO difference in 1,085 points.
 - `node tests/check_eclipses.mjs` lists every eclipse in 2023–2035 as seen from the Moon and checks the partial-Sun math.
-- `node tests/check_assistant.mjs` tests ASK LUNI (typed or spoken commands): about 60 sentences must turn into the right actions, and the answers must use only the numbers LUNO computed. A real microphone has not been tested yet. ASK LUNI can also hand open questions to a language model running on the same computer (Ollama, LM Studio and similar); that link has only been tested against a scripted stand-in, not a real model.
-- `node tests/real_missions.mjs` prints LUNO's sunrise/sunset for the Chandrayaan-3, IM-1 and IM-2 landing sites.
-- At 89.45°S 222.69°E (a well-known high-illumination ridge near Shackleton) LUNO gets about 81% sunlight over 2026 at 2 m
+- `node tests/check_assistant.mjs` tests ASK LUNI (typed or spoken commands): about 60 sentences must turn into the right actions, and the answers must use only the numbers LUNI computed. A real microphone has not been tested yet. ASK LUNI can also hand open questions to a language model running on the same computer (Ollama, LM Studio and similar); that link has only been tested against a scripted stand-in, not a real model.
+- `node tests/real_missions.mjs` prints LUNI's sunrise/sunset for the Chandrayaan-3, IM-1 and IM-2 landing sites.
+- At 89.45°S 222.69°E (a well-known high-illumination ridge near Shackleton) LUNI gets about 81% sunlight over 2026 at 2 m
   and 93% at 10 m, in line with published LOLA illumination studies.
 
 ## Known limits
