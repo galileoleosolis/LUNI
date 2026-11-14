@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>LUNI: the problem, the solution, and what is new</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: "Inter", "Noto Sans", "Liberation Sans", "DejaVu Sans", Arial, sans-serif; color: #0d1b2e; font-size: 9.6pt; line-height: 1.32; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 8.5in; height: 11in; padding: 0.4in 0.55in 0.32in; overflow: hidden; display: flex; flex-direction: column; }
+  footer { margin-top: auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #0b63ce; padding-bottom: 8px; margin-bottom: 12px; }
+  h1 { margin: 0; font-size: 25pt; letter-spacing: .06em; color: #06264f; line-height: 1; }
+  h1 span { display: block; margin-top: 6px; font-size: 10.5pt; font-weight: 600; letter-spacing: .02em; color: #0b63ce; }
+  .ctx { text-align: right; font-size: 8.6pt; color: #4a5d78; line-height: 1.45; }
+  .ctx b { color: #06264f; }
+  h2 { margin: 0 0 7px; font-size: 12.5pt; color: #06264f; display: flex; align-items: center; gap: 8px; }
+  h2 i { font-style: normal; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #0b63ce; color: #fff; font-size: 10pt; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 11px; }
+  th { text-align: left; font-size: 8pt; letter-spacing: .07em; text-transform: uppercase; color: #fff; background: #06264f; padding: 5px 10px; }
+  td { padding: 3.3px 10px; vertical-align: middle; border-bottom: 1px solid #d9e2ef; }
+  tr:nth-child(even) td { background: #f4f8fd; }
+  .ps td:first-child { width: 47%; color: #33445c; }
+  .ps td:last-child { font-weight: 600; color: #06264f; }
+  .ps td:last-child::before { content: "→"; color: #0b63ce; font-weight: 700; margin-right: 8px; }
+  .fx th:nth-child(2), .fx th:nth-child(3), .fx td:nth-child(2), .fx td:nth-child(3) { text-align: center; width: 21%; }
+  .fx td:first-child { color: #0d1b2e; }
+  .pill { display: inline-block; min-width: 104px; padding: 1.5px 10px; border-radius: 999px; font-size: 8.6pt; font-weight: 700; letter-spacing: .04em; }
+  .yes { background: #dff3e6; color: #116a36; } .no { background: #fde4e1; color: #a3271a; } .part { background: #fff1cf; color: #7a5200; } .new { background: #0b63ce; color: #fff; }
+  .band td { background: #e8f0fb !important; font-size: 7.8pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0b63ce; padding: 3px 10px; border-bottom: none; }
+  .take { margin: 0 0 8px; padding: 7px 14px; border-left: 5px solid #0b63ce; background: #eef5ff; font-size: 10.8pt; color: #06264f; }
+  .take b { color: #0b63ce; }
+  footer { font-size: 7.9pt; color: #5a6b84; line-height: 1.45; border-top: 1px solid #d9e2ef; padding-top: 7px; }
+</style></head><body><div class="page">
+<header>
+  <h1>LUNI<span>Lunar Utility Navigational Intelligence</span></h1>
+  <div class="ctx"><b>NASA Space Apps Challenge 2026</b><br>Challenge: Lunar Landing Site Navigator<br>galileoleosolis.github.io/LUNI</div>
+</header>
+
+<h2><i>1</i>The problem, and what LUNI does about it</h2>
+<table class="ps">
+  <tr><th>The problem (from NASA's challenge page)</th><th>What LUNI does</th></tr>
+  <tr><td>Sun and Earth information exists, but it is spread across several expert tools</td><td>Puts it on one screen</td></tr>
+  <tr><td>Those tools give raw numbers that you have to interpret</td><td>Gives a plain GO or NO-GO, with the reason</td></tr>
+  <tr><td>A launch delay forces a new landing date</td><td>Finds the next good landing time, and shows 12 months of good landing days</td></tr>
+  <tr><td>A landing site may need to move a little</td><td>Scans the ground nearby for a better spot and moves the site there</td></tr>
+  <tr><td>South-pole hills and craters block the Sun and the Earth</td><td>Uses the real skyline from NASA's elevation data</td></tr>
+  <tr><td>Comparing options takes a long time</td><td>Pin any site and date, then compare them side by side</td></tr>
+  <tr><td>Hard to use for people who are not specialists</td><td>Plain words everywhere, and you can ask by typing or talking</td></tr>
+</table>
+
+<h2><i>2</i>What already exists, and what is new</h2>
+<table class="fx">
+  <tr><th>Feature</th><th>Existing tools*</th><th>LUNI</th></tr>
+  <tr class="band"><td colspan="3">Shared ground: built on the same NASA data</td></tr>
+  <tr><td>Sun and Earth position for a site and time</td><td><span class="pill yes">YES</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr><td>Moon elevation maps</td><td><span class="pill yes">YES</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr><td>3D view of the Moon</td><td><span class="pill yes">YES</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr><td>Full-detail maps and many data layers</td><td><span class="pill yes">YES</span></td><td><span class="pill no">NO</span></td></tr>
+  <tr class="band"><td colspan="3">Made easier</td></tr>
+  <tr><td>Sun and Earth drawn against the site's own skyline</td><td><span class="pill part">NOT IN ONE VIEW</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr><td>Countdown to sunset and to loss of the Earth link</td><td><span class="pill part">WORK IT OUT</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr><td>Eclipse warning during the mission</td><td><span class="pill part">NOT FLAGGED</span></td><td><span class="pill yes">YES</span></td></tr>
+  <tr class="band"><td colspan="3">New in LUNI: from data to a decision</td></tr>
+  <tr><td>GO / NO-GO for the mission you describe</td><td><span class="pill no">NO</span></td><td><span class="pill new">NEW</span></td></tr>
+  <tr><td>Next good landing date</td><td><span class="pill no">NO</span></td><td><span class="pill new">NEW</span></td></tr>
+  <tr><td>Scan nearby for a spot that meets the mission's needs</td><td><span class="pill no">NO</span></td><td><span class="pill new">NEW</span></td></tr>
+  <tr><td>Suggested ways to turn a NO-GO into a GO</td><td><span class="pill no">NO</span></td><td><span class="pill new">NEW</span></td></tr>
+  <tr><td>Ask in plain words, typed or spoken</td><td><span class="pill no">NO</span></td><td><span class="pill new">NEW</span></td></tr>
+</table>
+
+<div class="take"><b>In one line:</b> the existing tools hold the data. LUNI turns that data into a decision: can this mission land here, at this time, and if not, what would make it work?</div>
+
+<footer>* Existing NASA tools: QuickMap, Moon Trek and the JPL Horizons System, the three named on the challenge page. That column reflects the challenge page's own description of those tools and our use of them. It is not a complete audit of every feature they have. LUNI's Sun and Earth positions come from NASA NAIF SPICE (DE440) and agree with JPL Horizons to within 0.0007°; its terrain comes from LRO LOLA elevation maps.</footer>
+</div></body></html>
