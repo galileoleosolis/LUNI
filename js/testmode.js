@@ -3,11 +3,11 @@
 // sessionStorage, so a refresh does not lose it) until the tester copies the report themselves.
 // Enabled by "#test" in the address, or by window.LUNO_TEST on a build made for testing.
 import { SITES } from "./sites.js";
-import { sampleSite, hoursUntilChange } from "./model.js";
+import { sampleSite, hoursUntilChange, siteEclipses } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v4";
+const KEY = "luno-test-v5";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -22,7 +22,7 @@ const day = (d) => d.toISOString().slice(0, 10);
 
 // Each task states its own site and date, so the right answer is computed from the model, not from whatever
 // the tester happens to have on screen.
-const TASKS = [
+const SET_A = [
   { id: "go-10d", short: "GO for 10 days at IM-2 on 18 Dec?",
     text: "First choose the landing site IM-2 ATHENA. Then set the landing time to 18 December 2026, 00:00 UTC. Question: is this a GO for a 10-day mission?",
     setup: { site: "im2", t0: "2026-12-18T00:00" },
@@ -61,6 +61,50 @@ const TASKS = [
     answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"}`,
     check: (ans, exp, snap) => snap.missionOk && snap.site.id !== "nobile1" && kmBetween(snap.site, site("nobile1")) <= 25 },
 ];
+
+// Second set: different sites and dates, aimed at the mission needs, the mission clock, eclipses and the area scan.
+const SCAN_CASE = { site: "nobile1", t0: "2026-11-14T16:00", name: "NOBILE RIM 1", when: "14 November 2026, 16:00 UTC" };
+const SET_B = [
+  { id: "b-go", short: "GO at Chandrayaan-3's real landing time?",
+    text: "First choose the landing site CHANDRAYAAN-3. Then set the landing time to 23 August 2023, 12:00 UTC (about when it really landed). Question: is this a GO for a 10-day mission?",
+    setup: { site: "ch3", t0: "2023-08-23T12:00" },
+    type: "choice", options: ["GO", "NO-GO"],
+    expected: () => (mission("ch3", "2023-08-23T12:00:00Z").v.ok ? "GO" : "NO-GO") },
+  { id: "b-sunset-date", short: "Date the Sun sets after that landing",
+    text: "Keep CHANDRAYAAN-3 and 23 August 2023, 12:00 UTC. Question: on what date does the Sun set there?",
+    setup: { site: "ch3", t0: "2023-08-23T12:00" },
+    type: "date",
+    expected: () => { const m = mission("ch3", "2023-08-23T12:00:00Z"); return day(new Date(Date.parse("2023-08-23T12:00:00Z") + hoursUntilChange(m.samples, 0, "sunUp") * 3600000)); },
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "b-dark", short: "Smallest dark setting that gives GO",
+    text: "New situation: choose IM-2 ATHENA, landing 17 March 2027, 00:00 UTC, 10-day mission. It is a NO-GO because the Sun goes away for too long. Question: what is the smallest CAN SIT IN THE DARK setting that turns it into a GO?",
+    reach: { label: "tried a different CAN SIT IN THE DARK setting", test: (s) => s.req.maxDarkH !== 12 },
+    type: "choice", options: ["12", "24", "48", "NONE OF THEM"],
+    expected: () => [12, 24, 48].find((h) => mission("im2", "2027-03-17T00:00:00Z", { maxDarkH: h }).v.ok)?.toString() ?? "NONE OF THEM" },
+  { id: "b-earth", short: "GO once Earth at landing is not needed?",
+    text: "Put CAN SIT IN THE DARK back to 12. New situation: choose SHACKLETON CONNECTING RIDGE, landing 1 December 2026, 00:00 UTC. It is a NO-GO. This lander can land without talking to Earth, so change the mission needs to allow that. Question: is it a GO now?",
+    reach: { label: "switched EARTH LINK AT LANDING to NO", test: (s) => s.req.earthAtLanding === false },
+    type: "choice", options: ["GO", "STILL NO-GO"],
+    expected: () => (mission("shackleton", "2026-12-01T00:00:00Z", { earthAtLanding: false }).v.ok ? "GO" : "STILL NO-GO") },
+  { id: "b-eclipse", short: "Date of the eclipse during the mission",
+    text: "Put EARTH LINK AT LANDING back to REQUIRED. New situation: choose MALAPERT MASSIF, landing 25 December 2028, 00:00 UTC, 10-day mission. During this mission the Earth passes in front of the Sun (an eclipse). Question: on what date?",
+    setup: { site: "malapert", t0: "2028-12-25T00:00" },
+    type: "date",
+    expected: () => day(siteEclipses(site("malapert"), new Date("2028-12-25T00:00:00Z"), new Date("2029-01-04T00:00:00Z"))[0].peak),
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "b-find-go", short: `Find a GO point near ${SCAN_CASE.name}`,
+    text: `Last one: choose ${SCAN_CASE.name} and set the landing time to ${SCAN_CASE.when}, 10-day mission. It is a NO-GO there. Find a point nearby that IS a GO and move the site to it. Press DONE when the screen shows GO.`,
+    reach: { label: `got ${SCAN_CASE.name} at ${SCAN_CASE.t0} (a NO-GO) on screen`, test: (s) => s.site.id === SCAN_CASE.site && s.t0.toISOString().slice(0, 16) === SCAN_CASE.t0 },
+    type: "done",
+    expected: () => `a GO point within 25 km of ${SCAN_CASE.name}`,
+    answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"}`,
+    check: (ans, exp, snap) => snap.missionOk && snap.site.id !== SCAN_CASE.site && kmBetween(snap.site, site(SCAN_CASE.site)) <= 25 && snap.t0.toISOString().slice(0, 16) === SCAN_CASE.t0 },
+];
+
+// Which set runs: B by default, A with "#test-a" in the address or window.LUNO_TEST_SET = "A".
+const SET_NAME = location.hash === "#test-a" || globalThis.LUNO_TEST_SET === "A" ? "A" : "B";
+const TASKS = SET_NAME === "A" ? SET_A : SET_B;
+
 
 const FEATURES = {      // click targets -> the feature they belong to
   "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
@@ -124,7 +168,7 @@ function showIntro() {
     <p>Thanks for helping. You are testing the tool. The tool is not testing you: if something is hard to find, that is the tool's fault and exactly what we need to know.</p>
     <ul>
       <li>You are a mission planner choosing where and when to land on the Moon.</li>
-      <li>There are <b>6 short tasks</b>, shown one at a time in a bar at the top. No hints. It takes about 10 to 15 minutes.</li>
+      <li>There are <b>${TASKS.length} short tasks</b>, shown one at a time in a bar at the top. No hints. It takes about 10 to 15 minutes.</li>
       <li>If you get stuck for more than a couple of minutes, press <b>SKIP</b>. That is useful information too.</li>
       <li>At the end you answer 5 quick questions and get a report to copy and send back.</li>
     </ul>
@@ -206,6 +250,7 @@ export function buildReport(S, env) {
   const L = [];
   L.push("=== LUNO FIRST-USE TEST REPORT ===");
   L.push(`Date: ${new Date(S.started).toISOString().slice(0, 16)}Z | Window: ${env.window} | Layout: ${env.layout} | Browser: ${env.browser}`);
+  L.push(`Task set: ${SET_NAME}`);
   L.push(`Total time: ${mmss(S.totalSeconds)} | Clicks in the app: ${clicks.length} | Shortcut keys: ${keys.length}`);
   L.push(`Score: ${S.results.filter((r) => r.correct).length}/${S.results.length} correct, ${S.results.filter((r) => r.skipped).length} skipped`);
   L.push("", "TASKS");
@@ -248,7 +293,7 @@ function showReport() {
 }
 
 export function initTestMode(hooks) {
-  const wanted = location.hash === "#test" || globalThis.LUNO_TEST;
+  const wanted = /^#test(-a)?$/.test(location.hash) || globalThis.LUNO_TEST;
   if (!wanted) return;
   api = hooks;
   wireTracking();

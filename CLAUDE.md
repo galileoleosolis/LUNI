@@ -62,6 +62,8 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    He still never changed the mission length, stepped +1 day 21 times instead of using NEXT WINDOW, and never opened
    the area scan. Fixed since: mission length sits inside the verdict block, and a NO-GO shows two buttons there
    (next good landing time, better spot nearby). Still needs a test with someone who has NOT seen the app.
+   Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
+   set A runs with `#test-a`.
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNO-selected best-lit points near rough centers).
