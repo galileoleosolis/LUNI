@@ -549,7 +549,7 @@ html.flow .story:not([hidden]) { display: block; } html.flow .story-btns { margi
 .answer-side .mini { font-family: var(--cond); font-weight: 600; font-size: 15px; letter-spacing: .03em; white-space: nowrap; } .answer-side .mini b { font-weight: 700; }
 .answer-side .cd i { font-family: var(--cond); font-weight: 600; font-size: 14.5px; letter-spacing: .03em; }
 .answer-side .ro { gap: 10px; }
-.story-text { font-family: var(--cond); font-weight: 600; font-size: 15.5px; letter-spacing: .04em; }
+.story-text { font-family: var(--cond); font-weight: 600; font-size: 15px; letter-spacing: .02em; }
 .hz-key { color: #ffd23c; } .hz-key i { font-style: normal; color: var(--cy); }
 
 .proof { z-index: 8; }

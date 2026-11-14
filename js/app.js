@@ -152,7 +152,12 @@ function nextSite(by = 1) {
 function syncSiteUI() {
   const s = state.site;
   document.querySelectorAll(".site-row").forEach((b) => b.classList.toggle("sel", b.dataset.id === s.id));
-  document.querySelector(".site-row.sel")?.scrollIntoView({ block: "nearest" });
+  const row = document.querySelector(".site-row.sel"), list = $("site-list");
+  if (row) {                                             // keep the chosen row clear of the "more sites" marker at the bottom of the list
+    row.scrollIntoView({ block: "nearest" });
+    const over = (row.getBoundingClientRect().bottom - list.getBoundingClientRect().bottom) / zoomOf(list) + 24;
+    if (over > 0) list.scrollTop += over;
+  }
   $("lat-input").value = s.lat; $("lon-input").value = s.lon;
   syncT0();
   $("bar-site").textContent = `${siteName(s)} ${fmtLat(s.lat)} ${fmtLon(s.lon)}`;
@@ -434,7 +439,7 @@ function renderHorizon(cur) {
   const tr = state.scenario.terrain;
   let yMax = Math.max(6, tr.max + 2), yMin = Math.min(-4, tr.min - 1);
   for (const s of win) { yMax = Math.max(yMax, s.sunEl + 2, s.earthEl + 2); yMin = Math.min(yMin, Math.max(-12, Math.min(s.sunEl, s.earthEl) - 1)); }
-  yMax = Math.min(90, Math.ceil(yMax)); yMin = Math.floor(yMin);
+  yMax = Math.min(90, Math.ceil(yMax)); yMin = Math.floor(Math.min(yMin, -0.22 * yMax));      // always leave a band of ground in the picture
   const x = (a) => L + (a / 360) * (W - L - 4);
   const y = (e) => T + (1 - (e - yMin) / (yMax - yMin)) * (H - B - T);
   const clampY = (e) => y(Math.max(yMin, Math.min(yMax, e)));
@@ -446,7 +451,7 @@ function renderHorizon(cur) {
   grad("hz-ground", lit ? [[0, "#aab1b9"], [0.5, "#6b727b"], [1, "#3a4048"]] : [[0, "#39445a"], [0.5, "#1e2634"], [1, "#0e131b"]], { x1: 0, y1: 0, x2: 0, y2: 1 });
   grad("hz-halo", [[0, "#fff6c8", 0.95], [0.28, "#ffd23c", 0.5], [1, "#ffd23c", 0]], { r: 0.5 });
 
-  const span = yMax - yMin, step = span > 60 ? 15 : span > 24 ? 10 : span > 12 ? 5 : 2;
+  const span = yMax - yMin, step = [2, 5, 10, 15, 30, 45].find((v) => v / span * (H - B - T) >= 15 && span / v <= 7) || 90;      // height labels at least 15 px apart
   for (let e = Math.ceil(yMin / step) * step; e <= yMax; e += step) {
     el("line", { x1: L, x2: W, y1: y(e), y2: y(e), stroke: e === 0 ? C.grid0 : C.grid }, svg);
     el("text", { x: L - 6, y: y(e) + 4, fill: C.dim, "font-size": 12.5, "text-anchor": "end" }, svg, e + "°");
@@ -818,7 +823,7 @@ async function init() {
   $("next-window-btn").addEventListener("click", nextWindow);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
-    getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
+    getContext: () => ({ site: state.site, t0: state.t0, req: state.req, terrain: state.scenario.terrain }),
     onPick: (lat, lon) => {
       const from = state.site;
       selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
