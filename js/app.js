@@ -11,6 +11,7 @@ import { createSurfacePanel } from "./ui-surface.js";
 import { createAssistant } from "./assistant.js";
 import { createAssistantPanel } from "./ui-assistant.js";
 import { createModelLink } from "./assistant-llm.js";
+import { createOpenSpaceLink, OS_VIEWS } from "./openspace.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -31,7 +32,7 @@ const state = {
   req: { ...DEFAULT_REQ },       // mission needs
   cal: null,                     // year of landing-window data for the current site + needs
 };
-let globe = null, scan = null, surface = null;
+let globe = null, scan = null, surface = null, openspace = null;
 
 // ---------- sizing ----------
 // Wide windows: lay the unit out at a design size and scale it to fit. Narrow windows: stacked layout.
@@ -371,6 +372,7 @@ function renderMoment() {
   const sp = subPoints(cur.t);
   globe?.setBodies(sp.sun, sp.earth);
   surface?.update();
+  openspace?.update({ site: state.site, t: cur.t });
 }
 
 // A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNO's.
@@ -614,6 +616,17 @@ async function init() {
   });
   $("surface-btn").addEventListener("click", () => surface.toggle(true));
   buildNeeds();
+  // OpenSpace link: off until asked for; not offered on the preview page, which cannot reach programs on this computer.
+  if (globalThis.LUNO_B64) $("os-box").hidden = true;
+  else {
+    openspace = createOpenSpaceLink({ onStatus: (st, text) => { $("os-status").textContent = text; $("os-btn").classList.toggle("on", st === "on"); $("os-btn").textContent = st === "on" ? "OPENSPACE: CONNECTED" : st === "connecting" ? "CONNECTING…" : "CONNECT TO OPENSPACE"; } });
+    $("os-btn").addEventListener("click", () => { if (openspace.connected) openspace.disconnect(); else { openspace.update({ site: state.site, t: state.scenario.samples[state.idx].t }); openspace.connect(); } });
+    for (const [label, m] of OS_VIEWS) {
+      const b = document.createElement("button"); b.textContent = label; b.title = `Camera ${m / 1000} km above the site`; b.classList.toggle("on", m === openspace.view);
+      b.addEventListener("click", () => { openspace.setView(m); [...$("os-view").children].forEach((x) => x.classList.toggle("on", x === b)); });
+      $("os-view").appendChild(b);
+    }
+  }
   const assistant = createAssistant(assistantApi);
   const comms = createAssistantPanel({ assistant, model: createModelLink({ assistant, sites: assistantApi.sites, needOptions: assistantApi.needOptions }) });
   $("calendar").addEventListener("click", (e) => {
