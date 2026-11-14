@@ -1,5 +1,5 @@
-import { SITES, CUSTOM_ID } from "./sites.js";
-import { getScenario, summarize, hoursUntilChange, horizonAt, subPoints, STEP_HOURS, IS_DEMO } from "./model.js";
+import { SITES, CUSTOM_ID, loadSites } from "./sites.js";
+import { initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
 import { createGlobe } from "./globe.js";
 
 const $ = (id) => document.getElementById(id);
@@ -7,7 +7,7 @@ const SVGNS = "http://www.w3.org/2000/svg";
 const C = { amb: "#ffb000", dim: "#8a6614", faint: "#2a1f06", grn: "#21e07a", red: "#ff3d3d", cy: "#5ac8ff", wht: "#f4f4f4" };
 
 const state = {
-  site: SITES[0],
+  site: null,
   t0: roundToHour(new Date()),   // landing time
   idx: 0,                        // hours after landing (mission clock)
   scenario: null,
@@ -76,11 +76,39 @@ function syncSiteUI() {
   if (s.id === CUSTOM_ID) note.textContent = "CUSTOM POINT";
   else if (s.approx) note.textContent = "APPROXIMATE REGION CENTRE — TO BE VERIFIED";
   else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>`;
+  else if (s.srcText) note.textContent = s.srcText.toUpperCase();
   else note.textContent = s.tag || "";
+}
+
+// Site details: values LUNO computed from LOLA, then the team's research notes.
+function renderBrief() {
+  const s = state.site, t = state.scenario.terrain;
+  const row = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
+  const num = (v) => (v >= 0 ? "+" : "−") + Math.abs(Math.round(v)).toLocaleString("en-US");
+  let h = "";
+  if (t.real) {
+    h += row("ELEVATION", `${num(t.heightM)} M`);
+    h += row("SLOPE", `${t.slopeDeg.toFixed(1)}° OVER ${t.slopeBaseM >= 1000 ? (t.slopeBaseM / 1000).toFixed(1) + " KM" : t.slopeBaseM + " M"}`);
+    h += row("SKYLINE", `${sgn(t.min)}° TO ${sgn(t.max)}°`);
+    h += row("TERRAIN MAP", t.maps.map((m) => m.replace("ldem_", "").replace(/_/g, " ").toUpperCase()).join(" + "));
+  } else {
+    h += row("TERRAIN", "FLAT HORIZON");
+  }
+  $("brief-lola").innerHTML = h;
+  const n = s.notes, box = $("brief-notes");
+  box.hidden = !n;
+  if (n) box.innerHTML = `<h3>TEAM RESEARCH NOTES · SOURCES PENDING</h3>` +
+    [["TERRAIN", n.terrain], ["TEMP", n.temp], ["HAZARD", n.hazard]].filter((r) => r[1]).map(([k, v]) => `<p><b>${k}</b> ${v}</p>`).join("");
+  const badge = $("data-badge");
+  badge.className = "demo" + (t.real ? " ok" : "");
+  badge.textContent = t.real ? "NASA DATA · SPICE DE440 + LOLA TERRAIN" : "NASA SPICE POSITIONS · FLAT HORIZON (NO TERRAIN FOR CUSTOM POINTS YET)";
 }
 
 // ---------- compute ----------
 function recompute({ keepIdx = false } = {}) {
+  const cov = coverage(), last = new Date(cov.end.getTime() - 31 * 86400000);
+  if (state.t0 < cov.start) state.t0 = cov.start;
+  if (state.t0 > last) state.t0 = last;
   state.scenario = getScenario(state.site, state.t0);
   state.summary = summarize(state.scenario.samples);
   if (!keepIdx) state.idx = 0;
@@ -90,6 +118,7 @@ function recompute({ keepIdx = false } = {}) {
   $("pct-earth").textContent = pct(s.pctEarth);
   $("pct-both").textContent = pct(s.pctBoth);
   $("max-dark").textContent = s.maxDarkHours ? fmtT(s.maxDarkHours) : "NONE";
+  renderBrief();
   renderTimeline();
   renderMoment();
 }
@@ -161,7 +190,8 @@ function renderHorizon(cur) {
   const lo = Math.max(0, state.idx - 72), hi = Math.min(samples.length - 1, state.idx + 72);
   const win = samples.slice(lo, hi + 1);
 
-  let yMax = Math.max(6, ...horizon) + 2, yMin = Math.min(-4, Math.min(...horizon) - 1);
+  const tr = state.scenario.terrain;
+  let yMax = Math.max(6, tr.max + 2), yMin = Math.min(-4, tr.min - 1);
   for (const s of win) { yMax = Math.max(yMax, s.sunEl + 2, s.earthEl + 2); yMin = Math.min(yMin, Math.max(-12, Math.min(s.sunEl, s.earthEl) - 1)); }
   yMax = Math.min(90, Math.ceil(yMax)); yMin = Math.floor(yMin);
   const x = (a) => L + (a / 360) * (W - L - 4);
@@ -192,11 +222,12 @@ function renderHorizon(cur) {
   track("sun", C.wht); track("earth", C.cy);
 
   // terrain: filled so it visibly hides whatever is behind it
-  let d = `M${x(0)},${H - B}`;
-  for (let az = 0; az <= 360; az++) d += `L${x(az).toFixed(1)},${y(horizonAt(horizon, az % 360)).toFixed(1)}`;
+  let d = `M${x(0)},${H - B}`, ln = "";
+  for (let az = 0; az <= 360; az += 0.5) {
+    const pt = `${x(az).toFixed(1)},${clampY(horizonAt(horizon, az)).toFixed(1)}`;
+    d += "L" + pt; ln += (az ? "L" : "M") + pt;
+  }
   el("path", { d: d + `L${x(360)},${H - B}Z`, fill: "#120d02", stroke: "none" }, svg);
-  let ln = "";
-  for (let az = 0; az <= 360; az++) ln += `${az ? "L" : "M"}${x(az).toFixed(1)},${y(horizonAt(horizon, az % 360)).toFixed(1)}`;
   el("path", { d: ln, fill: "none", stroke: C.amb, "stroke-width": 1.6 }, svg);
 
   // bodies
@@ -292,7 +323,11 @@ function renderCompare() {
 }
 
 // ---------- wiring ----------
-function init() {
+async function init() {
+  await Promise.all([loadSites(), initModel()]);
+  state.site = SITES[0];
+  const cov = coverage();
+  $("date-input").min = toInputValue(cov.start); $("date-input").max = toInputValue(new Date(cov.end.getTime() - 31 * 86400000));
   buildSiteList();
 
   const tip = $("globe-tip");
@@ -342,7 +377,6 @@ function init() {
   });
 
   let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); renderMoment(); }, 80); });
-  if (!IS_DEMO) $("data-badge").remove();
 
   renderCompare();
   globe?.select(state.site);
@@ -350,4 +384,8 @@ function init() {
   document.fonts?.ready.then(() => { renderTimeline(); renderMoment(); });
 }
 
-init();
+init().catch((e) => {
+  console.error(e);
+  $("verdict").className = "verdict nogo";
+  $("verdict").textContent = "> DATA FAILED TO LOAD. SERVE THE FOLDER OVER HTTP (SEE README) AND RELOAD.";
+});

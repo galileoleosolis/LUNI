@@ -1,0 +1,4 @@
+tools/kernels/*
+!tools/kernels/.gitkeep
+tools/dem/
+__pycache__/

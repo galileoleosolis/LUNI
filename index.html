@@ -12,7 +12,7 @@
   <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
   <div class="unit-top">
     <span><i class="led"></i>LUNO PLANNING UNIT</span>
-    <span id="data-badge" class="demo" title="Placeholder geometry and terrain. Real SPICE + LOLA data coming.">DEMO DATA · PLACEHOLDER MODEL</span>
+    <span id="data-badge" class="demo" >LOADING DATA</span>
   </div>
 
   <div class="screen">
@@ -76,11 +76,14 @@
           <tr><td>BOTH</td><td id="pct-both"></td></tr>
           <tr><td>MAX DARK</td><td id="max-dark"></td></tr>
         </table>
+        <h3 style="margin-top:14px">SITE · FROM LOLA ELEVATION DATA</h3>
+        <table class="sum" id="brief-lola"></table>
+        <div id="brief-notes" class="notes" hidden></div>
         <h3 style="margin-top:14px">COMPARE</h3>
         <div id="compare-list" class="compare"></div>
         <h3 style="margin-top:14px">KEYBOARD</h3>
         <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
-        <div class="credit">MOON IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA NASA MOON TREK. POSITIONS: NASA SPICE (PLANNED). TERRAIN: LRO LOLA (PLANNED).</div>
+        <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
     </div>
   </div>

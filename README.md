@@ -14,12 +14,34 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
 ## Status
 - **UI:** 3D Moon site picker, site list + custom coordinates, landing time + launch-slip keys, GO / NO-GO readouts with
   sunset / Earthset countdowns, horizon panorama, 30-day visibility timeline, side-by-side comparison, keyboard shortcuts.
-- **Data:** still a **placeholder** analytic model + synthetic terrain (`js/model.js`). Real SPICE geometry and LOLA horizons are next.
+- **Sun and Earth positions:** real. NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
+- **Terrain:** real for the preset sites. Skylines are pre-computed from LRO LOLA elevation maps (`data/horizons.json`),
+  with the observer 2 m above the surface. Custom points still use a flat horizon.
+
+## Checks
+- `node tests/check_ephemeris.mjs` compares LUNO with 1,110 JPL Horizons values (6 sites, 4 date ranges): worst error 0.0007°.
+- `node tests/real_missions.mjs` prints LUNO's sunrise/sunset for the Chandrayaan-3, IM-1 and IM-2 landing sites.
+- At 89.45°S 222.69°E (a well-known high-illumination ridge near Shackleton) LUNO gets about 81% sunlight over 2026 at 2 m
+  and 93% at 10 m, in line with published LOLA illumination studies.
+
+## Known limits
+- Sun counts as "up" when the centre of its disc clears the skyline (no partial-disc power yet).
+- Eclipses (Earth blocking the Sun) are not modelled.
+- Sites outside the south polar maps use the coarser global LOLA map (about 1.9 km per pixel).
+
+## Rebuilding the data
+```
+pip install spiceypy numpy
+tools/fetch_kernels.sh && python3 tools/build_ephemeris.py      # Sun/Earth table
+tools/fetch_dem.sh && python3 tools/build_horizons.py           # terrain skylines (downloads about 620 MB)
+python3 tools/fetch_horizons_fixtures.py                        # refresh the JPL Horizons reference values
+```
 
 ## Data and credits
+- Sun/Earth geometry: NASA NAIF SPICE generic kernels (de440s.bsp, moon_pa_de440, pck00011, naif0012); reference values from JPL Horizons
+- Terrain: LRO LOLA gridded elevation (ldem_80s_40m, ldem_60s_240m, ldem_16), NASA PDS Geosciences Node
 - Moon imagery: LRO WAC global mosaic (NASA/GSFC/Arizona State University), tiles from NASA Moon Trek → `assets/moon_wac_4k.jpg`
-- Landing-site coordinates: see `src` links in `js/sites.js` (rows marked `approx` still need an official source)
-- Planned: NASA NAIF SPICE (Sun/Earth geometry, cross-checked with JPL Horizons); LRO LOLA polar DEMs (terrain horizons)
+- Landing-site coordinates and notes: `data/sites.json` (rows marked `approx` and all `notes` still need official sources)
 - Libraries: three.js (MIT, `vendor/`); fonts IBM Plex Mono and Barlow Condensed (SIL OFL, `assets/fonts/`)
 
 ## AI disclosure

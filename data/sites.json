@@ -1,0 +1,160 @@
+{
+ "_about": "Preset landing sites. lat: deg (south negative); lon: deg east (west negative). approx = rough regional point still needing an official source. notes = team research, not yet sourced.",
+ "sites": [
+  {
+   "id": "nobile1",
+   "name": "Nobile Rim 1",
+   "tag": "ARTEMIS III",
+   "group": "South pole — Artemis III candidates",
+   "lat": -85.45,
+   "lon": 36.36,
+   "approx": true,
+   "src": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/",
+   "notes": {
+    "terrain": "South pole highlands near permanently shadowed regions; slopes under 20° targeted",
+    "temp": "≤ −148 °C in cold traps / PSRs",
+    "hazard": "1.9–4.5 km to PSR edges"
+   }
+  },
+  {
+   "id": "malapert",
+   "name": "Malapert Massif",
+   "tag": "ARTEMIS III",
+   "group": "South pole — Artemis III candidates",
+   "lat": -86.0,
+   "lon": 0.0,
+   "approx": true
+  },
+  {
+   "id": "haworth",
+   "name": "Haworth",
+   "tag": "ARTEMIS III",
+   "group": "South pole — Artemis III candidates",
+   "lat": -87.0,
+   "lon": -5.0,
+   "approx": true
+  },
+  {
+   "id": "shackleton",
+   "name": "Shackleton connecting ridge",
+   "tag": "SOUTH POLE · HIGH-ILLUMINATION POINT",
+   "group": "South pole — Artemis III candidates",
+   "lat": -89.45,
+   "lon": -137.31,
+   "approx": false,
+   "srcText": "Mazarico et al. 2011, Icarus 211 (LOLA illumination study): 89.45S, 222.69E"
+  },
+  {
+   "id": "im2",
+   "name": "IM-2 Athena · Mons Mouton",
+   "tag": "USA 2025",
+   "group": "South polar landings",
+   "lat": -84.7906,
+   "lon": 29.1957,
+   "src": "https://en.wikipedia.org/wiki/IM-2",
+   "notes": {
+    "terrain": "High plateau, south pole region (Mons Mouton / Marston crater)",
+    "temp": "about −130 to −20 °C; down to −240 °C in PSRs",
+    "hazard": "~1.5 km to Marston crater PSR"
+   }
+  },
+  {
+   "id": "im1",
+   "name": "IM-1 Odysseus · Malapert A",
+   "tag": "USA 2024",
+   "group": "South polar landings",
+   "lat": -80.13,
+   "lon": 1.44,
+   "src": "https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf",
+   "notes": {
+    "terrain": "South pole highlands near Malapert A crater; landed on a ~12° slope",
+    "temp": "about −130 to −20 °C; down to −200 °C at night",
+    "hazard": "~1.5 km to Malapert A crater walls"
+   }
+  },
+  {
+   "id": "ch3",
+   "name": "Chandrayaan-3 · Shiv Shakti",
+   "tag": "INDIA 2023",
+   "group": "South polar landings",
+   "lat": -69.373,
+   "lon": 32.319,
+   "src": "https://planetarynames.wr.usgs.gov/Feature/16272",
+   "notes": {
+    "terrain": "Anorthositic highland soil, smooth topography (slope under 4°)",
+    "temp": "−3 to 17 °C; daytime surface up to 67 °C",
+    "hazard": "under 0.5 km"
+   }
+  },
+  {
+   "id": "ce6",
+   "name": "Chang'e 6 · Apollo basin",
+   "tag": "CHINA 2024",
+   "group": "Reference sites",
+   "lat": -41.6385,
+   "lon": -153.9852,
+   "src": "https://en.wikipedia.org/wiki/Chang%27e_6",
+   "notes": {
+    "terrain": "Southern mare plain in Apollo basin (far side)",
+    "temp": "−190 to 100 °C over the day/night cycle",
+    "hazard": "~1.5 km to local craters"
+   }
+  },
+  {
+   "id": "ce4",
+   "name": "Chang'e 4 · Von Kármán",
+   "tag": "CHINA 2019",
+   "group": "Reference sites",
+   "lat": -45.4446,
+   "lon": 177.5991,
+   "src": "https://en.wikipedia.org/wiki/Chang%27e_4",
+   "notes": {
+    "terrain": "Crater floor in South Pole–Aitken basin (far side)",
+    "temp": "−190 to 100 °C over the day/night cycle",
+    "hazard": "~2.0 km to crater walls and peak"
+   }
+  },
+  {
+   "id": "apollo11",
+   "name": "Apollo 11 · Tranquility",
+   "tag": "USA 1969",
+   "group": "Reference sites",
+   "lat": 0.6741,
+   "lon": 23.4731,
+   "src": "https://lroc.im-ldi.com/visit/exhibits/1/gallery/8",
+   "notes": {
+    "terrain": "Very flat basaltic plain (Mare Tranquillitatis)",
+    "temp": "−130 to 120 °C over the day/night cycle",
+    "hazard": "~0.4 km (West crater)"
+   }
+  },
+  {
+   "id": "apollo15",
+   "name": "Apollo 15 · Hadley",
+   "tag": "USA 1971",
+   "group": "Reference sites",
+   "lat": 26.1322,
+   "lon": 3.634,
+   "src": "https://apollojournals.org/alsj/alsjcoords.html",
+   "notes": {
+    "terrain": "Mare plain between Hadley Rille and the Apennine mountains",
+    "temp": "−130 to 120 °C over the day/night cycle",
+    "hazard": "~1.5 km to Hadley Rille edge"
+   }
+  },
+  {
+   "id": "apollo17",
+   "name": "Apollo 17 · Taurus-Littrow",
+   "tag": "USA 1972",
+   "group": "Reference sites",
+   "lat": 20.1881,
+   "lon": 30.7748,
+   "src": "https://apollojournals.org/alsj/alsjcoords.html",
+   "notes": {
+    "terrain": "Valley floor between highland massifs (Taurus-Littrow)",
+    "temp": "−130 to 120 °C over the day/night cycle",
+    "hazard": "~0.5 km to local craters"
+   }
+  }
+ ]
+}
