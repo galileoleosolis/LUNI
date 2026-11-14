@@ -5,6 +5,8 @@ NASA Space Apps Challenge 2026 · *Lunar Landing Site Navigator*
 Pick a lunar landing site and date, and LUNO shows the Sun and Earth against the local terrain horizon:
 how long you'll have solar power, when direct-to-Earth communication is possible, and how a launch slip changes that.
 
+**Try it: https://galileoleosolis.github.io/LUNI/** (the newest work in progress is at `/LUNI/next/`)
+
 ## Run locally
 ```
 python -m http.server 8080

@@ -74,10 +74,10 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - No jargon on screen: say "landing" not "T0", dates as `14 JAN 2027 01:00 UTC`, never a bare "Z".
 
 ## Open work, roughly in priority order
-1. **GITHUB PAGES: THE USER STILL HAS TO SWITCH IT ON.** This session cannot change repository settings (the
-   API path is blocked on purpose; do not work around it). The user does: repo Settings → Pages → "Deploy from a
-   branch" → branch **`release`**, folder `/ (root)` → Save. Then check `https://galileoleosolis.github.io/LUNI/` and
-   `.../LUNI/next/` load, and put the link in the README and the project submission.
+1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment
+   record shows "success" for https://galileoleosolis.github.io/LUNI/). This session cannot open github.io or change
+   repository settings (both blocked on purpose), so the user has to look at the live pages. Still to do: the user
+   confirms `/LUNI/` and `/LUNI/next/` load, and the link goes into the project submission.
    **Branches:** `main` is work in progress and is never served. `release` is what Pages serves: the released
    version at the root and the newest work in `next/` (the page labels itself TEST BUILD there). Only
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
