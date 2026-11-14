@@ -32,11 +32,11 @@ export function createSurfacePanel({ getContext, fmt }) {
     a.href = view.image(); a.download = `luno-surface-${c.site.id}-${c.cur.t.toISOString().slice(0, 13)}.png`; a.click();
   });
 
-  // LUNO computes the skyline for an observer 2 m above the ground, so it is only drawn at that eye height.
+  // LUNI computes the skyline for an observer 2 m above the ground, so it is only drawn at that eye height.
   const applySkyline = () => {
     const show = st.skyline && st.eye === 2;
     view?.setSkyline(show ? getContext().horizon : null);
-    $("sv-keytext").textContent = show ? "LUNO'S CALCULATED SKYLINE (FOR AN OBSERVER 2 M UP)" : st.skyline ? "SKYLINE HIDDEN: IT IS CALCULATED FOR 2 M EYE HEIGHT" : "SKYLINE OFF";
+    $("sv-keytext").textContent = show ? "LUNI'S CALCULATED SKYLINE (FOR AN OBSERVER 2 M UP)" : st.skyline ? "SKYLINE HIDDEN: IT IS CALCULATED FOR 2 M EYE HEIGHT" : "SKYLINE OFF";
   };
 
   async function rebuild(force) {

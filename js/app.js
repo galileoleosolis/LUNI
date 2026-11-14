@@ -161,7 +161,7 @@ function syncSiteUI() {
   else note.textContent = s.tag || "";
 }
 
-// Site details: values LUNO computed from LOLA, then the team's research notes.
+// Site details: values LUNI computed from LOLA, then the team's research notes.
 function renderBrief() {
   const s = state.site, t = state.scenario.terrain;
   const row = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
@@ -246,7 +246,7 @@ function renderMission() {
   if (!v.ok) {
     const tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS).at(calIdx()).ok;
     if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
-    fixes.push(["mission-scan", "FIND A BETTER SPOT NEARBY", () => scan.toggle(true)]);
+    fixes.push(["mission-scan", "SCAN FOR BETTER SPOT", () => scan.toggle(true)]);
     const dark = REQ_OPTIONS.maxDarkH.find((hh) => hh > r.maxDarkH && tryReq({ maxDarkH: hh }));
     if (dark) fixes.push(["mission-fix-dark", `LET IT SIT ${dark} H IN THE DARK`, () => setReq("maxDarkH", dark)]);
     if (r.earthAtLanding && tryReq({ earthAtLanding: false })) fixes.push(["mission-fix-earth", "LAND WITHOUT AN EARTH LINK", () => setReq("earthAtLanding", false)]);
@@ -267,6 +267,9 @@ function renderMission() {
   for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
     `<div class="warn">⚠ ECLIPSE ON ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</div>`);
   state.mission = { v, next: nx ? nx.start : null, fixes, eclipses: hit };      // kept for the command assistant
+  // the same answer, short, for the BIG MOON view (which covers the verdict block)
+  $("globe-verdict").className = "globe-verdict" + (v.ok ? " go" : "");
+  $("globe-verdict").innerHTML = `<b>${v.ok ? "GO" : "NO-GO"}</b>${siteName(state.site)} · ${r.days}-DAY MISSION${v.ok ? "" : " · " + v.reasons[0]}`;
   return v;
 }
 
@@ -275,7 +278,7 @@ function renderWindows() {
   const from = all.findIndex((w) => w.end >= state.t0);
   const list = from < 0 ? [] : all.slice(from, from + 4);
   box.replaceChildren();
-  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. RELAX THE NEEDS OR TRY ANOTHER SITE.</div>`; return; }
+  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">RELAX THE MISSION NEEDS OR TRY ANOTHER SITE</b></div>`; return; }
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
@@ -375,7 +378,7 @@ function renderMoment() {
   openspace?.update({ site: state.site, t: cur.t });
 }
 
-// A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNO's.
+// A JPL Horizons query for the same site and moment, so anyone can compare NASA's answer with LUNI's.
 // (Horizons does not let other web pages read its answers, so this opens it in a new tab.)
 function horizonsUrl(body, t) {
   const tr = state.scenario.terrain, lonE = ((state.site.lon % 360) + 360) % 360, altKm = (tr.heightM + tr.mastM) / 1000;
@@ -450,7 +453,7 @@ function renderHorizon(cur) {
 }
 
 // ---------- timeline ----------
-const TL = { left: 58, right: 4, top: 18, rowH: 16, gap: 5 };
+const TL = { left: 58, right: 4, top: 18, rowH: 14, gap: 4, rail: 27 };      // rail = distance from the axis line down to the slider rail
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -489,17 +492,35 @@ function renderTimeline() {
   }
   const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
   el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
-  el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, state.req.days < 30 ? `THE ${state.req.days}-DAY MISSION` : "");
+  // The bracket's label sits to the right of the bracket; when there is no room there (a 28-day mission), it moves inside.
+  const mLabel = `THE ${state.req.days}-DAY MISSION`, mW = mLabel.length * 6.9 + 6;
+  if (mEnd + 5 + mW <= W - TL.right) el("text", { x: mEnd + 5, y: TL.top - 5, fill: C.wht, "font-size": 11 }, svg, mLabel);
+  else {
+    el("rect", { x: mEnd - 10 - mW, y: TL.top - 15, width: mW + 4, height: 12, fill: "#000" }, svg);
+    el("text", { x: mEnd - 9, y: TL.top - 5, fill: C.wht, "font-size": 11, "text-anchor": "end" }, svg, mLabel);
+  }
+  // The slider: a rail under the chart and a handle that carries the moment it stands on.
+  const yRail = yAxis + TL.rail;
+  el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
+  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 11, "font-weight": 600 }, svg, "SLIDER");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
+  const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
+  el("rect", { id: "tl-handle-box", y: yRail - 10, height: 20, rx: 10, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
+  el("text", { id: "tl-handle-text", y: yRail + 4, fill: "#000", "font-size": 12, "font-weight": 700, "text-anchor": "middle" }, g, "");
 }
 
 function renderTimelineCursor() {
   const svg = $("timeline"), c = svg.querySelector("#tl-cursor"); if (!c) return;
   const W = svg.clientWidth || 700, n = state.scenario.samples.length;
   const xx = TL.left + (state.idx + 0.5) * (W - TL.left - TL.right) / n, y1 = TL.top + 3 * (TL.rowH + TL.gap) - 4;
-  c.setAttribute("d", `M${xx},6V${y1}`);
+  const yRail = y1 + 4 + TL.rail, h = state.idx * STEP_HOURS;
+  c.setAttribute("d", `M${xx},6V${yRail}`);
   svg.querySelector("#tl-cursor-top").setAttribute("d", `M${xx - 5},0H${xx + 5}L${xx},7Z`);
+  // handle: "◀ +9D 00H ▶", kept inside the chart at both ends
+  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 7.6 + 16, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
+  const box = svg.querySelector("#tl-handle-box"), txt = svg.querySelector("#tl-handle-text");
+  box.setAttribute("x", bx); box.setAttribute("width", bw); txt.setAttribute("x", bx + bw / 2); txt.textContent = label;
 }
 
 function scrubFromEvent(e) {
@@ -519,7 +540,7 @@ function pinCurrent() {
 function renderCompare() {
   const box = $("compare-list");
   box.replaceChildren();
-  if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. PRESS [PIN] TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
+  if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. <b class="h-do">PRESS THE PIN KEY</b> TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
   const score = (p) => (p.mission.ok ? 10 : 0) + p.summary.pctSun * 0.6 + p.summary.pctEarth * 0.4;      // meeting the needs comes first
   const best = state.pinned.length > 1 ? state.pinned.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
   for (const p of state.pinned) {
@@ -535,6 +556,23 @@ function renderCompare() {
     d.addEventListener("click", () => { state.t0 = new Date(p.t0); selectSite(p.site); });
     box.appendChild(d);
   }
+}
+
+// A short confirmation at the top of the screen that fades by itself.
+let toastTimer = 0;
+function toast(text) {
+  const n = $("toast");
+  n.hidden = true; void n.offsetWidth;                 // restart the fade if one is already showing
+  n.textContent = "✓ " + text; n.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { n.hidden = true; }, 4600);
+}
+// "1.90 KM TO THE SOUTHEAST": how far and which way b is from a, on the Moon.
+function moveText(a, b) {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r, la = a.lat * r, lb = b.lat * r;
+  const km = 2 * 1737.4 * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(la) * Math.cos(lb) * Math.sin(dLon / 2) ** 2));
+  const brg = (Math.atan2(Math.sin(dLon) * Math.cos(lb), Math.cos(la) * Math.sin(lb) - Math.sin(la) * Math.cos(lb) * Math.cos(dLon)) / r + 360) % 360;
+  const dir = ["NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "WEST", "NORTHWEST"][Math.round(brg / 45) % 8];
+  return km < 0.005 ? "0 KM" : `${km < 10 ? km.toFixed(2) : km.toFixed(1)} KM TO THE ${dir}`;
 }
 
 // ---------- command assistant ----------
@@ -570,7 +608,7 @@ const assistantApi = {
 // ---------- wiring ----------
 async function init() {
   // The work-in-progress copy on the public site lives under /next/: say so on the unit, so nobody mistakes it for the release.
-  if (/\/next\//.test(location.pathname)) document.querySelector(".unit-top span").insertAdjacentHTML("beforeend", ' <b class="wip">· TEST BUILD, NOT THE RELEASED VERSION</b>');
+  if (/\/next\//.test(location.pathname)) document.querySelector(".unit-top span").insertAdjacentHTML("beforeend", ' <b class="wip">· TEST BUILD (NOT RELEASED)</b>');
   fitStage();
   await Promise.all([loadSites(), initModel()]);
   state.site = SITES[0];
@@ -591,6 +629,15 @@ async function init() {
     },
   });
 
+  // BIG MOON: the picture moves from the left column to the middle of the screen, and back.
+  const gw = document.querySelector(".globe-wrap"), gwHome = gw.parentElement, gwNext = gw.nextElementSibling;
+  const setBigMoon = (on) => {
+    if (on) document.querySelector(".col-main").appendChild(gw); else gwHome.insertBefore(gw, gwNext);
+    gw.classList.toggle("big", on); $("globe-big").classList.toggle("on", on); $("globe-big").textContent = on ? "⤡ SMALL MOON" : "⤢ BIG MOON";
+  };
+  $("globe-big").addEventListener("click", () => setBigMoon(!gw.classList.contains("big")));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && gw.classList.contains("big") && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) setBigMoon(false); });
+
   const onCoord = () => {
     const lat = parseFloat($("lat-input").value), lon = parseFloat($("lon-input").value);
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
@@ -607,10 +654,14 @@ async function init() {
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
-    onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),
+    onPick: (lat, lon) => {
+      const from = state.site;
+      selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
+      toast(`LANDING SITE MOVED ${moveText(from, { lat, lon })} · NOW AT ${fmtLat(lat)} ${fmtLon(lon)}`);
+    },
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
-  $("scan-btn").addEventListener("click", () => scan.toggle());
+  $("scan-btn").addEventListener("click", () => scan.toggle());      // a plain open / close toggle for the scan menu (the user asked for this)
   $("side-scan").addEventListener("click", () => scan.toggle(true));
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
@@ -641,7 +692,7 @@ async function init() {
 
   const tl = $("timeline");
   let dragging = false;
-  tl.addEventListener("pointerdown", (e) => { dragging = true; tl.setPointerCapture(e.pointerId); scrubFromEvent(e); });
+  tl.addEventListener("pointerdown", (e) => { dragging = true; state.scrubbed = true; tl.querySelector("#tl-handle")?.classList.remove("nudge"); tl.setPointerCapture(e.pointerId); scrubFromEvent(e); });
   tl.addEventListener("pointermove", (e) => { if (dragging) scrubFromEvent(e); });
   tl.addEventListener("pointerup", () => { dragging = false; });
 

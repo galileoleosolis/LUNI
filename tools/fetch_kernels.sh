@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download the NASA NAIF SPICE kernels LUNO's ephemeris build needs (about 45 MB).
+# Download the NASA NAIF SPICE kernels LUNI's ephemeris build needs (about 45 MB).
 set -euo pipefail
 cd "$(dirname "$0")/kernels"
 B=https://naif.jpl.nasa.gov/pub/naif/generic_kernels

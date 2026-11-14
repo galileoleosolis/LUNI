@@ -17,6 +17,8 @@ function rampColor(ramp, v) {            // v in 0..100
 }
 
 const GO_RGB = [33, 224, 122], NOGO_RGB = [70, 14, 14];
+const BEST_PX = 26;                                      // least size of the best-point star box on the map
+const GLIDE_MS = 1100, HOLD_MS = 300, PAN_MS = 700;      // moving the site: lander travels, pauses, map slides
 // A small lander: the mark for "where you are now" on the map and in the side panel.
 const LANDER_SVG = `<svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
 function drawLander(ctx, x, y, s) {
@@ -74,6 +76,8 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     note();
     if (key === st.key) return draw();
     st.run?.cancel();
+    if (!st.moving) st.under = null;                       // a backdrop only makes sense right after a move
+    st.moving = false;
     st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
     const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
     const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, t0: c.t0, req: c.req,
@@ -83,11 +87,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       st.engine = "SKYLINES: ON THE GRAPHICS CHIP.";
       st.run = runScanGpu({ ...common, gpu: chip,
         onCheck: (diff) => { check = ` CHECKED AGAINST THE PROCESSOR AT THE SITE: SAME SKYLINE WITHIN ${diff < 0.001 ? "0.001" : diff.toFixed(3)}°.`; st.engine = `SKYLINES: ON THE GRAPHICS CHIP.${check}`; note(); },
-        onDone: () => { st.took = secs(); note(); draw(); },
+        onDone: () => { st.took = secs(); st.under = null; note(); draw(); },
         onFail: (why) => { console.warn("GPU scan dropped:", why); gpu = null; st.key = ""; st.engine = ""; start(); } });      // back to the processor, for good
     } else {
       st.engine = "SKYLINES: ON THE PROCESSOR.";
-      st.run = runScan({ ...common, onDone: () => { st.took = secs(); draw(); } });
+      st.run = runScan({ ...common, onDone: () => { st.took = secs(); st.under = null; draw(); } });
     }
     note();
     st.grid = st.run.grid;
@@ -106,13 +110,22 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
+    // A move in progress: first the lander glides to the chosen point, then the map slides so that point is the center.
+    const A = st.anim, mid = (n - 1) / 2, ease = (t) => t * t * (3 - 2 * t);
+    const el = A ? performance.now() - A.t0 : 0, glide = A ? ease(Math.min(1, el / GLIDE_MS)) : 0, pan = A ? ease(Math.max(0, Math.min(1, (el - GLIDE_MS - HOLD_MS) / PAN_MS))) : 0;
+    const offX = A ? (A.c.k - mid) * cw : 0, offY = A ? (A.c.r - mid) * cw : 0;
+    ctx.imageSmoothingEnabled = false;
+    if (st.under && st.under.n === n) {      // the picture from before the move, shifted and dimmed, until the new scan covers it
+      ctx.globalAlpha = 0.4; ctx.drawImage(st.under.img, -st.under.dk * cw, -st.under.dr * cw, size, size); ctx.globalAlpha = 1;
+    }
+    ctx.save(); ctx.translate(-offX * pan, -offY * pan);
 
     // One image pixel per scan point, then stretched: quick even for tens of thousands of points.
     if (tile.width !== n) tile.width = tile.height = n;
     const img = tctx.createImageData(n, n), px = img.data, inv = 1 / (st.grid.stepM * 1.6);
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) {
       const c = st.cells[r * n + k], o = (r * n + k) * 4;
-      if (!c) { px[o] = 5; px[o + 1] = 4; px[o + 2] = 2; px[o + 3] = 255; continue; }
+      if (!c) continue;                                    // not scanned yet: see-through
       const rgb = m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? GO_RGB : NOGO_RGB;
       // light hill shading from the neighbors' heights, so ridges and crater walls show through the colors
       const w = H(r, k - 1) ?? c.heightM, e = H(r, k + 1) ?? c.heightM, no = H(r - 1, k) ?? c.heightM, so = H(r + 1, k) ?? c.heightM;
@@ -125,22 +138,24 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (cw >= 7) for (let i = 1; i < n; i++) { ctx.beginPath(); ctx.moveTo(i * cw, 0); ctx.lineTo(i * cw, size); ctx.moveTo(0, i * cw); ctx.lineTo(size, i * cw); ctx.stroke(); }
 
     const mark = (c, color, star) => {
-      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw, m = Math.max(cw, 13);      // marks keep a readable size on fine maps
-      ctx.strokeStyle = color; ctx.lineWidth = 2;
-      if (star) { ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2); ctx.fillStyle = color; ctx.font = `700 ${Math.max(10, m * 0.7)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1); }
+      const x = (c.k + 0.5) * cw, y = (c.r + 0.5) * cw, m = Math.max(cw, star ? BEST_PX : 13);      // marks keep a readable size on fine maps
+      ctx.strokeStyle = color; ctx.lineWidth = star ? (color === "#000" ? 5 : 2.5) : 2;
+      if (star) {      // a dark box with a white star: readable on bright and on dark ground alike
+        ctx.fillStyle = "#000"; ctx.fillRect(x - m / 2, y - m / 2, m, m); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2.5; ctx.strokeRect(x - m / 2 + 1, y - m / 2 + 1, m - 2, m - 2);
+        ctx.fillStyle = "#fff"; ctx.font = `700 ${Math.max(10, m * 0.72)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", x, y + 1);
+      }
       else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
-    // distance bar, bottom left: a round number of km close to a fifth of the map
-    const across = st.grid.radiusKm * 2 * (n / (n - 1)), barKm = [50, 20, 10, 5, 2, 1, 0.5, 0.2].find((v) => v <= across / 4.5) || 0.2, barPx = barKm / across * size;
-    ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.fillRect(8, size - 30, Math.max(barPx, 46) + 12, 23);
-    ctx.fillStyle = "#fff"; ctx.fillRect(14, size - 14, barPx, 3); ctx.fillRect(14, size - 18, 1.5, 7); ctx.fillRect(14 + barPx - 1.5, size - 18, 1.5, 7);
-    ctx.font = "600 10px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(`${barKm} KM`, 14, size - 19);
     const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
     // a label on a dark plate, kept inside the map
-    const tag = (text, x, y) => {
-      ctx.font = "700 11px sans-serif"; const w = ctx.measureText(text).width + 10;
-      const tx = Math.max(3, Math.min(size - w - 3, x - w / 2)), ty = Math.max(3, Math.min(size - 19, y));
-      ctx.fillStyle = "rgba(0,0,0,.78)"; ctx.fillRect(tx, ty, w, 16); ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, tx + 5, ty + 8.5);
+    // big = the best-point label: larger, black on a white plate, so it is the first thing the eye finds on the map
+    const tag = (text, x, y, big) => {
+      const fs = big ? 16 : 11, hgt = big ? 26 : 16, padX = big ? 9 : 5;
+      ctx.font = `700 ${fs}px sans-serif`; const w = ctx.measureText(text).width + 2 * padX;
+      const tx = Math.max(3, Math.min(size - w - 3, x - w / 2)), ty = Math.max(3, Math.min(size - hgt - 3, y));
+      if (big) { ctx.fillStyle = "#000"; ctx.fillRect(tx - 2, ty - 2, w + 4, hgt + 4); }
+      ctx.fillStyle = big ? "#fff" : "rgba(0,0,0,.78)"; ctx.fillRect(tx, ty, w, hgt);
+      ctx.fillStyle = big ? "#000" : "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(text, tx + padX, ty + hgt / 2 + 0.5);
     };
     const cx = (center.k + 0.5) * cw, cy = (center.r + 0.5) * cw, here = 26, moved = best && !(best.r === center.r && best.k === center.k);
     if (best && st.done === st.total) {
@@ -149,12 +164,22 @@ export function createScanPanel({ getContext, onPick, fmt }) {
         ctx.setLineDash([6, 4]); ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke();
         ctx.lineWidth = 1.8; ctx.strokeStyle = "#fff"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
       }
-      mark(best, "#000", true), mark(best, "#fff", true);
-      tag(moved ? `★ BEST · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST POINT", bx, by + (by > cy ? 12 : -30));
+      mark(best, "#fff", true);
+      const bm = Math.max(cw, BEST_PX) / 2;
+      if (!A) tag(moved ? `★ BEST SPOT · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST SPOT", bx, moved ? (by > cy ? by + bm + 7 : by - bm - 35) : by - bm - 50, true);
     }
-    drawLander(ctx, cx, cy, here);
-    if (moved || !(best && st.done === st.total)) tag("YOU ARE HERE", cx, cy + (best && st.done === st.total && (best.r + 0.5) * cw > cy ? -32 : 16));
-    if (st.hover) { const m = Math.max(cw, 9); ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect((st.hover.k + 0.5) * cw - m / 2 + 1, (st.hover.r + 0.5) * cw - m / 2 + 1, m - 2, m - 2); }
+    const lx = cx + offX * glide, ly = cy + offY * glide;
+    if (A) { ctx.beginPath(); ctx.arc(lx, ly, 17 + 5 * Math.sin(el / 110), 0, 7); ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 2; ctx.stroke(); }
+    drawLander(ctx, lx, ly, here);
+    if (A) tag(glide < 1 ? "MOVING THE SITE…" : "✓ SITE MOVED HERE", lx, ly + 18);
+    else if (moved || !(best && st.done === st.total)) tag("YOU ARE HERE", cx, cy + (best && st.done === st.total && (best.r + 0.5) * cw > cy ? -32 : 16));
+    ctx.restore();
+    // distance bar, bottom left: a round number of km close to a fifth of the map
+    const across = st.grid.radiusKm * 2 * (n / (n - 1)), barKm = [50, 20, 10, 5, 2, 1, 0.5, 0.2].find((v) => v <= across / 4.5) || 0.2, barPx = barKm / across * size;
+    ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.fillRect(8, size - 30, Math.max(barPx, 46) + 12, 23);
+    ctx.fillStyle = "#fff"; ctx.fillRect(14, size - 14, barPx, 3); ctx.fillRect(14, size - 18, 1.5, 7); ctx.fillRect(14 + barPx - 1.5, size - 18, 1.5, 7);
+    ctx.font = "600 10px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(`${barKm} KM`, 14, size - 19);
+    if (st.hover && !A) { const m = Math.max(cw, 9); ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect((st.hover.k + 0.5) * cw - m / 2 + 1, (st.hover.r + 0.5) * cw - m / 2 + 1, m - 2, m - 2); }
 
     // side readouts
     const finished = st.done === st.total;
@@ -172,8 +197,9 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     const far = best && away(best);
     $("scan-best").innerHTML = !(finished && best) ? "…" : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
-    $("scan-go-best").disabled = !(finished && best && !(best.r === center.r && best.k === center.k));
-    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + "<br>CLICK TO MOVE THE SITE HERE" : "MOVE OVER THE MAP TO INSPECT A POINT. CLICK TO MOVE THE SITE THERE.";
+    const canMove = finished && best && !(best.r === center.r && best.k === center.k);
+    $("scan-go-best").disabled = !canMove;
+    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + `<br><b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO INSPECT A POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`;
   }
 
   const cellAt = (e) => {
@@ -192,10 +218,28 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   buildSeg($("scan-metric"), Object.entries(METRICS).map(([k, v]) => [k, v.label]), () => st.metric, (v) => { st.metric = v; draw(); });
   new ResizeObserver(() => schedule()).observe(canvas.parentElement);
 
-  function pick(c) { toggle(false); onPick(+c.lat.toFixed(4), +c.lon.toFixed(4)); }
+  // Moving the site from the scan: stay here, show the lander travel to the point, slide the map so the new site is
+  // the center, then scan again around it. The old picture stays as a faint backdrop until the new one covers it.
+  function pick(c) {
+    if (st.anim || !st.grid) return;
+    const n = st.grid.n, mid = (n - 1) / 2;
+    if (c.r === mid && c.k === mid) return;                // already here
+    st.anim = { c, t0: performance.now() }; st.hover = null;
+    const step = () => {
+      if (!st.anim) return;
+      if (panel.hidden) { st.anim = null; return; }
+      draw();
+      if (performance.now() - st.anim.t0 < GLIDE_MS + HOLD_MS + PAN_MS) return requestAnimationFrame(step);
+      const img = document.createElement("canvas"); img.width = img.height = n; img.getContext("2d").drawImage(tile, 0, 0);
+      st.under = { img, dk: c.k - mid, dr: c.r - mid, n }; st.moving = true; st.anim = null;
+      onPick(+c.lat.toFixed(4), +c.lon.toFixed(4));
+    };
+    requestAnimationFrame(step);
+  }
   function toggle(show = panel.hidden) {
     panel.hidden = !show;
     $("scan-btn").classList.toggle("on", show);
+    if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
   return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); } };

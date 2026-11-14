@@ -1,4 +1,4 @@
-// LUNO data provider: real geometry (NASA SPICE) + real terrain horizons (LRO LOLA).
+// LUNI data provider: real geometry (NASA SPICE) + real terrain horizons (LRO LOLA).
 //
 // getScenario(site, startDate) returns everything the UI needs:
 //   {

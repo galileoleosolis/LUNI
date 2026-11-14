@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download the LOLA elevation maps LUNO's terrain build needs (about 620 MB) from the NASA PDS Geosciences Node.
+# Download the LOLA elevation maps LUNI's terrain build needs (about 620 MB) from the NASA PDS Geosciences Node.
 set -euo pipefail
 mkdir -p "$(dirname "$0")/dem" && cd "$(dirname "$0")/dem"
 B=https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr

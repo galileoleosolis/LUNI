@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build LUNO's Sun/Earth ephemeris table from NASA NAIF SPICE kernels.
+"""Build LUNI's Sun/Earth ephemeris table from NASA NAIF SPICE kernels.
 
 For every 2 hours from START to STOP (UTC) it stores, in the Moon-fixed MOON_ME frame
 (the mean Earth / polar axis frame that LRO and LOLA maps use):
