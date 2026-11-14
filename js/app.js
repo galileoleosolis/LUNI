@@ -278,7 +278,7 @@ function renderWindows() {
   const from = all.findIndex((w) => w.end >= state.t0);
   const list = from < 0 ? [] : all.slice(from, from + 4);
   box.replaceChildren();
-  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. RELAX THE NEEDS OR TRY ANOTHER SITE.</div>`; return; }
+  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">RELAX THE MISSION NEEDS OR TRY ANOTHER SITE</b></div>`; return; }
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
@@ -453,7 +453,7 @@ function renderHorizon(cur) {
 }
 
 // ---------- timeline ----------
-const TL = { left: 58, right: 4, top: 18, rowH: 16, gap: 5, rail: 31 };      // rail = distance from the axis line down to the slider rail
+const TL = { left: 58, right: 4, top: 18, rowH: 14, gap: 4, rail: 27 };      // rail = distance from the axis line down to the slider rail
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -500,7 +500,7 @@ function renderTimeline() {
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
   const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
-  el("rect", { id: "tl-handle-box", y: yRail - 11, height: 22, rx: 11, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
+  el("rect", { id: "tl-handle-box", y: yRail - 10, height: 20, rx: 10, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
   el("text", { id: "tl-handle-text", y: yRail + 4, fill: "#000", "font-size": 12, "font-weight": 700, "text-anchor": "middle" }, g, "");
 }
 
@@ -534,7 +534,7 @@ function pinCurrent() {
 function renderCompare() {
   const box = $("compare-list");
   box.replaceChildren();
-  if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. PRESS [PIN] TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
+  if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. <b class="h-do">PRESS THE PIN KEY</b> TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
   const score = (p) => (p.mission.ok ? 10 : 0) + p.summary.pctSun * 0.6 + p.summary.pctEarth * 0.4;      // meeting the needs comes first
   const best = state.pinned.length > 1 ? state.pinned.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
   for (const p of state.pinned) {

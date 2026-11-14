@@ -72,6 +72,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
 - American spelling everywhere (center, color, meters, modeled): in the app, the code, the docs and in chat. The user insists.
 - No jargon on screen: say "landing" not "T0", dates as `14 JAN 2027 01:00 UTC`, never a bare "Z".
+- Headings speak in three voices (the user asked for this): the name of the thing (`.h-t`, bright), what it is
+  (plain, dim), and what you can do with it (`.h-do`, bold white with a pointer). Any text that points at a feature
+  uses `.h-do`; do not leave an instruction in the dim voice.
+- The crowded case to check after any layout change in the middle column: a NO-GO with three "ways to get a GO"
+  buttons (Nobile Rim 1, 14 NOV 2026 20:00). The landing-day strip must stay fully visible at 1100 x 700 and up.
 
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment

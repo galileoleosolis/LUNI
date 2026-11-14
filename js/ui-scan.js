@@ -173,7 +173,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const far = best && away(best);
     $("scan-best").innerHTML = !(finished && best) ? "…" : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
     $("scan-go-best").disabled = !(finished && best && !(best.r === center.r && best.k === center.k));
-    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + "<br>CLICK TO MOVE THE SITE HERE" : "MOVE OVER THE MAP TO INSPECT A POINT. CLICK TO MOVE THE SITE THERE.";
+    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + `<br><b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO INSPECT A POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`;
   }
 
   const cellAt = (e) => {
