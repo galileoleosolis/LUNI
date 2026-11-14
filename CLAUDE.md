@@ -93,8 +93,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    ("land on <date> instead", "find a better spot nearby", one need to relax); eclipse shown as a yellow tag;
    countdowns show the date; keys renamed NEXT GOOD TIME and BETTER SPOT; Moon zoom is faster.
    Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
-   Task set C (next good time, mission length, dark, Earth link, eclipse, better spot) is now the default; sets A and B
-   run with `#test-a` and `#test-b`.
+   Task set D is now the default (a site low in the list, next good time, two ASK LUNI tasks, scan distance to the
+   best point, move there); sets A, B and C run with `#test-a`, `#test-b`, `#test-c`. Set D's scan answer is read
+   from the tester's own scan panel, because the chip and the processor scan different grids.
    Fourth run (set C, same person): 5/6, ease 4/5, 7 minutes. He liked that everything to change is on the left.
    He still never pressed NEXT GOOD TIME, BETTER SPOT or the verdict-block buttons (stepped +1 day 20 times; for
    "find a GO point nearby" he clicked through the preset list). Complaints: the test's own date answer box showed the

@@ -7,7 +7,7 @@ import { sampleSite, hoursUntilChange, siteEclipses } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v7";
+const KEY = "luno-test-v8";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -140,9 +140,52 @@ const SET_C = [
       && snap.req.days === 10 && snap.req.maxDarkH === 12 && snap.req.earthAtLanding === true },
 ];
 
-// Which set runs: C by default; "#test-a" or "#test-b" in the address (or window.LUNO_TEST_SET) picks an earlier one.
-const SET_NAME = (location.hash.match(/^#test-([ab])$/)?.[1] || globalThis.LUNO_TEST_SET || "C").toUpperCase();
-const TASKS = { A: SET_A, B: SET_B, C: SET_C }[SET_NAME] || SET_C;
+// Fourth set: what was added after the third run. A site low in the list, the shortcut in the WHEN header,
+// ASK LUNI (typed or spoken commands), and the scan map's "how far is the best point" readout.
+const D_LUNI = "2027-01-12T12:00", D_SCAN = { site: "malapert", t0: "2027-02-08T00:00" };
+const DIR8 = ["NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "WEST", "NORTHWEST"];
+const usedLuni = { label: "used ASK LUNI", luni: true, test: () => false };      // set by the luno:command listener
+const SET_D = [
+  { id: "d-list", short: "Apollo 15 on 10 Mar 2027: GO?",
+    text: "First choose the landing site APOLLO 15. Then set the landing time to 10 March 2027, 00:00 UTC. Question: is this a GO for a 10-day mission?",
+    setup: { site: "apollo15", t0: "2027-03-10T00:00" },
+    type: "choice", options: ["GO", "NO-GO"],
+    expected: () => (mission("apollo15", "2027-03-10T00:00:00Z").v.ok ? "GO" : "NO-GO") },
+  { id: "d-next", short: "Next good landing date at Apollo 15",
+    text: "Stay on APOLLO 15, landing 10 March 2027, 00:00 UTC. Question: on what date is the next good landing time?",
+    reach: { label: "ended with a GO at Apollo 15 on screen", test: (s) => s.site.id === "apollo15" && s.missionOk },
+    type: "date",
+    expected: () => day(mission("apollo15", "2027-03-10T00:00:00Z").next.start),
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "d-luni-sun", short: "Ask LUNI where the Sun is",
+    text: "For this task use ASK LUNI, the green key at the bottom: type (or say) what you want in plain words. Tell LUNI to go to NOBILE RIM 1 and to land on 12 January 2027 at 12:00. Then ask it where the Sun is. Question: in which direction is the Sun at landing?",
+    setup: { site: "nobile1", t0: D_LUNI }, reach: usedLuni,
+    type: "choice", options: DIR8,
+    expected: () => DIR8[Math.round(mission("nobile1", D_LUNI + ":00Z").samples[0].sunAz / 45) % 8] },
+  { id: "d-luni-need", short: "Ask LUNI for a 28-day mission",
+    text: "Use ASK LUNI again. Stay on NOBILE RIM 1, landing 12 January 2027 at 12:00. Tell LUNI, in your own words, that the mission should last 28 days. Question: is it a GO now?",
+    reach: usedLuni,
+    type: "choice", options: ["GO", "NO-GO"],
+    expected: () => (mission("nobile1", D_LUNI + ":00Z", { days: 28 }).v.ok ? "GO" : "NO-GO") },
+  { id: "d-scan-dist", short: "Distance to the best point near Malapert",
+    text: "Put MISSION LENGTH back to 10. New situation: choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC. It is a NO-GO. Have LUNO look for a better spot nearby and wait until it has finished. Question: how far away is the best point it finds, in km?",
+    reach: { label: "got Malapert Massif at 2027-02-08T00:00 (a NO-GO) on screen", test: (s) => s.site.id === D_SCAN.site && s.t0.toISOString().slice(0, 16) === D_SCAN.t0 },
+    type: "number", unit: "KM", step: 0.01,
+    // The best point depends on how fine a map this computer scanned, so the right answer is what its own scan showed.
+    expected: () => $("scan-best")?.textContent.match(/([\d.]+) KM AWAY/)?.[1] ?? "(the search was not run to the end)",
+    check: (ans, exp) => Number.isFinite(+exp) && Math.abs(ans - +exp) <= 0.15 },
+  { id: "d-scan-move", short: "Move to the best point near Malapert",
+    text: "Last one: move the landing site to that best point, without changing the date or the mission needs. Press DONE when the screen shows the site there.",
+    type: "done",
+    expected: () => "a GO point within 25 km of Malapert Massif, same date and needs",
+    answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"} needs ${snap.req.days}d/${snap.req.maxDarkH}h/${snap.req.earthAtLanding ? "E" : "-"}`,
+    check: (ans, exp, snap) => snap.missionOk && snap.site.id !== D_SCAN.site && kmBetween(snap.site, site(D_SCAN.site)) <= 25 && snap.t0.toISOString().slice(0, 16) === D_SCAN.t0
+      && snap.req.days === 10 && snap.req.maxDarkH === 12 && snap.req.earthAtLanding === true },
+];
+
+// Which set runs: D by default; "#test-a", "#test-b" or "#test-c" in the address (or window.LUNO_TEST_SET) picks an earlier one.
+const SET_NAME = (location.hash.match(/^#test-([abc])$/)?.[1] || globalThis.LUNO_TEST_SET || "D").toUpperCase();
+const TASKS = { A: SET_A, B: SET_B, C: SET_C, D: SET_D }[SET_NAME] || SET_D;
 
 
 const FEATURES = {      // click targets -> the feature they belong to
@@ -185,6 +228,7 @@ function wireTracking() {
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
     if (/^(Arrow|Home| |Escape)/.test(e.key) || /^[spnatvSPNATV/]$/.test(e.key)) log("key", (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key));
   }, true);
+  window.addEventListener("luno:command", (e) => { if (T?.phase === "tasks" && TASKS[T.task]?.reach?.luni && e.detail.ok) { T.reached = true; save(); } });
   window.addEventListener("luno:command", (e) => log("input", `${e.detail.via}:"${e.detail.text.slice(0, 60)}" -> ${e.detail.ok ? e.detail.tools.join("+") : "NOT UNDERSTOOD"}`));
   let last = "";
   window.addEventListener("luno:state", () => {
@@ -228,7 +272,7 @@ function showTask() {
   T.taskStart = now(); T.reached = false; save();
   let ctl = "";
   if (t.type === "choice") ctl = t.options.map((o) => `<button class="test-opt" data-v="${o}">${o}</button>`).join("");
-  if (t.type === "number") ctl = `<input id="test-answer" type="number" step="1" min="0" inputmode="numeric" aria-label="Answer"> <span>${t.unit}</span>`;
+  if (t.type === "number") ctl = `<input id="test-answer" type="number" step="${t.step || 1}" min="0" inputmode="decimal" aria-label="Answer"> <span>${t.unit}</span>`;
   if (t.type === "date") {
     const M = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"], opt = (v, label) => `<option value="${v}">${label}</option>`;
     ctl = `<span class="test-date"><select id="ta-day" aria-label="Day">${opt("", "DAY")}${Array.from({ length: 31 }, (_, i) => opt(i + 1, String(i + 1).padStart(2, "0"))).join("")}</select>`
