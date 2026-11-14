@@ -7,7 +7,7 @@ import { sampleSite, hoursUntilChange, siteEclipses } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v5";
+const KEY = "luno-test-v6";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -109,7 +109,7 @@ const TASKS = SET_NAME === "A" ? SET_A : SET_B;
 const FEATURES = {      // click targets -> the feature they belong to
   "site list": /^site-row/, "3D Moon": /^globe/, "lat/lon boxes": /^(lat|lon)-input/, "landing-time pickers": /^t0-/,
   "launch-slip keys": /^slip/, "NEXT WINDOW": /^next-window-btn/, "AREA SCAN": /^scan/, "mission needs": /^need:/,
-  "verdict-block buttons": /^mission-(next|scan)/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
+  "verdict-block buttons": /^mission-/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
 };
 
 let T = null, api = null;       // T = test state, api = hooks from app.js

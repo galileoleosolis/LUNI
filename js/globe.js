@@ -100,7 +100,7 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
   // --- controls ---
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.12;
-  controls.minDistance = 1.35; controls.maxDistance = 7; controls.rotateSpeed = 0.6;
+  controls.minDistance = 1.35; controls.maxDistance = 7; controls.rotateSpeed = 0.6; controls.zoomSpeed = 2.4;
 
   let tween = null;
   function flyTo(lat, lon, dist) {

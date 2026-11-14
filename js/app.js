@@ -227,13 +227,28 @@ function renderMission() {
   const r = state.req, v = state.cal.a.at(calIdx()), nx = state.cal.windows.find((w) => w.start > state.t0);
   $("mission").className = "hero " + (v.ok ? "go" : "nogo");
   $("mission-word").textContent = v.ok ? "GO" : "NO-GO";
-  $("mission-title").textContent = `LANDING ${stamp(state.t0)} ·`;
+  $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
   const line = (s) => `<div>${s}</div>`;
   $("mission-why").innerHTML = v.ok
     ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
     : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT GOOD LANDING TIME: ${stamp(nx.start)}` : "NO GOOD LANDING TIME IN THE NEXT 12 MONTHS"}</div>`;
-  $("mission-actions").hidden = v.ok;
-  $("mission-next").hidden = !nx;
+  // A NO-GO comes with ways out: another time, another spot, or a mission need that could be relaxed.
+  const fixes = [];
+  if (!v.ok) {
+    const tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS).at(calIdx()).ok;
+    if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
+    fixes.push(["mission-scan", "FIND A BETTER SPOT NEARBY", () => scan.toggle(true)]);
+    const dark = REQ_OPTIONS.maxDarkH.find((hh) => hh > r.maxDarkH && tryReq({ maxDarkH: hh }));
+    if (dark) fixes.push(["mission-fix-dark", `LET IT SIT ${dark} H IN THE DARK`, () => setReq("maxDarkH", dark)]);
+    if (r.earthAtLanding && tryReq({ earthAtLanding: false })) fixes.push(["mission-fix-earth", "LAND WITHOUT AN EARTH LINK", () => setReq("earthAtLanding", false)]);
+    const days = [...REQ_OPTIONS.days].reverse().find((d) => d < r.days && tryReq({ days: d }));
+    if (days) fixes.push(["mission-fix-days", `SHORTEN THE MISSION TO ${days} DAYS`, () => setReq("days", days)]);
+  }
+  fixes.length = Math.min(fixes.length, 3);                      // keep it to one row: another time, another spot, one need to relax
+  $("mission-fix").hidden = !fixes.length;
+  $("mission-fix-list").replaceChildren(...fixes.map(([id, label, run]) => {
+    const b = document.createElement("button"); b.id = id; b.className = "hero-next"; b.textContent = label + " ▸"; b.addEventListener("click", run); return b;
+  }));
   // Eclipses during the mission (Earth passing in front of the Sun), if the Sun would otherwise be in view.
   const end = new Date(+state.t0 + r.days * DAY), i0 = calIdx();
   const hit = siteEclipses(state.site, state.t0, end, state.scenario.terrain).filter((e) => {
@@ -241,7 +256,7 @@ function renderMission() {
     return s && s.sunTerrain > 0 && e.maxCover >= 0.05;
   });
   for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
-    `<div class="warn">ECLIPSE ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${fmtDH(Math.round((e.end - e.start) / 3600000))}</div>`);
+    `<div class="warn">⚠ ECLIPSE ON ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</div>`);
   return v;
 }
 
@@ -269,6 +284,13 @@ function nextWindow() {
   const b = $("next-window-btn"); b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 500);
 }
 
+// Change one mission need (from its buttons or from a "way to get a GO" button) and keep the buttons in step.
+function setReq(k, val) {
+  state.req = { ...state.req, [k]: val };
+  document.querySelectorAll(`.seg[data-req="${k}"] button`).forEach((x) => x.classList.toggle("on", x.dataset.v === String(val)));
+  recompute({ keepIdx: true });
+}
+
 function buildNeeds() {
   document.querySelectorAll(".seg[data-req]").forEach((seg) => {
     const k = seg.dataset.req;
@@ -276,12 +298,7 @@ function buildNeeds() {
     for (const [val, label] of opts) {
       const b = document.createElement("button");
       b.textContent = label; b.dataset.v = String(val); b.classList.toggle("on", state.req[k] === val);
-      b.addEventListener("click", () => {
-        state.req = { ...state.req, [k]: val };
-        // the same need can appear in two places (the verdict block and the needs panel): keep them in step
-        document.querySelectorAll(`.seg[data-req="${k}"] button`).forEach((x) => x.classList.toggle("on", x.dataset.v === String(val)));
-        recompute({ keepIdx: true });
-      });
+      b.addEventListener("click", () => setReq(k, val));
       seg.appendChild(b);
     }
   });
@@ -326,12 +343,15 @@ function renderMoment() {
   const ecl = $("sun-eclipse");
   ecl.hidden = !(cur.eclipse > 0.01 && cur.sunTerrain > 0);
   if (!ecl.hidden) ecl.textContent = `ECLIPSE: EARTH HIDES ${Math.round(cur.eclipse * 100)}% OF THE SUN`;
-  $("sun-next-label").textContent = cur.sunUp ? "SUNSET IN" : "SUNRISE IN";
+  const sunNext = sunLeft == null ? null : samples[state.idx + sunLeft / STEP_HOURS];      // what ends the sunlight: the skyline or an eclipse
+  $("sun-next-label").textContent = cur.sunUp ? (sunNext && sunNext.eclipse > 0.4 ? "ECLIPSE IN" : "SUNSET IN") : (cur.eclipse > 0.4 ? "ECLIPSE ENDS IN" : "SUNRISE IN");
   $("sun-next").textContent = fmtBig(sunLeft);
+  $("sun-next-date").textContent = sunLeft == null ? "" : `ON ${stamp(new Date(+cur.t + sunLeft * 3600000))}`;
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1).padStart(5, "0") + "°";
   set("earth-state", cur.earthUp, "EARTH IN VIEW", "NO LINK");
   $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
   $("earth-next").textContent = fmtBig(earthLeft);
+  $("earth-next-date").textContent = earthLeft == null ? "" : `ON ${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1).padStart(5, "0") + "°";
 
   $("hz-sun").href = horizonsUrl(10, cur.t);
@@ -540,8 +560,6 @@ async function init() {
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
   $("next-window-btn").addEventListener("click", nextWindow);
-  $("mission-next").addEventListener("click", nextWindow);
-  $("mission-scan").addEventListener("click", () => scan.toggle(true));
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req }),
     onPick: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }),

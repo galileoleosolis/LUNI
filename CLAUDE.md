@@ -23,7 +23,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - `js/scan-core.js`, `js/scan.js`, `js/scan-worker.js`, `js/ui-scan.js` — area scan in module Web Workers.
 - `js/surface.js`, `js/ui-surface.js` — 3D first-person surface view (three.js): nested terrain sheets from `data/patch/`
   (40 m, built by `tools/build_patches.py`) and the reduced maps, Sun light with shadow map, LUNO skyline overlay at 2 m.
-  Not yet on the preview page: the patches need base64 copies for that host (see the artifact build step).
+  On the preview page the patches are served as base64 text copies (see the artifact build step).
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -65,6 +65,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    He still never changed the mission length, stepped +1 day 21 times instead of using NEXT WINDOW, and never opened
    the area scan. Fixed since: mission length sits inside the verdict block, and a NO-GO shows two buttons there
    (next good landing time, better spot nearby). Still needs a test with someone who has NOT seen the app.
+   Third run (set B, same person): 2/6, ease 4/5. Three runs in a row he used only the left column, the bottom keys
+   and the big GO word; never the right column, never the verdict text. He said the charts take too much space.
+   Fixed since: mission needs moved to the left column as step 3; a NO-GO shows up to three key-style buttons
+   ("land on <date> instead", "find a better spot nearby", one need to relax); eclipse shown as a yellow tag;
+   countdowns show the date; keys renamed NEXT GOOD TIME and BETTER SPOT; Moon zoom is faster.
    Task set B (new sites and dates; mission needs, sunset date, eclipse, area scan) is now the default;
    set A runs with `#test-a`.
 6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)

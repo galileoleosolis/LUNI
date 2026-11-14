@@ -53,11 +53,6 @@
         </div>
         <div class="k-hint">NUMBERED DOTS = THE SITES BELOW</div>
         <div id="site-list" class="site-list"></div>
-        <div class="fields">
-          <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
-          <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
-        </div>
-        <p id="site-note" class="note"></p>
         <h3 class="gap"><b class="step">2</b>WHEN · PICK THE LANDING TIME</h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
@@ -66,6 +61,13 @@
           <select id="t0-hour" aria-label="Hour, UTC"></select>
         </div>
         <p class="note">UTC = WORLD TIME (SAME AS GMT)</p>
+        <h3 class="gap"><b class="step">3</b>WHAT THE MISSION NEEDS</h3>
+        <div class="needs">
+          <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
+          <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
+          <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
+          <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+        </div>
       </section>
 
       <!-- CENTER: the answer -->
@@ -88,17 +90,14 @@
             </div>
           </div>
         </div>
-        <h3><b class="step">3</b>THE ANSWER · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <h3><b class="step">4</b>THE ANSWER · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
           <div class="hero-text">
-            <div class="hero-title"><span id="mission-title"></span> <span class="hero-len">MISSION LENGTH <span class="seg" data-req="days"></span> DAYS</span></div>
+            <div class="hero-title" id="mission-title"></div>
             <div class="hero-why" id="mission-why"></div>
           </div>
-          <div class="hero-actions" id="mission-actions" hidden>
-            <button id="mission-next" class="hero-next">NEXT GOOD LANDING TIME ▸</button>
-            <button id="mission-scan" class="hero-next alt">BETTER SPOT NEARBY ▸</button>
-          </div>
+          <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
 
         <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
@@ -113,7 +112,7 @@
               <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
             </div>
-            <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b></div>
+            <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
           </div>
           <div class="ro">
             <div class="ro-a">
@@ -121,7 +120,7 @@
               <div class="st" id="earth-state"></div>
               <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
             </div>
-            <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b></div>
+            <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
           </div>
         </div>
 
@@ -139,14 +138,7 @@
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side">
-        <h3><b class="step">4</b>MISSION NEEDS · WHAT COUNTS AS GOOD</h3>
-        <div class="needs">
-          <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
-          <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
-          <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
-          <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
-        </div>
-        <h3 class="gap">NEXT GOOD LANDING WINDOWS · CLICK ONE TO GO THERE</h3>
+        <h3>NEXT GOOD LANDING TIMES · CLICK ONE TO GO THERE</h3>
         <div id="windows" class="windows"></div>
         <h3 class="gap">COMPARE · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
@@ -161,6 +153,12 @@
           </table>
           <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
+          <p id="site-note" class="note"></p>
+          <h3 class="gap">A CUSTOM POINT · LATITUDE AND LONGITUDE</h3>
+          <div class="fields">
+            <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
+            <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
+          </div>
         </details>
         <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
@@ -174,8 +172,8 @@
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
     <span class="key-gap"></span>
-    <button class="key g" id="next-window-btn"><small>LANDING</small>NEXT WINDOW</button>
-    <button class="key g" id="scan-btn"><small>NEARBY</small>AREA SCAN</button>
+    <button class="key g" id="next-window-btn"><small>JUMP TO THE</small>NEXT GOOD TIME</button>
+    <button class="key g" id="scan-btn"><small>FIND A NEARBY</small>BETTER SPOT</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
     <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
   </div>
