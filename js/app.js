@@ -44,9 +44,10 @@ function fitStage() {
   const flow = root.clientWidth < FIT.flowBelow;
   root.classList.toggle("flow", flow);
   if (flow) return;
-  // Fit the height first (never smaller than sMin: a very short window scrolls instead of shrinking the text away),
-  // then let the unit use the window's width, within the range of widths the layout is designed for.
-  let s = Math.max(FIT.sMin, Math.min(FIT.sMax, vh / FIT.dhMin)), dw = vw / s, dh = FIT.dhMin;
+  // Fit the height first (never smaller than sMin: a very short window scrolls instead of shrinking the text away).
+  // A tall window first gets a taller layout at normal size (more sites, taller charts) and is only magnified past
+  // that. Then the unit uses the window's width, within the range of widths the layout is designed for.
+  let dh = Math.max(FIT.dhMin, Math.min(FIT.dhMax, vh)), s = Math.max(FIT.sMin, Math.min(FIT.sMax, vh / dh)), dw = vw / s;
   if (dw < FIT.dwMin) { dw = FIT.dwMin; s = vw / dw; dh = Math.max(FIT.dhMin, Math.min(FIT.dhMax, vh / s)); }   // narrow window: width decides, use spare height
   dw = Math.min(dw, FIT.dwMax);
   const st = $("stage").style;
@@ -82,6 +83,10 @@ function el(tag, attrs = {}, parent, text) {
 // ---------- site selection ----------
 function buildSiteList() {
   const box = $("site-list");
+  // "more below" marker: shown while the list can still be scrolled down
+  const more = document.createElement("div"); more.className = "site-more"; more.textContent = "▼ MORE SITES · SCROLL";
+  const sync = () => { more.classList.add("off"); more.classList.toggle("off", box.scrollTop + box.clientHeight >= box.scrollHeight - 6); };      // measured without the marker itself
+  box.addEventListener("scroll", sync); new ResizeObserver(sync).observe(box); queueMicrotask(() => { box.appendChild(more); sync(); });
   let grp = null, n = 0;
   for (const s of SITES) {
     if (s.group !== grp) { grp = s.group; const g = document.createElement("div"); g.className = "grp"; g.textContent = grp.toUpperCase(); box.appendChild(g); }

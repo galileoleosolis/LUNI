@@ -101,6 +101,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    month as a number and its year was slow to scroll; Moon zoom slightly too fast.
    Fixed since: the two shortcuts are repeated as buttons in the left column (`#side-scan` under the site list,
    `#side-next` under the landing time); the test's date answer is three pickers like the app's; zoom speed 1.9.
+   The user's own run (15 Nov, big screen about 2000 x 1250): "the landing site selection is very hidden, and
+   everything is very big". Fixed since: `fitStage` gives a tall window a taller layout (up to `dhMax`) before it
+   magnifies; the left column now starts with the site list (framed, with a "more sites" marker), the Moon sits under
+   it, and the two shortcut buttons live in the step 1 and step 2 headers (`#side-scan`, `#side-next`). Sites visible
+   without scrolling: 7 of 12 on laptop windows (was 4), 12 of 12 on big screens.
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNO).
