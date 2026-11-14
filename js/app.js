@@ -6,6 +6,7 @@ import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } fro
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
 import { sampleSite } from "./model.js";
 import { createScanPanel } from "./ui-scan.js";
+import { initTestMode } from "./testmode.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -30,7 +31,8 @@ const FIT = { flowBelow: 900, dhMin: 872, dhMax: 1120, dwMin: 1252, dwMax: 1732,
 function fitStage() {
   const root = document.documentElement, cs = getComputedStyle(document.body);
   const vw = root.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const vh = window.innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const bar = $("test-bar"), barH = bar && !bar.hidden ? bar.offsetHeight + 8 : 0;      // test-mode task bar sits above the unit
+  const vh = window.innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - barH;
   const flow = root.clientWidth < FIT.flowBelow;
   root.classList.toggle("flow", flow);
   if (flow) return;
@@ -166,6 +168,7 @@ function recompute({ keepIdx = false } = {}) {
   renderMission();
   renderMoment();
   scan?.refresh();
+  window.dispatchEvent(new Event("luno:state"));
 }
 
 // ---------- mission needs, landing windows, calendar ----------
@@ -529,6 +532,10 @@ async function init() {
   renderCompare();
   globe?.select(state.site);
   recompute();
+  initTestMode({
+    snapshot: () => ({ site: state.site, t0: state.t0, req: state.req, missionOk: state.cal.a.at(calIdx()).ok }),
+    relayout: () => { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); },
+  });
   document.fonts?.ready.then(() => { renderTimeline(); updateCalendar(); renderMoment(); });
 }
 
