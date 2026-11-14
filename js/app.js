@@ -2,6 +2,9 @@ import { SITES, CUSTOM_ID, loadSites } from "./sites.js";
 import { computeTerrain } from "./terrain.js";
 import { hasTerrain, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
 import { createGlobe } from "./globe.js";
+import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
+import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
+import { sampleSite } from "./model.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -15,6 +18,8 @@ const state = {
   summary: null,
   pinned: [],
   playing: null,
+  req: { ...DEFAULT_REQ },       // mission needs
+  cal: null,                     // year of landing-window data for the current site + needs
 };
 let globe = null;
 
@@ -121,7 +126,7 @@ function renderBrief() {
 
 // ---------- compute ----------
 function recompute({ keepIdx = false } = {}) {
-  const cov = coverage(), last = new Date(cov.end.getTime() - 31 * 86400000);
+  const cov = coverage(), last = new Date(cov.end.getTime() - 70 * 86400000);
   if (state.t0 < cov.start) state.t0 = cov.start;
   if (state.t0 > last) state.t0 = last;
   state.scenario = getScenario(state.site, state.t0);
@@ -134,8 +139,90 @@ function recompute({ keepIdx = false } = {}) {
   $("pct-both").textContent = pct(s.pctBoth);
   $("max-dark").textContent = s.maxDarkHours ? fmtT(s.maxDarkHours) : "NONE";
   renderBrief();
+  updateCalendar();
   renderTimeline();
+  renderMission();
   renderMoment();
+}
+
+// ---------- mission needs, landing windows, calendar ----------
+const DAY = 86400000;
+const monthStart = (d) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+
+// A year of hourly samples from the start of T0's month, judged against the mission needs.
+// Rebuilt only when the site, its terrain, the needs or the year in view change.
+function updateCalendar() {
+  // Keep the strip anchored while T0 stays inside it, so clicking a day does not shift the view.
+  const inView = state.cal && state.t0 >= state.cal.start && state.t0 < new Date(+state.cal.start + (state.cal.days - 1) * DAY);
+  const start = inView ? state.cal.start : monthStart(state.t0), terrain = state.scenario.terrain;
+  const key = `${state.site.lat},${state.site.lon},${terrain.real},${+start},${JSON.stringify(state.req)}`;
+  if (state.cal?.key !== key) {
+    const cov = coverage();
+    const days = Math.max(31, Math.min(365, Math.floor((cov.end - start) / DAY) - state.req.days - 3));
+    const samples = sampleSite(state.site, start, (days + state.req.days + 3) * 24, terrain);
+    const a = analyze(samples, state.req, STEP_HOURS);
+    for (let i = days * 24; i < a.mask.length; i++) a.mask[i] = 0;      // landing days beyond the strip are not offered
+    state.cal = { key, start, days, samples, a, windows: windowsFrom(a.mask, samples), daily: dailyStats(samples, a.mask, days) };
+  }
+  renderCalendar($("calendar"), state.cal.daily, { t0Day: Math.floor((state.t0 - state.cal.start) / DAY), missionDays: state.req.days });
+  renderWindows();
+}
+const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HOURS);
+
+function renderMission() {
+  const r = state.req, v = state.cal.a.at(calIdx()), box = $("mission");
+  const needs = `${r.days}D MISSION`;
+  if (v.ok) {
+    box.className = "verdict mission go";
+    box.innerHTML = `&gt; LAND AT T0, ${needs}: GO <span>— SUNLIGHT MARGIN ${v.marginOpen ? "OVER " : "+"}${fmtDH(Math.max(0, v.marginHours))} · EARTH LINK ${Math.round(v.earthPct)}% OF MISSION</span>`;
+  } else {
+    const nx = state.cal.windows.find((w) => w.start > state.t0);
+    box.className = "verdict mission nogo";
+    box.innerHTML = `&gt; LAND AT T0, ${needs}: NO-GO <span>— ${v.reasons.join(" · ")}${nx ? ` · NEXT WINDOW ${stamp(nx.start)}` : " · NO WINDOW IN THE NEXT 12 MONTHS"}</span>`;
+  }
+  return v;
+}
+
+function renderWindows() {
+  const box = $("windows"), all = state.cal.windows;
+  const from = all.findIndex((w) => w.end >= state.t0);
+  const list = from < 0 ? [] : all.slice(from, from + 4);
+  box.replaceChildren();
+  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. RELAX THE NEEDS OR TRY ANOTHER SITE.</div>`; return; }
+  const day = (d) => `${pad(d.getUTCDate())} ${["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][d.getUTCMonth()]} ${pad(d.getUTCHours())}Z`;
+  for (const w of list) {
+    const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
+    if (cur) b.className = "cur";
+    b.innerHTML = `<span>${cur ? "▶ " : ""}${day(w.start)} → ${day(w.end)}</span><span>${fmtDH((w.i1 - w.i0) * STEP_HOURS)}</span>`;
+    b.title = "Land at the start of this window";
+    b.addEventListener("click", () => setT0(w.start));
+    box.appendChild(b);
+  }
+}
+
+function setT0(d) { state.t0 = new Date(d); recompute(); }
+
+function nextWindow() {
+  const w = state.cal.windows.find((x) => x.start > state.t0);
+  if (w) return setT0(w.start);
+  const b = $("next-window-btn"); b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 500);
+}
+
+function buildNeeds() {
+  document.querySelectorAll(".seg[data-req]").forEach((seg) => {
+    const k = seg.dataset.req;
+    const opts = k === "earthAtLanding" ? [[true, "REQUIRED"], [false, "NO"]] : REQ_OPTIONS[k].map((v) => [v, k === "earthMinPct" && v === 0 ? "ANY" : String(v)]);
+    for (const [val, label] of opts) {
+      const b = document.createElement("button");
+      b.textContent = label; b.classList.toggle("on", state.req[k] === val);
+      b.addEventListener("click", () => {
+        state.req = { ...state.req, [k]: val };
+        seg.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+        recompute({ keepIdx: true });
+      });
+      seg.appendChild(b);
+    }
+  });
 }
 
 function slip(days) {
@@ -261,7 +348,7 @@ function renderHorizon(cur) {
 }
 
 // ---------- timeline ----------
-const TL = { left: 52, right: 4, top: 14, rowH: 17, gap: 6 };
+const TL = { left: 52, right: 4, top: 16, rowH: 16, gap: 5 };
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -291,6 +378,9 @@ function renderTimeline() {
     el("text", { x: xx, y: yAxis + 11, fill: C.dim, "font-size": 10, "text-anchor": day === 0 ? "start" : day === 30 ? "end" : "middle" }, svg,
       `${day ? "+" + day + "D" : "T0"}${W < 520 && day ? "" : ` ${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}`}`);
   }
+  const mEnd = TL.left + Math.min(n, state.req.days * 24 / STEP_HOURS) * w;      // mission length from T0
+  el("path", { d: `M${TL.left},${TL.top - 3}v-5H${mEnd}v5`, fill: "none", stroke: C.wht, "stroke-width": 1.2 }, svg);
+  el("text", { x: Math.min(mEnd + 5, W - 76), y: TL.top - 5, fill: C.wht, "font-size": 9 }, svg, state.req.days < 30 ? `MISSION ${state.req.days}D` : "");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
 }
@@ -313,7 +403,7 @@ function scrubFromEvent(e) {
 function pinCurrent() {
   const key = `${state.site.lat},${state.site.lon},${state.t0.toISOString()}`;
   if (!state.pinned.some((p) => p.key === key))
-    state.pinned.push({ key, site: { ...state.site }, t0: new Date(state.t0), summary: state.summary });
+    state.pinned.push({ key, site: { ...state.site }, t0: new Date(state.t0), summary: state.summary, days: state.req.days, mission: state.cal.a.at(calIdx()) });
   renderCompare();
 }
 
@@ -321,14 +411,15 @@ function renderCompare() {
   const box = $("compare-list");
   box.replaceChildren();
   if (!state.pinned.length) { box.innerHTML = `<div class="empty">NOTHING PINNED. PRESS [PIN] TO KEEP THIS SITE + DATE, THEN CHANGE EITHER AND PIN AGAIN.</div>`; return; }
-  const score = (p) => p.summary.pctSun * 0.6 + p.summary.pctEarth * 0.4;
+  const score = (p) => (p.mission.ok ? 10 : 0) + p.summary.pctSun * 0.6 + p.summary.pctEarth * 0.4;      // meeting the needs comes first
   const best = state.pinned.length > 1 ? state.pinned.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
   for (const p of state.pinned) {
     const d = document.createElement("div");
     d.className = "cmp" + (p === best ? " best" : "");
     const bar = (name, v, col) => `<div class="rowb"><span>${name}</span><i><b style="width:${Math.round(v * 100)}%;background:${col}"></b></i><span>${pct(v)}</span></div>`;
     d.innerHTML = `<div class="nm">${p === best ? '<span class="best-tag">BEST</span>' : ""}${siteName(p.site)}</div>
-      <div class="dt">T0 ${stamp(p.t0)} · DARK ${p.summary.maxDarkHours ? fmtT(p.summary.maxDarkHours) : "NONE"}</div>
+      <div class="dt">T0 ${stamp(p.t0)}</div>
+      <div class="dt"><span class="${p.mission.ok ? "tag-go" : "tag-nogo"}">${p.days}D ${p.mission.ok ? "GO" : "NO-GO"}</span>${p.mission.ok ? `MARGIN ${p.mission.marginOpen ? ">" : "+"}${fmtDH(Math.max(0, p.mission.marginHours))}` : p.mission.reasons[0]}</div>
       ${bar("SUN", p.summary.pctSun, C.grn)}${bar("EARTH", p.summary.pctEarth, C.cy)}${bar("BOTH", p.summary.pctBoth, C.wht)}
       <button class="x" title="Remove">✕</button>`;
     d.querySelector(".x").addEventListener("click", (e) => { e.stopPropagation(); state.pinned = state.pinned.filter((q) => q !== p); renderCompare(); });
@@ -342,7 +433,7 @@ async function init() {
   await Promise.all([loadSites(), initModel()]);
   state.site = SITES[0];
   const cov = coverage();
-  $("date-input").min = toInputValue(cov.start); $("date-input").max = toInputValue(new Date(cov.end.getTime() - 31 * 86400000));
+  $("date-input").min = toInputValue(cov.start); $("date-input").max = toInputValue(new Date(cov.end.getTime() - 70 * 86400000));
   buildSiteList();
 
   const tip = $("globe-tip");
@@ -371,6 +462,15 @@ async function init() {
   $("play-btn").addEventListener("click", togglePlay);
   $("next-site-btn").addEventListener("click", nextSite);
   $("pin-btn").addEventListener("click", pinCurrent);
+  $("next-window-btn").addEventListener("click", nextWindow);
+  buildNeeds();
+  $("calendar").addEventListener("click", (e) => {
+    const d = dayFromEvent($("calendar"), e, state.cal.days);
+    if (d < 0) return;
+    let i = d * 24; const end = i + 24;
+    while (i < end && !state.cal.a.mask[i]) i++;                     // first good landing hour that day, else midnight
+    setT0(state.cal.samples[i < end ? i : d * 24].t);
+  });
 
   const tl = $("timeline");
   let dragging = false;
@@ -386,17 +486,18 @@ async function init() {
     else if (k === " ") togglePlay();
     else if (k === "s" || k === "S") nextSite();
     else if (k === "p" || k === "P") pinCurrent();
+    else if (k === "n" || k === "N") nextWindow();
     else if (k === "Home") setIdx(0);
     else return;
     e.preventDefault();
   });
 
-  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); renderMoment(); }, 80); });
+  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderTimeline(); updateCalendar(); renderMoment(); }, 80); });
 
   renderCompare();
   globe?.select(state.site);
   recompute();
-  document.fonts?.ready.then(() => { renderTimeline(); renderMoment(); });
+  document.fonts?.ready.then(() => { renderTimeline(); updateCalendar(); renderMoment(); });
 }
 
 init().catch((e) => {

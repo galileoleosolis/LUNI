@@ -54,20 +54,26 @@ export function horizonAt(horizon, az) {
   return horizon[i] * (1 - k) + horizon[j] * k;
 }
 
-export function getScenario(site, startDate) {
-  const terrain = terrainFor(site), horizon = terrain.horizon;
+// Hourly Sun/Earth samples for a site over `hours`, judged against its terrain skyline.
+export function sampleSite(site, startDate, hours, terrain = terrainFor(site)) {
+  const horizon = terrain.horizon;
   const frame = siteFrame(site.lat, site.lon, MOON_RADIUS_KM + (terrain.heightM + terrain.mastM) / 1000);
-  const n = Math.round(SPAN_DAYS * 24 / STEP_HOURS);
+  const n = Math.round(hours / STEP_HOURS), t0 = +startDate;
   const samples = new Array(n);
   for (let i = 0; i < n; i++) {
-    const t = new Date(startDate.getTime() + i * STEP_HOURS * 3600000);
+    const t = new Date(t0 + i * STEP_HOURS * 3600000);
     const s = sunEarthAltAz(frame, t);
     s.t = t;
     s.sunUp = s.sunEl > horizonAt(horizon, s.sunAz);       // centre of the Sun's disc above the skyline
     s.earthUp = s.earthEl > horizonAt(horizon, s.earthAz);
     samples[i] = s;
   }
-  return { horizon, terrain, samples };
+  return samples;
+}
+
+export function getScenario(site, startDate) {
+  const terrain = terrainFor(site);
+  return { horizon: terrain.horizon, terrain, samples: sampleSite(site, startDate, SPAN_DAYS * 24, terrain) };
 }
 
 // Summary statistics over the whole span.

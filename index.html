@@ -59,17 +59,30 @@
           </div>
         </div>
         <div id="verdict" class="verdict"></div>
+        <div id="mission" class="verdict mission"></div>
 
         <h3>LOCAL HORIZON · LOOKING OUT FROM THE SITE · AZ 000–360 · EL DEG</h3>
         <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
 
         <h3>VISIBILITY · T0 → T0+30D · CLICK OR DRAG TO SCRUB</h3>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
+
+        <h3 id="cal-title">LANDING WINDOWS · NEXT 12 MONTHS · CLICK A DAY TO LAND THEN</h3>
+        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
       </section>
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side">
-        <h3>30-DAY SUMMARY FROM T0</h3>
+        <h3>MISSION NEEDS</h3>
+        <div class="needs">
+          <div class="need"><span>LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
+          <div class="need"><span>DARK GAP ≤</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
+          <div class="need"><span>EARTH LINK ≥</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
+          <div class="need"><span>EARTH AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+        </div>
+        <h3 style="margin-top:12px">NEXT LANDING WINDOWS</h3>
+        <div id="windows" class="windows"></div>
+        <h3 style="margin-top:14px">30-DAY SUMMARY FROM T0</h3>
         <table class="sum">
           <tr><td>SUNLIT</td><td id="pct-sun"></td></tr>
           <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
@@ -81,7 +94,7 @@
         <h3 style="margin-top:14px">COMPARE</h3>
         <div id="compare-list" class="compare"></div>
         <h3 style="margin-top:14px">KEYBOARD</h3>
-        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
+        <div class="help"><b>← →</b> SCRUB 1H &nbsp; <b>⇧← ⇧→</b> SLIP 1D &nbsp; <b>N</b> NEXT WINDOW<br><b>SPACE</b> PLAY &nbsp; <b>S</b> NEXT SITE &nbsp; <b>P</b> PIN</div>
         <div class="credit">SUN + EARTH POSITIONS: NASA NAIF SPICE (DE440), CHECKED AGAINST JPL HORIZONS. TERRAIN: LRO LOLA ELEVATION MAPS (NASA PDS). IMAGERY: LRO WAC MOSAIC (NASA/GSFC/ASU) VIA MOON TREK.</div>
       </section>
     </div>
@@ -94,6 +107,7 @@
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
     <span class="key-gap"></span>
+    <button class="key g" id="next-window-btn"><small>LANDING</small>NEXT WINDOW</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
     <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
   </div>
