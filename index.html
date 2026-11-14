@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LUNO · Lunar Utility for Navigational Operations</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>LUNO</h1>
+        <p class="tagline">Lunar Utility for Navigational Operations</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="data-badge" class="badge badge-warn" title="Placeholder geometry and terrain — real SPICE + LOLA data coming">DEMO DATA</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: scenario controls -->
+    <aside class="panel controls">
+      <section>
+        <h2>Landing site</h2>
+        <label class="field">
+          <span>Preset</span>
+          <select id="site-select"></select>
+        </label>
+        <div class="row">
+          <label class="field">
+            <span>Latitude °</span>
+            <input id="lat-input" type="number" step="0.01" min="-90" max="90">
+          </label>
+          <label class="field">
+            <span>Longitude °E</span>
+            <input id="lon-input" type="number" step="0.01" min="-180" max="360">
+          </label>
+        </div>
+        <p id="site-note" class="hint"></p>
+      </section>
+
+      <section>
+        <h2>Landing date</h2>
+        <label class="field">
+          <span>Date &amp; time (UTC)</span>
+          <input id="date-input" type="datetime-local">
+        </label>
+        <div class="slip">
+          <span class="slip-label">Launch slip</span>
+          <button data-slip="-7">−7 d</button>
+          <button data-slip="-1">−1 d</button>
+          <button data-slip="1">+1 d</button>
+          <button data-slip="7">+7 d</button>
+        </div>
+      </section>
+
+      <section>
+        <button id="pin-btn" class="primary">＋ Add to comparison</button>
+        <p class="hint">Pin this site + date to compare it side by side.</p>
+      </section>
+    </aside>
+
+    <!-- CENTER: the answer -->
+    <section class="main">
+      <div class="verdict" id="verdict"></div>
+
+      <div class="cards">
+        <article class="card sun">
+          <header><span class="dot sun-dot"></span>Sun · power</header>
+          <div class="big" id="sun-state">—</div>
+          <div class="kv"><span>Elevation</span><b id="sun-el">—</b></div>
+          <div class="kv"><span>Azimuth</span><b id="sun-az">—</b></div>
+          <div class="kv"><span id="sun-next-label">Sunset in</span><b id="sun-next">—</b></div>
+        </article>
+        <article class="card earth">
+          <header><span class="dot earth-dot"></span>Earth · comms</header>
+          <div class="big" id="earth-state">—</div>
+          <div class="kv"><span>Elevation</span><b id="earth-el">—</b></div>
+          <div class="kv"><span>Azimuth</span><b id="earth-az">—</b></div>
+          <div class="kv"><span id="earth-next-label">Earthset in</span><b id="earth-next">—</b></div>
+        </article>
+        <article class="card score">
+          <header>Next 30 days</header>
+          <div class="kv"><span>Sunlight</span><b id="pct-sun">—</b></div>
+          <div class="kv"><span>Earth in view</span><b id="pct-earth">—</b></div>
+          <div class="kv"><span>Both at once</span><b id="pct-both">—</b></div>
+          <div class="kv"><span>Longest darkness</span><b id="max-dark">—</b></div>
+        </article>
+      </div>
+
+      <div class="panel view">
+        <div class="view-head">
+          <h2>Horizon view <span class="sub">— what you'd see standing at the site, all the way around</span></h2>
+          <div class="legend">
+            <span><i class="sw sun-sw"></i>Sun</span>
+            <span><i class="sw earth-sw"></i>Earth</span>
+            <span><i class="sw terrain-sw"></i>Terrain</span>
+          </div>
+        </div>
+        <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
+      </div>
+
+      <div class="panel view">
+        <div class="view-head">
+          <h2>30-day timeline <span class="sub">— click anywhere to jump to that time</span></h2>
+          <div class="playback">
+            <button id="play-btn" title="Play / pause">▶</button>
+            <span id="time-label" class="mono"></span>
+          </div>
+        </div>
+        <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
+        <input id="time-slider" type="range" min="0" max="719" value="0" aria-label="Time offset">
+      </div>
+    </section>
+
+    <!-- RIGHT: comparison -->
+    <aside class="panel compare">
+      <h2>Compare</h2>
+      <div id="compare-list" class="compare-list">
+        <p class="hint">No scenarios pinned yet. Use “Add to comparison”.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    Positions from NASA SPICE · terrain from LRO LOLA · checked against JPL Horizons
+    <span class="muted">(demo build: placeholder model)</span>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
