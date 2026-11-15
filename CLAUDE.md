@@ -1,12 +1,12 @@
 # LUNI — project notes for Claude
 
-**Name:** the product is **LUNI, Lunar Utility Navigational Intelligence** (renamed by the user on 14 Nov 2026 from
+**Name:** the product is **LUNI, Lunar Utility for Navigational Intelligence** (renamed by the user on 14 Nov 2026 from
 LUNO, "Lunar Utility for Navigational Operations"; the idea came from the sibling). Everything a person can read says
 LUNI. Internal names were left alone on purpose and still say LUNO: `window.LUNO_B64`, `LUNO_TEST`, `LUNO_NO_GPU`,
 the `luno:state` / `luno:command` events, the `luno-*` storage keys, the artifact file `luno.html`, and the pictures
 in `docs/figures/`. Do not "fix" those in passing; a rename there has to be done everywhere at once.
 
-LUNI (Lunar Utility Navigational Intelligence) is a team entry for the NASA Space Apps Challenge 2026,
+LUNI (Lunar Utility for Navigational Intelligence) is a team entry for the NASA Space Apps Challenge 2026,
 challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to Sun 15 Nov 2026 23:59 local time.
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
@@ -393,7 +393,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   people at `#test`, which scores six tasks and gives a report to send.
   Claude's own quick score when asked (not blind): Impact 4, Creativity 4, Validity 4, Relevance 5, Presentation 3
   for the deck as it was before the features slide.
-- **TO DO AFTER THE LOCAL PRESENTATION (the user, Sun 15 Nov: "It is with for ... change the two later today after
+- **DONE ON THE PRE-RELEASE, WAITING FOR "release it" (the name with "for" is now in the app, README, docs, ASK LUNI and these notes; public is still r7).** Earlier note: **TO DO AFTER THE LOCAL PRESENTATION (the user, Sun 15 Nov: "It is with for ... change the two later today after
   that presentation"): the full name is "Lunar Utility FOR Navigational Intelligence".** The app, `README`,
   `docs/submission.md`, `docs/pitch-3min.md`, ASK LUNI's "who are you" answer and these notes still say "Lunar
   Utility Navigational Intelligence" without "for". Change every readable place at once, check, then it needs a
