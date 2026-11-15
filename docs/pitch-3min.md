@@ -114,8 +114,7 @@ Two family members and one friend. The first tester did five rounds (2 of 6 task
 simple view and the guided tutorial. We have not tested with a mission planner.
 
 **What would you build next?**
-An operations plan (the mission's stretches of work, sleep and darkness in order), finer detail in the Best Site
-Finder near the poles, NASA's official coordinates for the Artemis candidate regions, and landings before 2023.
+A power model that knows the panels and the battery, finer detail in the Best Site Finder near the poles, NASA's official coordinates for the Artemis candidate regions, and landings before 2023.
 
 **Does it need a server or an install?**
 No. It is a static web page; all the NASA data is prepared ahead of time and loaded by the browser.

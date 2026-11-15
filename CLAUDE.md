@@ -186,6 +186,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   3. All sites side by side (`renderRank` in `js/app.js`): a green / red dot on every row of the site list (GO or
      NO-GO at the landing time on screen) and a ranked table at the top of COMPARE SITES · MORE (good landing days
      in the months the calendar shows, GO / NO-GO now; click to go there). About 110 ms for 14 sites when a need changes.
+  4. OPERATIONS plan (extras item 1): a third chart button between MISSION PLAN and MISSION WINDOWS (`#tab-ops`,
+     `#ops`, `renderOps` / `opsStretches` / `OPS` in `js/app.js`; `showPlan("plan" | "ops" | "days")`). The mission
+     length as stretches in order: POWER + LINK, POWER, NO LINK, BATTERY, LINK, BATTERY, NO LINK, ECLIPSE, with the
+     shares, the longest time without Sun against the user's limit, and a line for the stretch the mission clock is
+     in. Clicking a stretch moves the clock there. It reads LUNI's own hourly answers; it is not a flight schedule.
+     The chart headings were shortened to fit three buttons.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
