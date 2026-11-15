@@ -408,6 +408,17 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   no likeness of anyone under 18; English; public links with no login.
   Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
   Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
+- **On the pre-release, waiting for "release it" (will be r8; public is r7), Sun 15 Nov about 3:45 PM New York:**
+  the name with "for"; and `DEFAULT_REQ.earthMinPct = 25` in `js/mission.js` (the user: "ok for 3"; a judge found
+  Shackleton, 14 Mar 2025 09:00, a GO with Earth in view 3% of the mission: it is now a NO-GO, "EARTH LINK 3% (NEED
+  25%)"). The EARTH LINK row starts on 25%. `tests/check_mission.mjs` pins its made-up cases to 0 and checks the
+  default on real data (2,519 good landing hours of 9,680, was 2,580). All Node checks touched and test sets E and D
+  (6/6 each) pass. A link saved without an `earth=` part now opens with 25%.
+  Also made: `CHANGELOG.md`, and `docs/version-history.html` = https://claude.ai/artifact/WBNrhJDohQV5tyZ1QMhS4G
+  (a screenshot of every version from two early drafts through r1 to r7 and the test build, stepped through with
+  buttons, plus the change log; made by checking out each release commit: r1 `03d208a`, drafts `32e66cd`, `4234c1a`).
+  Update both when a release is made. GIFs `docs/figures/luni-energy.gif` and `luni-solar-panels.gif` (0.5 MB each).
+  Skipped by the user for now: opening the left side by default, and the side-by-side box covering ASK LUNI's reply.
 - **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
   main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
   E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page

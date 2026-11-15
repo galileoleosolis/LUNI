@@ -5,7 +5,7 @@ export const DEFAULT_REQ = {
   days: 10,            // mission length
   maxDarkH: 12,        // longest stretch without sunlight the mission can ride out
   earthAtLanding: true,
-  earthMinPct: 0,      // minimum share of the mission with Earth in view (0 = any)
+  earthMinPct: 25,     // minimum share of the mission with Earth in view (0 = any). 25 by default since 15 Nov: with only "at landing" a mission with Earth in view 3% of the time counted as a GO
   maxSlopeDeg: 0,      // steepest ground the lander accepts, in degrees (0 = any; the choice is the planner's, LUNI suggests no limit)
 };
 export const REQ_OPTIONS = { days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48], earthMinPct: [0, 25, 50, 75], maxSlopeDeg: [0, 5, 10, 15] };
