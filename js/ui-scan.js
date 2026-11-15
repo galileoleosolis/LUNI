@@ -47,7 +47,7 @@ const DIRS = ["NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "
 // "2.76 KM" and "WEST" for a point's offset from the site
 const away = (c) => { const d = Math.hypot(c.eastKm, c.northKm); return [d < 10 ? d.toFixed(2) : d.toFixed(1), DIRS[Math.round(((Math.atan2(c.eastKm, c.northKm) * 180 / Math.PI + 360) % 360) / 45) % 8]]; };
 
-export function createScanPanel({ getContext, onPick, fmt }) {
+export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
   const panel = $("scan"), canvas = $("scan-canvas"), ctx = canvas.getContext("2d");
   const tile = document.createElement("canvas"), tctx = tile.getContext("2d");
   let st = { metric: "needs", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null, engine: "" };
@@ -234,8 +234,13 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-go-best").textContent = !finished ? "SCANNING…" : canMove ? "MOVE MY SITE TO THE BEST SPOT ▸" : best ? "YOU ARE AT THE BEST SPOT" : "NO SPOT HERE MEETS THE NEEDS";
     // Data profile: every layer at one point (the point under the pointer, else where you are now), each marked good or bad.
     const pc = st.hover || cur;
+    // Where you are now, on a preset site: its sunlight and Earth link over the years come from the site's own detailed
+    // skyline, the same numbers as on the MOON MAP card (the coarser layer reads low on narrow ridges; a judge saw 53 vs 78).
+    const own = !st.hover && cur && polarOkNow && polarMeta() ? getSiteYears?.() : null;
+    const lay = own ? [polarValue("sun", cur.lat, cur.lon), polarValue("earth", cur.lat, cur.lon)] : null;
+    const ownNote = own ? `<div class="prof-note">SUNLIGHT AND EARTH LINK 2023–35: FROM THIS SITE'S OWN DETAILED SKYLINE${lay[0] != null && lay[1] != null ? ` (THE COARSER MAP LAYER, WHICH COLORS THE MAP, READS ${Math.round(lay[0])}% AND ${Math.round(lay[1])}%)` : ""}.</div>` : "";
     $("scan-prof-of").textContent = st.hover ? "THE POINT UNDER THE POINTER" : "WHERE YOU ARE NOW";
-    $("scan-hover").innerHTML = !pc ? "…" : (st.hover ? `${away(pc)[0]} KM FROM WHERE YOU ARE · ` : "") + `${fmt.lat(pc.lat)} ${fmt.lon(pc.lon)}` + profileHtml(cellProfile(pc, span, polarOkNow))
+    $("scan-hover").innerHTML = !pc ? "…" : (st.hover ? `${away(pc)[0]} KM FROM WHERE YOU ARE · ` : "") + `${fmt.lat(pc.lat)} ${fmt.lon(pc.lon)}` + profileHtml(cellProfile(pc, span, polarOkNow, own)) + ownNote
       + (st.hover ? `<b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO READ ANY POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`);
   }
 
@@ -254,7 +259,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   }
   // The rows of the data profile card for one scanned point.
   let polarOkNow = false;
-  function cellProfile(c, span, polarOk) {
+  function cellProfile(c, span, polarOk, own = null) {
     const row = (label, text, score, share, rgb, note = "") => ({ label, text, score, share: Math.max(0, Math.min(1, share)), rgb: rgb || goodColor(score ?? 0.5), note });
     const rows = [
       row("MEETS THE NEEDS", c.ok ? "YES" : "NO", c.ok ? 1 : 0, 1),
@@ -264,11 +269,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       row("ELEVATION", `${Math.round(c.heightM).toLocaleString("en-US")} M`, null, (c.heightM - span.lo) / Math.max(1, span.hi - span.lo), elevColor((c.heightM - span.lo) / Math.max(1, span.hi - span.lo))),
     ];
     if (polarOk && polarMeta()) {
-      const s = polarValue("sun", c.lat, c.lon), e = polarValue("earth", c.lat, c.lon), sh = polarValue("shadow", c.lat, c.lon);
+      const s = own ? own.sun : polarValue("sun", c.lat, c.lon), e = own ? own.earth : polarValue("earth", c.lat, c.lon), sh = polarValue("shadow", c.lat, c.lon);
       rows.push(s == null ? { label: "SUNLIGHT 2023–35", text: null, note: "NO DATA" } : row("SUNLIGHT 2023–35", `${Math.round(s)}%`, s / 100, s / 100),
                 e == null ? { label: "EARTH LINK 2023–35", text: null, note: "NO DATA" } : row("EARTH LINK 2023–35", `${Math.round(e)}%`, e / 100, e / 100),
                 sh == null ? { label: "PERMANENT SHADOW", text: null, note: "POLES ONLY" } : row("PERMANENT SHADOW", sh ? "YES" : "NO", sh ? 0 : 1, 1, sh ? SHADOW_COLOR : null));
-      const t = polarValue("temp", c.lat, c.lon), mx = cellMix(c), T = layer("temp");
+      const t = polarValue("temp", c.lat, c.lon), mx = own ? mixScore({ sun: s, earth: e, temp: t, slope: c.slopeDeg }) : cellMix(c), T = layer("temp");
       if (t != null) rows.push(row("TEMPERATURE (AVG)", T.brief(t), null, (t - T.lo) / (T.hi - T.lo), T.color(t)));
       if (mx != null) rows.push(row("YOUR MIX", `${Math.round(mx)} OF 100`, mx / 100, mx / 100));
     }
