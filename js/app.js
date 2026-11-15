@@ -622,6 +622,24 @@ function renderHorizon(cur) {
       el("path", { d: dd + `L${x(360)},${floor}L${x(0)},${floor}Z`, fill, stroke: "none" }, svg);
       el("path", { d: dd, fill: "none", stroke: edge, "stroke-width": 1, opacity: 0.55 }, svg);
     }
+    if (floor - top >= 26) {
+      // Light with a direction. Ground seen toward the Sun shows its shadowed side (dark, with a bright rim); ground
+      // seen away from the Sun is lit face-on. A dark wash that is strongest under the Sun gives the panorama that shape.
+      if (lit) {
+        const g3 = el("linearGradient", { id: "hz-shade", gradientUnits: "userSpaceOnUse", x1: x(0), x2: x(360), y1: 0, y2: 0 }, defs);
+        for (let a = 0; a <= 360; a += 30) { let dA = Math.abs(a - cur.sunAz) % 360; if (dA > 180) dA = 360 - dA; el("stop", { offset: a / 360, "stop-color": "#01030a", "stop-opacity": (0.62 * (1 + Math.cos(dA * Math.PI / 180)) / 2).toFixed(3) }, g3); }
+        el("path", { d: d + `L${x(360)},${floor}Z`, fill: "url(#hz-shade)", stroke: "none" }, svg);
+      }
+      // Craters on the near ground, flatter and smaller the farther away they are: the simplest cue for distance.
+      // They are decoration (the same ones for a given site), placed only inside the two nearer bands.
+      let seed = Math.abs(Math.round((state.site.lat * 1000 + state.site.lon * 7919))) % 2147483647 || 7; const rnd = () => (seed = seed * 48271 % 2147483647) / 2147483647;
+      for (let k = 0; k < 22; k++) {
+        const i = Math.floor(rnd() * N), t = rnd(), y0 = near[i] + 4, room = floor - y0 - 3; if (room < 8) continue;
+        const cy = y0 + room * (0.15 + 0.85 * t * t), depth = (cy - y0) / room, rx = 5 + 26 * depth * (0.5 + rnd()), ry = Math.max(1.2, rx * (0.10 + 0.16 * depth)), cx = x(i / 2);
+        el("ellipse", { cx, cy, rx, ry, fill: "#000", opacity: (lit ? 0.26 : 0.4) }, svg);
+        el("path", { d: `M${(cx - rx).toFixed(1)},${cy.toFixed(1)}A${rx.toFixed(1)},${ry.toFixed(1)} 0 0 0 ${(cx + rx).toFixed(1)},${cy.toFixed(1)}`, fill: "none", stroke: lit ? "#e7ecf2" : "#6c7f9f", "stroke-width": 0.9, opacity: 0.5 }, svg);
+      }
+    }
   }
   ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].forEach((dname, i) => {
     if (narrow && i % 2) return;
@@ -1084,6 +1102,13 @@ async function init() {
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
+  // FULL SCREEN: LUNI is laid out for a whole screen, and a browser window with its bars gives it less.
+  const fsOn = () => !!document.fullscreenElement;
+  $("fs-btn").addEventListener("click", async () => { try { fsOn() ? await document.exitFullscreen() : await document.documentElement.requestFullscreen(); } catch { toast("THIS PAGE CANNOT GO FULL SCREEN BY ITSELF HERE · PRESS F11 (OR CTRL + CMD + F ON A MAC)", 6000); } });
+  document.addEventListener("fullscreenchange", () => { $("fs-btn").textContent = fsOn() ? "⤡ EXIT FULL SCREEN" : "⛶ FULL SCREEN"; $("fs-btn").classList.toggle("on", fsOn()); });
+  setTimeout(() => { let seen = false; try { seen = localStorage.getItem("luno-fs-tip") === "1"; } catch {}
+    if (!seen && !fsOn() && !navigator.webdriver && !document.documentElement.classList.contains("flow") && window.innerHeight < screen.height * 0.93 && !document.querySelector(".tour-card")) {
+      $("fs-btn").classList.add("nudge"); toast("TIP · LUNI IS BUILT FOR THE WHOLE SCREEN: PRESS ⛶ FULL SCREEN AT THE TOP RIGHT", 7000); try { localStorage.setItem("luno-fs-tip", "1"); } catch {} } }, 2500);
   $("tools-btn").addEventListener("click", () => { const all = document.documentElement.classList.contains("simple"); setTools(all); setSetup(all); });      // SIMPLE VIEW also folds the left side away
   $("needs-more").addEventListener("click", () => openNeeds(!document.querySelector(".needs").classList.contains("open")));
   openNeeds(document.querySelector(".needs").classList.contains("open"));

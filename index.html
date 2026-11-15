@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LUNI · Lunar Utility Navigational Intelligence</title>
+  <title>LUNI · Lunar Utility for Navigational Intelligence</title>
   <script>(() => { const p = new URLSearchParams(location.search).get("palette"); if (p) document.documentElement.dataset.palette = p; })();</script>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,7 +16,7 @@
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
     <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
-    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
+    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><button id="fs-btn" class="fs-btn" title="Use the whole screen: more room for every panel (F11 does the same)">⛶ FULL SCREEN</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
   </div>
 
   <div class="screen">
@@ -48,7 +48,7 @@
         <div class="mm-body">
           <div id="mm-globe" class="mm-globe"><div id="mm-status" class="mm-status" hidden></div><div class="mm-view"><span>LOOK AT</span><div id="mm-view"></div></div></div>
           <div class="mm-side">
-            <h3 class="band" data-band="1"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
+            <section class="fcard"><h3 class="band" data-band="1" data-ico="layers"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
             <div id="mm-layers" class="mm-layers"></div>
             <div class="mm-srcline">DATA: <b id="mm-src">NASA LRO PHOTO</b></div>
             <div id="mm-legend"></div>
@@ -57,12 +57,12 @@
               <div id="mm-mix-rows"></div>
               <button id="mm-mix-use" class="mm-mix-use" title="Opens the scan around the landing site, colored by your mix, with the best point picked by your mix among the points that meet the mission needs">USE THIS MIX IN THE SCAN ▸</button>
             </div>
-            <h3 class="gap band" data-band="2"><b class="h-t">DATA PROFILE</b> · AT ONE POINT</h3>
+            </section><section class="fcard"><h3 class="gap band" data-band="2" data-ico="bars"><b class="h-t">DATA PROFILE</b> · AT ONE POINT</h3>
             <div id="mm-prof-where" class="mm-prof-where"></div>
             <div id="mm-profile"></div>
-            <h3 class="gap band" data-band="3"><b class="h-t">ABOUT THIS LAYER</b> · AND ITS SOURCE</h3>
+            </section><section class="fcard"><h3 class="gap band" data-band="3" data-ico="info"><b class="h-t">ABOUT THIS LAYER</b> · AND ITS SOURCE</h3>
             <div id="mm-meaning" class="mm-meaning"></div>
-            <div id="mm-source" class="dimtxt"></div>
+            <div id="mm-source" class="dimtxt"></div></section>
           </div>
         </div>
       </div>
@@ -118,10 +118,10 @@
           <div class="scan-body">
             <div class="scan-map"><div class="scan-row" id="scan-row"><div class="scan-stack" id="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><div class="scan-stack" id="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric" role="group" aria-label="What the map's colors show"></div></div></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
-              <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
-              <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <div id="scan-progress"></div>
-              <h3 class="band" data-band="2"><b class="h-t">SOLAR PANELS</b> · <b class="h-do">PLACE THEM AT THE SUNNIEST SPOTS</b></h3>
+              <section class="fcard best"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4 6.1 20.7l1.3-6.6L2.5 9.5l6.6-.8z"/></svg><b>BEST SPOT FOUND</b></h3><div id="scan-best" class="scan-cell"></div><div id="scan-progress"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8" opacity=".45"/><rect x="3" y="13" width="8" height="8" opacity=".45"/><rect x="13" y="13" width="8" height="8"/></svg><b>WHAT THE COLORS MEAN</b><span id="scan-showing"></span></h3><div id="scan-legend" class="scan-legend"></div><div id="scan-rank" class="scan-rank"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2.6"/></svg><b>THIS SPOT’S NUMBERS</b><span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="3.2"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="currentColor" stroke-width="1.8"/><path d="M9 14h13l-3 8H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14l-2 8M18 14l-2 8" stroke="currentColor" stroke-width="1.4"/></svg><b>SOLAR PANELS</b><span>ON THE SUNNIEST SPOTS</span></h3>
               <div id="scan-panels" class="scan-panels">
                 <button id="panels-open" class="panels-open">☀ PLACE SOLAR PANELS ▸</button>
                 <div id="panels-form" class="panels-form" hidden>
@@ -130,15 +130,14 @@
                   <div class="panels-btns"><button id="panels-go" class="primary">PLACE THEM ▸</button><button id="panels-clear">CLEAR</button></div>
                 </div>
                 <div id="panels-out" class="panels-out"></div>
-              </div>
-              <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
-              <div id="scan-legend" class="scan-legend"></div>
-              <div id="scan-rank" class="scan-rank"></div>
-              <h3 class="band" data-band="2"><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
-              <div id="scan-engine" class="dimtxt"></div>
-              <div id="scan-scale" class="dimtxt"></div>
-              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b></h3><div id="scan-here" class="scan-cell" hidden></div>
-              <div id="scan-note" class="credit"></div>
+              </div></section>
+              <details class="fcard fmore"><summary><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10.500v7M12 6.500v1.600" stroke="currentColor" stroke-width="2.6"/></svg><b>ABOUT THIS SCAN</b><span>HOW TO READ IT · HOW IT WAS MADE</span></summary>
+                <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
+                <div id="scan-engine" class="dimtxt"></div>
+                <div id="scan-scale" class="dimtxt"></div>
+                <div id="scan-here" class="scan-cell" hidden></div>
+                <div id="scan-note" class="credit"></div>
+              </details>
             </div>
           </div>
         </div>
@@ -164,7 +163,7 @@
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
           <div class="answer-side">
-        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
+        <div class="tiles-head"><h3 id="clock-head" data-ico="sunearth">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
         <div class="readouts">
           <div class="ro">
             <div class="ro-ico" id="sun-ico" title="Power: sunlight on the solar panels">
@@ -197,13 +196,13 @@
           </div>
         </div>
 
-        <div class="tiles-head" id="hz-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><span id="src-sky" class="src-note"></span><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <div class="tiles-head" id="hz-head"><h3 data-ico="mountain"><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><span id="src-sky" class="src-note"></span><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
         <div class="tiles-head plan-head">
-          <h3 id="plan-title-a"><b class="h-t">30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER</b></h3>
-          <h3 id="ops-title" hidden><b class="h-t">OPERATIONS PLAN</b> · <b class="h-do">CLICK A STRETCH TO GO THERE</b></h3>
-          <h3 id="cal-title" hidden><b class="h-t">NEXT 12 MONTHS</b> · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
+          <h3 id="plan-title-a" data-ico="timeline"><b class="h-t">30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER</b></h3>
+          <h3 id="ops-title" data-ico="list" hidden><b class="h-t">OPERATIONS PLAN</b> · <b class="h-do">CLICK A STRETCH TO GO THERE</b></h3>
+          <h3 id="cal-title" data-ico="calendar" hidden><b class="h-t">NEXT 12 MONTHS</b> · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
           <span class="plan-tabs"><button id="tab-plan" class="on" title="The 30 days after landing: when there is Sun and Earth, with the slider">MISSION PLAN</button><button id="tab-ops" title="The mission as stretches in order: power and link, power only, on battery, eclipse">OPERATIONS</button><button id="tab-days" title="Mission windows: every good landing day in the next 12 months">MISSION WINDOWS</button></span>
         </div>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
@@ -214,31 +213,31 @@
       <!-- RIGHT: summary + compare -->
       <section class="col col-side" id="more-panel" hidden>
         <div class="side-head"><b>COMPARE SITES · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
-        <h3><b class="h-t">ALL SITES, THIS MISSION</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        <section class="fcard"><h3 data-ico="list"><b class="h-t">ALL SITES, THIS MISSION</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="rank" class="rank"></div>
         <p id="rank-note" class="note"></p>
-        <h3 class="gap"><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        </section><section class="fcard"><h3 class="gap" data-ico="calendar"><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
-        <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
-        <div id="compare-list" class="compare"></div>
-        <details class="more" open>
-          <summary><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
-          <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
+        </section><section class="fcard"><h3 class="gap" data-ico="pin"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
+        <div id="compare-list" class="compare"></div></section>
+        <details class="more fcard" open>
+          <summary data-ico="bars"><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
+          <h3 class="gap" data-ico="timeline">FIRST 30 DAYS AFTER LANDING</h3>
           <table class="sum">
             <tr><td>IN SUNLIGHT</td><td id="pct-sun"></td></tr>
             <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
             <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
             <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
           </table>
-          <h3 class="gap"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
+          <h3 class="gap" data-ico="globe"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
           <table class="sum versus" id="versus"></table>
           <p id="versus-note" class="note"></p>
-          <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
+          <h3 class="gap" data-ico="mountain">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
           <p id="site-note" class="note"></p>
         </details>
-        <div id="os-box" class="os-box">
-          <h3 class="gap"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNI</h3>
+        <div id="os-box" class="os-box fcard">
+          <h3 class="gap" data-ico="globe"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNI</h3>
           <div class="os-row"><button id="os-btn" class="mini-btn">CONNECT TO OPENSPACE</button><div class="seg" id="os-view"></div></div>
           <div id="os-status" class="dimtxt">NEEDS OPENSPACE RUNNING ON THIS COMPUTER.</div>
         </div>
@@ -248,7 +247,7 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-    <!-- ASK LUNI (Lunar Utility Navigational Intelligence): typed or spoken commands -->
+    <!-- ASK LUNI (Lunar Utility for Navigational Intelligence): typed or spoken commands -->
     <div id="comms" class="comms" hidden>
       <div class="comms-row">
         <button id="comms-mic" class="comms-mic" title="Talk to LUNI (T)"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 9.500a6 6 0 0 0 12 0M10 15.500V18.500M6.500 18.500h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>TALK</button>
@@ -258,7 +257,7 @@
         <button id="comms-hands" class="comms-opt" title="Keeps listening. Start each command with the word LUNI."></button>
         <button id="comms-close" class="comms-opt" title="Close (Esc)"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>CLOSE</button>
       </div>
-      <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">I am LUNI, the Lunar Utility Navigational Intelligence. Enter a question or a command, or select an example:</div></div>
+      <div class="comms-log" aria-live="polite"><div id="comms-you" class="comms-you"></div><div id="comms-reply" class="comms-reply">I am LUNI, the Lunar Utility for Navigational Intelligence. Enter a question or a command, or select an example:</div></div>
       <div id="comms-tips" class="comms-tips"></div>
       <div id="comms-ai-row" class="comms-ai" hidden>
         <span>AI MODEL RUNNING ON THIS COMPUTER:</span>
@@ -279,7 +278,7 @@
     <button class="key" id="play-btn" title="Runs the mission clock forward: the Sun and Earth move across the sky (Space)"><span id="play-label">▶ PLAY ORBITAL DATA</span></button>
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
-    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key.">ASK LUNI</button>
+    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility for Navigational Intelligence (T). Type instead with the / key.">ASK LUNI</button>
     <button class="key g" id="next-window-btn">NEXT LANDING WINDOW</button>
     <button class="key g" id="scan-btn" title="Opens and closes the Best Site Finder: a scan of the ground around this site (A)">BEST SITE FINDER</button>
     <button class="key y" id="next-site-btn">NEXT SITE</button>

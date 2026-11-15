@@ -1,12 +1,12 @@
 # LUNI — project notes for Claude
 
-**Name:** the product is **LUNI, Lunar Utility Navigational Intelligence** (renamed by the user on 14 Nov 2026 from
+**Name:** the product is **LUNI, Lunar Utility for Navigational Intelligence** (renamed by the user on 14 Nov 2026 from
 LUNO, "Lunar Utility for Navigational Operations"; the idea came from the sibling). Everything a person can read says
 LUNI. Internal names were left alone on purpose and still say LUNO: `window.LUNO_B64`, `LUNO_TEST`, `LUNO_NO_GPU`,
 the `luno:state` / `luno:command` events, the `luno-*` storage keys, the artifact file `luno.html`, and the pictures
 in `docs/figures/`. Do not "fix" those in passing; a rename there has to be done everywhere at once.
 
-LUNI (Lunar Utility Navigational Intelligence) is a team entry for the NASA Space Apps Challenge 2026,
+LUNI (Lunar Utility for Navigational Intelligence) is a team entry for the NASA Space Apps Challenge 2026,
 challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to Sun 15 Nov 2026 23:59 local time.
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
@@ -312,8 +312,8 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (spaceappschallenge.org/resources/project-submission-guide): up to seven slides including the title slide, in
   English, on an external site with a public link, covering team name, member names and the challenge.
   **Still placeholders on the cover: [Team name] and the two [Member name]s** (never told to Claude).
-- **The afternoon batch (the user's list, built Sun 15 Nov about 1:30 to 3 PM New York on "Build the new batch now").
-  On the pre-release only; the public site is r6.** The user: run only the checks that touch the change; the full set
+- **The afternoon batch (the user's list, built Sun 15 Nov between about 12:45 and 1:30 PM New York on "Build the new batch now").
+  Released as r7.** The user: run only the checks that touch the change; the full set
   at the release. Checked: syntax, `check_assistant` (111), `check_scan`, `check_mission`, test set E (6/6), and a
   browser run of every new feature with no page errors. NOT checked: phones (the user: "idc about phones rn"),
   test set D, the other Node checks, real hardware.
@@ -362,7 +362,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
       is computed from NASA data; the rule is the user's needs"; the better-spot wording; the three new features.
   No change, by the user's word: a GO being the team's rule, IM-2 opening as GO, the finder offering a move from a GO
   site, phones.
-- **Judge runs on the afternoon batch** (Sun 15 Nov about 3:45 PM New York; same brief, three models, Presentation
+- **Judge runs on the afternoon batch** (Sun 15 Nov about 1:30 PM New York; same brief, three models, Presentation
   fixed at 4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5): the same as before the batch.
   Two of the three never opened ENERGY, the solar panels or the before-and-after box. Fixed afterwards, on the
   pre-release: the comparison box now measures "sunlight to spare" over the same span as the verdict (`planSpan`,
@@ -375,6 +375,73 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   14 Jan 2027, 14 days); the side-by-side box covers the ASK LUNI reply; density; no outside users.
   The slide deck was updated for the batch (new screenshots; slide 3 shows ENERGY, slide 4 the finder with solar
   panels and the before-and-after box).
+- **GIFs** (the user, Sun 15 Nov about 2 PM New York: "Can you add gifs? i think the area scan one would be a cool
+  gif"): `docs/figures/luni-best-site-finder.gif` (800 x 398, 1.7 MB, 9 s: the scan fills in, the best spot is
+  starred, the lander moves, a new scan starts) and `docs/figures/luni-skyline-25-days.gif` (1280 x 197, 2.5 MB:
+  the Sun and Earth over 25 days at Nobile Rim 1, a frame every 6 hours). Recorded from the real app with
+  Playwright (`gifshots.js` in the scratchpad, `LUNO_NO_COMPARE` set) and put together with Pillow; nothing drawn
+  by hand or by an image model. In the deck: slide 4 left and slide 2. A PDF export shows one still frame.
+- **Deck, last changes before the local judging** (Sun 15 Nov, mid-afternoon New York): slide 5 is now ALL SEVEN
+  OBJECTIVES, AND MORE: `docs/figures/luni-more-features.gif` (eight captioned screens the deck did not show: Moon
+  map sunlight and water ice, mission history, 3D view, ASK LUNI, mission windows, operations, tutorial) beside the
+  seven objectives as short labels (the text table is gone). Slide 7 has a QR code to the public site (read back
+  with a decoder: https://galileoleosolis.github.io/LUNI/). The user's own cover text (team "Mystic Reaserch",
+  "Lunar Utility for Navigational Intelligence", both names) was left as typed.
+  **Visit tracking was asked for and dropped** ("Its fine then, i can find more testers after this"): LUNI has no
+  server, the counting services are blocked from this session so nothing could be tested, and a visit count is not
+  a tester count. If it comes back: GoatCounter (the user signs up, one script line, a sentence in PROOF), or point
+  people at `#test`, which scores six tasks and gives a report to send.
+  Claude's own quick score when asked (not blind): Impact 4, Creativity 4, Validity 4, Relevance 5, Presentation 3
+  for the deck as it was before the features slide.
+- **DONE ON THE PRE-RELEASE, WAITING FOR "release it" (the name with "for" is now in the app, README, docs, ASK LUNI and these notes; public is still r7).** Earlier note: **TO DO AFTER THE LOCAL PRESENTATION (the user, Sun 15 Nov: "It is with for ... change the two later today after
+  that presentation"): the full name is "Lunar Utility FOR Navigational Intelligence".** The app, `README`,
+  `docs/submission.md`, `docs/pitch-3min.md`, ASK LUNI's "who are you" answer and these notes still say "Lunar
+  Utility Navigational Intelligence" without "for". Change every readable place at once, check, then it needs a
+  "release it". Not started. The deck cover already says it with "for"; its team name was corrected to
+  "Mystic Research" (members: Galileo Solis and Jove Solis, as the user typed them on the cover).
+- **SUBMITTED for global judging** (the user, Sun 15 Nov, mid-afternoon New York: "ok its submitted, we can still edit
+  this later"). The Project page was filled from `docs/submission.md`: name "LUNI: Lunar Utility for Navigational
+  Intelligence", final project link https://galileoleosolis.github.io/LUNI/, the demo link is the user's own
+  PowerPoint on a public share (a fallback PDF is at `docs/LUNI-deck.pdf`, rendered here with a stand-in font).
+  It can be edited and resubmitted until Sun 11:59 PM New York; only the last saved submission is judged, and it must
+  be SUBMITTED again after edits. Rules from the official guide: at most seven slides or the entry is not eligible;
+  no likeness of anyone under 18; English; public links with no login.
+  Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
+  Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
+- **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
+  Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
+  "for comparison". The design system is a private Claude artifact, "LUNI Console"
+  (https://claude.ai/artifact/AEi7gdJMj3FqDx6xNuTV1B; the user: "This is a private doc so dont save it in the repo").
+  Everything is in blocks at the end of `css/style.css`: `--sheen` / `--sheen-hi`, dark glass for every choice button
+  (`.seg`, `.plan-tabs`, `.mm-layers`, `.tabs`, `#mm-view`; chosen = glazed, white edge; mission needs and ENERGY
+  stay amber via `--on1` / `--on2`), the glaze on the smaller action buttons (`--b1` / `--b2`), icons on bands by
+  `data-ico` (CSS masks), `section.fcard` wrappers in the Moon map side panel and COMPARE SITES · MORE, a check or
+  cross inside `.site-ok`, and a 12.5 px text floor on the wide layout. The `:not(#_)` in those selectors is only
+  there to win over older rules. Left-column choices are tightened so they fit (checked at four sizes).
+  - Skyline picture: a darker wash on the ground away from the Sun and seeded craters on the near ground (depth).
+  - NASA DATA USED band holds 14 s (`HOLD_MS` in `js/sources.js`), pauses under the pointer, and each source is a link
+    to where the data comes from (`LINKS`).
+  - FULL SCREEN button (`#fs-btn`) in the top strip and a one-time tip (`luno-fs-tip`) when the window is short.
+  - Best Site Finder side panel is cards with icons (`section.fcard`, `.fi`; ABOUT THIS SCAN is folded); `draw()` in
+    `js/ui-scan.js` sets the body's columns so the side panel gets all the leftover width (two columns of cards on wide screens).
+  - Bottom keys are glossy (one sheen over each key's own color, `--k1` / `--k2` at the end of `css/style.css`).
+  - Finder stack buttons: 3 px borders, 8 px corners; SCAN SIZE / MAP SHOWS headers 18 px.
+- **On the pre-release, waiting for "release it" (will be r8; public is r7), Sun 15 Nov about 3:45 PM New York:**
+  the name with "for"; and `DEFAULT_REQ.earthMinPct = 25` in `js/mission.js` (the user: "ok for 3"; a judge found
+  Shackleton, 14 Mar 2025 09:00, a GO with Earth in view 3% of the mission: it is now a NO-GO, "EARTH LINK 3% (NEED
+  25%)"). The EARTH LINK row starts on 25%. `tests/check_mission.mjs` pins its made-up cases to 0 and checks the
+  default on real data (2,519 good landing hours of 9,680, was 2,580). All Node checks touched and test sets E and D
+  (6/6 each) pass. A link saved without an `earth=` part now opens with 25%.
+  Also made: `CHANGELOG.md`, and `docs/version-history.html` = https://claude.ai/artifact/WBNrhJDohQV5tyZ1QMhS4G
+  (a screenshot of every version from two early drafts through r1 to r7 and the test build, stepped through with
+  buttons, plus the change log; made by checking out each release commit: r1 `03d208a`, drafts `32e66cd`, `4234c1a`).
+  Update both when a release is made. GIFs `docs/figures/luni-energy.gif` and `luni-solar-panels.gif` (0.5 MB each).
+  Skipped by the user for now: opening the left side by default, and the side-by-side box covering ASK LUNI's reply.
+- **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
+  main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
+  E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
+  errors. The public site now has the whole afternoon batch and the fixes made after the judges. Nothing newer is
+  waiting on the pre-release.
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
@@ -499,8 +566,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). **r6 (15 Nov, 17:05 UTC, main 8c8cb9c) is the current public version.**
-   To roll back to r5: `tools/release.sh promote 90e2028`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). **r7 (15 Nov, 18:40 UTC, main b12dd78) is the current public version.**
+   To roll back to r6: `tools/release.sh promote 8c8cb9c`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

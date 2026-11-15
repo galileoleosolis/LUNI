@@ -1,4 +1,4 @@
-// "ASK LUNI" panel (LUNI = Lunar Utility Navigational Intelligence):
+// "ASK LUNI" panel (LUNI = Lunar Utility for Navigational Intelligence):
 // a command line you can type into or talk to, and LUNI's answer in text and speech.
 // Understanding the command is done on the unit (js/assistant.js). Turning speech into text is done by the browser:
 // on the device where the browser offers that, otherwise through the browser's online service. The panel says which.
@@ -131,7 +131,7 @@ export function createAssistantPanel({ assistant, model }) {
       : st.micBlocked ? "VOICE: THE MICROPHONE IS BLOCKED ON THIS PAGE. TYPE INSTEAD, OR ALLOW THE MICROPHONE AND RELOAD."
       : st.local ? "VOICE: SPEECH IS TURNED INTO TEXT ON THIS DEVICE."
       : "VOICE: THIS BROWSER USES ITS ONLINE SERVICE TO TURN SPEECH INTO TEXT.";
-    $("comms-note").textContent = `LUNI = LUNAR UTILITY NAVIGATIONAL INTELLIGENCE. IT UNDERSTANDS COMMANDS ON THIS UNIT, WITH NO EARTH LINK. ${voice}`;
+    $("comms-note").textContent = `LUNI = LUNAR UTILITY FOR NAVIGATIONAL INTELLIGENCE. IT UNDERSTANDS COMMANDS ON THIS UNIT, WITH NO EARTH LINK. ${voice}`;
     $("comms-local").hidden = !st.canInstall;
   }
   // Prefer on-device speech recognition where the browser has it (no internet needed). Asked once, and only when
