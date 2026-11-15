@@ -13,11 +13,12 @@ export const compareOpen = () => !!open;
 export function closeCompare() { if (open) { open.remove(); open = null; } }
 
 // a, b: { label, site, t0, terrain }. buttons: [[text, run, primary?], ...]. fmt: { site, stamp, lat, lon }.
-export function showCompare({ title, lead, a, b, req, fmt, buttons, heads = ["BEFORE", "AFTER"], gainHead = "CHANGE" }) {
+// span(t0): hours of data to look through from that landing time, the same as the main verdict does.
+export function showCompare({ title, lead, a, b, req, fmt, buttons, heads = ["BEFORE", "AFTER"], gainHead = "CHANGE", span = () => 0 }) {
   closeCompare();
-  const e = getEnergy(), A = planStats(a.site, a.t0, req, a.terrain, e), B = planStats(b.site, b.t0, req, b.terrain, e);
+  const e = getEnergy(), A = planStats(a.site, a.t0, req, a.terrain, e, span(a.t0)), B = planStats(b.site, b.t0, req, b.terrain, e, span(b.t0));
   const sign = (v, unit, digits = 0) => (Math.abs(v) < 0.5 * 10 ** -digits ? "SAME" : (v > 0 ? "+" : "−") + Math.abs(v).toFixed(digits) + unit);
-  const hrs = (h) => (h >= 48 ? fmtDH(h) : Math.round(h) + " H");
+  const hrs = (h) => fmtDH(h);                               // the same wording as the verdict strip
   // each row: label, value A, value B, the change as text, and whether the change is good (1), bad (-1) or neither (0)
   const rows = [
     ["VERDICT", A.ok ? "GO" : "NO-GO", B.ok ? "GO" : "NO-GO", A.ok === B.ok ? "SAME" : B.ok ? "NOW A GO" : "NOW A NO-GO", B.ok - A.ok, true],
