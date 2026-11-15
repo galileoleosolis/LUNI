@@ -413,6 +413,17 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   "for", the 25% Earth-link default and the whole design system batch below. Nothing newer is waiting. To roll back
   to r7: `tools/release.sh promote b12dd78`. **Local judging result: the team won BEST USE OF DATA** (the user: the
   judges "were really impressed with the whole thing"). Not yet done: `docs/version-history.html` has no r8 picture.
+- **Deck, selling pass** (the user, Sun 15 Nov about 7 PM New York, after the award: "we can really up the slide show to
+  make it sell the website more"; "you can use your deck"). Deck Version 25, still seven slides: cover (r8 look, award
+  line), THE CHALLENGE, ONE ANSWER, PLAN SLIPS? TWO WAYS OUT, ALL SEVEN OBJECTIVES AND MORE, NASA DATA, CHECKED (the
+  data table and the four proof numbers on one slide, plus "the data is NASA's; the GO rule is the planner's own
+  needs"), WHO IT IS FOR (planners, teachers and students with the lesson, anyone curious; testing, AI use, QR).
+  All pictures and the three GIFs were re-recorded from r8 (`gif/make.py` and `pw/deckshots3.js` in the scratchpad;
+  the finder GIF now starts on the finished map so a still export shows it). Titles are kept short so they do not
+  wrap in a fallback font. `docs/lesson.md` is the 45-minute classroom lesson the deck points to (not run by a
+  teacher yet: do not claim classroom use). **The submitted demo link is the user's own PowerPoint copy, so the new
+  deck reaches the judges only if the user exports or shares it and updates the submission.** The GIFs in
+  `docs/figures/` still show the older look.
 - **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
   Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
   "for comparison". The design system is a private Claude artifact, "LUNI Console"
