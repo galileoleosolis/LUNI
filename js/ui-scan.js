@@ -3,6 +3,8 @@ import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
 import { scanOptions, bestCell, keepUp, judgePoint } from "./scan-core.js";
 import { showData } from "./sources.js";
+import { SOLAR_W_M2 } from "./plan.js";
+import { getEnergy, kwh } from "./ui-energy.js";
 import { mapResFor } from "./terrain.js";
 import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
 
@@ -97,6 +99,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     if (!st.moving) st.under = null;                       // a backdrop only makes sense right after a move
     st.moving = false;
     showData("finder");
+    st.panels = null; $("panels-out").innerHTML = st.panelCfg ? "PANELS WILL BE PLACED WHEN THE SCAN FINISHES" : "";
     st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
     const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
     // The square you stand on, at a listed site: judged with the site's own detailed skyline, exactly as on the main
@@ -111,11 +114,11 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
       st.engine = "SKYLINES: ON THE GRAPHICS CHIP.";
       st.run = runScanGpu({ ...common, gpu: chip,
         onCheck: (diff) => { check = ` CHECKED AGAINST THE PROCESSOR AT THE SITE: SAME SKYLINE WITHIN ${diff < 0.001 ? "0.001" : diff.toFixed(3)}°.`; st.engine = `SKYLINES: ON THE GRAPHICS CHIP.${check}`; note(); },
-        onDone: () => { st.took = secs(); st.under = null; note(); draw(); runPending(); },
+        onDone: () => { st.took = secs(); st.under = null; note(); if (st.panelCfg) placePanels(); draw(); runPending(); },
         onFail: (why) => { console.warn("GPU scan dropped:", why); gpu = null; st.key = ""; st.engine = ""; start(); } });      // back to the processor, for good
     } else {
       st.engine = "SKYLINES: ON THE PROCESSOR.";
-      st.run = runScan({ ...common, onDone: () => { st.took = secs(); st.under = null; draw(); runPending(); } });
+      st.run = runScan({ ...common, onDone: () => { st.took = secs(); st.under = null; if (st.panelCfg) placePanels(); draw(); runPending(); } });
     }
     note();
     st.grid = st.run.grid;
@@ -128,9 +131,13 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
 
   function draw() {
     if (panel.hidden || !st.grid) return;
-    const n = st.grid.n, box = canvas.parentElement;
-    const size = Math.max(160, Math.floor(Math.min(box.clientWidth, box.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.style.width = canvas.style.height = size + "px"; $("scan-go-best").style.width = $("scan-ctl").style.width = size + "px";
+    const n = st.grid.n, row = $("scan-row"), sizes = $("scan-sizes"), shows = $("scan-shows"), flow = document.documentElement.classList.contains("flow");
+    // The two button stacks stand against the map's left and right edges and are exactly as tall as the map, so no
+    // room is left over between them (the user: "vertical selections", "get rid of empty space").
+    const size = Math.max(160, Math.floor(flow ? Math.min(row.clientWidth, window.innerHeight * 0.6) : Math.min(row.clientWidth - sizes.offsetWidth - shows.offsetWidth, row.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.style.width = canvas.style.height = size + "px";
+    sizes.style.height = shows.style.height = flow ? "" : size + "px";
+    $("scan-go-best").style.width = (flow ? size : size + sizes.offsetWidth + shows.offsetWidth) + "px";
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
@@ -194,6 +201,15 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
       const bm = Math.max(cw, BEST_PX) / 2;
       if (!A) tag(moved ? `★ BEST SPOT · ${away(best)[0]} KM AWAY` : "★ YOU ARE AT THE BEST SPOT", bx, moved ? (by > cy ? by + bm + 7 : by - bm - 35) : by - bm - 50, true);
     }
+    if (st.panels && !A) {                               // solar panels: the circle they were chosen in, and a numbered mark on each
+      const pxKm = cw / (st.grid.stepM / 1000);
+      ctx.setLineDash([5, 5]); ctx.lineWidth = 2; ctx.strokeStyle = "#ffd23c"; ctx.beginPath(); ctx.arc(cx, cy, st.panels.radiusKm * pxKm, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      st.panels.cells.forEach((c, i) => {
+        const px = (c.k + 0.5) * cw, py = (c.r + 0.5) * cw, m = Math.max(cw * 0.92, 17);
+        ctx.fillStyle = "#ffd23c"; ctx.fillRect(px - m / 2, py - m / 2, m, m); ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.strokeRect(px - m / 2, py - m / 2, m, m);
+        ctx.fillStyle = "#000"; ctx.font = `700 ${Math.max(11, m * 0.62)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(String(i + 1), px, py + 1);
+      });
+    }
     const lx = cx + offX * glide, ly = cy + offY * glide;
     if (A) { ctx.beginPath(); ctx.arc(lx, ly, 17 + 5 * Math.sin(el / 110), 0, 7); ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.lineWidth = 2; ctx.stroke(); }
     drawLander(ctx, lx, ly, here);
@@ -230,9 +246,9 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
       : `<b style="background:#21e07a"></b> GREEN = MISSION WORKS THERE<br><b style="background:#460e0e"></b> DARK RED = IT DOES NOT`;
     const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M${c.slopeDeg == null ? "" : ` · SLOPE ${c.slopeDeg.toFixed(0)}°`}<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? `<br>SUNLIGHT TO SPARE: ${c.marginHours >= 72 ? "3 DAYS OR MORE" : Math.max(0, Math.round(c.marginHours)) + " H"}` : "<br>" + c.reason}`;
     const cur = st.cells[center.r * n + center.k];
-    $("scan-here").innerHTML = cur ? cellText(cur) : "…";
+    $("scan-here").innerHTML = cur ? cellText(cur) : "";
     const far = best && away(best);
-    $("scan-best").innerHTML = !finished ? "…" : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT LANDING WINDOW</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
+    $("scan-best").innerHTML = !finished ? `<b class="dist">SCANNING · ${Math.round(100 * st.done / Math.max(1, st.total))}% DONE</b><br>${best ? `BEST SO FAR: ${far[0]} KM AWAY, TO THE ${far[1]}` : "NO SPOT THAT MEETS THE NEEDS YET"}` : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT LANDING WINDOW</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
     if (finished && best && st.rank === "mix" && polarOkNow) { const v = cellMix(best); if (v != null) $("scan-best").insertAdjacentHTML("beforeend", `<br><b class="h-do">PICKED BY YOUR MIX</b>: ${Math.round(v)} OF 100 (${mixText()})`); }
     const canMove = finished && best && !(best.r === center.r && best.k === center.k);
     $("scan-go-best").disabled = !canMove;
@@ -245,7 +261,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     const lay = own ? [polarValue("sun", cur.lat, cur.lon), polarValue("earth", cur.lat, cur.lon)] : null;
     const ownNote = own ? `<div class="prof-note">SUNLIGHT AND EARTH LINK 2023–35: FROM THIS SITE'S OWN DETAILED SKYLINE${lay[0] != null && lay[1] != null ? ` (THE COARSER MAP LAYER, WHICH COLORS THE MAP, READS ${Math.round(lay[0])}% AND ${Math.round(lay[1])}%)` : ""}.</div>` : "";
     $("scan-prof-of").textContent = st.hover ? "THE POINT UNDER THE POINTER" : "WHERE YOU ARE NOW";
-    $("scan-hover").innerHTML = !pc ? "…" : (st.hover ? `${away(pc)[0]} KM FROM WHERE YOU ARE · ` : "") + `${fmt.lat(pc.lat)} ${fmt.lon(pc.lon)}` + profileHtml(cellProfile(pc, span, polarOkNow, own)) + ownNote
+    $("scan-hover").innerHTML = !pc ? "CHECKING THIS SPOT FIRST" : (st.hover ? `${away(pc)[0]} KM FROM WHERE YOU ARE · ` : "") + `${fmt.lat(pc.lat)} ${fmt.lon(pc.lon)}` + profileHtml(cellProfile(pc, span, polarOkNow, own)) + ownNote
       + (st.hover ? `<b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO READ ANY POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`);
   }
 
@@ -292,14 +308,14 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     const box = $("scan-metric"); box.replaceChildren();
     for (const [title, ids] of GROUPS) {
       if (METRICS[ids[0]].polar && !polarOk) continue;
-      const g = document.createElement("optgroup"); g.label = title;
+      const g = document.createElement("div"); g.className = "scan-mgroup"; g.title = title;
       for (const id of ids) {
         if (METRICS[id].capsOnly && !nearPole) continue;     // permanent shadow and ice are only worked out near the poles
-        const o = document.createElement("option"); o.textContent = STACK[id]; o.value = id; g.appendChild(o);
+        const o = document.createElement("button"); o.textContent = STACK[id]; o.dataset.id = id; o.classList.toggle("on", id === st.metric);
+        o.addEventListener("click", () => setMetric(id)); g.appendChild(o);
       }
-      box.appendChild(g);
+      if (g.children.length) box.appendChild(g);
     }
-    box.value = st.metric;
     const rank = $("scan-rank"); rank.replaceChildren();
     if (polarOk) {      // who picks the best point
       rank.innerHTML = `<span>★ BEST SPOT IS PICKED BY</span><div class="seg"></div>`;
@@ -311,6 +327,8 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     }
   }
 
+  const hasMetric = (id) => !!$("scan-metric").querySelector(`button[data-id="${id}"]`);
+  const setMetric = (id) => { st.metric = id; for (const b of $("scan-metric").querySelectorAll("button")) b.classList.toggle("on", b.dataset.id === id); draw(); };
   const cellAt = (e) => {
     if (!st.grid) return null;
     const r = canvas.getBoundingClientRect(), n = st.grid.n;
@@ -322,8 +340,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
   canvas.addEventListener("click", (e) => { const c = cellAt(e); if (c) pick(c); });
   $("scan-go-best").addEventListener("click", () => { const b = bestNow(); if (b) pick(b); });
   $("scan-close").addEventListener("click", () => toggle(false));
-  $("scan-metric").addEventListener("change", (e) => { st.metric = e.target.value; draw(); });
-  new ResizeObserver(() => schedule()).observe(canvas.parentElement);
+  new ResizeObserver(() => schedule()).observe($("scan-row"));
 
   // Moving the site from the scan: stay here, show the lander travel to the point, slide the map so the new site is
   // the center, then scan again around it. The old picture stays as a faint backdrop until the new one covers it.
@@ -358,7 +375,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
   function extreme(id, which) {
     if (!EXT[id]) return { state: "none" };
     if (panel.hidden) toggle(true);
-    if (METRICS[id] && !(METRICS[id].capsOnly && !$("scan-metric").querySelector(`option[value="${id}"]`))) { st.metric = id; $("scan-metric").value = id; schedule(); }
+    if (METRICS[id] && hasMetric(id)) setMetric(id);
     if (!st.grid || st.done < st.total || st.anim) { st.pendingExtreme = [id, which]; return { state: "pending" }; }
     const [get, show] = EXT[id], sign = which === "lowest" ? -1 : 1, mid = (st.grid.n - 1) / 2;
     let best = null, bv = null;
@@ -373,6 +390,38 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     pick(best);
     return { state: "moved", value: show(bv), km, dir: dir.toLowerCase() };
   }
+  // SOLAR PANELS: the user gives a distance from the landing site and a number of panels; LUNI puts one panel on each
+  // of the squares inside that distance with the most sunlight during the mission. Ties go to the square with the
+  // most sunlight to spare after the mission, then to the nearest. One panel a square.
+  function placePanels() {
+    const out = $("panels-out"), g = st.grid;
+    if (!g || st.done < st.total) { out.innerHTML = "PANELS WILL BE PLACED WHEN THE SCAN FINISHES"; return; }
+    const cfg = st.panelCfg, stepKm = g.stepM / 1000, R = Math.max(stepKm, Math.min(g.radiusKm, cfg.radiusKm)), dist = (c) => Math.hypot(c.eastKm, c.northKm);
+    const cand = st.cells.filter((c) => c && dist(c) <= R + 1e-6);
+    cand.sort((a, b) => b.sunPct - a.sunPct || b.marginHours - a.marginHours || dist(a) - dist(b));
+    const N = Math.max(1, Math.min(20, cfg.count, cand.length)), cells = cand.slice(0, N);
+    st.panels = { radiusKm: R, cells };
+    const e = getEnergy(), hours = getContext().req.days * 24, each = (c) => SOLAR_W_M2 * e.areaM2 * e.effPct / 100 * c.sunPct / 100 * hours;
+    const total = cells.reduce((t, c) => t + each(c), 0), far = cells.reduce((t, c) => Math.max(t, dist(c)), 0);
+    out.innerHTML = `<b class="dist">${N} PANEL${N === 1 ? "" : "S"} WITHIN ${+R.toFixed(2)} KM</b>${R < cfg.radiusKm ? ` (THE SCAN ONLY REACHES ${g.radiusKm} KM: PICK A BIGGER SCAN SIZE FOR MORE)` : ""}
+      <table class="panels-table"><tr><th>#</th><th>WHERE</th><th>SUN IN THE MISSION</th><th>ENERGY</th></tr>
+      ${cells.map((c, i) => `<tr><td><i>${i + 1}</i></td><td>${dist(c) < stepKm / 2 ? "AT THE LANDER" : `${away(c)[0]} KM ${away(c)[1]}`}</td><td>${Math.round(c.sunPct)}%</td><td>${kwh(each(c))}</td></tr>`).join("")}</table>
+      <b>ALL ${N} TOGETHER: ABOUT ${kwh(total)}</b> OVER THE ${getContext().req.days}-DAY MISSION · FARTHEST PANEL ${far < 10 ? far.toFixed(2) : far.toFixed(1)} KM FROM THE LANDER
+      <div class="scan-src">PICKED BY THE MOST SUNLIGHT DURING THE MISSION, THEN THE MOST SUNLIGHT TO SPARE AFTER IT, THEN THE SHORTEST DISTANCE. ONE PANEL A SQUARE (${fmtStep(g.stepM)}). ENERGY IS FOR YOUR PANEL (${e.areaM2} M², ${e.effPct}%, SET UNDER POWER › ENERGY) FACING THE SUN, AT ${SOLAR_W_M2.toLocaleString("en-US")} W PER SQUARE METER (NASA). CABLES AND SHADOWS BETWEEN PANELS ARE NOT MODELED.</div>`;
+    showData("panels");
+    draw();
+  }
+  $("panels-open").addEventListener("click", () => {
+    const f = $("panels-form"); f.hidden = !f.hidden;
+    if (!f.hidden && !$("panels-radius").value && st.grid) $("panels-radius").value = +(st.grid.radiusKm / 2).toFixed(1);
+    if (!f.hidden) $("panels-radius").focus();
+  });
+  $("panels-go").addEventListener("click", () => {
+    const r = parseFloat($("panels-radius").value), n = parseInt($("panels-count").value, 10);
+    if (!(r > 0) || !(n >= 1)) { $("panels-out").innerHTML = `<b class="dist bad">TYPE A DISTANCE IN KM AND A NUMBER OF PANELS</b>`; return; }
+    st.panelCfg = { radiusKm: r, count: n }; placePanels();
+  });
+  $("panels-clear").addEventListener("click", () => { st.panelCfg = null; st.panels = null; $("panels-out").innerHTML = ""; draw(); });
   const runPending = () => { const p = st.pendingExtreme; st.pendingExtreme = null; if (p && !panel.hidden) extreme(p[0], p[1]); };
   globalThis.lunoScanDebug = () => st;                   // for the checks: the scan's current grid and cells
   function toggle(show = panel.hidden) {
@@ -381,7 +430,10 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
-  return { toggle, extreme, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
+  return { toggle, extreme, isOpen: () => !panel.hidden,
+           // ASK LUNI: "place 4 solar panels within 2 km"
+           panels(radiusKm, count) { if (panel.hidden) toggle(true); $("panels-form").hidden = false; st.panelCfg = { radiusKm: radiusKm || (st.grid ? st.grid.radiusKm / 2 : 2), count: count || 4 };
+             $("panels-radius").value = st.panelCfg.radiusKm; $("panels-count").value = st.panelCfg.count; placePanels(); return { ...st.panelCfg, placed: st.panels ? st.panels.cells.length : 0 }; }, refresh: () => { if (!panel.hidden) start(); },
            // From the MOON MAP: show the scan colored by the mix, with the best point picked by the mix.
            useMix() { st.metric = "mix"; st.rank = "mix";  if (panel.hidden) toggle(true); else start(); } };
 }

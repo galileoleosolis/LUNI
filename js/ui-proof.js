@@ -1,6 +1,7 @@
 // PROOF panel: how anyone can tell LUNI's answers are right, and where LUNI stops.
 // The "real" side of each mission comes from js/stories.js (sourced); LUNI's side is computed here, live, from the
 // same data and the same functions the rest of the app uses. Nothing on LUNI's side is typed in by hand.
+import { showData } from "./sources.js";
 import { SITES } from "./sites.js";
 import { sampleSite, terrainFor } from "./model.js";
 import { siteFrame, eclipsesBetween, MOON_RADIUS_KM } from "./ephem.js";
@@ -109,7 +110,7 @@ export function createProofPanel({ fmt, onReplay, links }) {
   // card: the id of a real landing to bring into view (from the story strip)
   function toggle(show = box.hidden, card = null) {
     if (show) build();
-    box.hidden = !show; $("proof-btn").classList.toggle("on", show);
+    box.hidden = !show; $("proof-btn").classList.toggle("on", show); if (show) showData("proof");
     if (show) { $("proof-body").scrollTop = 0; if (card) { const c = $("proof-body").querySelector(`[data-card="${card}"]`); const d = c?.closest("details"); if (d) d.open = true; c?.classList.add("hot"); c?.scrollIntoView({ block: "center" }); } }
   }
   $("proof-btn").addEventListener("click", () => toggle());

@@ -312,32 +312,53 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (spaceappschallenge.org/resources/project-submission-guide): up to seven slides including the title slide, in
   English, on an external site with a public link, covering team name, member names and the challenge.
   **Still placeholders on the cover: [Team name] and the two [Member name]s** (never told to Claude).
-- **THE WAITING BATCH (the user, Sun 15 Nov about 12:45 PM New York). NOT STARTED: "DONT DO THIS YET I NEED YOU TO DO
-  SOMTHING ELSE FIRST".** Build it all at once only when the user says so. Skip the tests while building; run them
-  when publishing to the public site (the user's words). The list:
-  1. SOLAR PANEL PLACEMENT: a button; it asks for a radius around the landing site and a number of panels, and
-     places them at the best points.
-  2. Sun in the skyline picture: the rays must grow with the bigger Sun. The Sun changes size when the left panel is
-     hidden and the rays do not follow.
-  3. Verdict strip: the eclipse (or other) warning goes to the RIGHT of GO / NO-GO, not underneath.
-  4. Best Site Finder: bring back the VERTICAL button stacks for the choices (the user only wanted the empty space
-     gone), and the chosen one must be highlighted blue.
-  5. NASA DATA USED must be more prominent still: flash more, or a different color, so it does not blend in; more
-     NASA data shown in a noticeable way (also covers the band overlapping the top line as it fades).
-  6. The view from the site (skyline picture) should look nicer: a little depth, for example layered 2D slices.
-  7. Earth is drawn large, so it sometimes looks like an eclipse when there is none.
-  8. Judges, density: SIMPLE VIEW stays the default, and in it the left panel starts collapsed.
-  9. Judges, comparison: when the finder (site) or the next window (date) changes the plan, a good-sized popup
-     compares the original with the new one and shows the gain in each number.
-  10. Judges, power: add an energy estimate, "make it good" (only sourced physics; the panel's size is the user's input).
-  11. ASK LUNI: fix the four questions the judges got wrong (best time in a given year, compare two sites, go to
-      typed coordinates, an open "why" question).
-  12. Finder: do not show "…" under BEST SPOT FOUND while scanning.
-  13. Project page: "a better spot nearby" is no longer a one-press button in the NO-GO strip; fix the wording.
-  No change wanted: a GO being the team's rule ("conditions will be set by NASA if it is used"); IM-2 opening as GO
-  (the tip-over was "an engineering and control failure", not the site); the finder offering a move from a GO site
-  ("a sign that there could be a better site"); phones ("idc about phones rn"). Outside users: "we can try to fix
-  that a little" (the user's side).
+- **The afternoon batch (the user's list, built Sun 15 Nov about 1:30 to 3 PM New York on "Build the new batch now").
+  On the pre-release only; the public site is r6.** The user: run only the checks that touch the change; the full set
+  at the release. Checked: syntax, `check_assistant` (111), `check_scan`, `check_mission`, test set E (6/6), and a
+  browser run of every new feature with no page errors. NOT checked: phones (the user: "idc about phones rn"),
+  test set D, the other Node checks, real hardware.
+  1. SOLAR PANELS in the Best Site Finder (`#scan-panels`, `placePanels` / `st.panelCfg` / `st.panels` in
+     `js/ui-scan.js`; `scan.panels(radiusKm, count)`; ASK LUNI "place 6 solar panels within 3 km"): a distance from
+     the lander and a number of panels; one panel on each of the squares inside that distance with the most sunlight
+     in the mission (ties: sunlight to spare, then nearest), numbered on the map inside a dashed circle, with a table
+     and the energy for the user's panel. Cables and panel-to-panel shadows are not modeled (said on screen).
+  2. Skyline picture (`renderHorizon`): the Sun's glow and 8 rays are sized from the Sun's own radius; when Earth is
+     not in front of the Sun, both discs shrink until they stand clear (no false eclipse); two darker, smoother bands
+     of ground in front of the true skyline for depth (always below the real top edge, said in the tooltip); light
+     along the ridge under the Sun.
+  3. Verdict strip: warnings live in `#mission-warn` (`.hero-warn`), to the right of the verdict. Test scripts that
+     read the eclipse date must read `#mission-warn`, not `#mission-why`.
+  4. Finder: `#scan-row` = the SCAN SIZE stack (`#scan-sizes`), the map, the MAP SHOWS stack (`#scan-shows`;
+     `#scan-metric` is a box of buttons again, `setMetric` / `hasMetric`). `draw()` sizes the map from the row and
+     makes both stacks exactly as tall as the map; the chosen button is blue with a white edge. The side panel is 36%.
+     While scanning, BEST SPOT FOUND shows the progress and the best so far, not "…".
+  5. NASA DATA USED band: white with a red tag and a red frame, three flashes in 1.5 s, wiped in and out (no fade over
+     the top line), held 8 s; also shown for PROOF, the 3D view, ENERGY, the comparison box and the panels.
+  6. SIMPLE VIEW starts with the left side folded away (`setSetup` is module-level in `js/app.js`; the tab is large,
+     blue and pulses three times). ALL TOOLS, the test sets (`#test…`, `LUNO_TEST`), `LUNO_SETUP_OPEN` and the
+     tutorial open it. The ALL TOOLS / SIMPLE VIEW key opens / folds it too.
+  7. BEFORE AND AFTER (`js/ui-compare.js`, `offerCompare` / `flushCompare` in `js/app.js`): after NEXT LANDING
+     WINDOW or a move in the finder, a box on `body` puts the original plan next to the new one (verdict, sunlight,
+     sunlight to spare, longest time without Sun, Earth link, energy; slope and elevation when the site changed) with
+     the change in each, KEEP THE NEW PLAN / GO BACK TO THE ORIGINAL, and a "show this after every move" box
+     (`luno-compare`). Not during a test, the tutorial or with `LUNO_NO_COMPARE`. ASK LUNI "compare shackleton and
+     malapert" opens it for two sites (`compare_sites`, `assistantApi.compareSites`).
+  8. ENERGY (`js/plan.js`: `planStats`, `energyBudget`, `SOLAR_W_M2` = 1361; `js/ui-energy.js`; `#energy` panel,
+     the yellow `#energy-btn` in the POWER block showing PANEL NOW n W): panel size, efficiency and the lander's power
+     use are the user's (`ENERGY_OPTIONS`, kept under `luno-energy`, defaults 2 m2, 30%, 200 W, labeled as values to
+     start from); each hour = size x efficiency x 1361 x LUNI's share of the Sun's disc; a battery that starts full;
+     tiles, an hour-by-hour chart, the longest time on the battery, a flat-panel comparison, and what is not modeled.
+     Sources: NASA SORCE TIM 1360.8 W/m2 (Kopp & Lean 2011). The 30% default has no sourced figure behind it; NASA's
+     small-spacecraft report only says multi-junction cells are the state of the art and single-junction about 20%.
+     The GO / NO-GO rule does NOT use energy (unchanged on purpose).
+  9. ASK LUNI: "go to 85.5S 30E" (compact coordinates), "compare A and B", "best time to land at X in 2027" (sets the
+     start of the period, then `next_good_time { from_here }`), "why is the south pole hard" (`pole`), "how much
+     energy" (`energy`, opens the panel), a general why-question LUNI has no numbers for (`cant`), "place n solar
+     panels within r km".
+  10. `docs/submission.md` and `docs/pitch-3min.md`: 99.1% south / 98.9% north instead of "about 99%"; "every number
+      is computed from NASA data; the rule is the user's needs"; the better-spot wording; the three new features.
+  No change, by the user's word: a GO being the team's rule, IM-2 opening as GO, the finder offering a move from a GO
+  site, phones.
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
