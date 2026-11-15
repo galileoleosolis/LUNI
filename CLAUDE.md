@@ -289,6 +289,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
+  deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
+  controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
+  direction and the source text. Nothing newer is waiting on the pre-release. Every note above that says
+  "on the pre-release only" is released as of r6.
 - **r5 released** on the user's "release it" (Sun 15 Nov, 10:26 AM New York = 15:26 UTC; main 90e2028; GitHub reports the
   deployment as a success): the public site now also has the site's own data card, the WATER ICE layer, the DEEP
   SPACE NETWORK line and the PROOF section against NASA's polar maps. Nothing newer is waiting on the pre-release.
@@ -408,8 +413,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). **r5 (15 Nov, 15:26 UTC, main 90e2028) is the current public version.**
-   To roll back to r4: `tools/release.sh promote 3093d3b`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). **r6 (15 Nov, 17:05 UTC, main 8c8cb9c) is the current public version.**
+   To roll back to r5: `tools/release.sh promote 90e2028`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
