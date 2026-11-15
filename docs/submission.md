@@ -1,0 +1,188 @@
+# LUNI: text for the Space Apps Project page
+
+Each section below matches one box on the Project tab. Copy the text under the heading into that box.
+Anything in [square brackets] is for you to fill in or check. This draft was written by the AI assistant from the
+project as built; read it and change anything that is not how you would say it.
+
+---
+
+## Project Name
+
+LUNI: Lunar Utility Navigational Intelligence
+
+---
+
+## High-Level Project Summary
+
+LUNI is a web app that answers one question fast: can this mission land here, at this time? You pick a landing site
+on the Moon and a landing time, and LUNI gives a plain GO or NO-GO for power and for a direct link to Earth, with the
+reason, countdowns to sunset and Earthset, and one-press ways out of a NO-GO: the next good landing time, a better
+spot nearby, or a mission need to relax.
+
+It addresses the challenge directly: it compares sites and dates quickly, shows the Sun and Earth against the real
+terrain skyline, and makes the result readable by a planner, a teacher or a curious visitor. Every answer is computed
+from NASA data (SPICE positions, LRO LOLA elevation, LRO Diviner temperatures), and the app shows its own proof: it
+matches NASA JPL Horizons to 0.0007° and replays real landings next to what really happened.
+
+It matters because a launch slip or a few hundred meters can turn a workable landing into a dead lander, and today
+finding that out takes several specialist tools.
+
+---
+
+## Link to Project Demo
+
+[Tomorrow: the public link to the 7-slide deck goes here.]
+
+---
+
+## Link to Final Project
+
+https://galileoleosolis.github.io/LUNI/
+
+Source code: https://github.com/galileoleosolis/LUNI
+
+---
+
+## Detailed Project Description
+
+**What it does**
+
+- **The answer.** For a site, a landing time and a set of mission needs (mission length, how long the lander can sit
+  in the dark, how much Earth link it needs, how steep the ground may be), LUNI says GO or NO-GO and why. A NO-GO comes
+  with buttons that get to a GO.
+- **The view from the site.** The skyline all the way round, drawn from elevation data, with the Sun, the Earth in its
+  real phase, and where each will go over the next 3 days. Eclipses (Earth passing in front of the Sun) are detected
+  and flagged.
+- **Mission plan and mission windows.** A 30-day timeline with a slider for any moment of the mission, and every good
+  landing day for the next 12 months.
+- **Scan for a better spot.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
+  one that meets the needs. The skylines are computed on the graphics chip when one is available, and each run first
+  checks itself against the processor.
+- **Moon map with layers.** The 3D Moon with elevation and slope for the whole Moon, and sunlight, Earth link,
+  permanent shadow and temperature for the south polar region. Green is good, red is bad, and each layer names its
+  data source. A data profile card gives every layer's value at any point. The layers can be blended with your own
+  weights into one score, and that mix can pick the best point in the scan.
+- **Mission history.** Six real landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6, Blue Ghost Mission 1, IM-2)
+  side by side, each loadable into the main screen at its real date and hour.
+- **For every skill level.** A first-visit guide, plain-language labels, typed or spoken commands (ASK LUNI), a 3D
+  first-person view from the surface, a comparison of the site with a place on Earth, and a link that reopens LUNI on
+  the exact same question.
+
+**How it works**
+
+LUNI is a static web page with no server. Sun and Earth directions come from a table built from NASA SPICE (DE440) for
+2023 to 2035, in the same Moon-fixed frame as the elevation maps. For each site LUNI builds the terrain skyline from
+LRO LOLA elevation and compares the Sun's disc and the Earth with it, hour by hour. "Sun" means at least half of the
+Sun's disc is in view from 2 m above the ground. The map layers were worked out the same way for 1.26 million points
+south of 80°S, every 6 hours over 2023 to 2035. Temperatures are NASA's own Diviner values, only re-gridded.
+
+**How we know it is right**
+
+- Sun and Earth positions agree with NASA JPL Horizons within 0.0007° across 1,110 values at 6 sites. The app links
+  to NASA's own answer for whatever is on screen.
+- Blue Ghost Mission 1: LUNI works out 347 hours of daylight after touchdown; Firefly reported 346. LUNI puts the
+  14 March 2025 eclipse at 05:01 to 09:51 UTC with the Sun fully hidden from 06:18; the lander's pictures give about
+  05:30, 06:18 and 09:52.
+- Chandrayaan-3: LUNI's sunset is 4 September 2023, the day the lander was put to sleep ahead of the lunar night.
+- The app lists what it does not model: the landing itself, rocks and craters smaller than a map pixel, panel
+  direction, lander tilt, antennas and relay satellites.
+
+**Benefits and what we hope to achieve**
+
+A planner can re-check a site after a schedule slip in seconds instead of moving between several tools. A teacher or
+student can see why the Moon's south pole is hard: a Sun that stays within a few degrees of the horizon near the pole, sunsets that take
+hours, and craters that never see sunlight next to ridges that almost always do. We hope LUNI is useful as a first
+look before detailed analysis, and as a way for anyone to explore real mission conditions.
+
+We tested it with one first-time user over five rounds and changed the design after each; task success went from 2 of
+6 in the first round to 6 of 6 in the fifth. [Add any other people who tried it and what they said.]
+
+**Tools**
+
+HTML, CSS and JavaScript (no build step), WebGL2, Web Workers, the Web Speech API, three.js for the 3D views; Python
+with NumPy and SpiceyPy to prepare the NASA data; Node.js for the checks; Playwright for layout checks; GitHub Pages
+for hosting; an optional link to OpenSpace. The code was written with an AI assistant (see Use of SI).
+
+---
+
+## Use of Super Intelligence (SI)
+
+Yes. We used Claude (Anthropic's large language model, through Claude Code) throughout.
+
+- **Code:** all of the app's code and the data-preparation scripts were written by Claude under our direction. This is
+  stated in the app's PROOF panel, in the README, and in the commit history (each commit is marked as co-authored by
+  Claude).
+- **Ideas:** we chose the challenge and set the goal. We directed the work by testing each version and deciding what
+  to keep, change or remove. Claude also proposed features, for example the mission-needs check, the landing-window
+  calendar and the area scan; we decided which to build. [Check this paragraph against your own memory of who
+  proposed what, and correct it. This answer must be accurate.]
+- **Data:** no data was generated by AI. Every number comes from NASA data through ordinary calculation. Mission facts
+  were looked up on the web and each is linked to its source.
+- **Text:** this project page text was drafted by Claude and edited by us.
+- **Images, video, audio:** none generated by an image, video or audio model. The pictures in the app are drawn by
+  its code. The app's speech uses the browser's built-in voice. No NASA logos or mission identifiers are used.
+  [If the slide deck uses AI-made images or is AI-drafted, say so here and mark the slides.]
+- The assistant inside the app (ASK LUNI) is rule-based, not a language model. A language model on the user's own
+  computer can be connected as an option; it is off by default.
+
+---
+
+## NASA Data
+
+- **NASA NAIF SPICE** generic kernels (DE440 planetary ephemeris `de440s.bsp`, `naif0012.tls`, `pck00011.tpc`,
+  `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf`): positions of the Sun and Earth as seen from the Moon, 2023 to
+  2035. https://naif.jpl.nasa.gov/naif/data_generic.html
+- **NASA JPL Horizons System:** 1,110 reference values used to check LUNI's positions, and live links from the app to
+  NASA's own answer. https://ssd.jpl.nasa.gov/horizons/
+- **LRO LOLA (Lunar Orbiter Laser Altimeter) gridded elevation**, NASA PDS Geosciences Node: `ldem_80s_40m`,
+  `ldem_60s_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
+  https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/
+- **LRO Diviner Lunar Radiometer, Polar Resource Product V2.0** (Paige et al., LRO-L-DLRE-5-PRP-V2.0), NASA PDS:
+  annual average and maximum surface temperature for the south polar region.
+  https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/
+- **LRO Wide Angle Camera global mosaic** (NASA/GSFC/Arizona State University), through NASA Moon Trek: the picture on
+  the 3D Moon and the mission-history map. https://trek.nasa.gov/moon/
+- **LROC landing-site pages** for coordinates of Blue Ghost Mission 1, SLIM and Apollo 11.
+  https://lroc.im-ldi.com/images/1400 · https://www.lroc.asu.edu/images/1358 · https://lroc.im-ldi.com/visit/exhibits/1/gallery/8
+- The challenge's own description and resources for the Lunar Landing Site Navigator challenge.
+
+---
+
+## Space Agency Partner Data and Other References
+
+**Space agency partners**
+
+- **JAXA:** the SLIM landing (19 January 2024) is one of the replayed missions. NASA's Diviner temperature product is
+  built on a polar elevation model from JAXA's Kaguya laser altimeter (Araki et al., Science, 2009), as its NASA catalog entry states.
+- **ISRO:** the Chandrayaan-3 landing (23 August 2023) is one of the replayed missions; the site coordinates come from the
+  IAU / USGS planetary names gazetteer. https://planetarynames.wr.usgs.gov/Feature/16272
+
+**Mission facts (each shown in the app with its link)**
+
+- IM-2 Athena: Spaceflight Now, https://spaceflightnow.com/2025/03/07/intuitive-machines-im-2-mission-ends-with-lander-on-its-side-on-the-moon/ ; SpacePolicyOnline, https://spacepolicyonline.com/news/im-2-mission-ends-one-day-after-lunar-landing/
+- Blue Ghost Mission 1: Firefly Aerospace, https://fireflyspace.com/missions/blue-ghost-mission-1/ ; FOX 7 Austin, https://www.fox7austin.com/news/blue-ghost-lander-eclipse-from-moon
+- Chandrayaan-3: News On AIR, https://www.newsonair.gov.in/vikram-lander-of-chandrayan-3-put-into-sleep-mode-hopes-for-its-awakening-on-22nd-september-isro ; The Planetary Society, https://planetary.org/space-missions/chandrayaan-3
+- SLIM: SpacePolicyOnline, https://spacepolicyonline.com/news/farewell-slim ; Scientific American, https://www.scientificamerican.com/article/japans-slim-mission-is-revived-on-the-moon
+- IM-1 Odysseus: Intuitive Machines, https://www.intuitivemachines.com/post/im-1-lunar-night-update-farewell-odysseus ; Universe Today, https://www.universetoday.com/articles/lunar-night-permanently-ends-the-odysseus-mission
+- Chang'e 6: collectSPACE, https://www.collectspace.com/news/news-060124a-china-chang'e-6-moon-far-side-sample-landing.html ; SpaceNews, https://spacenews.com/change-6-lands-on-far-side-of-the-moon-to-collect-unique-lunar-samples
+
+**Site coordinates**
+
+- Shackleton connecting ridge: Mazarico et al. 2011, Icarus 211 (LOLA illumination study).
+- Apollo 15 and 17: Apollo Lunar Surface Journal, https://apollojournals.org/alsj/alsjcoords.html
+- IM-1: https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf
+- IM-2, Chang'e 4, Chang'e 6: Wikipedia articles for each mission.
+- Nobile Rim 1 and Malapert Massif are points LUNI itself picked as the best-lit spot near a rough region center, and
+  Haworth is an approximate point on the crater floor; the app labels them as such.
+
+**Papers**
+
+- Paige et al., Science 330, 497 (2010): the Diviner polar temperature model.
+
+**Software and fonts**
+
+- three.js and OrbitControls (MIT license), included in the project.
+- IBM Plex Mono and Barlow Condensed fonts (SIL Open Font License), included in the project.
+- OpenSpace (openspaceproject.com), optional link; its openspace-api-js message format.
+- Python, NumPy, SpiceyPy; Node.js; Playwright.
+- Claude (Anthropic), through Claude Code: wrote the code (see Use of SI).
