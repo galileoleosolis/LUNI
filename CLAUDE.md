@@ -178,6 +178,14 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   BACK TO THE MAIN SCREEN button, scan sizes as a vertical stack left of the map (`.scan-sizes`), and the
   MOVE MY SITE TO THE BEST SPOT button under the map at the map's width (`#scan-go-best` in `.scan-map`; its text
   says SCANNING / YOU ARE AT THE BEST SPOT / NO SPOT HERE MEETS THE NEEDS when it cannot be pressed).
+- The user (Sun, about 2 AM New York): "work until it runs out" (the weekly Fable allowance was at 90%). Built, in this
+  order, each saved by itself:
+  1. Sun / Earth in view at a negative height shows a note (`#sun-low`, `#earth-low`): the skyline there dips below level.
+  2. Custom coordinates in the open: `.coord-row` under the site list (`#lat-input`, `#lon-input`, `#coord-go`); the
+     boxes are gone from COMPARE SITES · MORE. Extras item 3 is done.
+  3. All sites side by side (`renderRank` in `js/app.js`): a green / red dot on every row of the site list (GO or
+     NO-GO at the landing time on screen) and a ranked table at the top of COMPARE SITES · MORE (good landing days
+     in the months the calendar shows, GO / NO-GO now; click to go there). About 110 ms for 14 sites when a need changes.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the

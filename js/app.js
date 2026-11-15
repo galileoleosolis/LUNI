@@ -1,6 +1,6 @@
 import { SITES, CUSTOM_ID, loadSites } from "./sites.js";
 import { computeTerrain } from "./terrain.js";
-import { hasTerrain, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
+import { hasTerrain, terrainFor, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
 import { createGlobe } from "./globe.js";
 import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
@@ -99,7 +99,7 @@ function buildSiteList() {
     if (s.group !== grp) { grp = s.group; const g = document.createElement("div"); g.className = "grp"; g.textContent = grp.toUpperCase(); box.appendChild(g); }
     const b = document.createElement("button");
     b.className = "site-row"; b.dataset.id = s.id;
-    b.innerHTML = `<span>${pad(++n)} ${s.name}</span><span>${fmtLat(s.lat)}</span>`;
+    b.innerHTML = `<span>${pad(++n)} ${s.name}</span><span><i class="site-ok"></i>${fmtLat(s.lat)}</span>`;
     b.addEventListener("click", () => selectSite(s));
     box.appendChild(b);
   }
@@ -160,7 +160,7 @@ function syncSiteUI() {
     const over = (row.getBoundingClientRect().bottom - list.getBoundingClientRect().bottom) / zoomOf(list) + 24;
     if (over > 0) list.scrollTop += over;
   }
-  $("lat-input").value = s.lat; $("lon-input").value = s.lon;
+  $("lat-input").value = +(+s.lat).toFixed(3); $("lon-input").value = +(+s.lon).toFixed(3);
   syncT0();
   $("bar-site").textContent = `${siteName(s)} ${fmtLat(s.lat)} ${fmtLon(s.lon)}`;
   $("bar-t0").textContent = stamp(state.t0);
@@ -266,8 +266,39 @@ function updateCalendar() {
   }
   renderCalendar($("calendar"), state.cal.daily, { t0Day: Math.floor((state.t0 - state.cal.start) / DAY), missionDays: state.req.days });
   renderWindows();
+  renderRank();
 }
 const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HOURS);
+
+// Every preset for this mission, side by side: GO or NO-GO at the landing time on screen, the number of good landing
+// days in the months the calendar shows, and the next window. Worked out once per (months shown, mission needs).
+let rank = { key: "", rows: [] };
+function renderRank() {
+  const c = state.cal, key = `${+c.start},${c.days},${JSON.stringify(state.req)}`;
+  if (rank.key !== key) {
+    rank = { key, rows: SITES.map((site) => {
+      const terrain = terrainFor(site), samples = sampleSite(site, c.start, (c.days + state.req.days + 3) * 24, terrain), a = analyze(samples, state.req, STEP_HOURS, terrain);
+      for (let i = c.days * 24; i < a.mask.length; i++) a.mask[i] = 0;
+      let good = 0;
+      for (let d = 0; d < c.days; d++) { let any = 0; for (let i = d * 24; i < (d + 1) * 24; i++) any |= a.mask[i]; good += any; }
+      return { site, mask: a.mask, good, windows: windowsFrom(a.mask, samples) };
+    }) };
+  }
+  const i = calIdx(), box = $("rank");
+  for (const r of rank.rows) {                       // the dots in the site list
+    const dot = document.querySelector(`.site-row[data-id="${r.site.id}"] .site-ok`);
+    if (dot) { dot.className = "site-ok " + (r.mask[i] ? "go" : "nogo"); dot.title = r.mask[i] ? "GO at this landing time" : "NO-GO at this landing time"; }
+  }
+  box.replaceChildren(...[...rank.rows].sort((a, b) => b.good - a.good || a.site.name.localeCompare(b.site.name)).map((r, n) => {
+    const b = document.createElement("button"), ok = !!r.mask[i], nx = r.windows.find((w) => w.end >= state.t0);
+    b.className = "rank-row" + (r.site.id === state.site.id ? " cur" : ""); b.style.setProperty("--f", (r.good / c.days * 100).toFixed(1) + "%");
+    b.innerHTML = `<span class="rk-n">${n + 1}</span><span class="rk-name">${siteName(r.site)}</span><span class="rk-ok ${ok ? "go" : "nogo"}">${ok ? "GO" : "NO-GO"}</span><span class="rk-days">${r.good} DAYS</span>`;
+    b.title = nx ? `Next landing window opens ${stamp(nx.start)}` : "No landing window in the months shown";
+    b.addEventListener("click", () => selectSite(r.site));
+    return b;
+  }));
+  $("rank-note").textContent = `DAYS = DAYS WITH A GOOD LANDING HOUR, OUT OF THE ${c.days} FROM ${dayStamp(c.start)}, FOR A ${state.req.days}-DAY MISSION WITH YOUR NEEDS. GO / NO-GO IS FOR THE LANDING TIME ON SCREEN.`;
+}
 
 // The answer: can this mission land at this site at this time?
 function renderMission() {
@@ -420,11 +451,15 @@ function renderMoment() {
   $("sun-next").textContent = fmtBig(sunLeft);
   $("sun-next-date").textContent = sunLeft == null ? "" : `${stamp(new Date(+cur.t + sunLeft * 3600000))}`;
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1) + "°";
+  // In view below level: the site stands high, so the skyline in that direction dips under the horizontal.
+  const lowNote = (id, up, el) => { const n = $(id); n.hidden = !(up && el < 0); if (!n.hidden) n.textContent = "BELOW LEVEL, BUT THE SKYLINE THERE DIPS LOWER"; };
+  lowNote("sun-low", cur.sunUp, cur.sunEl);
   set("earth-state", cur.earthUp, "EARTH IN VIEW", "NO LINK");
   $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
   $("earth-next").textContent = fmtBig(earthLeft);
   $("earth-next-date").textContent = earthLeft == null ? "" : `${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1) + "°";
+  lowNote("earth-low", cur.earthUp, cur.earthEl);
 
   $("sun-ico").className = "ro-ico " + (cur.sunUp ? "go" : "nogo");
   $("earth-ico").className = "ro-ico " + (cur.earthUp ? "go" : "nogo");
@@ -868,6 +903,7 @@ async function init() {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
     selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
   };
+  $("coord-go").addEventListener("click", onCoord);
   $("lat-input").addEventListener("change", onCoord);
   $("lon-input").addEventListener("change", onCoord);
 

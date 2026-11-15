@@ -12,7 +12,7 @@ const STEPS = [
   { at: ['h3[data-step="1"]', "#site-list"], title: "1 · WHERE: THE LANDING SITE",
     what: "A list of places to land. Some are real landings from the last few years. Others are places NASA is studying for astronauts.",
     why: "Hills and crater walls can block the Sun and Earth. Two spots only a few kilometers apart can get very different answers.",
-    how: "Click a name in the list. Scroll the list to see more.",
+    how: "Click a name in the list. Scroll the list to see more. The dot beside each name is green if that site is a GO for your landing time.",
     doIt: { on: "click", sel: ".site-row", say: "CLICK ANY SITE IN THE LIST" },
     alt: "It is like picking a campsite. One is on a sunny hilltop, another is down in a shady valley. Same park, very different trip." },
   { at: ['h3[data-step="2"]', ".t0"], title: "2 · WHEN: THE LANDING TIME",
