@@ -202,6 +202,10 @@ everything through the layers, mix, temperature, history, icons and the NEXT SIT
 pre-release again and need a new "release it". The submission: the user chose a 7-slide deck (GIFs on hold; "we can do
 slide decks tomorrow") over the 30-second video; the Project page takes JPG / PNG / GIF up to 10 MB and public links
 only. The Project page text and the deck do not exist yet; the box titles of the Project tab were asked for.
+`docs/submission.md` holds the drafted text for every Project-tab box. The user makes the slide deck themselves at the
+end (no deck or GIFs from Claude unless asked), will have their mother test the app, and wants the Use of SI "ideas"
+line to say the idea and direction were theirs; it says that, and keeps one clause that Claude offered suggestions,
+because some features were Claude's proposals.
 Three independent judge runs (15 Nov UTC, sub-agents on three models, Presentation fixed at 4): 19, 21, 21 of 25
 (Impact 3/4/4, Creativity 3/4/4, Validity 4, Relevance 5). Asked for: outside users, an operations schedule or a
 best site-and-date search, a richer power model; found the NEXT SITE bug (fixed), ASK LUNI misreading open questions,
