@@ -230,6 +230,19 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
     DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
     sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- **Source bubbles** (the user, Sun 15 Nov about 11 AM New York, from a screenshot: the green "NASA DATA · SPICE DE440
+  + LOLA TERRAIN" line "can go away", the top-row buttons "need to be bigger", and the NASA data should "appear in
+  like a bubble whenever something is calculated or displayed saying where the data came from"). **On the pre-release
+  only; the public site is r5.**
+  - `#data-badge` is still in the page but `hidden` (test set D reads its text); what it said about the terrain in
+    use is on the skyline's bubble (`#src-sky`: NASA LRO LOLA, or NASA LRO LOLA · REDUCED MAP in orange).
+  - Tabs and ? TUTORIAL are 16 px with more padding; the top row is 35 px tall (was about 23), so the skyline is
+    about 10 px shorter (139 / 162 px at 1440 x 900).
+  - `js/sources.js` (`initSources`, `pulseSources`): any element with class `src` is a green pill naming the NASA data
+    behind the result beside it (`data-src` key into `SOURCES`, or its own `data-long` sentence). Pointing at it or
+    tapping it opens a "WHERE THIS COMES FROM" bubble (one fixed element on `body`); every pill pulses when
+    `recompute` runs. Pills: the verdict strip, the Sun / Earth readouts heading, the skyline heading, the small
+    Moon, the Best Site Finder header, MISSION HISTORY, and the MOON MAP (`#mm-src`, text and sentence follow the layer).
 - The user (Sun 15 Nov, about 10 AM New York) asked for the UI "all consolidated ... extremely intuitive". A sketch was
   shown first (one row of tabs for every screen, bottom keys as the only action buttons, the duplicate buttons in
   the left column and headings removed, extras under one MORE key). **Rejected: "Actually just leave it these are

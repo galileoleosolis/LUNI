@@ -22,6 +22,10 @@ export function createMoonMap({ globe, getSite, getNow, getSiteYears, fmt, onClo
     [...$("mm-layers").children].forEach((b) => b.classList.toggle("on", b.dataset.id === id));
     const L = layer(id);
     $("mm-legend").innerHTML = L ? legendHtml(L) : "";
+    // the source bubble: which NASA data this layer is made of (the full sentence is the layer's own source text)
+    const SHORT = { elev: "NASA LRO LOLA", slope: "NASA LRO LOLA", sun: "NASA SPICE + LRO LOLA", earth: "NASA SPICE + LRO LOLA", shadow: "NASA SPICE + LRO LOLA", temp: "NASA LRO DIVINER", ice: "NASA LRO DIVINER", mix: "NASA DATA · YOUR WEIGHTS" };
+    const sb = $("mm-src"); sb.textContent = L ? SHORT[L.id] || "NASA DATA" : "NASA LRO PHOTO";
+    if (L?.source) { sb.dataset.long = L.source; delete sb.dataset.src; } else { delete sb.dataset.long; sb.dataset.src = "photo"; }
     $("mm-meaning").textContent = L ? L.meaning : "THE MOON AS A CAMERA SEES IT: NASA LRO WIDE-ANGLE CAMERA MOSAIC. PICK A LAYER TO PUT DATA ON IT.";
     $("mm-mix").hidden = !L?.mix;
     $("mm-source").textContent = L ? L.source : "PICTURE: NASA / GSFC / ARIZONA STATE UNIVERSITY (LRO WAC MOSAIC).";
