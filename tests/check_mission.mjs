@@ -9,7 +9,7 @@ import { setHorizons, sampleSite } from "../js/model.js";
 // --- synthetic cases: strings of S (sun), E (earth), B (both), . (neither), one char per hour ---
 const mk = (str) => [...str].map((c, i) => ({ sunUp: c === "S" || c === "B", earthUp: c === "E" || c === "B", t: new Date(i * 3600000) }));
 const day = (c) => c.repeat(24);
-const req = (o) => ({ ...DEFAULT_REQ, ...o });
+const req = (o) => ({ ...DEFAULT_REQ, earthMinPct: 0, ...o });      // the made-up cases below state their own Earth need; the default (25%) is checked on real data further down
 
 { // 3 days of both, then a long night: a 2-day mission fits only if it starts in the first day
   const s = mk(day("B") + day("B") + day("B") + day(".") + day(".") + day("B"));

@@ -6,7 +6,7 @@ Times are New York time. **Public version: r7.** The test build (`/next/`) is r7
 Sun 15 Nov · after 2 PM · 126 saves
 
 - The full name with “for”: Lunar Utility for Navigational Intelligence.
-- Coming next, not built yet: a default Earth-link need of 25%.
+- The default Earth-link need is now 25% of the mission (was only "at landing"), so a plan with almost no Earth link is no longer a GO.
 - Outside the app: the slide deck, three GIFs, the talk scripts.
 
 ## r7: Energy, before and after, solar panels
