@@ -381,6 +381,18 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   the Sun and Earth over 25 days at Nobile Rim 1, a frame every 6 hours). Recorded from the real app with
   Playwright (`gifshots.js` in the scratchpad, `LUNO_NO_COMPARE` set) and put together with Pillow; nothing drawn
   by hand or by an image model. In the deck: slide 4 left and slide 2. A PDF export shows one still frame.
+- **Deck, last changes before the local judging** (Sun 15 Nov, mid-afternoon New York): slide 5 is now ALL SEVEN
+  OBJECTIVES, AND MORE: `docs/figures/luni-more-features.gif` (eight captioned screens the deck did not show: Moon
+  map sunlight and water ice, mission history, 3D view, ASK LUNI, mission windows, operations, tutorial) beside the
+  seven objectives as short labels (the text table is gone). Slide 7 has a QR code to the public site (read back
+  with a decoder: https://galileoleosolis.github.io/LUNI/). The user's own cover text (team "Mystic Reaserch",
+  "Lunar Utility for Navigational Intelligence", both names) was left as typed.
+  **Visit tracking was asked for and dropped** ("Its fine then, i can find more testers after this"): LUNI has no
+  server, the counting services are blocked from this session so nothing could be tested, and a visit count is not
+  a tester count. If it comes back: GoatCounter (the user signs up, one script line, a sentence in PROOF), or point
+  people at `#test`, which scores six tasks and gives a report to send.
+  Claude's own quick score when asked (not blind): Impact 4, Creativity 4, Validity 4, Relevance 5, Presentation 3
+  for the deck as it was before the features slide.
 - **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
   main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
   E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
