@@ -197,7 +197,15 @@ them when the UTC date turned to 15 Nov, and Claude wrongly said "tonight"). Nev
 deadline from the UTC date: ask the user for their local time, or give the time in UTC and say so.
 **The user is in New York (US Eastern, UTC-5 in November).** The deadline is Sunday 15 Nov 23:59 New York time, which
 is **Monday 16 Nov 04:59 UTC**. New York time = this session's UTC clock minus 5 hours.
-The public site is still r2. Releasing needs the user's "release it". The submission text and video do not exist.
+**r3 released** on the user's "release it" (Sat 14 Nov, about 10 PM New York; main 9f099f4): the public site now has
+everything through the layers, mix, temperature, history, icons and the NEXT SITE fix. Later changes go to the
+pre-release again and need a new "release it". The submission: the user chose a 7-slide deck (GIFs on hold; "we can do
+slide decks tomorrow") over the 30-second video; the Project page takes JPG / PNG / GIF up to 10 MB and public links
+only. The Project page text and the deck do not exist yet; the box titles of the Project tab were asked for.
+Three independent judge runs (15 Nov UTC, sub-agents on three models, Presentation fixed at 4): 19, 21, 21 of 25
+(Impact 3/4/4, Creativity 3/4/4, Validity 4, Relevance 5). Asked for: outside users, an operations schedule or a
+best site-and-date search, a richer power model; found the NEXT SITE bug (fixed), ASK LUNI misreading open questions,
+a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW buttons.
 
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment
@@ -209,7 +217,8 @@ The public site is still r2. Releasing needs the user's "release it". The submis
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
-   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name.
+   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
+   main 9f099f4) is the current public version.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
