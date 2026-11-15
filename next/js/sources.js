@@ -1,37 +1,37 @@
-// Source bubbles: a small pill beside each result that names the NASA data it was worked out from. Pointing at it
-// (or tapping it) opens the full sentence; every bubble on screen pulses when LUNI recalculates.
-// A bubble is any element with class "src" and either data-src="<key below>" or its own data-long text.
-const SOURCES = {
-  verdict: "GO / NO-GO IS CALCULATED BY LUNI FROM NASA DATA: WHERE THE SUN AND EARTH ARE (NASA NAIF SPICE, THE DE440 EPHEMERIS) AGAINST THE SKYLINE AT THE SITE (NASA LRO LOLA LASER ELEVATION MAPS).",
-  positions: "SUN AND EARTH HEIGHT AND DIRECTION: NASA NAIF SPICE (DE440), CHECKED AGAINST NASA JPL HORIZONS TO 0.0007°. THE COUNTDOWNS ADD THE SKYLINE FROM NASA LRO LOLA. THE DEEP SPACE NETWORK LINE USES NASA NAIF STATION POSITIONS AND EARTH ORIENTATION.",
-  skyline: "THE GRAY SKYLINE IS BUILT FROM NASA LRO LOLA LASER ELEVATION MAPS. THE SUN, THE EARTH AND THEIR PATHS COME FROM NASA NAIF SPICE (DE440).",
-  photo: "THE MOON PICTURE IS THE LRO WIDE ANGLE CAMERA MOSAIC (NASA / GSFC / ARIZONA STATE UNIVERSITY), FROM NASA MOON TREK. THE SUN AND EARTH MARKS COME FROM NASA NAIF SPICE.",
-  finder: "EVERY SQUARE IS CALCULATED BY LUNI THE SAME WAY AS THE MAIN ANSWER: A SKYLINE FROM NASA LRO LOLA ELEVATION (REDUCED MAPS, 240 M TO 3.8 KM PER PIXEL) AGAINST SUN AND EARTH POSITIONS FROM NASA NAIF SPICE.",
-  history: "THE LANDINGS' DATES AND OUTCOMES COME FROM THE SOURCES LISTED FOR EACH MISSION. LUNI'S NUMBERS AND BARS ARE CALCULATED FROM NASA NAIF SPICE AND NASA LRO LOLA ELEVATION.",
+// The NASA DATA USED band: whenever LUNI calculates or shows something, a bright band slides over the screen's top
+// line (site · landing · mission clock, which is also shown elsewhere) and names the NASA data it came from, then
+// slides away. One place, every screen. showData("verdict") or showData([["WHAT", "SOURCE"], ...]).
+const SETS = {
+  verdict: [["SUN + EARTH POSITIONS", "NASA NAIF SPICE (DE440)"], ["SKYLINE AT THE SITE", "NASA LRO LOLA ELEVATION"]],
+  finder: [["TERRAIN OF EVERY SQUARE", "NASA LRO LOLA ELEVATION"], ["SUN + EARTH", "NASA NAIF SPICE (DE440)"]],
+  history: [["LUNI'S NUMBERS", "NASA NAIF SPICE + NASA LRO LOLA"], ["MISSION RECORDS", "THE SOURCES LISTED FOR EACH LANDING"]],
+  surface: [["THE GROUND", "NASA LRO LOLA ELEVATION (40 M NEAR THE POLAR SITES)"], ["SUN + EARTH", "NASA NAIF SPICE (DE440)"]],
+  proof: [["CHECKED AGAINST", "NASA JPL HORIZONS · NASA LRO LOLA POLAR MAPS · REAL LANDINGS"]],
+  layers: {
+    none: [["THE MOON PICTURE", "NASA LRO WIDE ANGLE CAMERA MOSAIC"]],
+    elev: [["ELEVATION", "NASA LRO LOLA LASER ALTIMETER"]], slope: [["SLOPE, FROM ELEVATION", "NASA LRO LOLA LASER ALTIMETER"]],
+    sun: [["SUN POSITIONS", "NASA NAIF SPICE (DE440)"], ["TERRAIN", "NASA LRO LOLA"]], earth: [["EARTH POSITIONS", "NASA NAIF SPICE (DE440)"], ["TERRAIN", "NASA LRO LOLA"]],
+    shadow: [["SUN POSITIONS", "NASA NAIF SPICE (DE440)"], ["TERRAIN", "NASA LRO LOLA"]],
+    temp: [["TEMPERATURE", "NASA LRO DIVINER RADIOMETER"]], ice: [["WATER ICE DEPTH", "NASA LRO DIVINER POLAR RESOURCE PRODUCT"]],
+    mix: [["YOUR MIX OF", "NASA SPICE · NASA LRO LOLA · NASA LRO DIVINER"]],
+  },
 };
-let pop = null, shown = null;
-
-function place(el) {
-  const r = el.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight, W = innerWidth, H = innerHeight;
-  const below = r.bottom + 8 + h <= H - 6;
-  pop.style.left = Math.max(6, Math.min(W - w - 6, r.left + r.width / 2 - w / 2)) + "px";
-  pop.style.top = (below ? r.bottom + 8 : Math.max(6, r.top - 8 - h)) + "px";
-}
-function show(el) {
-  const text = el.dataset.long || SOURCES[el.dataset.src]; if (!text) return;
-  shown = el; pop.innerHTML = `<b>WHERE THIS COMES FROM</b>${text}`; pop.hidden = false; place(el);
-}
-function hide() { shown = null; if (pop) pop.hidden = true; }
+let band = null, timer = 0;
+const HOLD_MS = 6500;
 
 export function initSources() {
-  pop = document.createElement("div"); pop.className = "src-pop"; pop.hidden = true; pop.setAttribute("role", "tooltip"); document.body.appendChild(pop);
-  document.addEventListener("pointerover", (e) => { const el = e.target.closest?.(".src"); if (el) show(el); else if (shown && e.pointerType === "mouse") hide(); });
-  document.addEventListener("focusin", (e) => { const el = e.target.closest?.(".src"); if (el) show(el); });
-  document.addEventListener("focusout", (e) => { if (e.target.closest?.(".src")) hide(); });
-  document.addEventListener("click", (e) => { const el = e.target.closest?.(".src"); if (el) { e.stopPropagation(); if (shown === el && e.pointerType !== "mouse") hide(); else show(el); } else hide(); });
-  window.addEventListener("scroll", hide, true); window.addEventListener("resize", hide);
+  const bar = document.querySelector("header.bar"); if (!bar || band) return;
+  band = document.createElement("div"); band.className = "data-band"; band.hidden = true; band.setAttribute("role", "status"); band.setAttribute("aria-live", "polite");
+  bar.appendChild(band);
 }
-// Called after LUNI recalculates: the bubbles in view light up for a moment.
-export function pulseSources(root = document) {
-  for (const el of root.querySelectorAll(".src")) { el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("fresh"); }
+// what: a key of SETS, "layer:<id>", or rows [[what, source], ...]. extra: one more row (e.g. a reduced-map note).
+export function showData(what, extra = null) {
+  if (!band) return;
+  let rows = Array.isArray(what) ? what : what.startsWith("layer:") ? SETS.layers[what.slice(6)] || SETS.layers.none : SETS[what];
+  if (!rows) return;
+  if (extra) rows = [...rows, extra];
+  band.innerHTML = `<b>NASA DATA USED</b>` + rows.map(([k, v]) => `<span><i>${k}</i> ${v}</span>`).join("");
+  band.hidden = true; void band.offsetWidth; band.hidden = false;      // restart the slide-in if one is already showing
+  band.style.animationDuration = HOLD_MS + "ms";
+  clearTimeout(timer); timer = setTimeout(() => { band.hidden = true; }, HOLD_MS);
 }
