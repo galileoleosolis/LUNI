@@ -322,8 +322,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
      the lander and a number of panels; one panel on each of the squares inside that distance with the most sunlight
      in the mission (ties: sunlight to spare, then nearest), numbered on the map inside a dashed circle, with a table
      and the energy for the user's panel. Cables and panel-to-panel shadows are not modeled (said on screen).
-  2. Skyline picture (`renderHorizon`): the Sun's glow and 8 rays are sized from the Sun's own radius; when Earth is
-     not in front of the Sun, both discs shrink until they stand clear (no false eclipse); two darker, smoother bands
+  2. Skyline picture (`renderHorizon`): the Sun's glow and 8 rays are sized from the Sun's own radius. The Sun and
+     Earth are FIXED sizes (`RS = 9`, `RE = 15`; the user: "Earth and the sun change sizes when they get close", so
+     the first fix, shrinking them, was replaced, and they no longer follow the picture's height either). When the
+     two are close the pair is placed by the real gap between them (`cur.sepDeg` over the sum of the two real
+     radii): standing clear until the real discs touch, then overlapping by as much as the real discs do; two darker, smoother bands
      of ground in front of the true skyline for depth (always below the real top edge, said in the tooltip); light
      along the ridge under the Sun.
   3. Verdict strip: warnings live in `#mission-warn` (`.hero-warn`), to the right of the verdict. Test scripts that

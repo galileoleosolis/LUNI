@@ -635,15 +635,27 @@ function renderHorizon(cur) {
   const clipAbove = (id, p) => { const c = el("clipPath", { id }, defs); el("rect", { x: 0, y: 0, width: W, height: Math.max(0, p.ySky) }, c); };
 
   // Sun
-  // Both are drawn larger than life; Earth stays the bigger of the two, as it is from the Moon (about 3.6 times wider).
-  // Drawn that large, the two discs can touch on the picture when the real ones are well apart, which looks like an
-  // eclipse that is not happening. So unless Earth really is in front of the Sun, both shrink until they stand clear.
-  let RS = Math.round(Math.max(8, Math.min(11, H * 0.06))), RE = Math.round(Math.max(13, Math.min(20, H * 0.11)));
-  {
-    const s0 = place(cur.sunAz, cur.sunEl, 0.2666, RS), e0 = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE), gap = Math.hypot(s0.cx - e0.cx, s0.cy - e0.cy);
-    if (!(cur.eclipse > 0.01) && s0.k > -1 && e0.k > -1 && gap < RS + RE + 5) { const k = Math.max(0.3, (gap - 5) / (RS + RE)); RS = Math.max(3, RS * k); RE = Math.max(4.5, RE * k); }
+  // Both are drawn larger than life, at sizes that never change; Earth stays the bigger of the two, as it is from
+  // the Moon (about 3.6 times wider). Drawn that large, the two discs would overlap on the picture while the real
+  // ones are still well apart, which looks like an eclipse that is not happening. So when they are close, the pair is
+  // placed by the real gap between them, the same way each is placed against the skyline: standing clear of each
+  // other until the real discs touch, then overlapping by as much as the real discs do.
+  const RS = 9, RE = 15;                                         // fixed sizes: the picture changes height with the layout, and the two must not change with it
+  const sp = place(cur.sunAz, cur.sunEl, 0.2666, RS), ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
+  if (sp.k > -1 && ep.k > -1) {
+    const u = (cur.sepDeg ?? 99) / (0.2666 + (cur.earthRadDeg || 0.95));      // the real gap, where 1 = the two discs just touch
+    let dx = sp.cx - ep.cx, dy = sp.cy - ep.cy, d = Math.hypot(dx, dy);
+    const want = u < 1 ? u * (RS + RE) : Math.max(d, RS + RE + 3);
+    if (Math.abs(want - d) > 0.5) {
+      if (d < 0.01) { dx = 0; dy = -1; d = 1; }
+      const mx = (sp.cx + ep.cx) / 2, my = (sp.cy + ep.cy) / 2, ux = dx / d, uy = dy / d;
+      sp.cx = mx + ux * want / 2; sp.cy = my + uy * want / 2; ep.cx = mx - ux * want / 2; ep.cy = my - uy * want / 2;
+      for (const [b, r] of [[sp, RS], [ep, RE]]) {                 // a disc that is wholly above the skyline stays above it
+        if (b.k >= 1) b.cy = Math.min(b.cy, b.ySky - r - 1);
+        b.cy = Math.max(T + r, Math.min(H - B - 2, b.cy));
+      }
+    }
   }
-  const sp = place(cur.sunAz, cur.sunEl, 0.2666, RS);
   if (sp.k > -1) {
     clipAbove("hz-clip-sun", sp);
     const g = el("g", sp.k < 1 ? { "clip-path": "url(#hz-clip-sun)" } : {}, svg), inner = el("g", { transform: `translate(${sp.cx},${sp.cy})` }, g);
@@ -657,7 +669,6 @@ function renderHorizon(cur) {
 
   // Earth, with its real phase: the lit side faces the Sun.
   // Earth is drawn bigger than the Sun because it is: seen from the Moon its disc is about 3.6 times as wide.
-  const ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
   if (ep.k > -1) {
     clipAbove("hz-clip-earth", ep);
     const g = el("g", ep.k < 1 ? { "clip-path": "url(#hz-clip-earth)" } : {}, svg), e = el("g", { transform: `translate(${ep.cx},${ep.cy})` }, g);
