@@ -141,13 +141,18 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - **NASA NAIF SPICE** generic kernels (DE440 planetary ephemeris `de440s.bsp`, `naif0012.tls`, `pck00011.tpc`,
   `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf`): positions of the Sun and Earth as seen from the Moon, 2023 to
   2035. https://naif.jpl.nasa.gov/naif/data_generic.html
+- **NASA NAIF station and Earth-orientation kernels** (`earthstns_itrf93_260814.bsp`,
+  `earth_1962_260806_2126_combined.bpc`): the positions of the Deep Space Network sites at Goldstone, Madrid and
+  Canberra and the Earth's rotation, used to say which sites have the Moon in their sky.
+  https://naif.jpl.nasa.gov/pub/naif/generic_kernels/
 - **NASA JPL Horizons System:** 1,110 reference values used to check LUNI's positions, and live links from the app to
   NASA's own answer. https://ssd.jpl.nasa.gov/horizons/
 - **LRO LOLA (Lunar Orbiter Laser Altimeter) gridded elevation**, NASA PDS Geosciences Node: `ldem_80s_40m`,
   `ldem_60s_240m`, `ldem_60n_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
   https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/
 - **LRO Diviner Lunar Radiometer, Polar Resource Product V2.0** (Paige et al., LRO-L-DLRE-5-PRP-V2.0), NASA PDS:
-  annual average and maximum surface temperature around both poles.
+  annual average and maximum surface temperature around both poles, and the depth at which water ice would stay
+  frozen (the product's `ice_depth` column).
   https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/
 - **LRO Diviner Global Cumulative Products V1.0** (Williams et al. 2017, LRO-L-DLRE-5-GCP-V1.0), NASA PDS: measured
   surface temperature for the whole Moon in half-degree squares.

@@ -208,6 +208,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     such triangle has a yearly maximum of 101 K or less (0 values: 101 to 131 K), so it is stored as depth 0 and the
     source text on screen says the label does not describe it. `data/layers/{sp,np}_ice.u8.gz` (value * 0.0125 = m).
     `tests/check_layers.mjs` checks Haworth's floor (0), the Shackleton ridge (none) and Apollo 11 (no value).
+  - C. DEEP SPACE NETWORK line under EARTH LINK (`#earth-dsn`, only while Earth is in view): which of Goldstone,
+    Madrid and Canberra have the Moon above their horizon at the mission clock, and how high. `js/dsn.js`
+    (`loadDsn`, `dsnAt`), `data/dsn.bin` + `data/dsn.json` from `tools/build_dsn.py` (NAIF station kernel
+    earthstns_itrf93_260814 and Earth orientation earth_1962_260806_2126_combined, ITRF93, every 6 hours).
+    `tests/check_dsn.mjs`: within 0.016 degrees of SPICE at 720 values. Geometry only; the tooltip says it does not
+    know station schedules. The preview page needs `data/dsn.bin.b64.txt`.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
