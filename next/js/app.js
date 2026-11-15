@@ -284,7 +284,7 @@ function renderMission() {
   if (!v.ok) {
     const tr = state.scenario.terrain, tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS, tr).at(calIdx()).ok;
     if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
-    fixes.push(["mission-scan", "SCAN FOR BETTER SPOT", () => scan.toggle(true)]);
+    fixes.push(["mission-scan", "BEST SITE FINDER", () => scan.toggle(true)]);
     if (v.steep) {                                               // too steep: the next slope limit that fits, or no limit at all
       const sl = REQ_OPTIONS.maxSlopeDeg.find((x) => x > r.maxSlopeDeg && tryReq({ maxSlopeDeg: x })) ?? (tryReq({ maxSlopeDeg: 0 }) ? 0 : null);
       if (sl != null) fixes.push(["mission-fix-slope", sl ? `ALLOW SLOPES UP TO ${sl}°` : "ACCEPT ANY SLOPE", () => setReq("maxSlopeDeg", sl)]);
