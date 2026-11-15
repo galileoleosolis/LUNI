@@ -2,12 +2,12 @@
 // (remembered under "luno-guide-v1"), never to automated browsers, and it can be skipped at any card.
 const KEY = "luno-guide-v1";
 const STEPS = [
-  { at: ".col-site", side: "right", head: "1 · PICK WHERE AND WHEN",
+  { at: ".col-site", side: "right", head: "1 · CHOOSE YOUR SITE AND TIME",
     text: "Choose a landing site from the list (or click any spot on the Moon), then the landing time and what the mission needs. LUNI opens on a real landing: IM-2 Athena, 6 March 2025." },
-  { at: "#mission", side: "below", head: "2 · READ THE ANSWER",
-    text: "GO or NO-GO for that site, time and mission, with the reason. A NO-GO comes with buttons that get you to a GO: another date, a better spot nearby, or a need to relax." },
-  { at: "#timeline", side: "above", head: "3 · WATCH IT CHANGE",
-    text: "Drag the slider, or press PLAY, to move through the mission and see the Sun and Earth move against the skyline. Stuck? Press ASK LUNI and type what you want in plain words." },
+  { at: "#mission", side: "below", head: "2 · GET THE VERDICT",
+    text: "GO or NO-GO for that site, time and mission, with the reason. A NO-GO comes with buttons that lead to a GO: land on another date, move to a better spot nearby, or change one mission need." },
+  { at: "#timeline", side: "above", head: "3 · MOVE THROUGH THE MISSION",
+    text: "Drag the blinking SLIDER handle along the bar, or press PLAY, to step through the mission. The Sun and Earth move against the skyline as you go. Stuck? Press ASK LUNI and type what you want in plain words." },
 ];
 
 export function seenGuide() { try { return localStorage.getItem(KEY) === "1"; } catch { return false; } }

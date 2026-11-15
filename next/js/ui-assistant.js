@@ -9,7 +9,7 @@ import { PRESETS } from "./assistant-llm.js";
 const $ = (id) => document.getElementById(id);
 const SR = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
 const WAKE = /^\s*(?:hey |ok |okay |yo )?(?:luni|lunie|luny|lunee|looney|loony|loonie|loonee|lunny|luno|luna|lunar|loono|you know|uno)\b[\s,.:!]*/i;      // LUNI, and what recognizers hear instead
-const TIPS = ["NEXT GOOD TIME", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BETTER SPOT", "HELP"];
+const TIPS = ["NEXT WINDOW", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BETTER SPOT", "HELP"];
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
 export function createAssistantPanel({ assistant, model }) {

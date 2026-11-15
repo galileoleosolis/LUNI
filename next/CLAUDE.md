@@ -152,6 +152,18 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
+**Pre-release state (15 Nov, about 05:30 UTC): `next/` and the preview page (Version 44) carry the north pole layers,
+the fixes from the mother's test and her second list of notes. The public site is still r3 (9f099f4).**
+Second list of notes (15 Nov, dictated; "more feedback as well" is coming), done on the pre-release:
+- Steps 1 to 4 are colored bands (`h3[data-step]`, `--sc`); the Moon map side panel has three bands (`h3.band`).
+- Tour wording: CHOOSE YOUR SITE AND TIME / GET THE VERDICT / MOVE THROUGH THE MISSION; the word "relax" is gone
+  everywhere ("change one mission need").
+- Slider: thicker rail and handle, bigger SUN / EARTH / BOTH / SLIDER labels, and a blinking "DRAG THIS ALONG THE BAR"
+  pointer (`#tl-hint`) until it is first used. The chart is 128 px tall (was 112).
+- The key and the step 2 button read NEXT WINDOW (was NEXT GOOD TIME); ASK LUNI still understands both.
+- Action words (`h3 .h-do`) and the ASK LUNI example buttons are larger and bold.
+- The left side pops in and out (`#setup-tab`, `.cols.setup-off`; `setSetup` in `js/app.js`); not on phones.
+- Found on the way: test set E's shadow answer choices did not match the card's new wording (fixed: YES, ALWAYS / NO).
 **Whole Moon and north pole (15 Nov, the user: "not really impressive to just have south pole ... at least the best we
 can get on the other parts of the moon"):** on the pre-release, not released.
 - `data/layers/index.json` now has three sets: `sp` and `np` (caps poleward of 80 degrees, 480 m: sun, earth, shadow,

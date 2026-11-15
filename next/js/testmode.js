@@ -208,7 +208,7 @@ const SET_E = [
   { id: "e-shadow", short: "Is Haworth's floor in permanent shadow?",
     text: "Choose the landing site HAWORTH CRATER FLOOR. Then open MOON MAP at the very top of the unit and look at the DATA PROFILE on the right. Question: is this site in PERMANENT SHADOW?",
     reach: { label: "had Haworth selected with the Moon map open when answering", test: (s) => s.site.id === "haworth" && !$("moonmap").hidden },
-    type: "choice", options: ["YES", "NO"],
+    type: "choice", options: ["YES, ALWAYS", "NO"],
     expected: () => profileRow("PERMANENT SHADOW") ?? "(the Moon map was not open on Haworth)" },
   { id: "e-temp", short: "How cold is Haworth's floor?",
     text: "Stay on the MOON MAP with HAWORTH CRATER FLOOR. Question: what is this site's average temperature?",

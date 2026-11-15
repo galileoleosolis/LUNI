@@ -48,7 +48,7 @@
         <div class="mm-body">
           <div id="mm-globe" class="mm-globe"><div id="mm-status" class="mm-status" hidden></div><div class="mm-view"><span>LOOK AT</span><div id="mm-view"></div></div></div>
           <div class="mm-side">
-            <h3><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
+            <h3 class="band" data-band="1"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
             <div id="mm-layers" class="mm-layers"></div>
             <div id="mm-legend"></div>
             <label class="mm-strength">LAYER STRENGTH <input id="mm-strength" type="range" min="25" max="100" value="80" aria-label="How strongly the layer covers the picture"></label>
@@ -56,10 +56,10 @@
               <div id="mm-mix-rows"></div>
               <button id="mm-mix-use" class="mm-mix-use" title="Opens the scan around the landing site, colored by your mix, with the best point picked by your mix among the points that meet the mission needs">USE THIS MIX IN THE SCAN ▸</button>
             </div>
-            <h3 class="gap"><b class="h-t">DATA PROFILE</b> · EVERY LAYER AT ONE POINT</h3>
+            <h3 class="gap band" data-band="2"><b class="h-t">DATA PROFILE</b> · AT ONE POINT</h3>
             <div id="mm-prof-where" class="mm-prof-where"></div>
             <div id="mm-profile"></div>
-            <h3 class="gap"><b class="h-t">ABOUT THIS LAYER</b> · AND WHERE ITS DATA COMES FROM</h3>
+            <h3 class="gap band" data-band="3"><b class="h-t">ABOUT THIS LAYER</b> · AND ITS SOURCE</h3>
             <div id="mm-meaning" class="mm-meaning"></div>
             <div id="mm-source" class="dimtxt"></div>
           </div>
@@ -78,6 +78,7 @@
         <div class="hist-foot"><span class="hist-sortlab">ORDER:</span><span id="hist-sort" class="seg"></span><span class="dimtxt">NUMBERS AND BARS: LUNI, FROM NASA SPICE AND LOLA DATA. WHAT REALLY HAPPENED: THE SOURCES LISTED FOR EACH MISSION. LUNI'S DATA COVERS 2023 TO 2035, SO EARLIER LANDINGS (APOLLO, CHANG'E 4) CANNOT BE REPLAYED ON THEIR OWN DATES.</span></div>
       </div>
       <!-- LEFT: site + date -->
+      <button id="setup-tab" class="setup-tab" title="Hide or show the left side: site, landing time and mission needs"></button>
       <section class="col col-site">
         <h3 data-step="1"><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
         <div id="site-list" class="site-list"></div>
@@ -91,7 +92,7 @@
           <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">SCAN FOR BETTER SPOT ▸</button>
         </div>
-        <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
+        <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT WINDOW ▸</button></h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
           <select id="t0-month" aria-label="Month"></select>
@@ -180,8 +181,8 @@
         <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
         <div class="tiles-head plan-head">
-          <h3 id="plan-title-a"><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
-          <h3 id="cal-title" hidden><b class="h-t">MISSION WINDOWS</b> · GOOD LANDING DAYS, NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
+          <h3 id="plan-title-a"><b class="h-t">30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO ANY MOMENT</b></h3>
+          <h3 id="cal-title" hidden><b class="h-t">MISSION WINDOWS</b> · NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
           <span class="plan-tabs"><button id="tab-plan" class="on" title="The 30 days after landing: when there is Sun and Earth, with the slider">MISSION PLAN</button><button id="tab-days" title="Mission windows: every good landing day in the next 12 months">MISSION WINDOWS</button></span>
         </div>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
@@ -191,7 +192,7 @@
       <!-- RIGHT: summary + compare -->
       <section class="col col-side" id="more-panel" hidden>
         <div class="side-head"><b>COMPARE · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
-        <h3><b class="h-t">NEXT GOOD LANDING TIMES</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        <h3><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
         <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
@@ -259,7 +260,7 @@
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
     <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key."><small>TALK OR TYPE</small>ASK LUNI</button>
-    <button class="key g" id="next-window-btn"><small>JUMP TO THE</small>NEXT GOOD TIME</button>
+    <button class="key g" id="next-window-btn"><small>JUMP TO THE</small>NEXT WINDOW</button>
     <button class="key g" id="scan-btn" title="Opens and closes the scan for a better spot (A)"><small>SCAN FOR</small>BETTER SPOT</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
     <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>

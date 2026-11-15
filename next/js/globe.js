@@ -172,6 +172,7 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
   // --- sizing + loop ---
   const resize = () => {
     const w = container.clientWidth, h = container.clientHeight || w;
+    if (!w) return;                                    // hidden (the left side is popped in): keep the last size
     renderer.setSize(w, h, false);
     renderer.domElement.style.width = w + "px"; renderer.domElement.style.height = h + "px";
     camera.aspect = w / h; camera.fov = w >= h ? 30 : 2 * Math.atan(Math.tan(15 * DEG) * h / w) / DEG; camera.updateProjectionMatrix();
