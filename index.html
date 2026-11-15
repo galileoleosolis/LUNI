@@ -48,7 +48,7 @@
         <div class="mm-body">
           <div id="mm-globe" class="mm-globe"><div id="mm-status" class="mm-status" hidden></div><div class="mm-view"><span>LOOK AT</span><div id="mm-view"></div></div></div>
           <div class="mm-side">
-            <h3 class="band" data-band="1"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
+            <section class="fcard"><h3 class="band" data-band="1" data-ico="layers"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
             <div id="mm-layers" class="mm-layers"></div>
             <div class="mm-srcline">DATA: <b id="mm-src">NASA LRO PHOTO</b></div>
             <div id="mm-legend"></div>
@@ -57,12 +57,12 @@
               <div id="mm-mix-rows"></div>
               <button id="mm-mix-use" class="mm-mix-use" title="Opens the scan around the landing site, colored by your mix, with the best point picked by your mix among the points that meet the mission needs">USE THIS MIX IN THE SCAN ▸</button>
             </div>
-            <h3 class="gap band" data-band="2"><b class="h-t">DATA PROFILE</b> · AT ONE POINT</h3>
+            </section><section class="fcard"><h3 class="gap band" data-band="2" data-ico="bars"><b class="h-t">DATA PROFILE</b> · AT ONE POINT</h3>
             <div id="mm-prof-where" class="mm-prof-where"></div>
             <div id="mm-profile"></div>
-            <h3 class="gap band" data-band="3"><b class="h-t">ABOUT THIS LAYER</b> · AND ITS SOURCE</h3>
+            </section><section class="fcard"><h3 class="gap band" data-band="3" data-ico="info"><b class="h-t">ABOUT THIS LAYER</b> · AND ITS SOURCE</h3>
             <div id="mm-meaning" class="mm-meaning"></div>
-            <div id="mm-source" class="dimtxt"></div>
+            <div id="mm-source" class="dimtxt"></div></section>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
           <div class="answer-side">
-        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
+        <div class="tiles-head"><h3 id="clock-head" data-ico="sunearth">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
         <div class="readouts">
           <div class="ro">
             <div class="ro-ico" id="sun-ico" title="Power: sunlight on the solar panels">
@@ -196,13 +196,13 @@
           </div>
         </div>
 
-        <div class="tiles-head" id="hz-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><span id="src-sky" class="src-note"></span><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <div class="tiles-head" id="hz-head"><h3 data-ico="mountain"><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><span id="src-sky" class="src-note"></span><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
         <div class="tiles-head plan-head">
-          <h3 id="plan-title-a"><b class="h-t">30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER</b></h3>
-          <h3 id="ops-title" hidden><b class="h-t">OPERATIONS PLAN</b> · <b class="h-do">CLICK A STRETCH TO GO THERE</b></h3>
-          <h3 id="cal-title" hidden><b class="h-t">NEXT 12 MONTHS</b> · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
+          <h3 id="plan-title-a" data-ico="timeline"><b class="h-t">30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER</b></h3>
+          <h3 id="ops-title" data-ico="list" hidden><b class="h-t">OPERATIONS PLAN</b> · <b class="h-do">CLICK A STRETCH TO GO THERE</b></h3>
+          <h3 id="cal-title" data-ico="calendar" hidden><b class="h-t">NEXT 12 MONTHS</b> · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
           <span class="plan-tabs"><button id="tab-plan" class="on" title="The 30 days after landing: when there is Sun and Earth, with the slider">MISSION PLAN</button><button id="tab-ops" title="The mission as stretches in order: power and link, power only, on battery, eclipse">OPERATIONS</button><button id="tab-days" title="Mission windows: every good landing day in the next 12 months">MISSION WINDOWS</button></span>
         </div>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
@@ -213,31 +213,31 @@
       <!-- RIGHT: summary + compare -->
       <section class="col col-side" id="more-panel" hidden>
         <div class="side-head"><b>COMPARE SITES · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
-        <h3><b class="h-t">ALL SITES, THIS MISSION</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        <section class="fcard"><h3 data-ico="list"><b class="h-t">ALL SITES, THIS MISSION</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="rank" class="rank"></div>
         <p id="rank-note" class="note"></p>
-        <h3 class="gap"><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        </section><section class="fcard"><h3 class="gap" data-ico="calendar"><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
-        <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
-        <div id="compare-list" class="compare"></div>
-        <details class="more" open>
-          <summary><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
-          <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
+        </section><section class="fcard"><h3 class="gap" data-ico="pin"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
+        <div id="compare-list" class="compare"></div></section>
+        <details class="more fcard" open>
+          <summary data-ico="bars"><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
+          <h3 class="gap" data-ico="timeline">FIRST 30 DAYS AFTER LANDING</h3>
           <table class="sum">
             <tr><td>IN SUNLIGHT</td><td id="pct-sun"></td></tr>
             <tr><td>EARTH IN VIEW</td><td id="pct-earth"></td></tr>
             <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
             <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
           </table>
-          <h3 class="gap"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
+          <h3 class="gap" data-ico="globe"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
           <table class="sum versus" id="versus"></table>
           <p id="versus-note" class="note"></p>
-          <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
+          <h3 class="gap" data-ico="mountain">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
           <p id="site-note" class="note"></p>
         </details>
-        <div id="os-box" class="os-box">
-          <h3 class="gap"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNI</h3>
+        <div id="os-box" class="os-box fcard">
+          <h3 class="gap" data-ico="globe"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNI</h3>
           <div class="os-row"><button id="os-btn" class="mini-btn">CONNECT TO OPENSPACE</button><div class="seg" id="os-view"></div></div>
           <div id="os-status" class="dimtxt">NEEDS OPENSPACE RUNNING ON THIS COMPUTER.</div>
         </div>

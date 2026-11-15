@@ -408,8 +408,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   no likeness of anyone under 18; English; public links with no login.
   Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
   Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
-- **Batch waiting on `main` only, NOT on `/next/`, the preview or the public site** (the user, Sun 15 Nov about 4:15 PM
-  New York: "Dont publish yet ... ill have more so wait on publishing"). Checked: syntax, test set E 6/6, six window sizes.
+- **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
+  Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
+  "for comparison". The design system is a private Claude artifact, "LUNI Console"
+  (https://claude.ai/artifact/AEi7gdJMj3FqDx6xNuTV1B; the user: "This is a private doc so dont save it in the repo").
+  Everything is in blocks at the end of `css/style.css`: `--sheen` / `--sheen-hi`, dark glass for every choice button
+  (`.seg`, `.plan-tabs`, `.mm-layers`, `.tabs`, `#mm-view`; chosen = glazed, white edge; mission needs and ENERGY
+  stay amber via `--on1` / `--on2`), the glaze on the smaller action buttons (`--b1` / `--b2`), icons on bands by
+  `data-ico` (CSS masks), `section.fcard` wrappers in the Moon map side panel and COMPARE SITES · MORE, a check or
+  cross inside `.site-ok`, and a 12.5 px text floor on the wide layout. The `:not(#_)` in those selectors is only
+  there to win over older rules. Left-column choices are tightened so they fit (checked at four sizes).
   - Skyline picture: a darker wash on the ground away from the Sun and seeded craters on the near ground (depth).
   - NASA DATA USED band holds 14 s (`HOLD_MS` in `js/sources.js`), pauses under the pointer, and each source is a link
     to where the data comes from (`LINKS`).
