@@ -1,4 +1,4 @@
-# LUNI — Lunar Utility Navigational Intelligence
+# LUNI — Lunar Utility for Navigational Intelligence
 
 NASA Space Apps Challenge 2026 · *Lunar Landing Site Navigator*
 

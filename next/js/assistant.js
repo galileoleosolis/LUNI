@@ -1,4 +1,4 @@
-// LUNI's command assistant (LUNI = Lunar Utility Navigational Intelligence, the name of the whole unit). It turns a typed or spoken sentence into "tool calls" (the same actions the
+// LUNI's command assistant (LUNI = Lunar Utility for Navigational Intelligence, the name of the whole unit). It turns a typed or spoken sentence into "tool calls" (the same actions the
 // keys and buttons do) and writes a short answer from LUNI's own numbers. It is a fixed set of rules, not a
 // language model: it runs on the unit with no Earth link, and it never states anything LUNI did not compute.
 //
@@ -337,7 +337,7 @@ export function createAssistant(api) {
     "A day here lasts about a month. Nobody on the Moon has ever said: see you tomorrow.",
     "I would tell you a joke about the far side, but there is no Earth link to deliver it.",
   ];
-  const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
+  const WHO = "I am LUNI, the Lunar Utility for Navigational Intelligence. I work this unit's controls and read out its numbers.";
   const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT LANDING WINDOW. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BEST SITE FINDER. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
