@@ -8,7 +8,7 @@ project as built; read it and change anything that is not how you would say it.
 
 ## Project Name
 
-LUNI: Lunar Utility Navigational Intelligence
+LUNI: Lunar Utility for Navigational Intelligence
 
 ---
 
@@ -33,7 +33,7 @@ finding that out takes several specialist tools.
 
 ## Link to Project Demo
 
-[Tomorrow: the public link to the 7-slide deck goes here.]
+[PASTE THE PUBLIC LINK TO THE 7-SLIDE DECK HERE]
 
 ---
 
