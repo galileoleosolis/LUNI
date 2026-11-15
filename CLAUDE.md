@@ -178,6 +178,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   BACK TO THE MAIN SCREEN button, scan sizes as a vertical stack left of the map (`.scan-sizes`), and the
   MOVE MY SITE TO THE BEST SPOT button under the map at the map's width (`#scan-go-best` in `.scan-map`; its text
   says SCANNING / YOU ARE AT THE BEST SPOT / NO SPOT HERE MEETS THE NEEDS when it cannot be pressed).
+- Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
+  (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
+  between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
+  side panel (`#scan-rank`). The keys carry no small caption any more (only the four launch-slip keys do): PLAY
+  ORBITAL DATA (the user's wording), NEXT LANDING WINDOW, ASK LUNI (in the middle in both views), BEST SITE FINDER,
+  NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
 - The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they

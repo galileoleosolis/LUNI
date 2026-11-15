@@ -210,7 +210,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-progress").className = finished ? "ok" : "";
     const sq = st.grid.stepM / 1000, sqTxt = `${+sq.toFixed(2)} KM`;
     $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
-    $("scan-showing").textContent = m.label === "MEETS NEEDS" ? "GO OR NO-GO" : m.label;
+    $("scan-showing").textContent = STACK[st.metric];
     $("scan-legend").classList.toggle("flat", !m.ramp);
     $("scan-legend").classList.toggle("lay", !!m.rgb);
     $("scan-legend").innerHTML = m.lay ? legendHtml(layer(m.lay)) + `<div class="scan-src">${m.lay === "mix" ? "YOUR MIX = " + mixText() + ". CHANGE THE WEIGHTS ON THE MOON MAP SCREEN. " : ""}${layer(m.lay).source}</div>`
@@ -269,29 +269,31 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     }
     return rows;
   }
-  // SHOW buttons, in three groups; the all-years group only where its data exists.
+  // MAP SHOWS: one stack of buttons beside the map (a small gap between the groups). Their names say which
+  // sunlight is meant, because the mission's and the all-years ones sit in the same stack.
+  const STACK = { needs: "GO / NO-GO", sun: "SUN · MISSION", earth: "EARTH · MISSION", slope: "SLOPE", elev: "ELEVATION", ysun: "SUN · ALL YEARS", yearth: "EARTH · ALL YEARS", shadow: "NEVER SUNLIT", temp: "TEMPERATURE", mix: "YOUR MIX" };
   function buildMetrics(polarOk, nearPole) {
     polarOkNow = polarOk;
     const box = $("scan-metric"); box.replaceChildren();
     for (const [title, ids] of GROUPS) {
       if (METRICS[ids[0]].polar && !polarOk) continue;
-      const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>${title}</span><div class="seg"></div>`;
+      const g = document.createElement("div"); g.className = "scan-mgroup"; g.title = title;
       for (const id of ids) {
         if (METRICS[id].capsOnly && !nearPole) continue;     // permanent shadow is only worked out near the poles
-        const b = document.createElement("button"); b.textContent = METRICS[id].label; b.dataset.m = id; b.classList.toggle("on", st.metric === id);
+        const b = document.createElement("button"); b.textContent = STACK[id]; b.dataset.m = id; b.classList.toggle("on", st.metric === id);
         b.addEventListener("click", () => { st.metric = id; box.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x.dataset.m === id)); draw(); });
-        g.lastChild.appendChild(b);
+        g.appendChild(b);
       }
       box.appendChild(g);
     }
+    const rank = $("scan-rank"); rank.replaceChildren();
     if (polarOk) {      // who picks the best point
-      const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>★ BEST POINT IS PICKED BY</span><div class="seg"></div>`;
+      rank.innerHTML = `<span>★ BEST SPOT IS PICKED BY</span><div class="seg"></div>`;
       for (const [id, label] of [["luni", "SUNLIGHT TO SPARE"], ["mix", "YOUR MIX"]]) {
         const b = document.createElement("button"); b.textContent = label; b.classList.toggle("on", (st.rank || "luni") === id);
-        b.addEventListener("click", () => { st.rank = id; [...g.lastChild.children].forEach((x) => x.classList.toggle("on", x === b)); draw(); });
-        g.lastChild.appendChild(b);
+        b.addEventListener("click", () => { st.rank = id; [...rank.lastChild.children].forEach((x) => x.classList.toggle("on", x === b)); draw(); });
+        rank.lastChild.appendChild(b);
       }
-      box.appendChild(g);
     }
   }
 
@@ -336,5 +338,5 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   }
   return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
            // From the MOON MAP: show the scan colored by the mix, with the best point picked by the mix.
-           useMix() { st.metric = "mix"; st.rank = "mix"; $("scan-more").open = true; if (panel.hidden) toggle(true); else start(); } };
+           useMix() { st.metric = "mix"; st.rank = "mix";  if (panel.hidden) toggle(true); else start(); } };
 }
