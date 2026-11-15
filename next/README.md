@@ -35,9 +35,9 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   how little Earth moves in the sky, from a year of hourly positions.
 - **Mission history:** six real landings since 2023 side by side, each replayed with LUNI's data next to a sourced
   account of what happened, and loadable into the main screen at its real date, hour and mission needs.
-- **Moon map with layers:** the 3D Moon made big, with elevation and slope (whole Moon) and sunlight, Earth link and
-  permanent shadow (south of 80°S, `data/layers`, built by `tools/build_layers.py` from LOLA skylines and SPICE positions
-  every 6 hours over 2023–2035). Each layer names its data source and is colored green for good, red for bad. A data
+- **Moon map with layers:** the 3D Moon made big, with elevation, slope, sunlight, Earth link and temperature for the
+  whole Moon and permanent shadow at both poles (`data/layers`: 480 m squares poleward of 80° from `tools/build_layers.py`,
+  quarter-degree squares elsewhere from `tools/build_layers_global.py`, LOLA skylines against SPICE positions over 2023–2035). Each layer names its data source and is colored green for good, red for bad. A data
   profile card gives every layer's value at any point; the same layers and card are in the area scan.
 - **Temperature:** NASA's LRO Diviner Polar Resource Product V2.0 (annual average and maximum surface temperature),
   re-gridded by `tools/build_temperature.py`, as a layer and in the data profile.
