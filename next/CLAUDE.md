@@ -170,6 +170,19 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   WHAT IT IS / WHY IT MATTERS / HOW TO USE IT, NOT SURE? EXPLAIN IT ANOTHER WAY (`alt`), four TRY IT steps and two
   quick checks. Remembered under `luno-tour-v2`; `? TUTORIAL` (`#tour-btn`) in the top strip restarts it;
   `tourPrepare` in `js/app.js` puts the main screen back before each card. Body-level and fixed, so no zoom math.
+- Answer area (the user, 15 Nov, from a sketch they approved: "yes right is good"): the GO / NO-GO block is one wide
+  strip, the POWER and EARTH LINK readouts sit side by side under it, and the skyline gets the freed room (at
+  1440 x 900: 150 px on a GO, 173 px on a NO-GO; was 133 / 126). CSS only, under `html:not(.flow)`; phones unchanged.
+  The verdict lines were shortened to fit one row ("SUNLIGHT LASTS 3D 03H LONGER THAN NEEDED", "NEXT LANDING WINDOW: ...").
+- Best Site Finder panel (the user, 15 Nov): a large BEST SITE FINDER header with no "around <site>" text, a blue
+  BACK TO THE MAIN SCREEN button, scan sizes as a vertical stack left of the map (`.scan-sizes`), and the
+  MOVE MY SITE TO THE BEST SPOT button under the map at the map's width (`#scan-go-best` in `.scan-map`; its text
+  says SCANNING / YOU ARE AT THE BEST SPOT / NO SPOT HERE MEETS THE NEEDS when it cannot be pressed).
+- Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
+  FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
+  event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
+  ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
 - Names (the user, 15 Nov): the scan is **BEST SITE FINDER** on every button, key, title and tutorial card (was SCAN
   FOR BETTER SPOT), and the jump is **NEXT LANDING WINDOW** (was NEXT WINDOW, before that NEXT GOOD TIME). ASK LUNI
   understands the old and new phrases. The keys split the name over their two lines (BEST SITE / FINDER).

@@ -277,8 +277,8 @@ function renderMission() {
   $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
   const line = (s) => `<div>${s}</div>`;
   $("mission-why").innerHTML = v.ok
-    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
-    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT GOOD LANDING TIME: ${stamp(nx.start)}` : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO GOOD LANDING TIME IN THE NEXT 12 MONTHS"}</div>`;
+    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN NEEDED`) + line(`EARTH IN VIEW ${Math.round(v.earthPct)}% OF THE MISSION`)
+    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT LANDING WINDOW: ${stamp(nx.start)}` : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO LANDING WINDOW IN THE NEXT 12 MONTHS"}</div>`;
   // A NO-GO comes with ways out: another time, another spot, or a mission need that could be relaxed.
   const fixes = [];
   if (!v.ok) {

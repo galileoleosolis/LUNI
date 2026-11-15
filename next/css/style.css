@@ -789,3 +789,34 @@ html.flow.simple #play-btn { grid-column: span 2; } html.flow.simple #tools-btn 
 .tour-btn:hover { filter: brightness(1.1); }
 html.flow .tour-btn { font-size: 11.5px; padding: 3px 8px; letter-spacing: .08em; }
 .comms-row .ic { display: inline-block; } .comms-row .comms-opt, .comms-row .comms-mic { display: inline-flex; align-items: center; }
+/* 15 Nov (the user's sketch): the verdict is one wide strip, the Sun and Earth sit side by side under it, and the
+   room this frees goes to the skyline */
+html:not(.flow) .answer-row { display: block; }
+html:not(.flow) .answer-row .hero { padding: 5px 16px; margin-bottom: 7px; gap: 6px 22px; }
+html:not(.flow) .answer-row .hero-text { flex: 1 1 300px; }
+html:not(.flow) .answer-side .tiles-head { flex-wrap: nowrap; justify-content: space-between; }
+html:not(.flow) .answer-side .readouts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; }
+html:not(.flow) .answer-side .ro { padding: 2px 14px 0 0; }
+html:not(.flow) .answer-side .ro + .ro { padding: 2px 0 0 14px; border-top: none; border-left: 2px solid var(--grid0); }
+html:not(.flow) .answer-side .ro-a { overflow: hidden; }
+html:not(.flow) .answer-row .hero-fix > span { flex: none; }
+html:not(.flow) .answer-row .hero-why { display: flex; flex-wrap: wrap; gap: 0 26px; align-items: baseline; }
+/* Best Site Finder: a clear header, scan sizes stacked on the left, the move button under the map */
+.scan-name { font-family: var(--cond); font-size: 28px; font-weight: 700; letter-spacing: .06em; line-height: 1; color: var(--hi); }
+.scan-head .scan-home { font-family: var(--cond); font-size: 16px; font-weight: 700; letter-spacing: .05em; padding: 4px 14px; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b)); border: 1px solid #000; border-radius: 5px; }
+.scan-head .scan-home:hover { background: linear-gradient(180deg, var(--key-a), var(--key-b)); filter: brightness(1.15); }
+.scan-body, .scan.big .scan-body { grid-template-columns: 84px minmax(0, 1fr) 270px; gap: 14px; } .scan.big .scan-body { grid-template-columns: 84px minmax(0, 1fr) 300px; }
+.scan-sizes { display: flex; flex-direction: column; gap: 6px; align-self: center; } .scan-sizes > b { font-family: var(--cond); font-size: 15px; letter-spacing: .08em; color: var(--hi); text-align: center; }
+.scan-sizes > small { font-size: 12.5px; line-height: 1.25; color: var(--dim); text-align: center; }
+.scan-sizes .seg { display: flex; flex-direction: column; gap: 5px; } .scan-sizes .seg button { width: 100%; padding: 9px 2px; font-family: var(--cond); font-size: 18px; font-weight: 700; letter-spacing: .03em; border: 1px solid var(--dim); }
+.scan-map { display: flex; flex-direction: column; align-items: center; gap: 8px; } .scan-canvas-box { flex: 1; min-height: 0; align-self: stretch; display: grid; place-items: center; }
+.scan-map .scan-go { flex: none; margin: 0 0 2px; padding: 9px 10px; font-family: var(--cond); font-size: 27px; font-weight: 700; letter-spacing: .05em; line-height: 1.1; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b)); border: 2px solid #000; border-radius: 8px; box-shadow: 0 3px 0 #0d0d0d; cursor: pointer; }
+.scan-map .scan-go:hover { filter: brightness(1.12); } .scan-map .scan-go:disabled { background: var(--faint); color: var(--dim); box-shadow: none; cursor: default; filter: none; }
+html.flow .scan-map { height: auto; } html.flow .scan-canvas-box { height: min(92vw, 60vh); flex: none; } html.flow .scan-sizes .seg { flex-direction: row; } html.flow .scan-sizes { margin-bottom: 10px; } html.flow .scan-map .scan-go { font-size: 20px; }
+/* the bottom keys: every key reads as live; ASK LUNI keeps its own color */
+.key { background: linear-gradient(180deg, #686c76, #3d4048); } .key small { opacity: .85; }
+#play-btn, .key.g { background: linear-gradient(180deg, var(--key-a), var(--key-b)); color: var(--key-ink); }
+.key.c { background: linear-gradient(180deg, #35c2ad, #17776a); } .key.on, .key.g.on { background: linear-gradient(180deg, #2bd47c, #17a05a); color: #06210f; } .key.c.on { background: linear-gradient(180deg, #ff6b5a, #b3261c); color: #fff; }
+html:not(.flow) .answer-side .ro-a .mini { white-space: normal; }
+html:not(.flow) .answer-row .hero-text { flex: 1 1 430px; }
+html:not(.flow) .answer-row .hero-fix { flex: 0 1 auto; border-top: none; padding: 0; }      /* beside the reason when there is room, else on its own line */
