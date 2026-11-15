@@ -214,6 +214,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     earthstns_itrf93_260814 and Earth orientation earth_1962_260806_2126_combined, ITRF93, every 6 hours).
     `tests/check_dsn.mjs`: within 0.016 degrees of SPICE at 720 values. Geometry only; the tooltip says it does not
     know station schedules. The preview page needs `data/dsn.bin.b64.txt`.
+  - A. LUNI's polar layers against NASA's own maps (`tools/compare_lola_illum.py`; maps in `tools/dem/lola_illum/`,
+    490 MB, not in git: the LOLA team's 2016 polar illumination release in the LOLA archive's extras: LPSR, AVGVISIB,
+    AVGVISIB_EARTH at 240 m). Results are stored in `data/layers/index.json` under `nasa_check` and shown as section 3
+    of the PROOF panel (`layerCheck` in `js/ui-proof.js`). Sunlight: r 0.992 south / 0.990 north, mean gap 1.9 / 1.8
+    points. Never sunlit: same answer in 99.1% / 98.9% of squares (south 18,857 km2 vs NASA 19,081). Earth: r 0.981 /
+    0.985, mean gap 5.2 / 5.4 points, LUNI lower (center of the disc at 2 m vs any part of it at the surface).
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the

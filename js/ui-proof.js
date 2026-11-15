@@ -44,6 +44,23 @@ export function replay(story, fmt) {
   return rows;
 }
 
+// LUNI's polar layers against the LOLA team's own polar maps: numbers worked out once by tools/compare_lola_illum.py
+// (1.26 million squares a pole) and kept in data/layers/index.json.
+let layerCheckHtml = null;
+function layerCheck() {
+  return (layerCheckHtml ||= fetch("data/layers/index.json").then((r) => r.json()).then((ix) => {
+    const c = ix.nasa_check; if (!c) return "<p>NOT AVAILABLE IN THIS BUILD.</p>";
+    const n = (v) => Number(v).toLocaleString("en-US"), cell = (k, f) => `<td class="luni">${f(c.sp[k])}</td><td class="luni">${f(c.np[k])}</td>`;
+    const pct = (o) => `SAME PATTERN: ${o.r.toFixed(2)} OF 1.00 · AVERAGE GAP ${o.mean_abs_diff} POINTS · ${o.within_10_points_pct}% OF SQUARES WITHIN 10 POINTS`;
+    return `<table><tr><th></th><th>SOUTH POLE (${n(c.sp.squares)} SQUARES)</th><th>NORTH POLE (${n(c.np.squares)} SQUARES)</th></tr>
+      <tr><td>SUNLIGHT</td>${cell("sun", pct)}</tr>
+      <tr><td>EARTH IN VIEW</td>${cell("earth", pct)}</tr>
+      <tr><td>NEVER SUNLIT</td>${cell("shadow", (o) => `SAME ANSWER IN ${o.same_answer_pct.toFixed(1)}% OF SQUARES · LUNI ${n(o.luni_km2)} KM², NASA ${n(o.nasa_km2)} KM²`)}</tr></table>
+      <div class="proof-src">NASA'S MAPS: THE LRO LOLA TEAM'S POLAR ILLUMINATION MAPS, 2016 RELEASE (PERMANENTLY SHADOWED REGIONS, AVERAGE VISIBILITY OF THE SUN AND OF EARTH, 240 M). <a href="https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/" target="_blank" rel="noopener">NASA PDS ↗</a><br>
+      THE TWO ARE NOT THE SAME MEASUREMENT: NASA COUNTS ANY PART OF THE DISC, AT THE SURFACE, OVER A LONG PERIOD; LUNI COUNTS THE DISC'S CENTER, 2 M ABOVE THE SURFACE, OVER 2023 TO 2035. THAT IS WHY LUNI'S EARTH NUMBERS RUN ABOUT 5 POINTS LOWER.</div>`;
+  }).catch(() => "<p>COULD NOT BE LOADED.</p>"));
+}
+
 export function createProofPanel({ fmt, onReplay, links }) {
   const $ = (id) => document.getElementById(id), box = $("proof");
   const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
@@ -61,11 +78,12 @@ export function createProofPanel({ fmt, onReplay, links }) {
         ${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="luni">${esc(r[2])}</td></tr>`).join("")}</table>
         <div class="proof-src">SOURCES: ${st.sources.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(n.toUpperCase())} ↗</a>`).join(" · ")}</div></div>`;
     }
-    h += `</section><section><h3><b class="step">3</b><b class="h-t">THE GROUND</b> · NASA'S LASER ELEVATION MAPS (LRO LOLA)</h3>
+    h += `</section><section><h3><b class="step">3</b><b class="h-t">THE MAP LAYERS</b> · CHECKED AGAINST NASA'S OWN POLAR MAPS</h3><div id="proof-layers" class="proof-card"><p>LOADING…</p></div>`;
+    h += `</section><section><h3><b class="step">4</b><b class="h-t">THE GROUND</b> · NASA'S LASER ELEVATION MAPS (LRO LOLA)</h3>
       <ul><li>THE ${SITES.length} LISTED SITES USE SKYLINES BUILT FROM THE FULL MAPS: 40 M AND 240 M PER PIXEL IN THE SOUTH POLAR REGION, 1.9 KM ELSEWHERE.</li>
       <li>ANY OTHER POINT, AND EVERY SCAN, USES REDUCED MAPS (240 M TO 3.8 KM PER PIXEL) AND SAYS SO ON SCREEN. AGAINST THE FULL MAPS, THE REDUCED SKYLINES DIFFER BY 0.04° TO 1.0° ON AVERAGE AT THE LISTED SITES.</li>
       <li>WHEN A SCAN RUNS ON THE GRAPHICS CHIP, EVERY RUN FIRST COMPARES ITS SKYLINE WITH THE PROCESSOR'S AND FALLS BACK IF THEY DIFFER BY MORE THAN 0.02°.</li></ul></section>`;
-    h += `<section><h3><b class="step">4</b><b class="h-t">WHERE LUNI STOPS</b> · WHAT IT DOES NOT KNOW</h3>
+    h += `<section><h3><b class="step">5</b><b class="h-t">WHERE LUNI STOPS</b> · WHAT IT DOES NOT KNOW</h3>
       <ul><li><b>THE LANDING ITSELF.</b> LUNI JUDGES THE EXACT POINT IT IS GIVEN. A LANDER THAT COMES DOWN 250 M AWAY, OR ON ITS SIDE, IS IN DIFFERENT LIGHT.</li>
       <li><b>SMALL THINGS.</b> ROCKS AND CRATERS SMALLER THAN A MAP PIXEL ARE NOT IN THE DATA. SLOPE IS MEASURED OVER 80 M TO 3.8 KM, DEPENDING ON THE MAP.</li>
       <li><b>POWER.</b> "SUN" MEANS AT LEAST HALF THE SUN'S DISC IS IN VIEW FROM 2 M ABOVE THE GROUND. PANEL DIRECTION, LANDER TILT AND TEMPERATURE ARE NOT MODELED.</li>
@@ -74,6 +92,7 @@ export function createProofPanel({ fmt, onReplay, links }) {
       <li><b>THE 3D VIEW.</b> ANYTHING SMALLER THAN THE 40 M DATA (ROCKS, THE LANDER) IS ILLUSTRATIVE.</li>
       <li><b>HOW IT WAS MADE.</b> THE CODE WAS WRITTEN WITH AN AI ASSISTANT (CLAUDE), DIRECTED AND TESTED BY THE TEAM. EVERY NUMBER COMES FROM NASA DATA AND THE CHECKS ABOVE, NONE FROM THE AI.</li></ul></section>`;
     $("proof-body").innerHTML = h;
+    layerCheck().then((c) => { const at = $("proof-layers"); if (at) at.innerHTML = c; });
     $("proof-body").querySelectorAll("[data-replay]").forEach((b) => b.addEventListener("click", () => { toggle(false); onReplay(STORIES.find((s) => s.id === b.dataset.replay)); }));
   }
   // card: the id of a real landing to bring into view (from the story strip)
