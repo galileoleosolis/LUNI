@@ -230,6 +230,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
     DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
     sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- **Best Site Finder: the points slid after a move** (the user, Sun 15 Nov about noon New York: "the points move from
+  their original points after the shift"). Cause: the map was redrawn north-up at the new center, and near a pole
+  north turns from place to place (a 15 km scan at Nobile Rim 1 moved 11 km east: points up to 1,664 m, over six
+  squares, from where the shifted picture had them). Fix, **on the pre-release only**: `scanGrid(site, radiusKm, n, up)`
+  and `keepUp(from, to, up)` in `js/scan-core.js`; a move made inside the panel keeps the map's direction (`st.nextUp`
+  in `js/ui-scan.js`), any other change of site goes back to north-up. `eastKm` / `northKm` stay true east and north.
+  A north arrow sits at the bottom right of the map and the scale line says when north is not up. Measured after
+  the fix: 0.3 m at worst, 1 of 9,196 squares changes its answer. `tests/check_scan.mjs` checks it at three places.
+  `globalThis.lunoScanDebug()` returns the panel's state for checks.
 - **Source bubbles** (the user, Sun 15 Nov about 11 AM New York, from a screenshot: the green "NASA DATA · SPICE DE440
   + LOLA TERRAIN" line "can go away", the top-row buttons "need to be bigger", and the NASA data should "appear in
   like a bubble whenever something is calculated or displayed saying where the data came from"). **On the pre-release

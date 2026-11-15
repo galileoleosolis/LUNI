@@ -17,8 +17,8 @@ function getPool() {
 }
 
 // Runs a scan. onCell(point, result, done, total) fires as each point finishes. Returns { grid, cancel }.
-export function runScan({ site, radiusKm, n, t0, req, onCell, onDone }) {
-  const grid = scanGrid(site, radiusKm, n), job = ++jobSeq, workers = getPool();
+export function runScan({ site, radiusKm, n, up = 0, t0, req, onCell, onDone }) {
+  const grid = scanGrid(site, radiusKm, n, up), job = ++jobSeq, workers = getPool();
   const order = grid.points.map((p, i) => i).sort((a, b) => grid.points[a].dist - grid.points[b].dist);
   let next = 0, done = 0, canceled = false;
   const feed = (w) => {
@@ -42,8 +42,8 @@ export function runScan({ site, radiusKm, n, t0, req, onCell, onDone }) {
 // mission check left to the workers. onFail(reason) fires if the chip cannot be trusted; the caller then
 // falls back to runScan. Returns { grid, cancel }.
 export const GPU_TOLERANCE_DEG = 0.02;      // largest skyline difference from the processor version that is accepted
-export function runScanGpu({ gpu, site, radiusKm, n, t0, req, onCell, onDone, onFail, onCheck }) {
-  const grid = scanGrid(site, radiusKm, n), job = ++jobSeq, workers = getPool(), total = grid.points.length;
+export function runScanGpu({ gpu, site, radiusKm, n, up = 0, t0, req, onCell, onDone, onFail, onCheck }) {
+  const grid = scanGrid(site, radiusKm, n, up), job = ++jobSeq, workers = getPool(), total = grid.points.length;
   const order = grid.points.map((p, i) => i).sort((a, b) => grid.points[a].dist - grid.points[b].dist);
   let done = 0, canceled = false;
   const started = performance.now();

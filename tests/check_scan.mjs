@@ -7,7 +7,7 @@ import { setIndex, putGrid, makeGrid, computeTerrain } from "../js/terrain.js";
 import { initEphemeris } from "../js/ephem.js";
 import { sampleSite } from "../js/model.js";
 import { analyze, DEFAULT_REQ } from "../js/mission.js";
-import { scanGrid, evaluatePoint, bestCell, scanOptions, SCAN_AZ_STEP } from "../js/scan-core.js";
+import { scanGrid, keepUp, evaluatePoint, bestCell, scanOptions, SCAN_AZ_STEP } from "../js/scan-core.js";
 
 const root = new URL("..", import.meta.url), read = (p) => readFileSync(new URL(p, root));
 const index = JSON.parse(read("data/dem/index.json"));
@@ -64,4 +64,22 @@ assert.equal(pick([mk({ eastKm: 5 }), mk({ eastKm: 0, northKm: 0 }), mk({ eastKm
 assert.equal(pick([mk({ earthPct: 40 }), mk({ earthPct: 95 })]), 1, "all else equal: more Earth link wins");
 assert.equal(pick([mk({ slopeDeg: 2.2 }), mk({ slopeDeg: 1.8, eastKm: 4 })]), 0, "a slope difference under a degree does not justify a longer move");
 assert.equal(bestCell([null, null]), null);
+// A map re-centered after a move must keep its direction, so that its points fall on the old map's points. Near the
+// pole north turns quickly: a north-up map at the new center would be rotated against the old one.
+{
+  const R = 1737400, D = Math.PI / 180, far = (a, b) => Math.hypot((b.lon - a.lon) * D * Math.cos(a.lat * D) * R, (b.lat - a.lat) * D * R);
+  for (const [site, radius, n, r, k] of [[{ lat: -85.3, lon: 37.08 }, 15, 121, 60, 105], [{ lat: -89.45, lon: -137.31 }, 5, 41, 12, 33], [{ lat: 0.67, lon: 23.47 }, 100, 21, 3, 17]]) {
+    const A = scanGrid(site, radius, n), to = A.points[r * n + k], up = keepUp(site, to, 0);
+    const B = scanGrid({ lat: to.lat, lon: to.lon }, radius, n, up), mid = (n - 1) / 2, turned = scanGrid({ lat: to.lat, lon: to.lon }, radius, n, 0);
+    let worst = 0, worstNorthUp = 0, seen = 0;
+    for (const a of A.points) { const rr = a.r - (r - mid), kk = a.k - (k - mid); if (rr < 0 || kk < 0 || rr >= n || kk >= n) continue; seen++; worst = Math.max(worst, far(a, B.points[rr * n + kk])); worstNorthUp = Math.max(worstNorthUp, far(a, turned.points[rr * n + kk])); }
+    // On a sphere two flat grids cannot match exactly; the leftover is the ground's curvature (largest on the 200 km map).
+    const allow = Math.max(2, A.stepM * 0.2);
+    console.log(`kept direction at ${site.lat}, ${site.lon} (${radius} km): ${seen} shared points, worst ${worst.toFixed(1)} m apart (a north-up redraw: ${worstNorthUp.toFixed(0)} m; one square is ${A.stepM.toFixed(0)} m), map turned ${up.toFixed(2)} deg`);
+    if (!(worst <= allow)) { console.error("a re-centered map does not line up with the map before the move"); process.exit(1); }
+    const c0 = B.points[Math.round(mid) * n + Math.round(mid) + 1], trueE = c0.eastKm, trueN = c0.northKm;      // the square to the right of center
+    if (Math.abs(Math.hypot(trueE, trueN) * 1000 - A.stepM) > 0.01) { console.error("east / north offsets do not keep the distance"); process.exit(1); }
+  }
+}
+
 console.log("area scan OK");

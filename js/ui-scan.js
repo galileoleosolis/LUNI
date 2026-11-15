@@ -1,7 +1,7 @@
 // Area-scan panel: a north-up heat map of the ground around the site for the current landing time and needs.
 import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
-import { scanOptions, bestCell } from "./scan-core.js";
+import { scanOptions, bestCell, keepUp } from "./scan-core.js";
 import { mapResFor } from "./terrain.js";
 import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
 
@@ -83,7 +83,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const c = getContext(), chip = chipFor(c.site), opts = scanOptions(c.site.lat, !!chip);
     if (st.opt >= opts.length) st.opt = opts.length - 1;
     const o = opts[st.opt];
-    const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm},${o.n}`;
+    // After a move made inside this panel the map keeps the direction it had (near a pole, north turns from place to
+    // place, and a map redrawn north-up would slide every point sideways). Any other change of site starts north-up again.
+    const kept = st.nextUp && Math.abs(st.nextUp.lat - c.site.lat) < 2e-4 && Math.abs(((st.nextUp.lon - c.site.lon + 540) % 360) - 180) < 2e-4;
+    const up = kept ? st.nextUp.up : 0; if (!kept) st.nextUp = null;
+    const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm},${o.n},${up.toFixed(3)}`;
     buildSeg($("scan-radius"), opts.map((x, i) => [i, `${x.radiusKm} KM`]), () => st.opt, (v) => { st.opt = v; start(); });
     const polarOk = true;                                  // the all-years layers cover the whole Moon (finer poleward of 80 degrees)
     if (!polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
@@ -101,7 +105,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     st.moving = false;
     st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
     const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
-    const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, t0: c.t0, req: c.req,
+    const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, up, t0: c.t0, req: c.req,
       onCell: (p, r, done, total) => { if (r) st.cells[p.r * o.n + p.k] = { ...p, ...r }; st.done = done; st.total = total; schedule(); } };
     if (chip) {
       let check = "";
@@ -202,6 +206,12 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.fillRect(8, size - 30, Math.max(barPx, 46) + 12, 23);
     ctx.fillStyle = "#fff"; ctx.fillRect(14, size - 14, barPx, 3); ctx.fillRect(14, size - 18, 1.5, 7); ctx.fillRect(14 + barPx - 1.5, size - 18, 1.5, 7);
     ctx.font = "600 10px sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(`${barKm} KM`, 14, size - 19);
+    {                                                    // north arrow, bottom right: it leans once the map has been kept steady through a move
+      const ax = size - 24, ay = size - 26, a = -(st.grid.up || 0) * Math.PI / 180;
+      ctx.save(); ctx.translate(ax, ay); ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.beginPath(); ctx.arc(0, 0, 19, 0, 7); ctx.fill();
+      ctx.rotate(a); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.moveTo(0, -15); ctx.lineTo(5.5, 1); ctx.lineTo(-5.5, 1); ctx.closePath(); ctx.fill();
+      ctx.font = "700 10px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("N", 0, 9); ctx.restore();
+    }
     if (st.hover && !A) { const m = Math.max(cw, 9); ctx.strokeStyle = "#5ac8ff"; ctx.lineWidth = 2; ctx.strokeRect((st.hover.k + 0.5) * cw - m / 2 + 1, (st.hover.r + 0.5) * cw - m / 2 + 1, m - 2, m - 2); }
 
     // side readouts
@@ -210,7 +220,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-engine").textContent = st.onChip ? `COMPUTED ON THE GRAPHICS CHIP (GPU)${chipName() ? ": " + chipName() : ""}` : "COMPUTED ON THE PROCESSOR";
     $("scan-progress").className = finished ? "ok" : "";
     const sq = st.grid.stepM / 1000, sqTxt = `${+sq.toFixed(2)} KM`;
-    $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
+    $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · ${Math.abs(st.grid.up || 0) < 0.5 ? "NORTH UP" : "NORTH IS AT THE N ARROW (THE MAP HOLDS STILL WHEN YOU MOVE)"} · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
     $("scan-showing").textContent = STACK[st.metric];
     $("scan-legend").classList.toggle("flat", !m.ramp);
     $("scan-legend").classList.toggle("lay", !!m.rgb);
@@ -327,10 +337,13 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       if (performance.now() - st.anim.t0 < GLIDE_MS + HOLD_MS + PAN_MS) return requestAnimationFrame(step);
       const img = document.createElement("canvas"); img.width = img.height = n; img.getContext("2d").drawImage(tile, 0, 0);
       st.under = { img, dk: c.k - mid, dr: c.r - mid, n }; st.moving = true; st.anim = null;
-      onPick(+c.lat.toFixed(4), +c.lon.toFixed(4));
+      const from = st.cells[mid * n + mid] || getContext().site, to = { lat: +c.lat.toFixed(4), lon: +c.lon.toFixed(4) };
+      st.nextUp = { ...to, up: keepUp(from, to, st.grid.up || 0) };
+      onPick(to.lat, to.lon);
     };
     requestAnimationFrame(step);
   }
+  globalThis.lunoScanDebug = () => st;                   // for the checks: the scan's current grid and cells
   function toggle(show = panel.hidden) {
     panel.hidden = !show;
     $("scan-btn").classList.toggle("on", show);
