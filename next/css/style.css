@@ -683,3 +683,24 @@ html.flow .moonmap .scan-head, html.flow .history .scan-head { flex-wrap: wrap; 
 .mm-mix label { display: grid; grid-template-columns: 124px 1fr 38px; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--wht); } .mm-mix input { accent-color: var(--hi); width: 100%; } .mm-mix label b { text-align: right; color: var(--hi); }
 .mm-mix-use { margin-top: 6px; width: 100%; font-family: var(--cond); font-size: 16px; font-weight: 700; letter-spacing: .05em; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b)); border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; } .mm-mix-use:hover { filter: brightness(1.15); }
 .scan-mgroup .seg { flex-wrap: wrap; }
+
+/* ---------- 15 Nov: Sun / Earth blocks with big icons; one lower chart at a time (MISSION PLAN / GOOD DAYS) ---------- */
+.answer-side .ro { align-items: center; gap: 12px; padding: 5px 0; } .answer-side .ro + .ro { padding: 6px 0 0; }
+.ro-ico { flex: none; width: 66px; text-align: center; color: var(--grn); line-height: 1; }
+.ro-ico svg { display: block; width: 54px; height: 54px; margin: 0 auto; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.ro-ico span { display: block; margin-top: 2px; font-family: var(--cond); font-size: 12.5px; font-weight: 700; letter-spacing: .1em; color: var(--amb); white-space: nowrap; }
+.ro-ico .i-sun circle { fill: #ffd23c; stroke: #ffd23c; } .ro-ico .i-sun path { stroke: #ffd23c; } .ro-ico .i-panel path:first-child { fill: rgba(33, 224, 122, .16); }
+.ro-ico .i-earth circle { fill: #2a6fd8; stroke: #9fd0ff; stroke-width: 1.6; } .ro-ico .i-earth .land { fill: #3fae6a; stroke: none; }
+.ro-ico .i-off { display: none; stroke: var(--red); stroke-width: 4; }
+.ro-ico.nogo { color: var(--red); } .ro-ico.nogo .i-off { display: block; }
+.ro-ico.nogo .i-sun circle { fill: none; stroke: #7a6a2a; } .ro-ico.nogo .i-sun path { stroke: #7a6a2a; } .ro-ico.nogo .i-panel path:first-child { fill: none; }
+.ro-ico.nogo .i-waves { display: none; } .ro-ico.nogo .i-earth circle { fill: #173a70; }
+.answer-side .ro-a { flex: 1; min-width: 0; } .answer-side .st { margin: 0 0 2px; }
+.nasa-line { flex: none; font-size: 12.5px; color: var(--dim); white-space: nowrap; } .nasa-line a.nasa-check { margin-left: 6px; }
+.plan-head { align-items: center; } .plan-head h3 { margin-bottom: 0; } .plan-head h3[hidden] { display: none; }
+.plan-tabs { flex: none; display: flex; gap: 5px; }
+.plan-tabs button { background: #000; color: var(--amb); border: 1px solid var(--dim); font: inherit; font-size: 13px; font-weight: 700; padding: 2px 11px; cursor: pointer; white-space: nowrap; }
+.plan-tabs button:hover { background: var(--faint); color: var(--wht); } .plan-tabs button.on { background: var(--hi); border-color: var(--hi); color: #00101f; }
+.timeline[hidden], .calendar[hidden] { display: none !important; }
+.col-main .calendar { height: 112px; margin-bottom: 4px; }
+html.flow .plan-head { display: flex; flex-wrap: wrap; gap: 6px; }
