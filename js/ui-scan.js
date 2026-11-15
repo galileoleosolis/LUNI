@@ -1,7 +1,7 @@
 // Area-scan panel: a north-up heat map of the ground around the site for the current landing time and needs.
 import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
-import { scanOptions, bestCell, keepUp } from "./scan-core.js";
+import { scanOptions, bestCell, keepUp, judgePoint } from "./scan-core.js";
 import { showData } from "./sources.js";
 import { mapResFor } from "./terrain.js";
 import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
@@ -90,7 +90,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     const res = mapResFor(c.site.lat);
     // Slope depends on the distance it is measured over: the scan's map is coarser than a listed site's own map.
     const slopeNote = () => { const t = c.terrain; return `SLOPES IN THE SCAN ARE MEASURED OVER ${fmtStep(2 * res)}${t?.real && !t.reduced && t.slopeBaseM < 2 * res ? `; THIS SITE'S OWN FIGURE, ${t.slopeDeg.toFixed(1)}° OVER ${fmtStep(t.slopeBaseM)}, COMES FROM A FINER MAP` : ""}. `; };
-    const note = () => { $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. PRESET SITES USE FINER MAPS, SO THEIR NUMBERS CAN DIFFER A LITTLE. ${slopeNote()}${st.engine}`; };
+    const note = () => { $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. ${c.terrain?.real && !c.terrain.reduced ? "THE SQUARE YOU ARE ON IS JUDGED WITH THIS SITE'S OWN FINER MAP, THE SAME AS THE MAIN SCREEN. " : ""}${slopeNote()}${st.engine}`; };
     note();
     if (key === st.key) return draw();
     st.run?.cancel();
@@ -99,8 +99,13 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     showData("finder");
     st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
     const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
+    // The square you stand on, at a listed site: judged with the site's own detailed skyline, exactly as on the main
+    // screen, so the two can never give different answers for the same spot (a judge saw GO there and NO here).
+    const mid = (o.n - 1) / 2, T = c.terrain;
+    let own = null;
+    if (T?.real && !T.reduced) { const j = judgePoint(c.site.lat, c.site.lon, T, c.t0, c.req); own = { sunPct: j.sunPct, earthPct: j.earthPct, ok: j.ok, marginHours: j.marginHours, reason: j.reason }; }
     const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, up, t0: c.t0, req: c.req,
-      onCell: (p, r, done, total) => { if (r) st.cells[p.r * o.n + p.k] = { ...p, ...r }; st.done = done; st.total = total; schedule(); } };
+      onCell: (p, r, done, total) => { if (r) st.cells[p.r * o.n + p.k] = { ...p, ...r, ...(own && p.r === mid && p.k === mid ? own : null) }; st.done = done; st.total = total; schedule(); } };
     if (chip) {
       let check = "";
       st.engine = "SKYLINES: ON THE GRAPHICS CHIP.";

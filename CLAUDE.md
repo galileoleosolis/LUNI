@@ -289,6 +289,19 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- **Judge runs after r6** (Sun 15 Nov about 12:20 PM New York; three sub-agents on three models, Presentation fixed at
+  4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5). The project notes reached all three
+  as instructions, so the runs were not fully blind (told to the user). Common points: the main screen is dense;
+  side-by-side comparison of sites and dates is hidden in COMPARE SITES · MORE; a GO reads as more official than the
+  team's own rule; power is yes / no only; no outside users. Fixed **on the pre-release only** (public is r6):
+  the finder's card for a listed site uses the site's own skyline numbers for SUNLIGHT / EARTH LINK 2023–35
+  (`getSiteYears` passed to `createScanPanel`), and the square you stand on is judged with the site's own skyline
+  (`judgePoint` with `c.terrain` in `start()` of `js/ui-scan.js`), so the finder and the main verdict cannot differ.
+  **Not fixed**, ASK LUNI: "when is the best time to land at Nobile Rim 1 in 2027" (jumps, then sets the year and
+  reports a NO-GO), "compare shackleton and malapert" (only moves the site), "go to 85.5S 30E" (lists presets),
+  "why is the south pole hard for landers" (status report instead of "I cannot answer that").
+  The user then said (about 12:30 PM): "im going to just tell you stuff, and i want you to think about it and then
+  build it all at once": wait for the full list, then build it in one batch.
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
