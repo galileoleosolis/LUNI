@@ -215,6 +215,11 @@ everything through the layers, mix, temperature, history, icons and the NEXT SIT
 pre-release again and need a new "release it". The submission: the user chose a 7-slide deck (GIFs on hold; "we can do
 slide decks tomorrow") over the 30-second video; the Project page takes JPG / PNG / GIF up to 10 MB and public links
 only. The Project page text and the deck do not exist yet; the box titles of the Project tab were asked for.
+**Test set E** (15 Nov, for the user's mother, who had one run-through first): now the default with `#test`; A to D
+run with `#test-a` ... `#test-d`. Six tasks on the newer screens: load Blue Ghost 1 from MISSION HISTORY, read the
+eclipse date, next good landing date at Nobile Rim 1, permanent shadow and temperature of Haworth's floor from the
+MOON MAP data profile (answers read from her own screen), scan and move near Malapert. An automated run scores 6/6.
+Her link: https://galileoleosolis.github.io/LUNI/next/#test . Her feedback and report have not been pasted yet.
 `docs/submission.md` holds the drafted text for every Project-tab box. The user makes the slide deck themselves at the
 end (no deck or GIFs from Claude unless asked), will have their mother test the app, and wants the Use of SI "ideas"
 line to say the idea and direction were theirs; it says that, and keeps one clause that Claude offered suggestions,
