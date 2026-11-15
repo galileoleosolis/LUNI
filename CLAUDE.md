@@ -11,6 +11,9 @@ challenge "Lunar Landing Site Navigator". Hackathon window: Sat 14 Nov 9:00 to S
 Team of two siblings; the user directs and tests, Claude writes the code. AI use must be disclosed in the submission.
 Judging (1–5 each): Impact, Creativity, Validity, Relevance (NASA data as a core component), Presentation.
 
+The challenge's own wording is in `docs/challenge.md`, the judging sheet's five criteria are above: read them before
+scoring or pitching, do not work from memory (the user asked for this).
+
 ## What it is
 A static web app (no build step, no backend). Pick a lunar landing site and landing time; it shows the Sun and Earth
 against the terrain skyline, GO / NO-GO for power and Earth link, countdowns, a 30-day timeline, a 12-month
@@ -56,6 +59,37 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   (`flyToGeo("Moon", lat, lon, height)`, navigation or globebrowsing library, whichever exists) and mission clock
   (`time.setTime`). Send-only. Tested here against a stand-in server; the user confirmed it works with real OpenSpace. Hidden
   on the preview page.
+- 3D surface view, second version (14 Nov, after the user called the first one ugly; shown to the user as a picture
+  first, `docs/figures/surface-view-before-after.png`): cratered relief texture, rocks and an illustrative lander
+  with long shadows drawn as strips on the ground (the shadow map is too coarse for small things), a Sun flare, a
+  procedural Earth with a glow, name tags that follow the Sun and Earth, the lander's dish aimed at Earth and its
+  panels at the Sun. Everything smaller than the 40 m data is illustrative and the view says so on screen.
+  The user approved it from the picture ("put it on") and it is on the preview page and in `next/`.
+- Built late on 14 Nov ("do them all", after the rubric talk). The user said "go" for the pre-release only: it is on
+  the preview page (Version 33) and in `next/` (main 2156736). **Not released**: the public site is still r2.
+  - `js/stories.js` — real landings with sourced facts (IM-2, Blue Ghost 1, Chandrayaan-3). LUNI **opens on IM-2
+    Athena, 6 Mar 2025 17:00 UTC** (`OPENING`), with a one-line story strip (`#story`, `renderStory` in `js/app.js`)
+    shown only while the site and landing hour match a story. Facts were checked by web search on 14 Nov; do not add a
+    mission fact without a source. IM-1 was left out (its real end, with the lander tipped, proves nothing either way).
+  - `js/ui-proof.js` — PROOF panel (`#proof`, button in the step 4 heading): Horizons check, the three landings
+    replayed (LUNI's side is computed live; e.g. Blue Ghost: 347 h of daylight vs Firefly's 346, eclipse 05:01 to 09:51
+    UTC with the Sun fully hidden from 06:18, against reported 05:30 / 06:18 / 09:52), terrain notes, limits, AI disclosure.
+  - `js/share.js` — COPY LINK: `#site=im2&t=2025-03-06T17&days=10&dark=12&earth=0&slope=0&link=1` (or `at=lat,lon`).
+    Read at start and on `hashchange`. On the preview page the link points at the public Pages address.
+  - `js/guide.js` — first-visit guide, three cards, remembered under `luno-guide-v1`; never for automated browsers
+    (force with `window.LUNO_GUIDE`), and in a test build only after JUST EXPLORE.
+  - Mission need `maxSlopeDeg` (GROUND SLOPE AT MOST: ANY / 5 / 10 / 15, default ANY). `analyze(samples, req, step,
+    ground)` takes the terrain as a 4th argument; the verdict, calendar, scan and ASK LUNI all respect it. No default
+    limit, because no sourced limit was chosen.
+  - `versus()` in `js/app.js` — THIS SITE NEXT TO EARTH (MORE panel, and "how is this different from Earth" in ASK LUNI).
+  - Skyline picture (`renderHorizon`): gray ground lit or in shadow, Sun with flare, Earth with its real phase, paths
+    for the next 3 days. Bodies are drawn larger than life, so each is placed against the skyline by how much of its
+    real disc the ground hides. It is only about 90 px tall on a laptop window and grows on tall screens (364 px at
+    2000 x 1250): record the demo in a tall window.
+  - Blue Ghost Mission 1 (`bg1`, Mare Crisium) is a preset; `data/horizons.json` was rebuilt, other sites unchanged.
+  - OpenSpace HORIZON view (`OS_HORIZON` in `js/openspace.js`): written from the documented API, **never tried with
+    real OpenSpace**; falls back to the plain fly-to if it fails. FAR / NEAR / LOW are untouched.
+  - The Sun / Earth NASA CHECK links moved onto the POWER and EARTH LINK labels to save a line.
 - `js/ui-calendar.js` — landing-window strip. `js/globe.js` — three.js Moon (vendored in `vendor/`).
 - `js/bin.js` — binary loader; `LUNO_B64` switches to base64 `.b64.txt` files for hosts that only serve text.
 - `data/sites.json` — preset sites (single source of truth). `approx: true` rows still need an official source.
@@ -73,6 +107,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - Test UI changes at several window sizes (1000×480, 1366×650, 1440×900, 1920×950, 390×844); an earlier version
   overlapped badly at in-between sizes.
 - Keep plain-language explanations for the user; they are not a programmer.
+- Layout since 14 Nov (the user: "the right panel is mostly wasted space", "the blues are faded and nothing jumps",
+  "too much small text"): TWO columns. Left: site list, Moon, landing time, mission needs. Middle: the answer row
+  (GO / NO-GO block with the Sun and Earth readouts stacked on its right), skyline, 30-day slider, landing-day strip.
+  The old right column (`#more-panel`: next landing times, compare cards, site numbers, custom lat/lon, OpenSpace,
+  credits) is a panel opened by COMPARE · MORE or by pressing PIN; Esc closes it. Palette: `--hi` is the vivid blue
+  for names of things and active frames. Nothing a person has to read is under 12.5 px in the design.
 - Look: blue palette is the default (`:root` in `css/style.css`; `?palette=amber|ice|mono` previews others). The user
   asked for bigger text and a clear order of importance: the GO / NO-GO verdict block first, Sun/Earth second.
 - American spelling everywhere (center, color, meters, modeled): in the app, the code, the docs and in chat. The user insists.
@@ -81,7 +121,83 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   (plain, dim), and what you can do with it (`.h-do`, bold white with a pointer). Any text that points at a feature
   uses `.h-do`; do not leave an instruction in the dim voice.
 - The crowded case to check after any layout change in the middle column: a NO-GO with three "ways to get a GO"
-  buttons (Nobile Rim 1, 14 NOV 2026 20:00). The landing-day strip must stay fully visible at 1100 x 700 and up.
+  buttons (Nobile Rim 1, 14 NOV 2026 20:00). Nothing in the middle column may overflow at 1100 x 700 and up.
+- Since 15 Nov (the user: "the ui is a bit cluttered still"): the POWER and EARTH LINK blocks have big icons
+  (`#sun-ico`, `#earth-ico`, green when available, red with a slash when not) and less text; the NASA CHECK links
+  sit in that block's heading. The lower chart shows ONE thing at a time, switched by two large buttons, MISSION PLAN / MISSION WINDOWS
+  (the user renamed GOOD DAYS to MISSION WINDOWS and asked for bigger buttons; `showPlan` in `js/app.js`; MISSION
+  PLAN, the 30-day slider, is the default). The freed room goes to the skyline
+  picture (165 px at 1440 x 900, was 90).
+
+## Next batch (asked for on 14 Nov): work ONE TASK AT A TIME
+The user: "one task at a time, and then let me confirm before moving onto the next task". Build one, show it on the
+pre-release (preview page and `next/`), stop, and wait for the user's confirmation before starting the next.
+(1) custom coordinates out in the open: **skipped by the user**. (2) HISTORY tab: built, **accepted** ("fine for
+now"). (3) + (4) + (5): the user asked for these three together on 15 Nov; **built, on the pre-release, waiting for
+the user's confirmation** (see "Layers as built"). (6) + (7): asked for together on 15 Nov ("do those two, verify small sections, get this done fast"); **built, on the
+pre-release, waiting for the user's confirmation.**
+- (6) YOUR MIX: `MIX_PARTS`, `mixScore`, `getMix` / `setMix` in `js/layers.js` (weights 0 to 5, kept under `luno-mix`):
+  a weighted average of the parts' 0-to-1 scores (sunlight, Earth link, flat ground, warmer ground; defaults 3, 2, 1, 0).
+  On the MOON MAP it is a layer with sliders and USE THIS MIX IN THE SCAN (`scan.useMix()`); in the scan it is a SHOW
+  choice and a "best point is picked by" switch (`bestNow` in `js/ui-scan.js`: highest mix among points that meet the
+  needs). The weights are the user's choice and the screen says so.
+- (7) TEMPERATURE: NASA's own numbers, only re-gridded. `tools/build_temperature.py` reads the Diviner Polar Resource
+  Product V2.0 table (`dlre_prp_south.tab`, 605 MB, into `tools/dem/diviner/`, not in git) and writes
+  `data/layers/sp_tavg` and `sp_tmax` (value * 2 = kelvin). Average is the layer; the hottest is a row in the profile.
+  It has no good / bad score (no sourced limit); "warmer ground" in the mix uses 40 K to 250 K as a stated scale.
+For (7): the Diviner archive is reachable from this session at
+`https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/` (polar products are in `data_derived_prp/`);
+nothing has been downloaded or read yet.
+Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link within 4 points of the sites' own numbers;
+sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
+The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
+(a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
+Layers as built:
+- `js/layers.js` — the one definition of the layers (`LAYERS`: elev, slope, sun, earth, shadow): colors, good / bad
+  score, the source sentence shown on screen, `profileAt` + `profileHtml` (the data profile card), `globalCanvas` /
+  `polarCanvas` (pictures for the 3D Moon), `polarValue`. Green = good, red = bad everywhere; elevation is neutral.
+  The slope colors run 0 to 20 degrees as a scale for the eye; it is labeled as not being a safety limit.
+- `tools/build_layers.py` → `data/layers/` (`sp_sun`, `sp_earth`, `sp_shadow`, 480 m grid south of 80S): LOLA 240 m
+  skylines in 72 directions against the positions in `data/ephem.bin` every 6 hours over 2023 to 2035, 2 m mast.
+  "Permanent shadow" means no part of the Sun's disc at any checked moment in those years (said on screen: the
+  18.6-year cycle is not covered). Takes about 15 minutes on 4 cores. `tests/check_layers.mjs` compares the layers
+  with LUNI's own numbers at the polar presets; a layer is coarser than a preset's skyline and reads lower on the
+  narrow best-lit ridges, which is expected and said in the notes.
+- `js/ui-moonmap.js` + the MOON MAP tab (key M; BIG MOON · LAYERS on the small Moon): the same globe moves into the
+  screen (`.globe-wrap.big` inside `#mm-globe`), layer buttons, legend, strength slider, LOOK AT buttons, and the
+  data profile for the point under the pointer (else the landing site). `js/globe.js` gained `setOverlay` (a skin
+  for whole-Moon layers, a south polar cap mesh for the fine ones), `onHoverPoint`, `lookAt`; site marks shrink as
+  the camera comes close. `showScreen("main" | "moon" | "history")` in `js/app.js` switches screens.
+- Scan (`js/ui-scan.js`): SHOW is three groups (THIS MISSION / THE GROUND / ALL YEARS, the last only south of 80S)
+  and the old INSPECT box is the data profile card for the hovered point (else where you are now).
+HISTORY tab as built: screen tabs MAIN SCREEN / MISSION HISTORY in the unit's top strip (`.tabs`; key H; "open
+mission history" in ASK LUNI). `js/ui-history.js` covers `.cols` with a flat Moon map with numbered markers, the
+chosen mission's sourced account, and a table of six landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6,
+Blue Ghost 1, IM-2) with LUNI's live numbers (Sun height at landing, sunlight left, Earth at landing, slope) and a
+30-day Sun / Earth strip with the real end marked. LOAD calls `applyScene` (site, landing hour, mission length, and
+`needs` such as no direct Earth link for Chang'e 6; other needs go back to the defaults). SLIM (Shioli crater) was
+added as a 14th preset for it. Stories carry `proof: true` when they also belong on the PROOF panel.
+Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
+
+## Extras list (the user: "keep track of those extras"). Not to be built unless the user picks one.
+1. Operations plan / light scheduler: the mission's stretches in order (Sun and Earth: work and send data; Sun only;
+   dark: sleep; eclipse) with dates and lengths, inside the MISSION PLAN tab. A full drag-and-drop expedition
+   scheduler was advised against (big, and no sourced data on what activities need).
+2. Finer scan (40 m) near the seven polar presets, where `data/patch/` exists ("that's gonna be an extra").
+3. Custom coordinates out in the open on the main screen (task 1 of the layers batch, skipped by the user).
+4. Sunlight layer at finer detail, so the best-lit ridge tops stop reading low (now 480 m; a 240 m run takes hours).
+5. The landing site's own data profile from its own skyline, instead of the 480 m layer value.
+6. Replays before 2023 (Apollo, Chang'e 4): needs the position data extended back; the app covers 2023 to 2035.
+7. Windows .exe wrapper (Electron). 8. Earth-campers mode (advised against; keep as a story point).
+
+## Deadline
+Confirmed by the user from their team page: submissions close **Sunday 15 Nov 2026 at 11:59 PM, the user's LOCAL time**.
+This session's clock and "today's date" are UTC, and the user's local time is not known (it was still Saturday for
+them when the UTC date turned to 15 Nov, and Claude wrongly said "tonight"). Never say "today" or "tonight" about the
+deadline from the UTC date: ask the user for their local time, or give the time in UTC and say so.
+**The user is in New York (US Eastern, UTC-5 in November).** The deadline is Sunday 15 Nov 23:59 New York time, which
+is **Monday 16 Nov 04:59 UTC**. New York time = this session's UTC clock minus 5 hours.
+The public site is still r2. Releasing needs the user's "release it". The submission text and video do not exist.
 
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment
@@ -93,6 +209,7 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
+   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
@@ -144,11 +261,17 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
    pinned down (possibly an old cached copy). A key that moved to the best spot instead of closing the scan was
    tried and rejected: the user wants the bottom key as a plain open / close toggle for the scan menu, lit green
    while open, labeled SCAN FOR BETTER SPOT. All "find a better spot" buttons use that wording.
+   The user reported the scan sometimes "picks the worst site as the best". Measured: with no GO point it crowned
+   a tied NO-GO corner, and among GO points it ranked by mission sunlight, which is 100% for nearly all of them.
+   Now (`bestCell` in `js/scan-core.js`, checked in `tests/check_scan.mjs`): only a GO point can be best, else the
+   panel says no point meets the needs; GO points rank by sunlight margin, then slope in whole degrees, then the
+   shortest move, then Earth link. Slope is a tie-breaker only: there is no slope limit, because no sourced limit
+   has been chosen (a "max slope" mission need was offered to the user, not built).
    ASK LUNI (voice and typed commands) is built and passes its checks, but a real microphone has not been tried:
    the user must test it in Chrome or Edge from localhost or GitHub Pages. The user chose a local model on their own laptop (needs a
    restart with the GPU on; asked about running it on the NPU, which depends on the model program, not on LUNI).
    LUNI's side is built; still needed from the user: which program runs the model, which model, which chip, and a
    test with LUNI opened from the laptop itself (localhost or GitHub Pages; Ollama needs OLLAMA_ORIGINS for Pages).
-6. Quick wins left: share link, real-mission replays, explainer mode. (Eclipses and partial Sun are done.)
+6. Quick wins: share link, real-mission replays, first-visit guide: done on 14 Nov (see Layout). Left: nothing small.
 7. Verify coordinates in `data/sites.json` against their source links; get NASA's coordinates for the nine
    Artemis III candidate regions (current polar presets are LUNI-selected best-lit points near rough centers).

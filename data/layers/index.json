@@ -1,0 +1,42 @@
+{
+ "_about": "South polar map layers computed by tools/build_layers.py from LRO LOLA elevation (ldem_60s_240m, NASA PDS) and NASA NAIF SPICE DE440 positions (data/ephem.bin). North-up south polar stereographic grid, pole in the middle, x toward longitude 90E, y toward longitude 0. Values: sun / earth 0..200 = 0..100 % of the time, shadow 1 = no part of the Sun seen at any checked moment; 255 = outside the region.",
+ "sp": {
+  "kind": "polar_south",
+  "n": 1268,
+  "scale_m": 480.0,
+  "min_lat": -80.0,
+  "mast_m": 2.0,
+  "directions": 72,
+  "reach_km": 200.0,
+  "step_hours": 6,
+  "moments": 18993,
+  "from_utc": "2023-01-01T00:00:00Z",
+  "years": "2023 to 2035",
+  "files": {
+   "sun": "sp_sun.u8.gz",
+   "earth": "sp_earth.u8.gz",
+   "shadow": "sp_shadow.u8.gz",
+   "tavg": "sp_tavg.u8.gz",
+   "tmax": "sp_tmax.u8.gz"
+  },
+  "stats": {
+   "sun_mean_pct": 26.3,
+   "sun_max_pct": 63.0,
+   "shadow_share_pct": 6.5,
+   "earth_mean_pct": 23.8
+  },
+  "temperature": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018)",
+   "unit": "value * 2 = kelvin",
+   "avg_k": [
+    25.4,
+    208.9
+   ],
+   "max_k": [
+    26.9,
+    347.6
+   ],
+   "no_data_squares": 0
+  }
+ }
+}

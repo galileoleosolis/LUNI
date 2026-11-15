@@ -6,8 +6,9 @@ export const DEFAULT_REQ = {
   maxDarkH: 12,        // longest stretch without sunlight the mission can ride out
   earthAtLanding: true,
   earthMinPct: 0,      // minimum share of the mission with Earth in view (0 = any)
+  maxSlopeDeg: 0,      // steepest ground the lander accepts, in degrees (0 = any; the choice is the planner's, LUNI suggests no limit)
 };
-export const REQ_OPTIONS = { days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48], earthMinPct: [0, 25, 50, 75] };
+export const REQ_OPTIONS = { days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48], earthMinPct: [0, 25, 50, 75], maxSlopeDeg: [0, 5, 10, 15] };
 
 // One pass over the samples. Afterwards `at(i)` and `mask` answer "can we land at hour i?".
 //
@@ -16,8 +17,11 @@ export const REQ_OPTIONS = { days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48]
 //   2. no dark period longer than maxDarkH begins before the mission ends
 //      (held[i] = hours from i until such a period begins);
 //   3. Earth is in view at landing, if required;
-//   4. Earth is in view for at least earthMinPct of the mission.
-export function analyze(samples, req, stepHours = 1) {
+//   4. Earth is in view for at least earthMinPct of the mission;
+//   5. the ground is no steeper than maxSlopeDeg, when a limit is set and the slope is known
+//      (ground = { slopeDeg, slopeBaseM }: a property of the place, the same at every hour).
+export function analyze(samples, req, stepHours = 1, ground = null) {
+  const steep = req.maxSlopeDeg > 0 && ground?.slopeDeg != null && ground.slopeDeg > req.maxSlopeDeg;
   const n = samples.length, M = Math.round(req.days * 24 / stepHours), maxDark = req.maxDarkH / stepHours;
   const held = new Int32Array(n), earthSum = new Int32Array(n + 1);
   for (let i = 0; i < n; i++) earthSum[i + 1] = earthSum[i] + (samples[i].earthUp ? 1 : 0);
@@ -36,7 +40,7 @@ export function analyze(samples, req, stepHours = 1) {
   const earthPct = (i) => { const e = Math.min(n, i + M); return e > i ? (earthSum[e] - earthSum[i]) / (e - i) * 100 : 0; };
   const mask = new Uint8Array(n);
   for (let i = 0; i + M <= n; i++) {
-    mask[i] = samples[i].sunUp && held[i] >= M && (!req.earthAtLanding || samples[i].earthUp) && earthPct(i) >= req.earthMinPct ? 1 : 0;
+    mask[i] = !steep && samples[i].sunUp && held[i] >= M && (!req.earthAtLanding || samples[i].earthUp) && earthPct(i) >= req.earthMinPct ? 1 : 0;
   }
 
   return {
@@ -48,8 +52,9 @@ export function analyze(samples, req, stepHours = 1) {
       else if (held[i] < M) reasons.push(`SUN LOST AFTER ${fmtDH(held[i] * stepHours)}`);
       if (req.earthAtLanding && !s.earthUp) reasons.push("NO EARTH LINK AT LANDING");
       if (ep < req.earthMinPct) reasons.push(`EARTH LINK ${Math.round(ep)}% (NEED ${req.earthMinPct}%)`);
+      if (steep) reasons.push(`GROUND SLOPE ${ground.slopeDeg.toFixed(1)}° (LIMIT ${req.maxSlopeDeg}°)`);
       return {
-        ok: reasons.length === 0, reasons, earthPct: ep,
+        ok: reasons.length === 0, reasons, earthPct: ep, steep,
         sunHeldHours: held[i] * stepHours,
         marginHours: (held[i] - M) * stepHours,
         marginOpen: !knownAt[i],            // true = sunlight lasted to the end of the data, so the margin is "at least"

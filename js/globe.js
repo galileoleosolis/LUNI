@@ -41,7 +41,27 @@ function pin(color) {
   return g;
 }
 
-export function createGlobe(container, { sites, labels, onPickSite, onPickCoord, onHover }) {
+// A cap of the sphere around the south pole (pole to minLat), with texture coordinates laid out like a north-up
+// south polar map: pole in the middle, longitude 0 toward the top, 90E toward the right.
+function polarCap(minLat, radius, fill) {
+  const rings = 40, segs = 160, pos = [], uv = [], idx = [], edge = Math.tan((90 + minLat) * DEG / 2);
+  for (let i = 0; i <= rings; i++) {
+    const lat = -90 + (90 + minLat) * i / rings, rr = Math.tan((90 + lat) * DEG / 2) / edge * 0.5 * fill;
+    for (let j = 0; j <= segs; j++) {
+      const lon = j * 360 / segs, v = llToVec(lat, lon, radius);
+      pos.push(v.x, v.y, v.z); uv.push(0.5 + rr * Math.sin(lon * DEG), 0.5 + rr * Math.cos(lon * DEG));
+    }
+  }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) {
+    const a = i * (segs + 1) + j, b = a + segs + 1;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  return g;
+}
+
+export function createGlobe(container, { sites, labels, onPickSite, onPickCoord, onHover, onHoverPoint }) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -64,6 +84,13 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
     new THREE.SphereGeometry(1, 96, 64),
     new THREE.MeshStandardMaterial({ map: tex, roughness: 1, metalness: 0 }));
   scene.add(moon, graticule());
+
+  // Map layers: a see-through skin over the whole Moon, and a finer one over the south polar cap.
+  const skinMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide });
+  const skin = new THREE.Mesh(new THREE.SphereGeometry(1.0012, 96, 64), skinMat); skin.visible = false; scene.add(skin);
+  const capMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide });
+  let cap = null;
+  const texOf = (canvas) => { const t = new THREE.CanvasTexture(canvas); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.generateMipmaps = true; return t; };
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.9));
   const sunLight = new THREE.DirectionalLight(0xffffff, 2.6);
@@ -138,8 +165,9 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
     const m = frontHit(hitMeshes());
     renderer.domElement.style.cursor = m ? "pointer" : "grab";
     onHover?.(m ? m.object.userData.site : null, e);
+    if (onHoverPoint) { const h = ray.intersectObject(moon, false)[0]; onHoverPoint(h ? vecToLL(h.point) : null); }
   });
-  renderer.domElement.addEventListener("pointerleave", () => onHover?.(null));
+  renderer.domElement.addEventListener("pointerleave", () => { onHover?.(null); onHoverPoint?.(null); });
 
   // --- sizing + loop ---
   const resize = () => {
@@ -167,7 +195,7 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
       v.copy(t.pos).project(camera);
       const x = (v.x * 0.5 + 0.5) * w, y = (-v.y * 0.5 + 0.5) * h, tw = sel ? 26 + t.site.name.length * 6.2 : 20;
       const clash = placed.some((p) => Math.abs(p.y - y) < 14 && x < p.x + p.w && p.x < x + tw);
-      const show = front && x > 0 && x < w - 16 && y > 6 && y < h - 24 && (sel || !clash);
+      const show = front && x > 0 && x < w - 16 && y > 22 && y < h - 24 && (sel || !clash);
       t.el.style.display = show ? "" : "none";
       if (!show) continue;
       placed.push({ x, y, w: tw });
@@ -188,8 +216,12 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
       if (k >= 1) tween = null;
     }
     controls.update();
+    // Site marks keep about the same size on screen: they shrink as the camera comes close, so they do not hide the map.
+    const near = Math.max(0.1, Math.min(1, (camera.position.length() - 1) / 3.4));
+    for (const m of markers.children) m.scale.setScalar(near);
+    ring.scale.setScalar(near);
     const pulse = 1 + 0.25 * Math.sin(now / 350);
-    ring2.scale.setScalar(pulse);
+    ring2.scale.setScalar(pulse * near);
     renderer.render(scene, camera);
     if (tags.length) placeTags();
     requestAnimationFrame(frame);
@@ -207,6 +239,21 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
       for (const r of [ring, ring2]) { r.position.copy(selPos); r.lookAt(selPos.clone().multiplyScalar(2)); }
       if (fly) flyTo(site.lat, site.lon);
     },
+    // Show a map layer: { global: canvas (whole Moon, longitude -180..180) and / or polar: { canvas, minLat, n, scaleM } }, or null for none.
+    setOverlay(o, opacity = 0.8) {
+      for (const m of [skinMat, capMat]) { m.map?.dispose(); m.map = null; m.opacity = opacity; m.needsUpdate = true; }
+      skin.visible = !!o?.global;
+      if (o?.global) skinMat.map = texOf(o.global);
+      if (cap) { scene.remove(cap); cap.geometry.dispose(); cap = null; }
+      if (o?.polar) {
+        const edge = 2 * 1737400 * Math.tan((90 + o.polar.minLat) * DEG / 2);      // meters from the pole to the cap's rim on the map
+        cap = new THREE.Mesh(polarCap(o.polar.minLat, 1.0022, edge / (o.polar.n * o.polar.scaleM / 2)), capMat);
+        capMat.map = texOf(o.polar.canvas); scene.add(cap);
+      }
+    },
+    setOverlayOpacity(v) { skinMat.opacity = capMat.opacity = v; },
+    // Turn the camera to look straight down at a point; dist = how far out (1 = the surface).
+    lookAt(lat, lon, dist) { flyTo(lat, lon, dist); },
     // Light the globe from the Sun and point the Sun/Earth pins.
     setBodies(sun, earth) {
       sunLight.position.copy(llToVec(sun.lat, sun.lon, 10));

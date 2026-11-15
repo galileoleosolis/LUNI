@@ -36,18 +36,20 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { hours: { type: "number" } }, required: ["hours"], additionalProperties: false } },
   { name: "next_good_time", description: "Jump the landing time to the start of the next landing window that meets the mission needs.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
-  { name: "set_mission_need", description: "Change one mission need. days: mission length. maxDarkH: longest dark spell the mission can sit out, in hours. earthMinPct: least share of the mission with Earth in view. earthAtLanding: whether Earth must be in view at landing; give it with 'required' (true or false), the others with 'value' (a number). step (+1 or -1) moves days to the next longer or shorter choice instead of giving a value.",
-    input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "earthAtLanding"] }, value: { type: "number" }, required: { type: "boolean" }, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
+  { name: "set_mission_need", description: "Change one mission need. days: mission length. maxDarkH: longest dark spell the mission can sit out, in hours. earthMinPct: least share of the mission with Earth in view. maxSlopeDeg: steepest ground accepted, in degrees (0 = any slope). earthAtLanding: whether Earth must be in view at landing; give it with 'required' (true or false), the others with 'value' (a number). step (+1 or -1) moves days to the next longer or shorter choice instead of giving a value.",
+    input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "maxSlopeDeg", "earthAtLanding"] }, value: { type: "number" }, required: { type: "boolean" }, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
   { name: "mission_clock", description: "Move the mission clock (the moment shown for the Sun and Earth). to_hours: hours after landing. by_hours: relative move. play: true starts it running, false pauses it.",
     input_schema: { type: "object", properties: { to_hours: { type: "number" }, by_hours: { type: "number" }, play: { type: "boolean" } }, additionalProperties: false } },
-  { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view) or 'main' (close both).",
-    input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "main"] } }, required: ["view"], additionalProperties: false } },
+  { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view), 'proof' (how LUNI was checked against NASA and real landings, and its limits), 'history' (real landings since 2023 compared, each loadable into the main screen), 'moon' (the big Moon with data layers; give 'layer': elev, slope, sun, earth, shadow, temp or mix) or 'main' (close them all).",
+    input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "proof", "history", "moon", "main"] }, layer: { type: "string", enum: ["elev", "slope", "sun", "earth", "shadow", "temp", "mix"] } }, required: ["view"], additionalProperties: false } },
+  { name: "share_link", description: "Copy a link that opens LUNI on exactly this site, landing time and mission needs.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "take_option", description: "After a NO-GO, LUNI offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
     input_schema: { type: "object", properties: { number: { type: "integer" }, best_point: { type: "boolean" } }, additionalProperties: false } },
   { name: "pin", description: "Pin the current site and landing time to the compare list.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
-  { name: "report", description: "Read out LUNI's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, help.",
-    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
+  { name: "report", description: "Read out LUNI's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, versus (this site next to a place on Earth), help.",
+    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "versus", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
 ];
 
 // ---------- understanding a sentence ----------
@@ -85,6 +87,8 @@ const ALIASES = {
   im2: ["im 2 athena", "im 2", "im2", "i m 2", "athena", "mons mouton", "intuitive machines 2"],
   im1: ["im 1 odysseus", "im 1", "im1", "i m 1", "odysseus", "malapert a", "intuitive machines 1"],
   ch3: ["chandrayaan 3", "chandrayaan", "chandrayan 3", "chandrayan", "shiv shakti"],
+  bg1: ["blue ghost 1", "blue ghost", "mare crisium", "crisium", "firefly"],
+  slim: ["slim", "shioli crater", "shioli", "moon sniper"],
   ce6: ["chang e 6", "change 6", "chang 6", "chang e six", "apollo basin"],
   ce4: ["chang e 4", "change 4", "chang 4", "von karman"],
   apollo11: ["apollo 11", "tranquility base", "tranquility"],
@@ -146,6 +150,8 @@ export function parse(text, sites = []) {
     call("set_mission_need", { need: "earthAtLanding", value: true });
   if ((m = take(/\bearth\b[a-z ]*?(\d+) ?(?:%|percent)/)) || (m = take(/\b(\d+) ?(?:%|percent)[a-z ]*\bearth(?: link| contact| time| coverage)?\b/))) call("set_mission_need", { need: "earthMinPct", value: +m[1] });
   else if (take(/\bany (?:amount of )?earth(?: link| contact| time| coverage)?\b/)) call("set_mission_need", { need: "earthMinPct", value: 0 });
+  if (take(/\b(?:any|no|without(?: a)?|remove the|drop the) (?:max(?:imum)? )?slope(?: limit)?\b/)) call("set_mission_need", { need: "maxSlopeDeg", value: 0 });
+  else if ((m = take(/\b(?:slopes?|tilt|steep(?:ness|er)?)\b[a-z ]{0,30}?(\d+)(?: ?(?:°|deg|degrees?))?/)) || (m = take(/\b(\d+) ?(?:°|deg|degrees?)[a-z ]{0,12}\b(?:slopes?|tilt)\b/))) call("set_mission_need", { need: "maxSlopeDeg", value: +m[1] });
 
   // --- when ---
   if (take(/\bnext (?:good |best |open |available |landing )*(?:time|window|chance|opportunity|slot|date)\b|\bwhen (?:can|could|should|do) (?:i|we) land\b|\bfind (?:me )?(?:a |the |the next )?(?:good )?(?:landing )?(?:time|window|date)\b|\bbest time to land\b/))
@@ -188,8 +194,14 @@ export function parse(text, sites = []) {
   if ((m = take(/\b(?:option|choice|number|way)(?: number)? ([123])\b/)) || (m = take(/\b(?:the |do the |take the )([123]) (?:1\b|option\b|choice\b|$)/))) call("take_option", { number: +m[1] });
   if (take(/\b(?:move|go|jump|switch)\b[a-z ]{0,12}\bbest (?:point|spot|place|one)\b|\buse the best (?:point|spot|place)\b/)) call("take_option", { best_point: true });
   else if (take(/\b(?:close|exit|leave|hide)\b[a-z ]{0,10}\b(?:scan|map|surface|3d|view)?\b|\bmain screen\b|^ (?:cancel|go back|back) $/)) call("open_view", { view: "main" });
+  else if ((m = take(/\b(elevation|height|slope|sunlight|illumination|solar(?: power)?|earth(?: link)?|communications?|comms|shadows?|psr|temperature|thermal|heat|mix|combined|blend(?:ed)?)\b[a-z ]{0,14}\b(?:layer|map)\b/)))
+    call("open_view", { view: "moon", layer: /elev|height/.test(m[1]) ? "elev" : /slope/.test(m[1]) ? "slope" : /sun|illum|solar/.test(m[1]) ? "sun" : /earth|comm/.test(m[1]) ? "earth" : /temp|therm|heat/.test(m[1]) ? "temp" : /mix|comb|blend/.test(m[1]) ? "mix" : "shadow" });
+  else if (take(/\b(?:moon map|big moon|map layers?|layers)\b/)) call("open_view", { view: "moon" });
+  else if (take(/\b(?:mission )?history\b|\b(?:past|previous|earlier|real|old) (?:missions?|landings?)\b/)) call("open_view", { view: "history" });
+  else if (take(/\b(?:proof|prove it|how accurate|accuracy|can (?:i|we) trust|how do (?:you|we|i) know)\b/)) call("open_view", { view: "proof" });
   else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b/)) call("open_view", { view: "scan" });
   else if (take(/\b(?:surface|3d|3 d|first person|look around|ground view|stand on)\b/)) call("open_view", { view: "surface" });
+  if (take(/\b(?:share|copy|send)\b[a-z ]{0,15}\b(?:link|address|url)\b|\bshare (?:this|it)\b/)) call("share_link");
   if (take(/\b(?:pin|bookmark|save this|remember this|keep this)\b/)) call("pin");
   if (take(/\b(?:play|resume|run the clock|start the clock|run time)\b/)) call("mission_clock", { play: true });
   else if (take(/\b(?:pause|stop|freeze|hold)\b/)) call("mission_clock", { play: false });
@@ -200,6 +212,7 @@ export function parse(text, sites = []) {
   // --- questions ---
   const q = (re) => re.test(t);
   if (q(/\b(?:go to|select|switch to|fly to|land at|take me to|move to)\b/) || q(/\b(?:which|what|list)(?: are)?(?: the)? sites\b/)) call("report", { topic: "sites" });   // a place LUNI does not know, or asking for the list
+  else if (q(/\b(?:compared? (?:with|to)|different from|differ from|versus|vs|than|like) (?:on )?(?:the )?earth\b|\bon earth\b|\bwhy is the moon (?:so )?hard\b/)) call("report", { topic: "versus" });
   else if (q(/\beclipse/)) call("report", { topic: "eclipse" });
   else if (q(/\bhow (?:do|can|could|would) (?:i|we) (?:get|make|fix|turn)\b|\bwhat (?:can|could|should) (?:i|we) (?:do|change|try)\b|\bways\b|\bfix (?:it|this)\b|\boptions\b|\bsuggest/)) call("report", { topic: "options" });
   else if (q(/\bwhy\b|\bwhat s wrong\b|\bwhat is wrong\b|\breasons?\b|\bproblem\b/)) call("report", { topic: "status" });
@@ -236,7 +249,8 @@ export function createAssistant(api) {
       else if (v.sunHeldHours < r.days * 24) why.push(`sunlight is lost after ${dur(v.sunHeldHours)}`);
       if (r.earthAtLanding && !s.landing.earthUp) why.push("Earth is not in view at landing");
       if (v.earthPct < r.earthMinPct) why.push(`Earth is in view for only ${Math.round(v.earthPct)}% of the mission and the need is ${r.earthMinPct}%`);
-      out = `NO-GO for a ${r.days}-day mission: ${why.join(", and ")}. ` + (s.next ? `Next good landing time: ${stamp(s.next)}.` : "No good landing time in the next 12 months.");
+      if (v.steep) why.push(`the ground slopes ${s.terrain.slopeDeg.toFixed(1)}° and the limit is ${r.maxSlopeDeg}°`);
+      out = `NO-GO for a ${r.days}-day mission: ${why.join(", and ")}. ` + (s.next ? `Next good landing time: ${stamp(s.next)}.` : v.steep ? "The slope is the same on every date, so only another spot or a higher slope limit helps." : "No good landing time in the next 12 months.");
       if (s.options.length) out += ` Say OPTIONS to hear ways to get a GO.`;
     }
     for (const e of s.eclipses) out += ` Warning: eclipse on ${day(e.peak)}, Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`;
@@ -268,12 +282,13 @@ export function createAssistant(api) {
     else out += s.terrainBusy ? " The skyline is still being worked out." : " No terrain loaded: flat horizon.";
     return out;
   }
-  const needsText = (s = snap()) => `Mission needs: ${s.req.days} days long; can sit ${s.req.maxDarkH} hours in the dark; Earth link at landing ${s.req.earthAtLanding ? "required" : "not required"}; Earth in view for ${s.req.earthMinPct ? `at least ${s.req.earthMinPct}%` : "any share"} of the mission.`;
+  const needsText = (s = snap()) => `Mission needs: ${s.req.days} days long; can sit ${s.req.maxDarkH} hours in the dark; Earth link at landing ${s.req.earthAtLanding ? "required" : "not required"}; Earth in view for ${s.req.earthMinPct ? `at least ${s.req.earthMinPct}%` : "any share"} of the mission; ground slope ${s.req.maxSlopeDeg ? `at most ${s.req.maxSlopeDeg}°` : "any"}.`;
   function optionsText(s = snap()) {
     if (s.verdict.ok) return "This is already a GO, so nothing needs to change.";
     if (!s.options.length) return "No simple way to a GO from here. Try another site.";
     return "Ways to get a GO: " + s.options.map((o, i) => `${i + 1}: ${o.toLowerCase()}`).join(". ") + `. Say OPTION ${s.options.map((_, i) => i + 1).join(" or ")}.`;
   }
+  const cap = (t) => t.charAt(0) + t.slice(1).toLowerCase();
   const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
   const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
@@ -329,10 +344,10 @@ export function createAssistant(api) {
           v = opts[k][i];
         }
         if (!Number.isFinite(v)) return { say: "Say a number for that need." };
-        const use = nearest(opts[k], v), unit = { days: "days", maxDarkH: "hours", earthMinPct: "%" }[k];
+        const use = nearest(opts[k], v), unit = { days: "days", maxDarkH: "hours", earthMinPct: "%", maxSlopeDeg: "°" }[k];
         api.setReq(k, use);
-        const name = { days: "Mission length", maxDarkH: "Longest dark spell it can sit out", earthMinPct: "Earth link for at least" }[k];
-        const val = k === "earthMinPct" ? (use ? `${use}% of the mission` : "any share of the mission") : `${use} ${unit}`;
+        const name = { days: "Mission length", maxDarkH: "Longest dark spell it can sit out", earthMinPct: "Earth link for at least", maxSlopeDeg: "Steepest ground accepted" }[k];
+        const val = k === "earthMinPct" ? (use ? `${use}% of the mission` : "any share of the mission") : k === "maxSlopeDeg" ? (use ? `${use}°` : "any slope") : `${use} ${unit}`;
         return { say: (use === v ? "" : `The choices are ${opts[k].join(", ")}; the closest is ${use}. `) + `${name}: ${val}.`, changed: true };
       }
       case "mission_clock": {
@@ -345,11 +360,14 @@ export function createAssistant(api) {
       case "open_view": {
         if (input.view === "scan") { api.openScan(true); return { say: "Scanning the ground around this site for a better spot. Bright cells are better. When it finishes, say MOVE TO THE BEST POINT." }; }
         if (input.view === "surface") { api.openSurface(true); return { say: "Opening the 3D view from the surface. Say CLOSE to come back." }; }
-        api.openScan(false); api.openSurface(false);
+        if (input.view === "proof") { api.openProof(true); return { say: "Opening the proof: LUNI against NASA's own calculator, three real landings replayed, and what LUNI does not know. Say CLOSE to come back." }; }
+        if (input.view === "moon") { api.openMoonMap(true, input.layer); return { say: input.layer ? "Opening the Moon map with that layer on it. Say CLOSE to come back." : "Opening the Moon map. Pick a layer on the right, or say, for example, SUNLIGHT LAYER. Say CLOSE to come back." }; }
+        if (input.view === "history") { api.openHistory(true); return { say: "Opening mission history: six real landings since 2023, side by side. Pick one and press LOAD to put it on the main screen. Say CLOSE to come back." }; }
+        api.openScan(false); api.openSurface(false); api.openProof?.(false); api.openHistory?.(false); api.openMoonMap?.(false);
         return { say: "Back to the main screen." };
       }
       case "take_option": {
-        if (input.best_point) return api.pickBest() ? { say: "Moved to the best point the scan found.", changed: true, wait: true } : { say: "The scan has no best point yet. Say BETTER SPOT and wait for it to finish." };
+        if (input.best_point) return api.pickBest() ? { say: "Moved to the best point the scan found.", changed: true, wait: true } : { say: "There is no better point to move to: the scan is still running, has not been opened, or found nothing nearby that meets the mission needs." };
         if (s.verdict.ok) return { say: "This is already a GO, so there are no options to take." };
         const o = s.options[input.number - 1];
         if (!o) return { say: optionsText(s) };
@@ -357,8 +375,10 @@ export function createAssistant(api) {
         return /BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
       }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
+      case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };
       case "report":
         return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO,
+          versus: () => { const v = api.versus(); return `${s.siteName} next to a place on Earth's equator. ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
           eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
           time: () => `Landing time ${stamp(s.t0)}. The mission clock shows ${s.idx ? dur(s.idx) + " after landing, " + stamp(s.cur.t) : "the landing time"}.` }[input.topic]?.(s) ?? HELP };

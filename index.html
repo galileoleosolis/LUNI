@@ -15,6 +15,7 @@
   <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
+    <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
     <span id="data-badge" class="demo" >LOADING DATA</span>
   </div>
 
@@ -42,6 +43,40 @@
         <div id="sv-status" class="sv-status" hidden></div>
         <div class="sv-bottom"><div id="sv-look"></div><div id="sv-info"></div><div class="sv-key"><i></i> <span id="sv-keytext"></span> · DRAG TO LOOK AROUND · USE PLAY OR ← → TO RUN THE MISSION CLOCK</div></div>
       </div>
+      <div id="moonmap" class="moonmap" hidden>
+        <div class="scan-head"><span><b class="h-t">MOON MAP</b> · NASA DATA AS LAYERS ON THE MOON · <b class="h-do">PICK A LAYER · CLICK ANY SPOT TO LAND THERE</b></span><span class="scan-head-btns"><button id="mm-close" title="Close (Esc)">✕ BACK TO THE MAIN SCREEN</button></span></div>
+        <div class="mm-body">
+          <div id="mm-globe" class="mm-globe"><div id="mm-status" class="mm-status" hidden></div><div class="mm-view"><span>LOOK AT</span><div id="mm-view"></div></div></div>
+          <div class="mm-side">
+            <h3><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
+            <div id="mm-layers" class="mm-layers"></div>
+            <div id="mm-legend"></div>
+            <label class="mm-strength">LAYER STRENGTH <input id="mm-strength" type="range" min="25" max="100" value="80" aria-label="How strongly the layer covers the picture"></label>
+            <div id="mm-meaning" class="mm-meaning"></div>
+            <div id="mm-mix" class="mm-mix" hidden>
+              <div id="mm-mix-rows"></div>
+              <button id="mm-mix-use" class="mm-mix-use" title="Opens the scan around the landing site, colored by your mix, with the best point picked by your mix among the points that meet the mission needs">USE THIS MIX IN THE SCAN ▸</button>
+            </div>
+            <h3 class="gap"><b class="h-t">DATA PROFILE</b> · EVERY LAYER AT ONE POINT</h3>
+            <div id="mm-prof-where" class="mm-prof-where"></div>
+            <div id="mm-profile"></div>
+            <h3 class="gap"><b class="h-t">WHERE THIS LAYER'S DATA COMES FROM</b></h3>
+            <div id="mm-source" class="dimtxt"></div>
+          </div>
+        </div>
+      </div>
+      <div id="history" class="history" hidden>
+        <div class="scan-head"><span><b class="h-t">MISSION HISTORY</b> · REAL LANDINGS SINCE 2023, REPLAYED WITH LUNI'S NASA DATA · <b class="h-do">PICK ONE, THEN LOAD IT</b></span><span class="scan-head-btns"><button id="hist-close" title="Close (Esc)">✕ BACK TO THE MAIN SCREEN</button></span></div>
+        <div class="hist-top">
+          <div class="hist-map"><img src="assets/moon_wac_4k.jpg" alt="Map of the whole Moon with the landing sites marked"><div id="hist-pins"></div><span class="hist-map-note" title="A flat map of the whole Moon: the near side is in the middle, the far side at both edges. Picture: NASA LRO wide-angle camera mosaic.">THE WHOLE MOON · NEAR SIDE IN THE MIDDLE</span></div>
+          <div id="hist-detail" class="hist-detail"></div>
+        </div>
+        <div class="hist-table">
+          <div class="hist-row hist-headrow"><div>MISSION</div><div>SUN HEIGHT AT LANDING</div><div>SUNLIGHT LEFT AFTER LANDING</div><div>EARTH AT LANDING</div><div>GROUND SLOPE</div><div>THE 30 DAYS AFTER LANDING · <i class="k-s">■ SUN</i> <i class="k-e">■ EARTH IN VIEW</i> · <i class="k-m">▼ REAL END</i></div><div>WHAT REALLY HAPPENED</div><div></div></div>
+          <div id="hist-rows"></div>
+        </div>
+        <div class="hist-foot"><span class="hist-sortlab">ORDER:</span><span id="hist-sort" class="seg"></span><span class="dimtxt">NUMBERS AND BARS: LUNI, FROM NASA SPICE AND LOLA DATA. WHAT REALLY HAPPENED: THE SOURCES LISTED FOR EACH MISSION. LUNI'S DATA COVERS 2023 TO 2035, SO EARLIER LANDINGS (APOLLO, CHANG'E 4) CANNOT BE REPLAYED ON THEIR OWN DATES.</span></div>
+      </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">
         <h3><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
@@ -53,7 +88,7 @@
           <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
           <div class="k-hint"><b>DRAG</b><span class="long"> TO TURN</span> · <b>SCROLL</b><span class="long"> TO ZOOM</span> · <b>CLICK</b> A SPOT<span class="long"> TO LAND THERE</span></div>
           <div id="globe-verdict" class="globe-verdict"></div>
-          <button id="globe-big" class="globe-big" title="Make the Moon big, to look around and pick any spot">⤢ BIG MOON</button>
+          <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">SCAN FOR BETTER SPOT ▸</button>
         </div>
         <h3 class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
@@ -70,6 +105,7 @@
           <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
           <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
           <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+          <div class="need" title="The steepest ground the lander accepts. ANY = slope is not judged. Slope comes from NASA's LOLA elevation maps."><span>GROUND SLOPE AT MOST</span><div class="seg" data-req="maxSlopeDeg"></div><span>°</span></div>
         </div>
       </section>
 
@@ -81,20 +117,27 @@
             <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
             <div class="scan-side">
               <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
-              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-metric"></div>
+              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>
               <div id="scan-legend" class="scan-legend"></div>
+              <h3><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
+              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
+              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
               <div id="scan-progress"></div>
               <div id="scan-engine" class="dimtxt"></div>
               <div id="scan-scale" class="dimtxt"></div>
-              <h3><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell"></div>
-              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
-              <h3><b class="h-t">INSPECT</b></h3><div id="scan-hover" class="scan-cell"></div>
+              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell" hidden></div>
               <div id="scan-note" class="credit"></div>
             </div>
           </div>
         </div>
-        <h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE, AT THIS TIME?</h3>
+        <div id="proof" class="scan proof" hidden>
+          <div class="scan-head"><span><b class="h-t">PROOF</b> · HOW YOU CAN TELL LUNI IS RIGHT, AND WHERE IT STOPS</span><span class="scan-head-btns"><button id="proof-close" title="Close (Esc)">✕ CLOSE</button></span></div>
+          <div id="proof-body" class="proof-body"></div>
+        </div>
+        <div id="story" class="story" hidden></div>
+        <div class="tiles-head ans-head"><h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
+          <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></span></div>
+        <div class="answer-row">
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
           <div class="hero-text">
@@ -103,50 +146,56 @@
           </div>
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
-
-        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3>
-        <div class="nasa-check">CHECK WITH NASA JPL HORIZONS:
-          <a id="hz-sun" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a>
-          <a id="hz-earth" target="_blank" rel="noopener" title="Opens NASA's own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></div></div>
+          <div class="answer-side">
+        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
         <div class="readouts">
           <div class="ro">
+            <div class="ro-ico" id="sun-ico" title="Power: sunlight on the solar panels">
+              <svg viewBox="0 0 64 64" aria-hidden="true"><g class="i-sun"><circle cx="21" cy="20" r="9"/><path d="M21 4v5M21 31v5M5 20h5M32 20h5M9.7 8.7l3.5 3.5M28.8 27.8l3.5 3.5M9.7 31.3l3.5-3.5M28.8 12.2l3.5-3.5"/></g><g class="i-panel"><path d="M27 40h33l-6 19H21z"/><path d="M38 40l-6 19M49 40l-6 19M24 49.500h33"/></g><path class="i-off" d="M8 58L58 8"/></svg>
+              <span>POWER</span>
+            </div>
             <div class="ro-a">
-              <div class="lab">☀ POWER</div>
               <div class="st" id="sun-state"></div>
-              <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
+              <div class="mini">HEIGHT <b id="sun-el"></b> · DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
             </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
           </div>
           <div class="ro">
+            <div class="ro-ico" id="earth-ico" title="Earth link: a direct line to Earth for talking to the lander">
+              <svg viewBox="0 0 64 64" aria-hidden="true"><g class="i-earth"><circle cx="22" cy="42" r="15"/><path class="land" d="M12 36q5-6 10-3t3 7q-5 4-10 1zM24 46q5-2 8 2l-3 6q-6 0-5-8z"/></g><g class="i-waves"><path d="M36 26a8 8 0 0 0-8-8M44 26a16 16 0 0 0-16-16M52 26a24 24 0 0 0-24-24"/></g><path class="i-off" d="M36 8l18 18M54 8L36 26"/></svg>
+              <span>EARTH LINK</span>
+            </div>
             <div class="ro-a">
-              <div class="lab">⊕ EARTH LINK</div>
               <div class="st" id="earth-state"></div>
-              <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
+              <div class="mini">HEIGHT <b id="earth-el"></b> · DIRECTION <b id="earth-az"></b></div>
             </div>
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
           </div>
         </div>
+          </div>
+        </div>
 
+        <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
-
-        <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · THE SKYLINE ALL THE WAY ROUND</h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
-        <svg id="horizon" class="horizon" role="img" aria-label="Horizon panorama with Sun and Earth positions"></svg>
-
-        <h3><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
+        <div class="tiles-head plan-head">
+          <h3 id="plan-title-a"><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
+          <h3 id="cal-title" hidden><b class="h-t">MISSION WINDOWS</b> · GOOD LANDING DAYS, NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
+          <span class="plan-tabs"><button id="tab-plan" class="on" title="The 30 days after landing: when there is Sun and Earth, with the slider">MISSION PLAN</button><button id="tab-days" title="Mission windows: every good landing day in the next 12 months">MISSION WINDOWS</button></span>
+        </div>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
-
-        <h3 id="cal-title"><b class="h-t">GOOD LANDING DAYS</b> · NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
-        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
+        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months" hidden></svg>
       </section>
 
       <!-- RIGHT: summary + compare -->
-      <section class="col col-side">
+      <section class="col col-side" id="more-panel" hidden>
+        <div class="side-head"><b>COMPARE · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
         <h3><b class="h-t">NEXT GOOD LANDING TIMES</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
         <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
-        <details class="more">
+        <details class="more" open>
           <summary><b class="h-t">MORE NUMBERS</b> · <b class="h-do">CLICK TO OPEN</b></summary>
           <h3 class="gap">FIRST 30 DAYS AFTER LANDING</h3>
           <table class="sum">
@@ -155,6 +204,9 @@
             <tr><td>BOTH AT ONCE</td><td id="pct-both"></td></tr>
             <tr><td>LONGEST DARK SPELL</td><td id="max-dark"></td></tr>
           </table>
+          <h3 class="gap"><b class="h-t">THIS SITE NEXT TO EARTH</b> · WHY THE MOON IS HARD</h3>
+          <table class="sum versus" id="versus"></table>
+          <p id="versus-note" class="note"></p>
           <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
           <p id="site-note" class="note"></p>

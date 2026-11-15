@@ -3,13 +3,27 @@ import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
 import { scanOptions, bestCell } from "./scan-core.js";
 import { mapResFor } from "./terrain.js";
+import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
+
+// A scanned point's score in YOUR MIX (0..100): the all-years layers at the point, with the scan's own slope for it.
+const cellMix = (c) => mixScore({ sun: polarValue("sun", c.lat, c.lon), earth: polarValue("earth", c.lat, c.lon), temp: polarValue("temp", c.lat, c.lon), slope: c.slopeDeg });
 
 const $ = (id) => document.getElementById(id);
 const METRICS = {
   sun:   { label: "SUNLIGHT", ends: ["DARK = NO SUNLIGHT", "BRIGHT = ALWAYS SUNLIT"], unit: "% OF MISSION IN SUNLIGHT", value: (c) => c.sunPct, ramp: [[18, 12, 2], [255, 176, 0], [255, 244, 200]] },
   earth: { label: "EARTH LINK", ends: ["DARK = NO EARTH LINK", "BRIGHT = ALWAYS IN VIEW"], unit: "% OF MISSION WITH EARTH IN VIEW", value: (c) => c.earthPct, ramp: [[4, 14, 22], [40, 130, 190], [190, 235, 255]] },
   needs: { label: "MEETS NEEDS", unit: "", value: (c) => (c.ok ? 100 : 0), ramp: null },
+  // The ground itself, and the all-years layers (the same ones as on the MOON MAP screen; south of 80S only).
+  slope:  { label: "SLOPE", lay: "slope", rgb: (c) => (c.slopeDeg == null ? null : goodColor(1 - c.slopeDeg / 20)) },
+  elev:   { label: "ELEVATION", rgb: (c, x) => elevColor((c.heightM - x.lo) / Math.max(1, x.hi - x.lo)) },
+  ysun:   { label: "SUNLIGHT", lay: "sun", polar: true, rgb: (c) => { const v = polarValue("sun", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
+  yearth: { label: "EARTH LINK", lay: "earth", polar: true, rgb: (c) => { const v = polarValue("earth", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
+  temp:   { label: "TEMPERATURE", lay: "temp", polar: true, rgb: (c) => { const v = polarValue("temp", c.lat, c.lon); return v == null ? null : layer("temp").color(v); } },
+  mix:    { label: "YOUR MIX", lay: "mix", polar: true, rgb: (c) => { const v = cellMix(c); return v == null ? null : goodColor(v / 100); } },
+  shadow: { label: "SHADOW", lay: "shadow", polar: true, rgb: (c) => { const v = polarValue("shadow", c.lat, c.lon); return v == null ? null : v ? SHADOW_COLOR : [58, 62, 70]; } },
 };
+const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow", "temp"]], ["BLENDED WITH YOUR WEIGHTS", ["mix"]]];
+const NO_DATA = [26, 28, 34];
 const lerp = (a, b, t) => a + (b - a) * t;
 function rampColor(ramp, v) {            // v in 0..100
   const t = Math.max(0, Math.min(1, v / 100)), k = t < 0.5 ? 0 : 1, f = t < 0.5 ? t * 2 : (t - 0.5) * 2;
@@ -70,9 +84,15 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const o = opts[st.opt];
     const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm},${o.n}`;
     buildSeg($("scan-radius"), opts.map((x, i) => [i, `${x.radiusKm} KM`]), () => st.opt, (v) => { st.opt = v; start(); });
+    const polarOk = c.site.lat <= -79.5;                   // the all-years layers exist for the south polar region only
+    if (polarOk && !polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
+    if (!polarOk && METRICS[st.metric].polar) st.metric = "needs";
+    buildMetrics(polarOk);
     $("scan-title").textContent = `AREA SCAN · ${fmt.site(c.site)} · LAND ${fmt.stamp(c.t0)} · ${c.req.days}D MISSION`;
     const res = mapResFor(c.site.lat);
-    const note = () => { $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. PRESET SITES USE FINER MAPS, SO THEIR NUMBERS CAN DIFFER A LITTLE. ${st.engine}`; };
+    // Slope depends on the distance it is measured over: the scan's map is coarser than a listed site's own map.
+    const slopeNote = () => { const t = c.terrain; return `SLOPES IN THE SCAN ARE MEASURED OVER ${fmtStep(2 * res)}${t?.real && !t.reduced && t.slopeBaseM < 2 * res ? `; THIS SITE'S OWN FIGURE, ${t.slopeDeg.toFixed(1)}° OVER ${fmtStep(t.slopeBaseM)}, COMES FROM A FINER MAP` : ""}. `; };
+    const note = () => { $("scan-note").textContent = `SCAN USES THE ${res >= 1000 ? (res / 1000).toFixed(1) + " KM" : res + " M"} LOLA MAP, ONE CHECK EVERY ${fmtStep(2 * o.radiusKm * 1000 / (o.n - 1))}. PRESET SITES USE FINER MAPS, SO THEIR NUMBERS CAN DIFFER A LITTLE. ${slopeNote()}${st.engine}`; };
     note();
     if (key === st.key) return draw();
     st.run?.cancel();
@@ -110,6 +130,8 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
+    const span = { lo: Infinity, hi: -Infinity };          // lowest and highest ground in the scan, for the elevation colors
+    for (const c of st.cells) if (c) { if (c.heightM < span.lo) span.lo = c.heightM; if (c.heightM > span.hi) span.hi = c.heightM; }
     // A move in progress: first the lander glides to the chosen point, then the map slides so that point is the center.
     const A = st.anim, mid = (n - 1) / 2, ease = (t) => t * t * (3 - 2 * t);
     const el = A ? performance.now() - A.t0 : 0, glide = A ? ease(Math.min(1, el / GLIDE_MS)) : 0, pan = A ? ease(Math.max(0, Math.min(1, (el - GLIDE_MS - HOLD_MS) / PAN_MS))) : 0;
@@ -126,7 +148,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) {
       const c = st.cells[r * n + k], o = (r * n + k) * 4;
       if (!c) continue;                                    // not scanned yet: see-through
-      const rgb = m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? GO_RGB : NOGO_RGB;
+      const rgb = m.rgb ? (m.rgb(c, span) || NO_DATA) : m.ramp ? rampColor(m.ramp, m.value(c)) : c.ok ? GO_RGB : NOGO_RGB;
       // light hill shading from the neighbors' heights, so ridges and crater walls show through the colors
       const w = H(r, k - 1) ?? c.heightM, e = H(r, k + 1) ?? c.heightM, no = H(r - 1, k) ?? c.heightM, so = H(r + 1, k) ?? c.heightM;
       const shade = Math.max(0.72, Math.min(1.18, 1 + ((w - e) + (no - so)) * inv));
@@ -146,7 +168,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       }
       else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
-    const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
+    const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestNow();
     // a label on a dark plate, kept inside the map
     // big = the best-point label: larger, black on a white plate, so it is the first thing the eye finds on the map
     const tag = (text, x, y, big) => {
@@ -189,17 +211,85 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const sq = st.grid.stepM / 1000, sqTxt = `${+sq.toFixed(2)} KM`;
     $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
     $("scan-legend").classList.toggle("flat", !m.ramp);
-    $("scan-legend").innerHTML = m.ramp
+    $("scan-legend").classList.toggle("lay", !!m.rgb);
+    $("scan-legend").innerHTML = m.lay ? legendHtml(layer(m.lay)) + `<div class="scan-src">${m.lay === "mix" ? "YOUR MIX = " + mixText() + ". CHANGE THE WEIGHTS ON THE MOON MAP SCREEN. " : ""}${layer(m.lay).source}</div>`
+      : m.rgb ? `<div class="lay-legend"><i style="background:linear-gradient(90deg,${[0, 0.25, 0.5, 0.75, 1].map((t) => `rgb(${elevColor(t)})`).join(",")})"></i><div class="ends"><span>◀ ${Math.round(span.lo).toLocaleString("en-US")} M<br>LOWEST HERE</span><span>${Math.round(span.hi).toLocaleString("en-US")} M ▶<br>HIGHEST HERE</span></div></div><div class="scan-src">${layer("elev").source}</div>`
+      : m.ramp
       ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span><div class="ends"><span>◀ ${m.ends[0]}</span><span>${m.ends[1]} ▶</span></div>`
       : `<b style="background:#21e07a"></b> MEETS THE MISSION NEEDS &nbsp; <b style="background:#460e0e"></b> DOES NOT`;
-    const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? "" : "<br>" + c.reason}`;
+    const cellText = (c) => `${c.eastKm >= 0 ? "E" : "W"} ${Math.abs(c.eastKm).toFixed(2)} KM · ${c.northKm >= 0 ? "N" : "S"} ${Math.abs(c.northKm).toFixed(2)} KM<br>${fmt.lat(c.lat)} ${fmt.lon(c.lon)} · ELEV ${Math.round(c.heightM).toLocaleString("en-US")} M${c.slopeDeg == null ? "" : ` · SLOPE ${c.slopeDeg.toFixed(0)}°`}<br>SUN ${Math.round(c.sunPct)}% · EARTH ${Math.round(c.earthPct)}% · <span class="${c.ok ? "ok" : "bad"}">${c.ok ? "GO" : "NO-GO"}</span>${c.ok ? `<br>SUNLIGHT TO SPARE: ${c.marginHours >= 72 ? "3 DAYS OR MORE" : Math.max(0, Math.round(c.marginHours)) + " H"}` : "<br>" + c.reason}`;
     const cur = st.cells[center.r * n + center.k];
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     const far = best && away(best);
-    $("scan-best").innerHTML = !(finished && best) ? "…" : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
+    $("scan-best").innerHTML = !finished ? "…" : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT GOOD TIME</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
+    if (finished && best && st.rank === "mix" && polarOkNow) { const v = cellMix(best); if (v != null) $("scan-best").insertAdjacentHTML("beforeend", `<br><b class="h-do">PICKED BY YOUR MIX</b>: ${Math.round(v)} OF 100 (${mixText()})`); }
     const canMove = finished && best && !(best.r === center.r && best.k === center.k);
     $("scan-go-best").disabled = !canMove;
-    $("scan-hover").innerHTML = st.hover ? `${away(st.hover)[0]} KM FROM WHERE YOU ARE<br>` + cellText(st.hover) + `<br><b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO INSPECT A POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`;
+    // Data profile: every layer at one point (the point under the pointer, else where you are now), each marked good or bad.
+    const pc = st.hover || cur;
+    $("scan-prof-of").textContent = st.hover ? "THE POINT UNDER THE POINTER" : "WHERE YOU ARE NOW";
+    $("scan-hover").innerHTML = !pc ? "…" : (st.hover ? `${away(pc)[0]} KM FROM WHERE YOU ARE · ` : "") + `${fmt.lat(pc.lat)} ${fmt.lon(pc.lon)}` + profileHtml(cellProfile(pc, span, polarOkNow))
+      + (st.hover ? `<b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO READ ANY POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`);
+  }
+
+  // The best point. Usually LUNI's own rule (bestCell). With "pick by your mix" on: among the points that meet the
+  // mission needs, the one with the highest mix score; the shortest move wins a tie.
+  function bestNow() {
+    if (st.rank !== "mix" || !polarOkNow || !polarMeta()) return bestCell(st.cells);
+    let best = null, bs = -1, bd = Infinity;
+    for (const c of st.cells) {
+      if (!c || !c.ok) continue;
+      const s = cellMix(c); if (s == null) continue;
+      const d = Math.hypot(c.eastKm, c.northKm), r = Math.round(s);
+      if (r > bs || (r === bs && d < bd)) { best = c; bs = r; bd = d; }
+    }
+    return best;
+  }
+  // The rows of the data profile card for one scanned point.
+  let polarOkNow = false;
+  function cellProfile(c, span, polarOk) {
+    const row = (label, text, score, share, rgb, note = "") => ({ label, text, score, share: Math.max(0, Math.min(1, share)), rgb: rgb || goodColor(score ?? 0.5), note });
+    const rows = [
+      row("MEETS THE NEEDS", c.ok ? "YES" : "NO", c.ok ? 1 : 0, 1),
+      row("MISSION SUNLIGHT", `${Math.round(c.sunPct)}%`, c.sunPct / 100, c.sunPct / 100),
+      row("MISSION EARTH LINK", `${Math.round(c.earthPct)}%`, c.earthPct / 100, c.earthPct / 100),
+      c.slopeDeg == null ? { label: "SLOPE", text: null, note: "NO DATA" } : row("SLOPE", `${c.slopeDeg.toFixed(1)}°`, 1 - Math.min(1, c.slopeDeg / 20), c.slopeDeg / 20),
+      row("ELEVATION", `${Math.round(c.heightM).toLocaleString("en-US")} M`, null, (c.heightM - span.lo) / Math.max(1, span.hi - span.lo), elevColor((c.heightM - span.lo) / Math.max(1, span.hi - span.lo))),
+    ];
+    if (polarOk && polarMeta()) {
+      const s = polarValue("sun", c.lat, c.lon), e = polarValue("earth", c.lat, c.lon), sh = polarValue("shadow", c.lat, c.lon);
+      rows.push(s == null ? { label: "SUNLIGHT 2023–35", text: null, note: "OUTSIDE 80°S" } : row("SUNLIGHT 2023–35", `${Math.round(s)}%`, s / 100, s / 100),
+                e == null ? { label: "EARTH LINK 2023–35", text: null, note: "OUTSIDE 80°S" } : row("EARTH LINK 2023–35", `${Math.round(e)}%`, e / 100, e / 100),
+                sh == null ? { label: "PERMANENT SHADOW", text: null, note: "OUTSIDE 80°S" } : row("PERMANENT SHADOW", sh ? "YES" : "NO", sh ? 0 : 1, 1, sh ? SHADOW_COLOR : null));
+      const t = polarValue("temp", c.lat, c.lon), mx = cellMix(c), T = layer("temp");
+      if (t != null) rows.push(row("TEMPERATURE, AVERAGE", T.text(t), null, (t - T.lo) / (T.hi - T.lo), T.color(t)));
+      if (mx != null) rows.push(row("YOUR MIX", `${Math.round(mx)} OF 100`, mx / 100, mx / 100));
+    }
+    return rows;
+  }
+  // SHOW buttons, in three groups; the all-years group only where its data exists.
+  function buildMetrics(polarOk) {
+    polarOkNow = polarOk;
+    const box = $("scan-metric"); box.replaceChildren();
+    for (const [title, ids] of GROUPS) {
+      if (METRICS[ids[0]].polar && !polarOk) continue;
+      const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>${title}</span><div class="seg"></div>`;
+      for (const id of ids) {
+        const b = document.createElement("button"); b.textContent = METRICS[id].label; b.dataset.m = id; b.classList.toggle("on", st.metric === id);
+        b.addEventListener("click", () => { st.metric = id; box.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x.dataset.m === id)); draw(); });
+        g.lastChild.appendChild(b);
+      }
+      box.appendChild(g);
+    }
+    if (polarOk) {      // who picks the best point
+      const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>★ BEST POINT IS PICKED BY</span><div class="seg"></div>`;
+      for (const [id, label] of [["luni", "SUNLIGHT TO SPARE"], ["mix", "YOUR MIX"]]) {
+        const b = document.createElement("button"); b.textContent = label; b.classList.toggle("on", (st.rank || "luni") === id);
+        b.addEventListener("click", () => { st.rank = id; [...g.lastChild.children].forEach((x) => x.classList.toggle("on", x === b)); draw(); });
+        g.lastChild.appendChild(b);
+      }
+      box.appendChild(g);
+    }
   }
 
   const cellAt = (e) => {
@@ -211,11 +301,10 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   canvas.addEventListener("pointermove", (e) => { const c = cellAt(e); if (c !== st.hover) { st.hover = c; schedule(); } });
   canvas.addEventListener("pointerleave", () => { st.hover = null; schedule(); });
   canvas.addEventListener("click", (e) => { const c = cellAt(e); if (c) pick(c); });
-  $("scan-go-best").addEventListener("click", () => { const b = bestCell(st.cells); if (b) pick(b); });
+  $("scan-go-best").addEventListener("click", () => { const b = bestNow(); if (b) pick(b); });
   $("scan-close").addEventListener("click", () => toggle(false));
   $("scan-big").addEventListener("click", () => setBig(!panel.classList.contains("big")));
   try { if (localStorage.getItem("luno-scan-big")) setBig(true); } catch {}
-  buildSeg($("scan-metric"), Object.entries(METRICS).map(([k, v]) => [k, v.label]), () => st.metric, (v) => { st.metric = v; draw(); });
   new ResizeObserver(() => schedule()).observe(canvas.parentElement);
 
   // Moving the site from the scan: stay here, show the lander travel to the point, slide the map so the new site is
@@ -242,5 +331,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
-  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); } };
+  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
+           // From the MOON MAP: show the scan colored by the mix, with the best point picked by the mix.
+           useMix() { st.metric = "mix"; st.rank = "mix"; if (panel.hidden) toggle(true); else start(); } };
 }

@@ -777,7 +777,7 @@ function showScreen(name) {
   $("globe-big").textContent = name === "moon" ? "⤡ SMALL MOON" : "⤢ MOON MAP"; $("globe-big").classList.toggle("on", name === "moon");
 }
 
-// The lower chart shows one thing at a time: the MISSION PLAN (30 days after landing, with the slider) or GOOD DAYS
+// The lower chart shows one thing at a time: the MISSION PLAN (30 days after landing, with the slider) or MISSION WINDOWS
 // (the 12-month landing-day strip). The room this saves goes to the skyline picture.
 function showPlan(which) {
   const plan = which !== "days";

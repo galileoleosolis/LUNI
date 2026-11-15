@@ -264,7 +264,7 @@ function showIntro() {
     T = { phase: "tasks", started: Date.now(), task: 0, taskStart: 0, events: [], results: [], review: null };
     closeOverlay(); showTask();
   });
-  o.querySelector("#test-skip").addEventListener("click", () => { try { sessionStorage.setItem(KEY + "-skip", "1"); } catch {} closeOverlay(); });
+  o.querySelector("#test-skip").addEventListener("click", () => { try { sessionStorage.setItem(KEY + "-skip", "1"); } catch {} closeOverlay(); api.onExplore?.(); });
 }
 
 function showTask() {
@@ -389,8 +389,8 @@ function showReport() {
 }
 
 export function initTestMode(hooks) {
-  const wanted = /^#test(-[ab])?$/.test(location.hash) || globalThis.LUNO_TEST;
-  if (!wanted) return;
+  const wanted = /^#test(-[abc])?$/.test(location.hash) || globalThis.LUNO_TEST;
+  if (!wanted) return false;
   api = hooks;
   wireTracking();
   new ResizeObserver(() => api.relayout()).observe($("test-bar"));
@@ -398,5 +398,6 @@ export function initTestMode(hooks) {
   if (saved && saved.phase === "tasks" && saved.task < TASKS.length) { T = saved; showTask(); log("resumed", "page was reloaded"); }
   else if (saved && saved.phase === "review") { T = saved; showReview(); }
   else if (saved && saved.phase === "done") { T = saved; showReport(); }
-  else { let skip = false; try { skip = sessionStorage.getItem(KEY + "-skip") === "1" && location.hash !== "#test"; } catch {} if (!skip) showIntro(); }
+  else { let skip = false; try { skip = sessionStorage.getItem(KEY + "-skip") === "1" && location.hash !== "#test"; } catch {} if (skip) return false; showIntro(); }
+  return true;      // a test is on screen: the app holds back its own first-visit guide
 }

@@ -71,6 +71,23 @@ expect("move to the best point", [["take_option", { best_point: true }]]);
 expect("option two", [["take_option", { number: 2 }]]);
 expect("do the first one", [["take_option", { number: 1 }]]);
 expect("pin this", [["pin", {}]]);
+expect("show me the proof", [["open_view", { view: "proof" }]]);
+expect("open mission history", [["open_view", { view: "history" }]]);
+expect("show the sunlight layer", [["open_view", { view: "moon", layer: "sun" }]]);
+expect("slope map", [["open_view", { view: "moon", layer: "slope" }]]);
+expect("show the temperature map", [["open_view", { view: "moon", layer: "temp" }]]);
+expect("combined layer", [["open_view", { view: "moon", layer: "mix" }]]);
+expect("open the moon map", [["open_view", { view: "moon" }]]);
+expect("where is the sun", [rep("sun")]);
+expect("show past missions", [["open_view", { view: "history" }]]);
+expect("go to slim", [site("slim")]);
+expect("how accurate is this", [["open_view", { view: "proof" }]]);
+expect("copy a link to this", [["share_link", {}]]);
+expect("slope at most 10 degrees", [need("maxSlopeDeg", 10)]);
+expect("the lander can take a 15 degree slope", [need("maxSlopeDeg", 15)]);
+expect("any slope", [need("maxSlopeDeg", 0)]);
+expect("go to blue ghost", [site("bg1")]);
+expect("how is this different from earth", [rep("versus")]);
 // several things in one sentence
 expect("go to Shackleton and land on 3 March 2027 with a 14 day mission", [site("shackleton"), need("days", 14), ["set_landing_time", { day: 3, month: 3, year: 2027 }]]);
 // questions
@@ -95,7 +112,7 @@ const fake = {
   verdict: { ok: false, earthPct: 40, sunHeldHours: 50, marginHours: -190, marginOpen: false },
 };
 const api = {
-  sites: () => sites, needOptions: () => ({ days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48], earthMinPct: [0, 25, 50, 75] }),
+  sites: () => sites, needOptions: () => ({ days: [3, 7, 10, 14, 28], maxDarkH: [0, 12, 24, 48], earthMinPct: [0, 25, 50, 75], maxSlopeDeg: [0, 5, 10, 15] }),
   snapshot: () => ({
     site: fake.site, siteName: fake.site.name.replace(/ · /g, ", "), t0: fake.t0, idx: fake.idx, maxIdx: 719, req: fake.req,
     landing: { sunUp: true, earthUp: false }, cur: { t: new Date(+fake.t0 + fake.idx * 3600000), sunUp: true, sunFrac: 0.62, sunTerrain: 0.62, eclipse: 0, sunEl: 2.3, sunAz: 81.9, earthUp: false, earthEl: -1.2, earthAz: 327.8 },
@@ -130,6 +147,12 @@ r = A.handle("day 3");
 check("clock moved", fake.idx === 72 && /3 days after landing/.test(r.reply), r.reply);
 r = A.handle("site 99");
 check("unknown site number", /no such site/.test(r.reply), r.reply);
+r = A.handle("slope at most 9 degrees");
+check("slope need snaps and is said", fake.req.maxSlopeDeg === 10 && /closest is 10\. Steepest ground accepted: 10°\./.test(r.reply), r.reply);
+fake.verdict = { ok: false, earthPct: 100, sunHeldHours: 400, marginHours: 160, marginOpen: false, steep: true };
+r = A.handle("why");
+check("steep ground is a reason", /the ground slopes 4\.2° and the limit is 10°/.test(r.reply), r.reply);
+fake.verdict = { ok: false, earthPct: 40, sunHeldHours: 50, marginHours: -190, marginOpen: false };
 r = A.handle("xyzzy");
 check("not understood is said plainly", r.ok === false && /did not find a command/.test(r.reply), r.reply);
 fake.verdict = { ok: true, earthPct: 100, sunHeldHours: 373, marginHours: 133, marginOpen: false };
