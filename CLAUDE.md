@@ -362,6 +362,19 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
       is computed from NASA data; the rule is the user's needs"; the better-spot wording; the three new features.
   No change, by the user's word: a GO being the team's rule, IM-2 opening as GO, the finder offering a move from a GO
   site, phones.
+- **Judge runs on the afternoon batch** (Sun 15 Nov about 3:45 PM New York; same brief, three models, Presentation
+  fixed at 4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5): the same as before the batch.
+  Two of the three never opened ENERGY, the solar panels or the before-and-after box. Fixed afterwards, on the
+  pre-release: the comparison box now measures "sunlight to spare" over the same span as the verdict (`planSpan`,
+  `planStats(..., spanHours)`; it said OVER 3D 12H where the strip said 67D 07H); a hidden Sun or Earth above level
+  says BEHIND THE GROUND: THE SKYLINE THERE IS n° HIGH; the PROOF tile gives 99.1% south and 98.9% north; no more
+  "for up to 0 hours"; ASK LUNI answers "what is the temperature here" and says a year's first window is the first
+  one, not the best. Judges' points NOT acted on (the user's calls): the folded left side hides the site list on
+  first load (judge A's top weakness); the default Earth-link need (AT LANDING) lets a mission with 3% Earth link be
+  a GO (Shackleton, 14 Mar 2025 09:00); the finder's reduced map can call a GO site's neighbors NO-GO (Malapert,
+  14 Jan 2027, 14 days); the side-by-side box covers the ASK LUNI reply; density; no outside users.
+  The slide deck was updated for the batch (new screenshots; slide 3 shows ENERGY, slide 4 the finder with solar
+  panels and the before-and-after box).
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map

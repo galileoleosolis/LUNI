@@ -20,6 +20,7 @@ import { createHistoryPanel } from "./ui-history.js";
 import { createMoonMap } from "./ui-moonmap.js";
 import { loadDsn, dsnAt } from "./dsn.js";
 import { initSources, showData } from "./sources.js";
+import { polarValue, loadPolar } from "./layers.js";
 import { createEnergyPanel, watts, kwh } from "./ui-energy.js";
 import { showCompare, compareWanted, compareOpen, closeCompare } from "./ui-compare.js";
 
@@ -351,7 +352,7 @@ function renderMission() {
   });
   // Warnings sit to the right of the verdict, in their own box (the user: "to the right and not underneath").
   $("mission-warn").innerHTML = hit.map((e) =>
-    `<div class="warn"><b>⚠ ECLIPSE ON ${dayStamp(e.peak)}</b><span>EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</span></div>`).join("");
+    `<div class="warn"><b>⚠ ECLIPSE ON ${dayStamp(e.peak)}</b><span>EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR ${(e.end - e.start) < 5400000 ? "ABOUT AN HOUR OR LESS" : "UP TO " + Math.round((e.end - e.start) / 3600000) + " HOURS"}</span></div>`).join("");
   $("mission-warn").hidden = !hit.length;
   state.mission = { v, next: nx ? nx.start : null, fixes, eclipses: hit };      // kept for the command assistant
   // the same answer, short, for the BIG MOON view (which covers the verdict block)
@@ -388,6 +389,8 @@ function nextWindow() {
 // original plan next to the new one and shows what was gained (the user asked for this after the judges said the
 // comparison was hidden). Not during a test or the tutorial, and not when the user has switched it off.
 let quietCompare = false, pendingCompare = null, energy = null;
+// The verdict looks for sunlight as far as the landing-day strip's data runs; the comparison box must look as far.
+const planSpan = (t0) => { const c = state.cal; return c ? (+c.start + c.samples.length * STEP_HOURS * 3600000 - +t0) / 3600000 : 0; };
 function offerCompare(before, kind) {
   if (!compareWanted() || quietCompare || globalThis.LUNO_NO_COMPARE || document.querySelector(".tour-card")) return;
   const date = kind === "date", where = (site) => `${siteName(site)}<small>${fmtLat(site.lat)} ${fmtLon(site.lon)}</small>`;
@@ -396,7 +399,7 @@ function offerCompare(before, kind) {
     lead: date ? `${siteName(state.site)} · THE SAME SITE AT A NEW LANDING TIME · ${state.req.days}-DAY MISSION` : `LANDING ${stamp(state.t0)} · THE SAME TIME AT A NEW SITE · ${state.req.days}-DAY MISSION`,
     a: { label: date ? stamp(before.t0) : where(before.site), site: before.site, t0: before.t0, terrain: terrainFor(before.site) },
     b: { label: date ? stamp(state.t0) : where(state.site), site: state.site, t0: state.t0, terrain: state.scenario.terrain },
-    req: state.req,
+    req: state.req, span: planSpan,
     buttons: [["KEEP THE NEW PLAN ▸", null, true], ["◂ GO BACK TO THE ORIGINAL", () => { if (before.site !== state.site) selectSite(before.site); setT0(before.t0); }]],
   });
 }
@@ -914,11 +917,12 @@ const assistantApi = {
   pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
   takeOption: (i) => state.mission.fixes[i]?.[2](),
   moveToExtreme: (what, which) => { showScreen("main"); return scan.extreme(what, which); },
+  siteTempK: () => { const v = polarValue("temp", state.site.lat, state.site.lon); if (v == null) loadPolar().catch(() => {}); return v; },
   placePanels: (radiusKm, count) => { showScreen("main"); return scan.panels(radiusKm, count); },
   // two listed sites side by side at the landing time on screen
   compareSites: (A, B) => { showScreen("main"); const name = (x) => `${siteName(x)}<small>${fmtLat(x.lat)} ${fmtLon(x.lon)}</small>`;
     return showCompare({ title: "TWO SITES SIDE BY SIDE", lead: `LANDING ${stamp(state.t0)} · ${state.req.days}-DAY MISSION · YOUR MISSION NEEDS`, heads: ["SITE A", "SITE B"], gainHead: "B AGAINST A",
-      a: { label: name(A), site: A, t0: state.t0, terrain: terrainFor(A) }, b: { label: name(B), site: B, t0: state.t0, terrain: terrainFor(B) }, req: state.req,
+      a: { label: name(A), site: A, t0: state.t0, terrain: terrainFor(A) }, b: { label: name(B), site: B, t0: state.t0, terrain: terrainFor(B) }, req: state.req, span: planSpan,
       buttons: [[`GO TO ${siteName(A)}`, () => selectSite(A)], [`GO TO ${siteName(B)}`, () => selectSite(B)], ["CLOSE", null, true]] }); },
   energyText: () => { const b = energy.budget(), r = state.req; if (!energy.isOpen()) energy.toggle(true);
     return `With the panel and power use set under ENERGY, the panel gives ${watts(b.peakW)} in full Sun. Over the ${r.days}-day mission it collects ${kwh(b.inWh)} and the lander uses ${kwh(b.usedWh)}. ` +
@@ -1122,6 +1126,7 @@ async function init() {
     fmt: { site: siteName, stamp },
   });
   $("surface-btn").addEventListener("click", () => { surface.toggle(true); showData("surface"); });
+  $("talk-btn").addEventListener("click", () => loadPolar().catch(() => {}), { once: true });      // so ASK LUNI can answer "what is the temperature here" at once
   buildNeeds();
   // OpenSpace link: off until asked for; not offered on the preview page, which cannot reach programs on this computer.
   if (globalThis.LUNO_B64) $("os-box").hidden = true;

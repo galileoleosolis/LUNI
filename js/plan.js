@@ -34,8 +34,10 @@ export function energyBudget(samples, missionHours, e) {
 }
 
 // The numbers for one plan. terrain: the site's skyline (its own detailed one for a listed site).
-export function planStats(site, t0, req, terrain = terrainFor(site), energy = DEFAULT_ENERGY) {
-  const hours = (req.days + 3) * 24 + req.maxDarkH;
+//   spanHours: how far ahead to look when measuring "sunlight to spare". Pass the same span the main verdict uses,
+//   or the two will give different answers for the same plan.
+export function planStats(site, t0, req, terrain = terrainFor(site), energy = DEFAULT_ENERGY, spanHours = 0) {
+  const hours = Math.max((req.days + 3) * 24 + req.maxDarkH, Math.round(spanHours));
   const samples = sampleSite(site, t0, hours, terrain);
   const a = analyze(samples, req, 1, terrain), v = a.at(0), M = a.missionSteps;
   let sunH = 0, earthH = 0, dark = 0, longestDark = 0;

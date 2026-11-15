@@ -253,6 +253,7 @@ export function parse(text, sites = []) {
   else if (q(/\b(?:compared? (?:with|to)|different from|differ from|versus|vs|than|like) (?:on )?(?:the )?earth\b|\bon earth\b|\bwhy is the moon (?:so )?hard\b|\bcompare\b[a-z ]{0,14}\b(?:with|to|and|against)\b[a-z ]{0,6}\bearth\b/)) call("report", { topic: "versus" });
   else if (q(/\bwhy\b[a-z ]{0,40}\b(?:south pole|north pole|poles?|polar)\b|\b(?:south pole|poles?|polar)\b[a-z ]{0,30}\b(?:hard|difficult|tough|tricky|special|dangerous)\b/)) call("report", { topic: "pole" });
   else if (q(/\benergy\b|\bpower budget\b|\bbatter(?:y|ies)\b|\bkilowatts?\b|\bkwh\b|\bwatts?\b|\bhow much power\b|\bsolar panels?\b/)) call("report", { topic: "energy" });
+  else if (q(/\btemperatures?\b|\bhow (?:cold|hot|warm)\b|\bcold\b|\bfreezing\b/)) call("report", { topic: "temp" });
   else if (q(/\beclipse/)) call("report", { topic: "eclipse" });
   else if (q(/\bhow (?:do|can|could|would) (?:i|we) (?:get|make|fix|turn)\b|\bwhat (?:can|could|should) (?:i|we) (?:do|change|try)\b|\bways\b|\bfix (?:it|this)\b|\boptions\b|\bsuggest/)) call("report", { topic: "options" });
   else if (q(/\b(?:why|how come|explain)\b/) && t.trim().split(/\s+/).length > 3 && !q(/\b(?:no go|nogo|go|verdict|red|wrong|problem|fail(?:s|ed|ing)?|not|can t|cannot|this|here|it|landing|window|site)\b/)) call("report", { topic: "cant" });      // a general question LUNI has no numbers for
@@ -294,14 +295,14 @@ export function createAssistant(api) {
       out = `NO-GO for a ${r.days}-day mission: ${why.join(", and ")}. ` + (s.next ? `Next good landing time: ${stamp(s.next)}.` : v.steep ? "The slope is the same on every date, so only another spot or a higher slope limit helps." : "No good landing time in the next 12 months.");
       if (s.options.length) out += ` Say OPTIONS to hear ways to get a GO.`;
     }
-    for (const e of s.eclipses) out += ` Warning: eclipse on ${day(e.peak)}, Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`;
+    for (const e of s.eclipses) out += ` Warning: eclipse on ${day(e.peak)}, Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for ${(e.end - e.start) < 5400000 ? "about an hour or less" : "up to " + plural(Math.round((e.end - e.start) / 3600000), "hour")}.`;
     return out;
   }
   const momentHead = (s) => (s.idx ? `${dur(s.idx)} after landing (${stamp(s.cur.t)})` : `At landing (${stamp(s.cur.t)})`);
   function sunText(s = snap(), head = true) {
     const c = s.cur, where = `height ${deg(c.sunEl)}, direction ${Math.round(c.sunAz)}° (${compass(c.sunAz)})`;
     const frac = Math.round(c.sunFrac * 100);
-    let out = (head ? `${momentHead(s)}: ` : "") + (c.sunUp ? `the Sun is up${frac < 100 ? `, ${frac}% of its disc usable` : ""}, ${where}.` : `no usable Sun${frac > 0 ? ` (only ${frac}% of its disc)` : ""}, ${where}.`);
+    let out = (head ? `${momentHead(s)}: ` : "") + (c.sunUp ? `the Sun is up${frac < 100 ? `, ${frac}% of its disc usable` : ""}, ${where}${c.sunEl < 0 ? " (below level, but the skyline in that direction dips lower)" : ""}.` : `no usable Sun${frac > 0 ? ` (only ${frac}% of its disc)` : ""}, ${where}.`);
     if (c.eclipse > 0.01 && c.sunTerrain > 0) out += ` Eclipse: Earth hides ${Math.round(c.eclipse * 100)}% of the Sun.`;
     if (s.sunLeft == null) out += c.sunUp ? " It stays up for the rest of the 30 days shown." : " It stays down for the rest of the 30 days shown.";
     else out += ` ${c.sunUp ? (s.sunNextIsEclipse ? "An eclipse cuts the sunlight" : "Sunset") : "Sunrise"} in ${dur(s.sunLeft)}, on ${stamp(new Date(+c.t + s.sunLeft * 3600000))}.`;
@@ -379,7 +380,7 @@ export function createAssistant(api) {
         if (input.from_here && s.verdict.ok) return { say: `${stamp(s.t0)} is already inside a landing window.` };
         if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Change a mission need or try another site." };
         api.setT0(s.next);
-        return { say: `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
+        return { say: input.from_here ? `The first landing window from there opens ${stamp(s.next)}. That is the first one, not a ranking of the whole period: the MISSION WINDOWS strip shows every good day.` : `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
       }
       case "set_mission_need": {
         const k = input.need, opts = api.needOptions();
@@ -446,9 +447,10 @@ export function createAssistant(api) {
         return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO, joke: () => JOKES[jokeAt++ % JOKES.length],
           versus: () => { const v = api.versus(); return `${s.siteName} next to a place on Earth's equator. ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
-          eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
+          eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for ${(e.end - e.start) < 5400000 ? "about an hour or less" : "up to " + plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
           pole: () => { const v = api.versus(); return "Near a pole the Sun never climbs far above the horizon, so one hill can hide it, and the same hills can hide the Earth. Sunlight and the Earth link then depend on the exact spot and the exact day. " + `${s.siteName} next to a place on Earth's equator: ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           energy: () => api.energyText(),
+          temp: () => { const k = api.siteTempK(); return k == null ? "The temperature layer is still loading. Ask again in a moment, or open the MOON MAP and pick TEMPERATURE." : `The ground at ${s.siteName} averages ${Math.round(k - 273.15)} °C (${Math.round(k)} kelvin) over the lunar day and night, measured by NASA's LRO Diviner. The MOON MAP shows it as a layer.`; },
           cant: () => "I cannot answer a general question like that. I answer from LUNI's own numbers: ask about this site's Sun, Earth link, eclipses, energy or the verdict, or say HELP for examples.",
           time: () => `Landing time ${stamp(s.t0)}. The mission clock shows ${s.idx ? dur(s.idx) + " after landing, " + stamp(s.cur.t) : "the landing time"}.` }[input.topic]?.(s) ?? HELP };
       default: return { say: `There is no tool called ${tool}.` };
