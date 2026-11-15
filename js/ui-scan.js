@@ -88,7 +88,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (!polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
     if (METRICS[st.metric].capsOnly && Math.abs(c.site.lat) < 79.5) st.metric = "needs";
     buildMetrics(polarOk, Math.abs(c.site.lat) >= 79.5);
-    $("scan-title").innerHTML = `<b class="h-t">BEST SITE FINDER</b> · AROUND <span id="scan-of"></span> · LANDING ${fmt.stamp(c.t0)}`; $("scan-of").textContent = fmt.site(c.site);
+    $("scan-title").innerHTML = `<b class="scan-name">BEST SITE FINDER</b>`;
     const res = mapResFor(c.site.lat);
     // Slope depends on the distance it is measured over: the scan's map is coarser than a listed site's own map.
     const slopeNote = () => { const t = c.terrain; return `SLOPES IN THE SCAN ARE MEASURED OVER ${fmtStep(2 * res)}${t?.real && !t.reduced && t.slopeBaseM < 2 * res ? `; THIS SITE'S OWN FIGURE, ${t.slopeDeg.toFixed(1)}° OVER ${fmtStep(t.slopeBaseM)}, COMES FROM A FINER MAP` : ""}. `; };
@@ -126,7 +126,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (panel.hidden || !st.grid) return;
     const n = st.grid.n, box = canvas.parentElement;
     const size = Math.max(160, Math.floor(Math.min(box.clientWidth, box.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.style.width = canvas.style.height = size + "px";
+    canvas.style.width = canvas.style.height = size + "px"; $("scan-go-best").style.width = size + "px";
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
@@ -226,6 +226,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (finished && best && st.rank === "mix" && polarOkNow) { const v = cellMix(best); if (v != null) $("scan-best").insertAdjacentHTML("beforeend", `<br><b class="h-do">PICKED BY YOUR MIX</b>: ${Math.round(v)} OF 100 (${mixText()})`); }
     const canMove = finished && best && !(best.r === center.r && best.k === center.k);
     $("scan-go-best").disabled = !canMove;
+    $("scan-go-best").textContent = !finished ? "SCANNING…" : canMove ? "MOVE MY SITE TO THE BEST SPOT ▸" : best ? "YOU ARE AT THE BEST SPOT" : "NO SPOT HERE MEETS THE NEEDS";
     // Data profile: every layer at one point (the point under the pointer, else where you are now), each marked good or bad.
     const pc = st.hover || cur;
     $("scan-prof-of").textContent = st.hover ? "THE POINT UNDER THE POINTER" : "WHERE YOU ARE NOW";

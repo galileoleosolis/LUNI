@@ -92,7 +92,7 @@
           <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">BEST SITE FINDER ▸</button>
         </div>
-        <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT LANDING WINDOW ▸</button></h3>
+        <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · DATE</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT LANDING WINDOW ▸</button></h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
           <select id="t0-month" aria-label="Month"></select>
@@ -114,17 +114,16 @@
       <!-- CENTER: the answer -->
       <section class="col col-main">
         <div id="scan" class="scan" hidden>
-          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-big" title="Use the whole screen for the map">⤢ BIG MAP</button><button id="scan-close" title="Close (Esc)">✕ CLOSE</button></span></div>
+          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-big" title="Use the whole screen for the map">⤢ BIG MAP</button><button id="scan-close" class="scan-home" title="Close the Best Site Finder (Esc)">◂ BACK TO THE MAIN SCREEN</button></span></div>
           <div class="scan-body">
-            <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
+            <div class="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div><small>HOW FAR OUT TO LOOK</small></div>
+            <div class="scan-map"><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
               <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
               <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button>
               <div id="scan-progress"></div>
               <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
               <div id="scan-legend" class="scan-legend"></div>
-              <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
               <details id="scan-more" class="scan-more">
                 <summary><b class="h-t">MORE MAP CHOICES</b> · <b class="h-do">CLICK TO OPEN</b></summary>
                 <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>

@@ -200,7 +200,7 @@ const SET_E = [
     expected: () => { const t0 = new Date(E_BG.t0 + ":00Z"); return day(siteEclipses(site(E_BG.site), t0, new Date(+t0 + 14 * 86400000), terrainFor(site(E_BG.site)))[0].peak); },
     check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
   { id: "e-next", short: "Next good landing date at Nobile Rim 1",
-    text: "New situation: choose the landing site NOBILE RIM 1, set the landing time to 14 November 2026, 20:00 UTC, and set MISSION LENGTH to 10. It is a NO-GO. Question: on what date is the next good landing time?",
+    text: "New situation: choose the landing site NOBILE RIM 1, set the landing time to 14 November 2026, 20:00 UTC, and set MISSION LENGTH to 10. It is a NO-GO. Question: on what date does the next landing window open?",
     reach: { label: "ended with a GO at Nobile Rim 1 on screen", test: (s) => s.site.id === E_NOB.site && s.missionOk },
     type: "date",
     expected: () => day(mission(E_NOB.site, E_NOB.t0 + ":00Z").next.start),
