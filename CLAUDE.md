@@ -200,8 +200,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
-- The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they
-  say "release it"; the time of the local judging is not known yet (asked, not answered).
+- **r4 released** on the user's "Release it, that was great" (Sun 15 Nov, 9:05 AM New York = 14:05 UTC; main 3093d3b):
+  the public site now has everything in this list. Later changes go to the pre-release and need a new "release it".
+  The time of the local judging is still not known (asked, not answered).
 - **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
   event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
   ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
@@ -313,7 +314,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4) is the current public version.
+   main 9f099f4). **r4 (15 Nov, 14:05 UTC, main 3093d3b) is the current public version.** To roll back to r3:
+   `tools/release.sh promote 9f099f4`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
