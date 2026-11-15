@@ -820,3 +820,17 @@ html.flow .scan-map { height: auto; } html.flow .scan-canvas-box { height: min(9
 html:not(.flow) .answer-side .ro-a .mini { white-space: normal; }
 html:not(.flow) .answer-row .hero-text { flex: 1 1 430px; }
 html:not(.flow) .answer-row .hero-fix { flex: 0 1 auto; border-top: none; padding: 0; }      /* beside the reason when there is room, else on its own line */
+/* Best Site Finder: the map choices are a second stack, right of the map; a line sets off the scrolling panel */
+.scan-body, .scan.big .scan-body { grid-template-columns: 78px minmax(0, 1fr) 150px 250px; gap: 12px; } .scan.big .scan-body { grid-template-columns: 78px minmax(0, 1fr) 150px 290px; }
+.scan-shows { display: flex; flex-direction: column; gap: 6px; align-self: center; min-width: 0; } .scan-shows > b, .scan-sizes > b { font-family: var(--cond); font-size: 15px; letter-spacing: .08em; color: var(--hi); text-align: center; }
+.scan-shows .scan-metric { display: flex; flex-direction: column; gap: 9px; } .scan-shows .scan-mgroup { display: flex; flex-direction: column; gap: 4px; }
+.scan-shows button, .scan-sizes .seg button { width: 100%; padding: 7px 2px; font-family: var(--cond); font-size: 16.5px; font-weight: 700; letter-spacing: .03em; line-height: 1.1; white-space: nowrap; cursor: pointer; color: var(--amb); background: #000; border: 1px solid var(--dim); }
+.scan-shows button:hover, .scan-sizes .seg button:hover { background: var(--faint); } .scan-shows button.on { background: var(--hi); border-color: var(--hi); color: #00101f; }
+.scan-side { border-left: 2px solid var(--dim); padding-left: 12px; }
+.scan-rank { margin-top: 10px; } .scan-rank > span { display: block; font-size: 12.5px; color: var(--dim); margin-bottom: 3px; } .scan-rank .seg { display: flex; } .scan-rank .seg button { flex: 1; }
+html.flow .scan-shows .scan-metric, html.flow .scan-shows .scan-mgroup { flex-direction: row; flex-wrap: wrap; } html.flow .scan-shows button { width: auto; padding: 6px 10px; } html.flow .scan-shows { margin-bottom: 10px; } html.flow .scan-side { border-left: none; padding-left: 0; }
+/* bottom keys: one line of the same lettering on each (it may break into two lines on narrow keys); ASK LUNI in the middle */
+.key { white-space: normal; line-height: 1.08; padding: 0 6px; font-size: 21px; letter-spacing: .05em; } .tight .key { font-size: 19px; }
+.key.g, .key.y, .key.c { flex: 1.25; } #play-btn { flex: 1.25; }
+html.simple:not(.flow) #play-btn { order: 1; } html.simple:not(.flow) #next-window-btn { order: 2; } html.simple:not(.flow) #talk-btn { order: 3; } html.simple:not(.flow) #scan-btn { order: 4; } html.simple:not(.flow) #tools-btn { order: 5; }
+html.flow .key { font-size: 16px; }

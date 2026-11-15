@@ -357,7 +357,7 @@ function openNeeds(open) {
 // SIMPLE VIEW (the default): the few keys and needs most people use. ALL TOOLS: everything. Kept under "luno-view".
 function setTools(all, keep = true) {
   document.documentElement.classList.toggle("simple", !all);
-  $("tools-btn").innerHTML = all ? "<small>BACK TO</small>SIMPLE" : "<small>SHOW</small>ALL TOOLS";
+  $("tools-btn").innerHTML = all ? "SIMPLE VIEW" : "ALL TOOLS";
   if (keep) try { localStorage.setItem("luno-view", all ? "all" : "simple"); } catch {}
   requestAnimationFrame(relayout);
 }
@@ -391,7 +391,7 @@ function togglePlay(on = !state.playing) {
   if (on === !!state.playing) return;
   if (state.playing) {
     clearInterval(state.playing); state.playing = null;
-    $("play-label").textContent = "▶ PLAY"; btn.classList.remove("on");
+    $("play-label").textContent = "▶ PLAY ORBITAL DATA"; btn.classList.remove("on");
     return;
   }
   $("play-label").textContent = "❚❚ PAUSE"; btn.classList.add("on");

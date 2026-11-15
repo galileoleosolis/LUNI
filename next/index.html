@@ -118,16 +118,14 @@
           <div class="scan-body">
             <div class="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div><small>HOW FAR OUT TO LOOK</small></div>
             <div class="scan-map"><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
+            <div class="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric"></div></div>
             <div class="scan-side">
               <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
               <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
               <div id="scan-progress"></div>
               <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
               <div id="scan-legend" class="scan-legend"></div>
-              <details id="scan-more" class="scan-more">
-                <summary><b class="h-t">MORE MAP CHOICES</b> · <b class="h-do">CLICK TO OPEN</b></summary>
-                <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>
-              </details>
+              <div id="scan-rank" class="scan-rank"></div>
               <h3 class="band" data-band="2"><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
               <div id="scan-engine" class="dimtxt"></div>
               <div id="scan-scale" class="dimtxt"></div>
@@ -261,14 +259,14 @@
   <div class="keys">
     <button class="key" data-slip="-7"><small>LAUNCH SLIP</small>◀◀ 7 D</button>
     <button class="key" data-slip="-1"><small>LAUNCH SLIP</small>◀ 1 D</button>
-    <button class="key" id="play-btn"><small>MISSION CLOCK</small><span id="play-label">▶ PLAY</span></button>
+    <button class="key" id="play-btn" title="Runs the mission clock forward: the Sun and Earth move across the sky (Space)"><span id="play-label">▶ PLAY ORBITAL DATA</span></button>
     <button class="key" data-slip="1"><small>LAUNCH SLIP</small>1 D ▶</button>
     <button class="key" data-slip="7"><small>LAUNCH SLIP</small>7 D ▶▶</button>
-    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key."><small>TALK OR TYPE</small>ASK LUNI</button>
-    <button class="key g" id="next-window-btn"><small>NEXT LANDING</small>WINDOW</button>
-    <button class="key g" id="scan-btn" title="Opens and closes the Best Site Finder: a scan of the ground around this site (A)"><small>BEST SITE</small>FINDER</button>
-    <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
-    <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
+    <button class="key c" id="talk-btn" title="Talk to LUNI, the Lunar Utility Navigational Intelligence (T). Type instead with the / key.">ASK LUNI</button>
+    <button class="key g" id="next-window-btn">NEXT LANDING WINDOW</button>
+    <button class="key g" id="scan-btn" title="Opens and closes the Best Site Finder: a scan of the ground around this site (A)">BEST SITE FINDER</button>
+    <button class="key y" id="next-site-btn">NEXT SITE</button>
+    <button class="key" id="pin-btn">PIN TO COMPARE</button>
     <button class="key" id="tools-btn" title="SIMPLE VIEW shows the few keys and mission needs most people use. ALL TOOLS shows everything."></button>
   </div>
 </div>
