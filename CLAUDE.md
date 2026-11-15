@@ -408,6 +408,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   no likeness of anyone under 18; English; public links with no login.
   Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
   Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
+- **r8 released** on the user's "release it" (Sun 15 Nov, 6:33 PM New York = 23:33 UTC; main 9bbecc4). The full set
+  ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes. The public site now has the name with
+  "for", the 25% Earth-link default and the whole design system batch below. Nothing newer is waiting. To roll back
+  to r7: `tools/release.sh promote b12dd78`. **Local judging result: the team won BEST USE OF DATA** (the user: the
+  judges "were really impressed with the whole thing"). Not yet done: `docs/version-history.html` has no r8 picture.
 - **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
   Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
   "for comparison". The design system is a private Claude artifact, "LUNI Console"
@@ -566,8 +571,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). **r7 (15 Nov, 18:40 UTC, main b12dd78) is the current public version.**
-   To roll back to r6: `tools/release.sh promote 8c8cb9c`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). r7 (15 Nov, 18:40 UTC, main b12dd78). **r8 (15 Nov, 23:33 UTC, main 9bbecc4) is the current public version.**
+   To roll back to r7: `tools/release.sh promote b12dd78`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
