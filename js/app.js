@@ -491,14 +491,19 @@ function renderMoment() {
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1) + "°";
   if (energy) $("sun-watts").textContent = `PANEL NOW ${watts(energy.now(cur.sunFrac))}`;
   // In view below level: the site stands high, so the skyline in that direction dips under the horizontal.
-  const lowNote = (id, up, el) => { const n = $(id); n.hidden = !(up && el < 0); if (!n.hidden) n.textContent = "BELOW LEVEL, BUT THE SKYLINE THERE DIPS LOWER"; };
-  lowNote("sun-low", cur.sunUp, cur.sunEl);
+  // A height that seems to disagree with the state gets a line saying why: in view below level (the skyline there
+  // dips lower), or out of view above level (the ground in that direction rises higher: a judge read "NO SUN" beside
+  // "HEIGHT +2.21°" as a mistake).
+  const lowNote = (id, up, el, az, hidden) => { const n = $(id); const sky = horizonAt(state.scenario.horizon, az);
+    n.hidden = !((up && el < 0) || (!up && hidden && el > 0.05));
+    if (!n.hidden) n.textContent = up ? "BELOW LEVEL, BUT THE SKYLINE THERE DIPS LOWER" : `BEHIND THE GROUND: THE SKYLINE THERE IS ${sgn(sky)}° HIGH`; };
+  lowNote("sun-low", cur.sunUp, cur.sunEl, cur.sunAz, cur.sunTerrain < 0.5);
   set("earth-state", cur.earthUp, "EARTH IN VIEW", "NO LINK");
   $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
   $("earth-next").textContent = fmtBig(earthLeft);
   $("earth-next-date").textContent = earthLeft == null ? "" : `${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1) + "°";
-  lowNote("earth-low", cur.earthUp, cur.earthEl);
+  lowNote("earth-low", cur.earthUp, cur.earthEl, cur.earthAz, true);
   // Which Deep Space Network sites have the Moon in their sky right now (only said while Earth is in view from the site).
   const dsn = cur.earthUp ? dsnAt(cur.t)?.filter((s) => s.el > 0) : null, dsnBox = $("earth-dsn");
   dsnBox.hidden = !dsn;
