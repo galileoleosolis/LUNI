@@ -312,8 +312,8 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (spaceappschallenge.org/resources/project-submission-guide): up to seven slides including the title slide, in
   English, on an external site with a public link, covering team name, member names and the challenge.
   **Still placeholders on the cover: [Team name] and the two [Member name]s** (never told to Claude).
-- **The afternoon batch (the user's list, built Sun 15 Nov about 1:30 to 3 PM New York on "Build the new batch now").
-  On the pre-release only; the public site is r6.** The user: run only the checks that touch the change; the full set
+- **The afternoon batch (the user's list, built Sun 15 Nov between about 12:45 and 1:30 PM New York on "Build the new batch now").
+  Released as r7.** The user: run only the checks that touch the change; the full set
   at the release. Checked: syntax, `check_assistant` (111), `check_scan`, `check_mission`, test set E (6/6), and a
   browser run of every new feature with no page errors. NOT checked: phones (the user: "idc about phones rn"),
   test set D, the other Node checks, real hardware.
@@ -362,7 +362,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
       is computed from NASA data; the rule is the user's needs"; the better-spot wording; the three new features.
   No change, by the user's word: a GO being the team's rule, IM-2 opening as GO, the finder offering a move from a GO
   site, phones.
-- **Judge runs on the afternoon batch** (Sun 15 Nov about 3:45 PM New York; same brief, three models, Presentation
+- **Judge runs on the afternoon batch** (Sun 15 Nov about 1:30 PM New York; same brief, three models, Presentation
   fixed at 4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5): the same as before the batch.
   Two of the three never opened ENERGY, the solar panels or the before-and-after box. Fixed afterwards, on the
   pre-release: the comparison box now measures "sunlight to spare" over the same span as the verdict (`planSpan`,
@@ -375,6 +375,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   14 Jan 2027, 14 days); the side-by-side box covers the ASK LUNI reply; density; no outside users.
   The slide deck was updated for the batch (new screenshots; slide 3 shows ENERGY, slide 4 the finder with solar
   panels and the before-and-after box).
+- **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
+  main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
+  E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
+  errors. The public site now has the whole afternoon batch and the fixes made after the judges. Nothing newer is
+  waiting on the pre-release.
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
@@ -499,8 +504,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). **r6 (15 Nov, 17:05 UTC, main 8c8cb9c) is the current public version.**
-   To roll back to r5: `tools/release.sh promote 90e2028`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). **r7 (15 Nov, 18:40 UTC, main b12dd78) is the current public version.**
+   To roll back to r6: `tools/release.sh promote 8c8cb9c`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
