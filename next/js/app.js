@@ -821,7 +821,8 @@ async function init() {
   });
 
   // Screens: MAIN, MOON MAP (the Moon made big, with data layers) and MISSION HISTORY. One at a time.
-  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon }, onClose: () => showScreen("main") });
+  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon }, onClose: () => showScreen("main"),
+    onUseMix: () => { showScreen("main"); scan.useMix(); } });
   $("globe-big").addEventListener("click", () => showScreen(moonmap.isOpen() ? "main" : "moon"));
   for (const [id, name] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).addEventListener("click", () => showScreen(name));
 

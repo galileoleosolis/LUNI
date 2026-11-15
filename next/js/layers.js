@@ -18,6 +18,8 @@ export const goodColor = (score) => ramp(GOOD_RAMP, score);
 export const elevColor = (t) => ramp(ELEV_RAMP, t);         // t = 0 (lowest) .. 1 (highest)
 export const SHADOW_COLOR = [140, 84, 255];
 const SHADOW_RGB = [140, 84, 255];
+const TEMP_RAMP = [[18, 10, 60], [44, 60, 190], [120, 60, 190], [226, 80, 80], [250, 190, 70], [255, 250, 220]];
+const celsius = (k) => { const c = Math.round(k - 273.15); return `${c < 0 ? "−" : "+"}${Math.abs(c)} °C`; };
 const num = (v) => `${v >= 0 ? "+" : "−"}${Math.abs(Math.round(v)).toLocaleString("en-US")}`;
 
 // score(v): 0 (bad for a solar-powered lander that talks straight to Earth) to 1 (good); null = neither.
@@ -47,8 +49,46 @@ export const LAYERS = [
     ends: ["", "PURPLE = NEVER ANY SUNLIGHT"], scale: ["", ""],
     meaning: "NO SOLAR POWER HERE AT ANY TIME. MISSIONS STILL WANT TO LAND NEAR THESE PLACES, BECAUSE WATER ICE CAN LAST IN THEM.",
     source: "WORKED OUT BY LUNI: PLACES WHERE NO PART OF THE SUN'S DISC CLEARS THE SKYLINE (NASA LRO LOLA ELEVATION) AT ANY CHECKED MOMENT FROM 2023 TO 2035 (NASA NAIF SPICE). THE MOON'S FULL 18.6-YEAR CYCLE IS NOT COVERED." },
+  { id: "temp", label: "TEMPERATURE", where: "SOUTH POLE", polar: true, lo: 30, hi: 280, card: "TEMPERATURE, AVERAGE",
+    color: (v) => ramp(TEMP_RAMP, (v - 30) / 250), score: null, text: (v) => `${celsius(v)} (${Math.round(v)} K)`,
+    ends: ["COLD", "WARM"], scale: ["−243 °C (30 K)", "+7 °C (280 K)"],
+    meaning: "THE GROUND'S AVERAGE TEMPERATURE OVER A YEAR. THE COLDEST PLACES ARE THE PERMANENT SHADOWS; COLD IS HARD ON A LANDER AND ITS BATTERIES. THE DATA PROFILE ALSO GIVES THE HOTTEST THE GROUND GETS.",
+    source: "NASA'S OWN NUMBERS, ONLY RE-GRIDDED BY LUNI: LRO DIVINER RADIOMETER, POLAR RESOURCE PRODUCT V2.0 (PAIGE ET AL., NASA PDS GEOSCIENCES NODE, 2018): ANNUAL AVERAGE AND ANNUAL MAXIMUM SURFACE TEMPERATURE FROM THERMAL MODELS FITTED TO DIVINER'S MEASUREMENTS." },
+  // YOUR MIX: the layers above blended with weights you choose (see mixScore).
+  { id: "mix", label: "YOUR MIX", where: "SOUTH POLE", polar: true, mix: true, lo: 0, hi: 100,
+    color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)} OF 100`,
+    ends: ["BAD", "GOOD"], scale: ["0", "100"],
+    meaning: "ONE SCORE PER PLACE: EACH LAYER'S GOOD / BAD SCORE (0 TO 100) AVERAGED WITH THE WEIGHTS YOU SET BELOW. A WEIGHT OF 0 LEAVES A LAYER OUT.",
+    source: "A BLEND MADE BY LUNI FROM THE LAYERS ABOVE (NASA LRO LOLA, NASA NAIF SPICE, NASA LRO DIVINER). THE WEIGHTS ARE YOUR CHOICE, NOT NASA'S." },
 ];
 export const layer = (id) => LAYERS.find((l) => l.id === id);
+
+// ---------- YOUR MIX ----------
+// Each part turns its layer's value into a score from 0 (bad) to 1 (good); the mix is their weighted average.
+// The scales are scales for the eye, the same ones the layers are colored with:
+//   sunlight and Earth link: percent of the time / 100;  flat ground: 1 at 0 degrees, 0 at 20 degrees or more;
+//   warmer ground: 0 at 40 K average or colder, 1 at 250 K or warmer (off unless you turn it up).
+export const MIX_PARTS = [
+  { id: "sun", label: "SUNLIGHT", w: 3, score: (v) => v / 100 },
+  { id: "earth", label: "EARTH LINK", w: 2, score: (v) => v / 100 },
+  { id: "slope", label: "FLAT GROUND", w: 1, score: (v) => 1 - clamp01(v / 20) },
+  { id: "temp", label: "WARMER GROUND", w: 0, score: (v) => clamp01((v - 40) / 210) },
+];
+const mix = Object.fromEntries(MIX_PARTS.map((p) => [p.id, p.w]));
+try { Object.assign(mix, JSON.parse(globalThis.localStorage?.getItem("luno-mix") || "{}")); } catch {}
+export const getMix = () => ({ ...mix });
+export function setMix(id, w) { mix[id] = Math.max(0, Math.min(5, +w || 0)); try { localStorage.setItem("luno-mix", JSON.stringify(mix)); } catch {} }
+// values: { sun, earth (percent), slope (degrees), temp (kelvin) }. Returns 0..100, or null if a weighted part has no value.
+export function mixScore(values) {
+  let sum = 0, wsum = 0;
+  for (const p of MIX_PARTS) {
+    const w = mix[p.id]; if (!w) continue;
+    const v = values[p.id]; if (v == null || !Number.isFinite(v)) return null;
+    sum += w * p.score(v); wsum += w;
+  }
+  return wsum ? sum / wsum * 100 : null;
+}
+export const mixText = () => MIX_PARTS.filter((p) => mix[p.id] > 0).map((p) => `${p.label} ×${mix[p.id]}`).join(" + ") || "NOTHING (ALL WEIGHTS ARE 0)";
 
 // ---------- the south polar layers ----------
 let polar = null, polarLoading = null;
@@ -68,8 +108,29 @@ export function polarValue(id, lat, lon) {
   const r = 2 * R * Math.tan((90 + lat) * DEG / 2), c = (polar.n - 1) / 2;
   const col = Math.round(c + r * Math.sin(lon * DEG) / polar.scale_m), row = Math.round(c - r * Math.cos(lon * DEG) / polar.scale_m);
   if (col < 0 || row < 0 || col >= polar.n || row >= polar.n) return null;
-  const v = polar[id][row * polar.n + col];
-  return v === 255 ? null : id === "shadow" ? v : v / 2;
+  const i = row * polar.n + col;
+  if (id === "mix") {
+    const g = (k, f) => (polar[k] && polar[k][i] !== 255 ? polar[k][i] * f : null);
+    return polar.sun[i] === 255 ? null : mixScore({ sun: g("sun", 0.5), earth: g("earth", 0.5), temp: g("tavg", 2), slope: polarSlope ? polarSlope[i] / 10 : null });
+  }
+  const arr = polar[id === "temp" ? "tavg" : id];
+  if (!arr) return null;
+  const v = arr[i];
+  return v === 255 ? null : id === "shadow" ? v : id === "temp" || id === "tmax" ? v * 2 : v / 2;
+}
+
+// Slope (tenths of a degree, capped at 25.5) for every square of the polar grid, from the 240 m map: made once, for the mix.
+let polarSlope = null;
+export async function loadPolarSlope() {
+  if (polarSlope) return polarSlope;
+  const P = await loadPolar(), n = P.n, fine = await getGrid("sp_cap"), pr = (fine.rows - 1) / 2, pc = (fine.cols - 1) / 2, k = P.scale_m / fine.scale_m, c = (n - 1) / 2;
+  const out = new Uint8Array(n * n), h = (row, col) => fine.sample(pr + (row - c) * k, pc + (col - c) * k);
+  for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
+    if (P.sun[row * n + col] === 255) continue;
+    const v = Math.atan(Math.hypot(h(row, col + 0.5) - h(row, col - 0.5), h(row - 0.5, col) - h(row + 0.5, col)) / P.scale_m) / DEG;
+    out[row * n + col] = Number.isFinite(v) ? Math.min(255, Math.round(v * 10)) : 255;
+  }
+  return (polarSlope = out);
 }
 
 // ---------- the data profile of one point ----------
@@ -79,15 +140,19 @@ export async function profileAt(lat, lon) {
   const [near, far] = mapsFor(lat), best = await getGrid(near || far);
   let h = best.height(lat, lon), slope = slopeAt(best, lat, lon);
   if (!Number.isFinite(h)) { const g = await getGrid(far); h = g.height(lat, lon); slope = slopeAt(g, lat, lon); }
-  if (lat <= -79.5) await loadPolar().catch(() => null);
+  if (lat <= -79.5) { await loadPolar().catch(() => null); await loadPolarSlope().catch(() => null); }
   const base = 2 * best.res;
-  return LAYERS.map((L) => {
+  const rows = LAYERS.map((L) => {
     const v = L.id === "elev" ? (Number.isFinite(h) ? h : null) : L.id === "slope" ? slope : polarValue(L.id, lat, lon);
     if (v == null) return { id: L.id, label: L.card || L.label, text: null, score: null, rgb: null, note: L.polar ? "SOUTH OF 80°S ONLY" : "NO DATA" };
     const score = L.score ? L.score(v) : null;
     return { id: L.id, label: L.id === "slope" ? `SLOPE OVER ${base >= 1000 ? (base / 1000).toFixed(1) + " KM" : base + " M"}` : L.card || L.label, value: v, text: (L.brief || L.text)(v), score, rgb: L.id === "shadow" ? (v ? SHADOW_RGB : GOOD_RAMP[2]) : L.color(v),
              share: L.binary ? 1 : clamp01((v - L.lo) / (L.hi - L.lo)), note: "" };
   });
+  // the hottest the ground gets in a year, next to the average
+  const hot = polarValue("tmax", lat, lon), at = rows.findIndex((r) => r.id === "temp"), T = layer("temp");
+  if (hot != null && at >= 0) rows.splice(at + 1, 0, { id: "tmax", label: "TEMPERATURE, HOTTEST", value: hot, text: T.text(hot), score: null, rgb: T.color(hot), share: clamp01((hot - T.lo) / (T.hi - T.lo)), note: "" });
+  return rows;
 }
 
 // The card: one row per layer, a bar in the layer's own color, the number, and a GOOD / FAIR / BAD word where the layer has a say.
@@ -129,14 +194,17 @@ export async function polarCanvas(id) {
   let fine = null, pr = 0, pc = 0, k = 1;
   if (!L.polar) { fine = await getGrid("sp_cap"); pr = (fine.rows - 1) / 2; pc = (fine.cols - 1) / 2; k = P.scale_m / fine.scale_m; }
   const hAt = (row, col) => fine.sample(pr + (row - c) * k, pc + (col - c) * k);
+  const slopes = id === "mix" ? await loadPolarSlope() : null;
   for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
     const i = row * n + col;
     if (P.sun[i] === 255) continue;                        // outside the region: see-through
     let v;
     if (id === "elev") v = hAt(row, col);
     else if (id === "slope") v = Math.atan(Math.hypot(hAt(row, col + 0.5) - hAt(row, col - 0.5), hAt(row - 0.5, col) - hAt(row + 0.5, col)) / P.scale_m) / DEG;
+    else if (id === "mix") v = mixScore({ sun: P.sun[i] / 2, earth: P.earth[i] / 2, temp: P.tavg && P.tavg[i] !== 255 ? P.tavg[i] * 2 : null, slope: slopes[i] === 255 ? null : slopes[i] / 10 });
+    else if (id === "temp") v = P.tavg && P.tavg[i] !== 255 ? P.tavg[i] * 2 : NaN;
     else v = id === "shadow" ? P.shadow[i] : P[id][i] / 2;
-    const rgb = Number.isFinite(v) ? L.color(v) : null;
+    const rgb = v != null && Number.isFinite(v) ? L.color(v) : null;
     if (!rgb) continue;
     px[i * 4] = rgb[0]; px[i * 4 + 1] = rgb[1]; px[i * 4 + 2] = rgb[2]; px[i * 4 + 3] = 255;
   }

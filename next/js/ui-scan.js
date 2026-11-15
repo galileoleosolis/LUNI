@@ -3,7 +3,10 @@ import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
 import { scanOptions, bestCell } from "./scan-core.js";
 import { mapResFor } from "./terrain.js";
-import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml } from "./layers.js";
+import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
+
+// A scanned point's score in YOUR MIX (0..100): the all-years layers at the point, with the scan's own slope for it.
+const cellMix = (c) => mixScore({ sun: polarValue("sun", c.lat, c.lon), earth: polarValue("earth", c.lat, c.lon), temp: polarValue("temp", c.lat, c.lon), slope: c.slopeDeg });
 
 const $ = (id) => document.getElementById(id);
 const METRICS = {
@@ -15,9 +18,11 @@ const METRICS = {
   elev:   { label: "ELEVATION", rgb: (c, x) => elevColor((c.heightM - x.lo) / Math.max(1, x.hi - x.lo)) },
   ysun:   { label: "SUNLIGHT", lay: "sun", polar: true, rgb: (c) => { const v = polarValue("sun", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
   yearth: { label: "EARTH LINK", lay: "earth", polar: true, rgb: (c) => { const v = polarValue("earth", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
+  temp:   { label: "TEMPERATURE", lay: "temp", polar: true, rgb: (c) => { const v = polarValue("temp", c.lat, c.lon); return v == null ? null : layer("temp").color(v); } },
+  mix:    { label: "YOUR MIX", lay: "mix", polar: true, rgb: (c) => { const v = cellMix(c); return v == null ? null : goodColor(v / 100); } },
   shadow: { label: "SHADOW", lay: "shadow", polar: true, rgb: (c) => { const v = polarValue("shadow", c.lat, c.lon); return v == null ? null : v ? SHADOW_COLOR : [58, 62, 70]; } },
 };
-const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow"]]];
+const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow", "temp"]], ["BLENDED WITH YOUR WEIGHTS", ["mix"]]];
 const NO_DATA = [26, 28, 34];
 const lerp = (a, b, t) => a + (b - a) * t;
 function rampColor(ramp, v) {            // v in 0..100
@@ -163,7 +168,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       }
       else { ctx.beginPath(); ctx.moveTo(x - m * 0.8, y); ctx.lineTo(x + m * 0.8, y); ctx.moveTo(x, y - m * 0.8); ctx.lineTo(x, y + m * 0.8); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, m * 0.45, 0, 7); ctx.stroke(); }
     };
-    const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestCell(st.cells);
+    const center = { r: (n - 1) / 2, k: (n - 1) / 2 }, best = bestNow();
     // a label on a dark plate, kept inside the map
     // big = the best-point label: larger, black on a white plate, so it is the first thing the eye finds on the map
     const tag = (text, x, y, big) => {
@@ -207,7 +212,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-scale").innerHTML = `<b>EACH SQUARE = ${sqTxt} × ${sqTxt} OF GROUND</b><br>MAP IS ${st.grid.radiusKm * 2} KM ACROSS · NORTH UP · ${LANDER_SVG} = WHERE YOU ARE NOW · ★ = BEST POINT`;
     $("scan-legend").classList.toggle("flat", !m.ramp);
     $("scan-legend").classList.toggle("lay", !!m.rgb);
-    $("scan-legend").innerHTML = m.lay ? legendHtml(layer(m.lay)) + `<div class="scan-src">${layer(m.lay).source}</div>`
+    $("scan-legend").innerHTML = m.lay ? legendHtml(layer(m.lay)) + `<div class="scan-src">${m.lay === "mix" ? "YOUR MIX = " + mixText() + ". CHANGE THE WEIGHTS ON THE MOON MAP SCREEN. " : ""}${layer(m.lay).source}</div>`
       : m.rgb ? `<div class="lay-legend"><i style="background:linear-gradient(90deg,${[0, 0.25, 0.5, 0.75, 1].map((t) => `rgb(${elevColor(t)})`).join(",")})"></i><div class="ends"><span>◀ ${Math.round(span.lo).toLocaleString("en-US")} M<br>LOWEST HERE</span><span>${Math.round(span.hi).toLocaleString("en-US")} M ▶<br>HIGHEST HERE</span></div></div><div class="scan-src">${layer("elev").source}</div>`
       : m.ramp
       ? `<i style="background:linear-gradient(90deg,${[0, 50, 100].map((v) => `rgb(${rampColor(m.ramp, v)})`).join(",")})"></i><span>0%</span><span>${m.unit}</span><span>100%</span><div class="ends"><span>◀ ${m.ends[0]}</span><span>${m.ends[1]} ▶</span></div>`
@@ -217,6 +222,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     const far = best && away(best);
     $("scan-best").innerHTML = !finished ? "…" : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT GOOD TIME</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
+    if (finished && best && st.rank === "mix" && polarOkNow) { const v = cellMix(best); if (v != null) $("scan-best").insertAdjacentHTML("beforeend", `<br><b class="h-do">PICKED BY YOUR MIX</b>: ${Math.round(v)} OF 100 (${mixText()})`); }
     const canMove = finished && best && !(best.r === center.r && best.k === center.k);
     $("scan-go-best").disabled = !canMove;
     // Data profile: every layer at one point (the point under the pointer, else where you are now), each marked good or bad.
@@ -226,6 +232,19 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       + (st.hover ? `<b class="h-do">CLICK TO MOVE THE SITE HERE</b>` : `<b class="h-do">MOVE OVER THE MAP</b> TO READ ANY POINT. <b class="h-do">CLICK</b> TO MOVE THE SITE THERE.`);
   }
 
+  // The best point. Usually LUNI's own rule (bestCell). With "pick by your mix" on: among the points that meet the
+  // mission needs, the one with the highest mix score; the shortest move wins a tie.
+  function bestNow() {
+    if (st.rank !== "mix" || !polarOkNow || !polarMeta()) return bestCell(st.cells);
+    let best = null, bs = -1, bd = Infinity;
+    for (const c of st.cells) {
+      if (!c || !c.ok) continue;
+      const s = cellMix(c); if (s == null) continue;
+      const d = Math.hypot(c.eastKm, c.northKm), r = Math.round(s);
+      if (r > bs || (r === bs && d < bd)) { best = c; bs = r; bd = d; }
+    }
+    return best;
+  }
   // The rows of the data profile card for one scanned point.
   let polarOkNow = false;
   function cellProfile(c, span, polarOk) {
@@ -242,6 +261,9 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       rows.push(s == null ? { label: "SUNLIGHT 2023–35", text: null, note: "OUTSIDE 80°S" } : row("SUNLIGHT 2023–35", `${Math.round(s)}%`, s / 100, s / 100),
                 e == null ? { label: "EARTH LINK 2023–35", text: null, note: "OUTSIDE 80°S" } : row("EARTH LINK 2023–35", `${Math.round(e)}%`, e / 100, e / 100),
                 sh == null ? { label: "PERMANENT SHADOW", text: null, note: "OUTSIDE 80°S" } : row("PERMANENT SHADOW", sh ? "YES" : "NO", sh ? 0 : 1, 1, sh ? SHADOW_COLOR : null));
+      const t = polarValue("temp", c.lat, c.lon), mx = cellMix(c), T = layer("temp");
+      if (t != null) rows.push(row("TEMPERATURE, AVERAGE", T.text(t), null, (t - T.lo) / (T.hi - T.lo), T.color(t)));
+      if (mx != null) rows.push(row("YOUR MIX", `${Math.round(mx)} OF 100`, mx / 100, mx / 100));
     }
     return rows;
   }
@@ -259,6 +281,15 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       }
       box.appendChild(g);
     }
+    if (polarOk) {      // who picks the best point
+      const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>★ BEST POINT IS PICKED BY</span><div class="seg"></div>`;
+      for (const [id, label] of [["luni", "SUNLIGHT TO SPARE"], ["mix", "YOUR MIX"]]) {
+        const b = document.createElement("button"); b.textContent = label; b.classList.toggle("on", (st.rank || "luni") === id);
+        b.addEventListener("click", () => { st.rank = id; [...g.lastChild.children].forEach((x) => x.classList.toggle("on", x === b)); draw(); });
+        g.lastChild.appendChild(b);
+      }
+      box.appendChild(g);
+    }
   }
 
   const cellAt = (e) => {
@@ -270,7 +301,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   canvas.addEventListener("pointermove", (e) => { const c = cellAt(e); if (c !== st.hover) { st.hover = c; schedule(); } });
   canvas.addEventListener("pointerleave", () => { st.hover = null; schedule(); });
   canvas.addEventListener("click", (e) => { const c = cellAt(e); if (c) pick(c); });
-  $("scan-go-best").addEventListener("click", () => { const b = bestCell(st.cells); if (b) pick(b); });
+  $("scan-go-best").addEventListener("click", () => { const b = bestNow(); if (b) pick(b); });
   $("scan-close").addEventListener("click", () => toggle(false));
   $("scan-big").addEventListener("click", () => setBig(!panel.classList.contains("big")));
   try { if (localStorage.getItem("luno-scan-big")) setBig(true); } catch {}
@@ -300,5 +331,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
-  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); } };
+  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
+           // From the MOON MAP: show the scan colored by the mix, with the best point picked by the mix.
+           useMix() { st.metric = "mix"; st.rank = "mix"; if (panel.hidden) toggle(true); else start(); } };
 }

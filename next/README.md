@@ -39,6 +39,10 @@ Then open http://localhost:8080 (it must be served, not opened as a file).
   permanent shadow (south of 80°S, `data/layers`, built by `tools/build_layers.py` from LOLA skylines and SPICE positions
   every 6 hours over 2023–2035). Each layer names its data source and is colored green for good, red for bad. A data
   profile card gives every layer's value at any point; the same layers and card are in the area scan.
+- **Temperature:** NASA's LRO Diviner Polar Resource Product V2.0 (annual average and maximum surface temperature),
+  re-gridded by `tools/build_temperature.py`, as a layer and in the data profile.
+- **Your mix:** blend sunlight, Earth link, flat ground and warmer ground with your own weights into one score per place,
+  see it on the Moon map, and send it to the scan, which then picks its best point by your mix.
 - **Sun and Earth positions:** NASA NAIF SPICE (DE440, Moon ME frame), stored every 2 hours for 2023–2035 in `data/ephem.bin`.
 - **Terrain:** skylines for the preset sites are pre-computed from LRO LOLA elevation maps (`data/horizons.json`),
   with the observer 2 m above the surface. Custom points and the area scan compute skylines in the browser from reduced
