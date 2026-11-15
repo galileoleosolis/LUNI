@@ -20,7 +20,7 @@ const METRICS = {
   yearth: { label: "EARTH LINK", lay: "earth", polar: true, rgb: (c) => { const v = polarValue("earth", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
   temp:   { label: "TEMPERATURE", lay: "temp", polar: true, rgb: (c) => { const v = polarValue("temp", c.lat, c.lon); return v == null ? null : layer("temp").color(v); } },
   mix:    { label: "YOUR MIX", lay: "mix", polar: true, rgb: (c) => { const v = cellMix(c); return v == null ? null : goodColor(v / 100); } },
-  shadow: { label: "SHADOW", lay: "shadow", polar: true, rgb: (c) => { const v = polarValue("shadow", c.lat, c.lon); return v == null ? null : v ? SHADOW_COLOR : [58, 62, 70]; } },
+  shadow: { label: "SHADOW", lay: "shadow", polar: true, capsOnly: true, rgb: (c) => { const v = polarValue("shadow", c.lat, c.lon); return v == null ? null : v ? SHADOW_COLOR : [58, 62, 70]; } },
 };
 const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow", "temp"]], ["BLENDED WITH YOUR WEIGHTS", ["mix"]]];
 const NO_DATA = [26, 28, 34];
@@ -84,10 +84,10 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const o = opts[st.opt];
     const key = `${c.site.lat},${c.site.lon},${+c.t0},${JSON.stringify(c.req)},${o.radiusKm},${o.n}`;
     buildSeg($("scan-radius"), opts.map((x, i) => [i, `${x.radiusKm} KM`]), () => st.opt, (v) => { st.opt = v; start(); });
-    const polarOk = c.site.lat <= -79.5;                   // the all-years layers exist for the south polar region only
-    if (polarOk && !polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
-    if (!polarOk && METRICS[st.metric].polar) st.metric = "needs";
-    buildMetrics(polarOk);
+    const polarOk = true;                                  // the all-years layers cover the whole Moon (finer poleward of 80 degrees)
+    if (!polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
+    if (METRICS[st.metric].capsOnly && Math.abs(c.site.lat) < 79.5) st.metric = "needs";
+    buildMetrics(polarOk, Math.abs(c.site.lat) >= 79.5);
     $("scan-title").textContent = `AREA SCAN · ${fmt.site(c.site)} · LAND ${fmt.stamp(c.t0)} · ${c.req.days}D MISSION`;
     const res = mapResFor(c.site.lat);
     // Slope depends on the distance it is measured over: the scan's map is coarser than a listed site's own map.
@@ -258,23 +258,24 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     ];
     if (polarOk && polarMeta()) {
       const s = polarValue("sun", c.lat, c.lon), e = polarValue("earth", c.lat, c.lon), sh = polarValue("shadow", c.lat, c.lon);
-      rows.push(s == null ? { label: "SUNLIGHT 2023–35", text: null, note: "OUTSIDE 80°S" } : row("SUNLIGHT 2023–35", `${Math.round(s)}%`, s / 100, s / 100),
-                e == null ? { label: "EARTH LINK 2023–35", text: null, note: "OUTSIDE 80°S" } : row("EARTH LINK 2023–35", `${Math.round(e)}%`, e / 100, e / 100),
-                sh == null ? { label: "PERMANENT SHADOW", text: null, note: "OUTSIDE 80°S" } : row("PERMANENT SHADOW", sh ? "YES" : "NO", sh ? 0 : 1, 1, sh ? SHADOW_COLOR : null));
+      rows.push(s == null ? { label: "SUNLIGHT 2023–35", text: null, note: "NO DATA" } : row("SUNLIGHT 2023–35", `${Math.round(s)}%`, s / 100, s / 100),
+                e == null ? { label: "EARTH LINK 2023–35", text: null, note: "NO DATA" } : row("EARTH LINK 2023–35", `${Math.round(e)}%`, e / 100, e / 100),
+                sh == null ? { label: "PERMANENT SHADOW", text: null, note: "POLES ONLY" } : row("PERMANENT SHADOW", sh ? "YES" : "NO", sh ? 0 : 1, 1, sh ? SHADOW_COLOR : null));
       const t = polarValue("temp", c.lat, c.lon), mx = cellMix(c), T = layer("temp");
-      if (t != null) rows.push(row("TEMPERATURE, AVERAGE", T.text(t), null, (t - T.lo) / (T.hi - T.lo), T.color(t)));
+      if (t != null) rows.push(row("TEMPERATURE (AVG)", T.brief(t), null, (t - T.lo) / (T.hi - T.lo), T.color(t)));
       if (mx != null) rows.push(row("YOUR MIX", `${Math.round(mx)} OF 100`, mx / 100, mx / 100));
     }
     return rows;
   }
   // SHOW buttons, in three groups; the all-years group only where its data exists.
-  function buildMetrics(polarOk) {
+  function buildMetrics(polarOk, nearPole) {
     polarOkNow = polarOk;
     const box = $("scan-metric"); box.replaceChildren();
     for (const [title, ids] of GROUPS) {
       if (METRICS[ids[0]].polar && !polarOk) continue;
       const g = document.createElement("div"); g.className = "scan-mgroup"; g.innerHTML = `<span>${title}</span><div class="seg"></div>`;
       for (const id of ids) {
+        if (METRICS[id].capsOnly && !nearPole) continue;     // permanent shadow is only worked out near the poles
         const b = document.createElement("button"); b.textContent = METRICS[id].label; b.dataset.m = id; b.classList.toggle("on", st.metric === id);
         b.addEventListener("click", () => { st.metric = id; box.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x.dataset.m === id)); draw(); });
         g.lastChild.appendChild(b);

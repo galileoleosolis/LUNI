@@ -11,8 +11,10 @@ LUNI's ephemeris (data/ephem.bin: NASA SPICE DE440, 2023 to 2035). Same rules as
 Skylines here are coarser than a preset site's (72 directions, the 240 m map), so a layer is a map to explore with,
 not a replacement for the site's own numbers.
 
-Usage:  tools/fetch_dem.sh && python3 tools/build_layers.py [grid_m]
-Output: data/layers/sp_sun.u8.gz, sp_earth.u8.gz, sp_shadow.u8.gz, data/layers/index.json
+Usage:  tools/fetch_dem.sh && python3 tools/build_layers.py [grid_m] [south|north]
+        (north needs ldem_60n_240m.img in tools/dem/ as well; files are then named np_... and the index entry is "np")
+Output: data/layers/sp_sun.u8.gz, sp_earth.u8.gz, sp_shadow.u8.gz, sp_slope.u8.gz, data/layers/index.json
+        slope: tenths of a degree across 480 m of the 240 m map, capped at 25.4
         sun / earth: 0..200 = 0..100 % of the time in half-percent steps; 255 = outside the region
         shadow: 1 = permanent shadow over the years checked, 0 = not, 255 = outside the region
 """
@@ -27,6 +29,9 @@ DEG = np.pi / 180
 SRC_N, SRC_M = 7760, 240.0                      # ldem_60s_240m: 7760 x 7760 pixels of 240 m, pole between the 4 center pixels
 MIN_LAT = -80.0
 GRID_M = float(sys.argv[1]) if len(sys.argv) > 1 else 480.0
+POLE = sys.argv[2] if len(sys.argv) > 2 else "south"
+SY = 1.0 if POLE == "south" else -1.0            # LOLA polar maps: longitude 0 points up on the south map, down on the north map
+PRE = "sp" if POLE == "south" else "np"
 MAST_M = 2.0
 NDIR = 72                                       # skyline directions (every 5 degrees)
 REACH_M = 200e3                                 # how far the skyline search looks
@@ -34,7 +39,7 @@ STEP_H = 6                                      # hours between checked moments
 SUN_RADIUS_DEG = 0.2666
 
 t_start = time.time()
-dem = np.memmap(os.path.join(HERE, "dem", "ldem_60s_240m.img"), dtype="<i2", mode="r", shape=(SRC_N, SRC_N))
+dem = np.memmap(os.path.join(HERE, "dem", f"ldem_60{POLE[0]}_240m.img"), dtype="<i2", mode="r", shape=(SRC_N, SRC_N))
 r80 = 2 * R * np.tan((90 + MIN_LAT) * DEG / 2)
 half = int(np.ceil((r80 + REACH_M) / SRC_M)) + 8
 c0 = SRC_N // 2                                 # crop [c0-half, c0+half): the pole sits at crop coordinate (half - 0.5)
@@ -56,10 +61,10 @@ rr = np.hypot(gx, gy)
 inside = rr <= r80
 x, y = gx[inside].astype(np.float64), gy[inside].astype(np.float64)
 N = x.size
-lat = 2 * np.arctan(np.hypot(x, y) / (2 * R)) - np.pi / 2
-lon = np.arctan2(x, y)
-scale = 2 / (1 + np.sin(-lat))                  # map meters per ground meter at each point (1 at the pole)
-print(f"grid {n} x {n} at {GRID_M:.0f} m, {N} points inside {MIN_LAT} deg")
+lat = (2 * np.arctan(np.hypot(x, y) / (2 * R)) - np.pi / 2) * SY       # south: negative; north: positive
+lon = np.arctan2(x, SY * y)
+scale = 2 / (1 + np.sin(np.abs(lat)))                  # map meters per ground meter at each point (1 at the pole)
+print(f"{POLE} pole: grid {n} x {n} at {GRID_M:.0f} m, {N} points poleward of {abs(MIN_LAT)} deg")
 
 
 def sample(level, mx, my):
@@ -135,7 +140,7 @@ def count_chunk(args):
 
 if __name__ == "__main__":
     # Both long steps keep their finished parts in tools/dem/, so a run that is cut short picks up where it stopped.
-    work = os.path.join(HERE, "dem", f"layers_{int(GRID_M)}m")
+    work = os.path.join(HERE, "dem", f"layers_{int(GRID_M)}m" + ("" if POLE == "south" else "_north"))
     os.makedirs(work, exist_ok=True)
     sky_file = os.path.join(work, "sky.npy")
     if os.path.exists(sky_file):
@@ -152,8 +157,9 @@ if __name__ == "__main__":
     UP = np.stack([cl * cn, cl * sn, sl], axis=1)
     NORTH = np.stack([-sl * cn, -sl * sn, cl], axis=1)
     EAST = np.stack([-sn, cn, np.zeros(N)], axis=1)
-    TX = (sn[:, None] * NORTH + cn[:, None] * EAST).astype(np.float32)
-    TY = (cn[:, None] * NORTH - sn[:, None] * EAST).astype(np.float32)
+    # south map: north is away from the pole; north map: north is toward the pole. East is the direction of growing longitude.
+    TX = (SY * sn[:, None] * NORTH + cn[:, None] * EAST).astype(np.float32)
+    TY = (cn[:, None] * NORTH - SY * sn[:, None] * EAST).astype(np.float32)
     POS = UP * (R + h0)[:, None]
     UP = UP.astype(np.float32)
 
@@ -175,26 +181,34 @@ if __name__ == "__main__":
     def grid(values, fill=255):
         out = np.full((n, n), fill, dtype=np.uint8); out[inside] = values; return out
     sun = grid(np.rint(sun_n / T * 200)); earth = grid(np.rint(earth_n / T * 200)); shadow = grid((~any_sun).astype(np.uint8))
+    # ground slope across two 240 m pixels (480 m), from the same map
+    pole_px = half - 0.5
+    hh = lambda dx, dy: base[np.rint(pole_px - (y + dy) / SRC_M).astype(np.int32), np.rint(pole_px + (x + dx) / SRC_M).astype(np.int32)].astype(np.float64)
+    slope_deg = np.arctan(np.hypot(hh(SRC_M, 0) - hh(-SRC_M, 0), hh(0, SRC_M) - hh(0, -SRC_M)) * scale / (2 * SRC_M)) / DEG
+    slope = grid(np.clip(np.rint(slope_deg * 10), 0, 254))
     out_dir = os.path.join(ROOT, "data", "layers"); os.makedirs(out_dir, exist_ok=True)
     sizes = {}
-    for name, a in [("sp_sun", sun), ("sp_earth", earth), ("sp_shadow", shadow)]:
+    for name, a in [(PRE + "_sun", sun), (PRE + "_earth", earth), (PRE + "_shadow", shadow), (PRE + "_slope", slope)]:
         p = os.path.join(out_dir, name + ".u8.gz")
         with open(p, "wb") as f:
             f.write(gzip.compress(a.tobytes(), 9, mtime=0))
         sizes[name] = os.path.getsize(p)
     lit = sun_n / T * 100
-    index = {
-        "_about": "South polar map layers computed by tools/build_layers.py from LRO LOLA elevation (ldem_60s_240m, NASA PDS) "
-                  "and NASA NAIF SPICE DE440 positions (data/ephem.bin). North-up south polar stereographic grid, pole in the middle, "
-                  "x toward longitude 90E, y toward longitude 0. Values: sun / earth 0..200 = 0..100 % of the time, shadow 1 = no part "
-                  "of the Sun seen at any checked moment; 255 = outside the region.",
-        "sp": {"kind": "polar_south", "n": n, "scale_m": GRID_M, "min_lat": MIN_LAT, "mast_m": MAST_M, "directions": NDIR,
-               "reach_km": REACH_M / 1000, "step_hours": STEP_H, "moments": int(T),
-               "from_utc": meta["start_utc"], "years": "2023 to 2035",
-               "files": {"sun": "sp_sun.u8.gz", "earth": "sp_earth.u8.gz", "shadow": "sp_shadow.u8.gz"},
-               "stats": {"sun_mean_pct": round(float(lit.mean()), 1), "sun_max_pct": round(float(lit.max()), 1),
-                         "shadow_share_pct": round(float((~any_sun).mean() * 100), 2),
-                         "earth_mean_pct": round(float((earth_n / T * 100).mean()), 1)}},
-    }
-    json.dump(index, open(os.path.join(out_dir, "index.json"), "w"), indent=1)
-    print("wrote", sizes, index["sp"]["stats"], f"total {time.time() - t_start:.0f} s")
+    ix_path = os.path.join(out_dir, "index.json")
+    index = json.load(open(ix_path)) if os.path.exists(ix_path) else {}
+    index["_about"] = ("Map layers computed by tools/build_layers.py (polar, sp and np) and build_layers_global.py (gl) from LRO LOLA "
+                       "elevation (NASA PDS) and NASA NAIF SPICE DE440 positions (data/ephem.bin); temperatures re-gridded from LRO Diviner "
+                       "by build_temperature.py. Polar grids: north-up polar stereographic, pole in the middle, x toward longitude 90E; "
+                       "y toward longitude 0 on the south grid and away from it on the north grid. sun / earth 0..200 = 0..100 % of the "
+                       "time; shadow 1 = no part of the Sun seen at any checked moment; slope in tenths of a degree; 255 = no data.")
+    old = index.get(PRE, {})
+    index[PRE] = {"kind": "polar_" + POLE, "n": n, "scale_m": GRID_M, "min_lat": MIN_LAT * SY, "y_sign": SY, "mast_m": MAST_M, "directions": NDIR,
+                  "reach_km": REACH_M / 1000, "step_hours": STEP_H, "moments": int(T),
+                  "from_utc": meta["start_utc"], "years": "2023 to 2035",
+                  "files": {**old.get("files", {}), "sun": PRE + "_sun.u8.gz", "earth": PRE + "_earth.u8.gz", "shadow": PRE + "_shadow.u8.gz", "slope": PRE + "_slope.u8.gz"},
+                  "stats": {"sun_mean_pct": round(float(lit.mean()), 1), "sun_max_pct": round(float(lit.max()), 1),
+                            "shadow_share_pct": round(float((~any_sun).mean() * 100), 2),
+                            "earth_mean_pct": round(float((earth_n / T * 100).mean()), 1)}}
+    if "temperature" in old: index[PRE]["temperature"] = old["temperature"]
+    json.dump(index, open(ix_path, "w"), indent=1)
+    print("wrote", sizes, index[PRE]["stats"], f"total {time.time() - t_start:.0f} s")

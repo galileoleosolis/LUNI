@@ -10,14 +10,16 @@ Output: data/layers/sp_tavg.u8.gz and sp_tmax.u8.gz on the grid of data/layers/i
         value * 2 = kelvin, 255 = no data. Each grid square takes the mean of the triangles whose centers fall in it.
 Nothing is modeled here: the numbers are NASA's, only re-gridded.
 """
-import gzip, json, os
+import gzip, json, os, sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, "..")
 R, DEG = 1737400.0, np.pi / 180
-src = os.path.join(HERE, "dem", "diviner", "dlre_prp_south.tab")
+POLE = sys.argv[1] if len(sys.argv) > 1 else "south"      # python3 tools/build_temperature.py [south|north]
+PRE, SY = ("sp", 1.0) if POLE == "south" else ("np", -1.0)
+src = os.path.join(HERE, "dem", "diviner", f"dlre_prp_{POLE}.tab")
 ix_path = os.path.join(ROOT, "data", "layers", "index.json")
-ix = json.load(open(ix_path)); sp = ix["sp"]; n, scale = sp["n"], sp["scale_m"]
+ix = json.load(open(ix_path)); sp = ix[PRE]; n, scale = sp["n"], sp["scale_m"]
 
 REC = 210
 with open(src, "rb") as f:
@@ -38,9 +40,9 @@ with open(src, "rb") as f:
         a = np.frombuffer(buf, dtype=np.uint8).reshape(-1, REC)
         get = lambda nm: np.ascontiguousarray(a[:, col[nm][0]:col[nm][1]]).view(f"S{col[nm][1] - col[nm][0]}").ravel().astype(np.float64)
         lon, lat, tavg, tmax = get("tri_clon"), get("tri_clat"), get("temp_avg"), get("temp_max")
-        ok = (tavg > 0) & (tmax > 0) & (lat <= sp["min_lat"] + 0.05)
-        r = 2 * R * np.tan((90 + lat[ok]) * DEG / 2)
-        cc = np.rint(c + r * np.sin(lon[ok] * DEG) / scale).astype(int); rr = np.rint(c - r * np.cos(lon[ok] * DEG) / scale).astype(int)
+        ok = (tavg > 0) & (tmax > 0) & (np.abs(lat) >= abs(sp["min_lat"]) - 0.05)
+        r = 2 * R * np.tan((90 - np.abs(lat[ok])) * DEG / 2)
+        cc = np.rint(c + r * np.sin(lon[ok] * DEG) / scale).astype(int); rr = np.rint(c - SY * r * np.cos(lon[ok] * DEG) / scale).astype(int)
         inb = (cc >= 0) & (cc < n) & (rr >= 0) & (rr < n)
         np.add.at(tsum, (rr[inb], cc[inb]), tavg[ok][inb]); np.add.at(msum, (rr[inb], cc[inb]), tmax[ok][inb]); np.add.at(cnt, (rr[inb], cc[inb]), 1)
 print("triangles used:", int(cnt.sum()), "| grid squares with data:", int((cnt > 0).sum()))
@@ -57,10 +59,10 @@ def finish(total):
     return out, v
 import warnings; warnings.simplefilter("ignore")
 tavg_u8, tavg = finish(tsum); tmax_u8, tmax = finish(msum)
-for name, a in [("sp_tavg", tavg_u8), ("sp_tmax", tmax_u8)]:
+for name, a in [(PRE + "_tavg", tavg_u8), (PRE + "_tmax", tmax_u8)]:
     with open(os.path.join(ROOT, "data", "layers", name + ".u8.gz"), "wb") as f:
         f.write(gzip.compress(a.tobytes(), 9, mtime=0))
-sp["files"]["tavg"] = "sp_tavg.u8.gz"; sp["files"]["tmax"] = "sp_tmax.u8.gz"
+sp["files"]["tavg"] = PRE + "_tavg.u8.gz"; sp["files"]["tmax"] = PRE + "_tmax.u8.gz"
 sp["temperature"] = {"source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018)", "unit": "value * 2 = kelvin",
                      "avg_k": [round(float(np.nanmin(tavg[inside])), 1), round(float(np.nanmax(tavg[inside])), 1)],
                      "max_k": [round(float(np.nanmin(tmax[inside])), 1), round(float(np.nanmax(tmax[inside])), 1)],

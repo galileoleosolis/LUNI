@@ -11,9 +11,9 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
 
   async function pictures(id) {
     if (cache[id]) return cache[id];
-    const L = layer(id), out = {};
-    if (!L.polar) out.global = await globalCanvas(id);
-    out.polar = await polarCanvas(id).catch((e) => { console.warn("south polar layer unavailable:", e); return null; });
+    const out = {}, quiet = (what) => (e) => { console.warn(what + " unavailable:", e); return null; };
+    out.global = await globalCanvas(id).catch(quiet("whole-Moon layer"));
+    out.polar = [await polarCanvas(id, "sp").catch(quiet("south polar layer")), await polarCanvas(id, "np").catch(quiet("north polar layer"))];
     return (cache[id] = out);
   }
 
@@ -33,7 +33,8 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
       if (mine !== job) return;
       globe?.setOverlay(pics, strength);
       $("mm-status").hidden = true;
-      if (L.polar) { if (!pics.polar) { $("mm-status").hidden = false; $("mm-status").textContent = "THIS LAYER'S DATA DID NOT LOAD."; } else globe?.lookAt(-86, 0, 1.75); }
+      if (!pics.global && !pics.polar.some(Boolean)) { $("mm-status").hidden = false; $("mm-status").textContent = "THIS LAYER'S DATA DID NOT LOAD."; }
+      else if (L.capsOnly) globe?.lookAt(-86, 0, 1.75);      // a layer that only exists at the poles: go and look at one
     } catch (e) { console.error(e); if (mine === job) $("mm-status").textContent = "THIS LAYER COULD NOT BE DRAWN."; }
   }
 
@@ -55,7 +56,7 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
     const b = document.createElement("button"); b.dataset.id = id; b.innerHTML = `<b>${label}</b><small>${where}</small>`;
     b.addEventListener("click", () => setLayer(id)); $("mm-layers").appendChild(b);
   }
-  for (const [label, go] of [["THE SITE", () => { const s = getSite(); globe?.lookAt(s.lat, s.lon, 2.4); }], ["SOUTH POLE", () => globe?.lookAt(-86, 0, 1.75)],
+  for (const [label, go] of [["THE SITE", () => { const s = getSite(); globe?.lookAt(s.lat, s.lon, 2.4); }], ["SOUTH POLE", () => globe?.lookAt(-86, 0, 1.75)], ["NORTH POLE", () => globe?.lookAt(86, 0, 1.75)],
                              ["NEAR SIDE", () => globe?.lookAt(0, 0, 4.4)], ["FAR SIDE", () => globe?.lookAt(0, 180, 4.4)]]) {
     const b = document.createElement("button"); b.textContent = label; b.addEventListener("click", go); $("mm-view").appendChild(b);
   }
