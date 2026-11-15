@@ -320,7 +320,7 @@ function renderWindows() {
   const from = all.findIndex((w) => w.end >= state.t0);
   const list = from < 0 ? [] : all.slice(from, from + 4);
   box.replaceChildren();
-  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">RELAX THE MISSION NEEDS OR TRY ANOTHER SITE</b></div>`; return; }
+  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">CHANGE A MISSION NEED OR TRY ANOTHER SITE</b></div>`; return; }
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
@@ -614,7 +614,7 @@ function renderVersus() {
 }
 
 // ---------- timeline ----------
-const TL = { left: 58, right: 4, top: 18, rowH: 14, gap: 4, rail: 27 };      // rail = distance from the axis line down to the slider rail
+const TL = { left: 64, right: 4, top: 18, rowH: 16, gap: 4, rail: 32 };      // rail = distance from the axis line down to the slider rail
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -633,7 +633,7 @@ function renderTimeline() {
       el("rect", { x: TL.left + i * w, y: yy, width: Math.max(1, (j - i) * w), height: TL.rowH, fill: color }, svg);
       i = j;
     }
-    el("text", { x: 0, y: yy + TL.rowH / 2 + 4.5, fill: color, "font-size": 13.5, "font-weight": 600 }, svg, name);
+    el("text", { x: 0, y: yy + TL.rowH / 2 + 4.5, fill: color, "font-size": 15.5, "font-weight": 700 }, svg, name);
   });
   const yAxis = TL.top + 3 * (TL.rowH + TL.gap);
   const every = W < 520 ? 10 : 5;
@@ -662,13 +662,15 @@ function renderTimeline() {
   }
   // The slider: a rail under the chart and a handle that carries the moment it stands on.
   const yRail = yAxis + TL.rail;
-  el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
-  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 12, "font-weight": 700 }, svg, "SLIDER");
+  el("rect", { x: TL.left, y: yRail - 4, width: W - TL.left - TL.right, height: 8, rx: 4, fill: C.dim, opacity: 0.7 }, svg);
+  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 15.5, "font-weight": 700 }, svg, "SLIDER");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
   const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
-  el("rect", { id: "tl-handle-box", y: yRail - 10, height: 20, rx: 10, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
-  el("text", { id: "tl-handle-text", y: yRail + 4, fill: "#000", "font-size": 12, "font-weight": 700, "text-anchor": "middle" }, g, "");
+  el("rect", { id: "tl-handle-box", y: yRail - 13, height: 26, rx: 13, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
+  el("text", { id: "tl-handle-text", y: yRail + 5, fill: "#000", "font-size": 14, "font-weight": 700, "text-anchor": "middle" }, g, "");
+  el("rect", { id: "tl-hint-bg", y: yRail - 10, height: 20, width: 236, fill: "#000" }, g);
+  el("text", { id: "tl-hint", y: yRail + 5, fill: cssVar("--key-y"), "font-size": 14, "font-weight": 700 }, g, "");      // shown until the slider is first used
 }
 
 function renderTimelineCursor() {
@@ -679,9 +681,12 @@ function renderTimelineCursor() {
   c.setAttribute("d", `M${xx},6V${yRail}`);
   svg.querySelector("#tl-cursor-top").setAttribute("d", `M${xx - 5},0H${xx + 5}L${xx},7Z`);
   // handle: "◀ +9D 00H ▶", kept inside the chart at both ends
-  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 7.6 + 16, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
+  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 8.8 + 18, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
   const box = svg.querySelector("#tl-handle-box"), txt = svg.querySelector("#tl-handle-text");
   box.setAttribute("x", bx); box.setAttribute("width", bw); txt.setAttribute("x", bx + bw / 2); txt.textContent = label;
+  const hint = svg.querySelector("#tl-hint"), right = bx + bw + 250 < W;      // the pointer to the handle sits on whichever side has room
+  svg.querySelector("#tl-hint-bg").setAttribute("x", right ? bx + bw + 4 : bx - 240);
+  hint.setAttribute("x", right ? bx + bw + 10 : bx - 10); hint.setAttribute("text-anchor", right ? "start" : "end"); hint.textContent = right ? "◀◀ DRAG THIS ALONG THE BAR" : "DRAG THIS ALONG THE BAR ▶▶";
 }
 
 function scrubFromEvent(e) {
@@ -864,6 +869,14 @@ async function init() {
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
+  // The left side (site, time, needs) pops in and out; the answer and charts take the freed room.
+  const setSetup = (show) => {
+    document.querySelector(".cols").classList.toggle("setup-off", !show);
+    $("setup-tab").textContent = show ? "◀ HIDE" : "▶ SHOW SITE · TIME · NEEDS";
+    requestAnimationFrame(relayout);
+  };
+  $("setup-tab").addEventListener("click", () => setSetup(document.querySelector(".cols").classList.contains("setup-off")));
+  setSetup(true);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req, terrain: state.scenario.terrain }),

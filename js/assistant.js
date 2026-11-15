@@ -297,7 +297,7 @@ export function createAssistant(api) {
     "I would tell you a joke about the far side, but there is no Earth link to deliver it.",
   ];
   const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
-  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
+  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT WINDOW. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
 
@@ -336,7 +336,7 @@ export function createAssistant(api) {
         return { say: `Landing moved ${dur(Math.abs(input.hours))} ${input.hours < 0 ? "earlier" : "later"}, to ${stamp(snap().t0)}.`, changed: true };
       }
       case "next_good_time": {
-        if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Relax a mission need or try another site." };
+        if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Change a mission need or try another site." };
         api.setT0(s.next);
         return { say: `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
       }
