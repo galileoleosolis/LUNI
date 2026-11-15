@@ -848,7 +848,7 @@ async function init() {
 
   document.querySelectorAll("[data-slip]").forEach((b) => b.addEventListener("click", () => slip(Number(b.dataset.slip))));
   $("play-btn").addEventListener("click", () => togglePlay());
-  $("next-site-btn").addEventListener("click", nextSite);
+  $("next-site-btn").addEventListener("click", () => nextSite());      // not nextSite itself: the click event must not arrive as its "by"
   $("pin-btn").addEventListener("click", pinCurrent);
   $("more-btn").addEventListener("click", () => setMore());
   $("share-btn").addEventListener("click", shareLink);
