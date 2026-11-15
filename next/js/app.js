@@ -20,6 +20,8 @@ import { createHistoryPanel } from "./ui-history.js";
 import { createMoonMap } from "./ui-moonmap.js";
 import { loadDsn, dsnAt } from "./dsn.js";
 import { initSources, showData } from "./sources.js";
+import { createEnergyPanel, watts, kwh } from "./ui-energy.js";
+import { showCompare, compareWanted, compareOpen, closeCompare } from "./ui-compare.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -127,6 +129,7 @@ async function loadCustomTerrain(site) {
   if (job !== terrainJob) return;
   state.terrainBusy = false;
   if (state.site === site) recompute({ keepIdx: true });
+  flushCompare();
 }
 
 // Landing time: four pickers (day, month, year, hour), all UTC. Nothing to type, so it cannot be half-entered.
@@ -243,7 +246,7 @@ function recompute({ keepIdx = false } = {}) {
   renderTimeline();
   renderMission();
   renderMoment();
-  scan?.refresh();
+  scan?.refresh(); energy?.refresh();
   surface?.refresh();
   window.dispatchEvent(new Event("luno:state"));
   // A small surprise: Apollo 11's own site on its own day of the year (it landed there on 20 July 1969, 20:17 UTC).
@@ -346,8 +349,10 @@ function renderMission() {
     const s = state.cal.samples[i0 + Math.round((e.peak - state.t0) / 3600000 / STEP_HOURS)];
     return s && s.sunTerrain > 0 && e.maxCover >= 0.05;
   });
-  for (const e of hit) $("mission-why").insertAdjacentHTML("beforeend",
-    `<div class="warn">⚠ ECLIPSE ON ${dayStamp(e.peak)}: EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</div>`);
+  // Warnings sit to the right of the verdict, in their own box (the user: "to the right and not underneath").
+  $("mission-warn").innerHTML = hit.map((e) =>
+    `<div class="warn"><b>⚠ ECLIPSE ON ${dayStamp(e.peak)}</b><span>EARTH HIDES ${e.maxCover >= 0.995 ? "ALL" : Math.round(e.maxCover * 100) + "%"} OF THE SUN FOR UP TO ${Math.round((e.end - e.start) / 3600000)} HOURS</span></div>`).join("");
+  $("mission-warn").hidden = !hit.length;
   state.mission = { v, next: nx ? nx.start : null, fixes, eclipses: hit };      // kept for the command assistant
   // the same answer, short, for the BIG MOON view (which covers the verdict block)
   $("globe-verdict").className = "globe-verdict" + (v.ok ? " go" : "");
@@ -375,9 +380,27 @@ function setT0(d) { state.t0 = new Date(d); recompute(); }
 
 function nextWindow() {
   const w = state.cal.windows.find((x) => x.start > state.t0);
-  if (w) return setT0(w.start);
+  if (w) { const before = { site: state.site, t0: state.t0 }; setT0(w.start); offerCompare(before, "date"); return; }
   for (const b of [$("next-window-btn"), $("side-next")]) { b.classList.add("flash"); setTimeout(() => b.classList.remove("flash"), 500); }
 }
+
+// BEFORE AND AFTER: when the Best Site Finder moves the site or NEXT LANDING WINDOW moves the date, a box puts the
+// original plan next to the new one and shows what was gained (the user asked for this after the judges said the
+// comparison was hidden). Not during a test or the tutorial, and not when the user has switched it off.
+let quietCompare = false, pendingCompare = null, energy = null;
+function offerCompare(before, kind) {
+  if (!compareWanted() || quietCompare || globalThis.LUNO_NO_COMPARE || document.querySelector(".tour-card")) return;
+  const date = kind === "date", where = (site) => `${siteName(site)}<small>${fmtLat(site.lat)} ${fmtLon(site.lon)}</small>`;
+  showCompare({
+    title: date ? "NEXT LANDING WINDOW · WHAT CHANGED" : "NEW LANDING SITE · WHAT CHANGED",
+    lead: date ? `${siteName(state.site)} · THE SAME SITE AT A NEW LANDING TIME · ${state.req.days}-DAY MISSION` : `LANDING ${stamp(state.t0)} · THE SAME TIME AT A NEW SITE · ${state.req.days}-DAY MISSION`,
+    a: { label: date ? stamp(before.t0) : where(before.site), site: before.site, t0: before.t0, terrain: terrainFor(before.site) },
+    b: { label: date ? stamp(state.t0) : where(state.site), site: state.site, t0: state.t0, terrain: state.scenario.terrain },
+    req: state.req,
+    buttons: [["KEEP THE NEW PLAN ▸", null, true], ["◂ GO BACK TO THE ORIGINAL", () => { if (before.site !== state.site) selectSite(before.site); setT0(before.t0); }]],
+  });
+}
+function flushCompare() { if (!pendingCompare || state.terrainBusy) return; const b = pendingCompare; pendingCompare = null; offerCompare(b, "site"); }
 
 // Change one mission need (from its buttons or from a "way to get a GO" button) and keep the buttons in step.
 function setReq(k, val) { setReqs({ [k]: val }); }
@@ -397,6 +420,7 @@ function openNeeds(open) {
   $("needs-more").textContent = open ? "▾ SHOW FEWER NEEDS" : "▸ 3 MORE MISSION NEEDS";
 }
 // SIMPLE VIEW (the default): the few keys and needs most people use. ALL TOOLS: everything. Kept under "luno-view".
+let setSetup = () => {};
 function setTools(all, keep = true) {
   document.documentElement.classList.toggle("simple", !all);
   $("tools-btn").innerHTML = all ? "SIMPLE VIEW" : "ALL TOOLS";
@@ -465,6 +489,7 @@ function renderMoment() {
   $("sun-next").textContent = fmtBig(sunLeft);
   $("sun-next-date").textContent = sunLeft == null ? "" : `${stamp(new Date(+cur.t + sunLeft * 3600000))}`;
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1) + "°";
+  if (energy) $("sun-watts").textContent = `PANEL NOW ${watts(energy.now(cur.sunFrac))}`;
   // In view below level: the site stands high, so the skyline in that direction dips under the horizontal.
   const lowNote = (id, up, el) => { const n = $(id); n.hidden = !(up && el < 0); if (!n.hidden) n.textContent = "BELOW LEVEL, BUT THE SKYLINE THERE DIPS LOWER"; };
   lowNote("sun-low", cur.sunUp, cur.sunEl);
@@ -569,8 +594,27 @@ function renderHorizon(cur) {
     d += "L" + pt; ln += (az ? "L" : "M") + pt;
   }
   el("path", { d: d + `L${x(360)},${H - B}Z`, fill: "url(#hz-ground)", stroke: "none" }, svg);
-  el("path", { d: ln, fill: "none", stroke: lit ? "#e9eef3" : C.dim, "stroke-width": 1.6 }, svg);
+  const ridgeLine = el("path", { d: ln, fill: "none", stroke: lit ? "#e9eef3" : C.dim, "stroke-width": 1.6 }, svg);
   drawPaths(el("g", { opacity: 0.3 }, svg), 0.999);             // the same paths, faint, where they run behind the ground
+  // Depth: two nearer bands of ground in front of the skyline, each darker and smoother. They are for the eye only;
+  // they always stay below the true skyline (the top edge), which alone decides what the ground hides.
+  {
+    const N = 720, hz = Array.from({ length: N + 1 }, (_, i) => clampY(horizonAt(horizon, i / 2)));
+    const smooth = (w) => hz.map((_, i) => { let t = 0; for (let k = -w; k <= w; k++) t += hz[(((i + k) % N) + N) % N]; return t / (2 * w + 1); });
+    const floor = H - B, top = Math.min(...hz), G = Math.max(18, floor - hz.reduce((t, v) => t + v, 0) / hz.length);
+    const s1 = smooth(24), s2 = smooth(80);
+    const near = hz.map((v, i) => Math.min(floor, Math.max(v + 0.13 * G, s1[i] + 0.24 * G)));
+    const front = near.map((v, i) => Math.min(floor, Math.max(v + 0.12 * G, s2[i] + 0.52 * G + 0.035 * G * Math.sin(i / N * Math.PI * 10))));
+    grad("hz-near", lit ? [[0, "#7c838c"], [1, "#2b3037"]] : [[0, "#252e40"], [1, "#0c1018"]], { x1: 0, y1: 0, x2: 0, y2: 1 });
+    grad("hz-front", lit ? [[0, "#4d535b"], [1, "#16191e"]] : [[0, "#171d2a"], [1, "#06080c"]], { x1: 0, y1: 0, x2: 0, y2: 1 });
+    for (const [ys, fill, edge] of [[near, "url(#hz-near)", lit ? "#c3cad2" : "#4d5d7c"], [front, "url(#hz-front)", lit ? "#8b929b" : "#34405a"]]) {
+      if (floor - top < 26) break;                               // too little ground in the picture for bands
+      let dd = "";
+      for (let i = 0; i <= N; i++) dd += (i ? "L" : "M") + x(i / 2).toFixed(1) + "," + ys[i].toFixed(1);
+      el("path", { d: dd + `L${x(360)},${floor}L${x(0)},${floor}Z`, fill, stroke: "none" }, svg);
+      el("path", { d: dd, fill: "none", stroke: edge, "stroke-width": 1, opacity: 0.55 }, svg);
+    }
+  }
   ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"].forEach((dname, i) => {
     if (narrow && i % 2) return;
     el("text", { x: Math.min(W - 8, x(i * 45)), y: H - 4, fill: C.dim, "font-size": 12.5, "text-anchor": "middle" }, svg, dname);
@@ -591,12 +635,20 @@ function renderHorizon(cur) {
   const clipAbove = (id, p) => { const c = el("clipPath", { id }, defs); el("rect", { x: 0, y: 0, width: W, height: Math.max(0, p.ySky) }, c); };
 
   // Sun
-  const RS = Math.round(Math.max(8, Math.min(11, H * 0.06))), sp = place(cur.sunAz, cur.sunEl, 0.2666, RS);      // drawn larger than life; Earth stays the bigger of the two, as it is from the Moon (about 3.6 times wider)
+  // Both are drawn larger than life; Earth stays the bigger of the two, as it is from the Moon (about 3.6 times wider).
+  // Drawn that large, the two discs can touch on the picture when the real ones are well apart, which looks like an
+  // eclipse that is not happening. So unless Earth really is in front of the Sun, both shrink until they stand clear.
+  let RS = Math.round(Math.max(8, Math.min(11, H * 0.06))), RE = Math.round(Math.max(13, Math.min(20, H * 0.11)));
+  {
+    const s0 = place(cur.sunAz, cur.sunEl, 0.2666, RS), e0 = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE), gap = Math.hypot(s0.cx - e0.cx, s0.cy - e0.cy);
+    if (!(cur.eclipse > 0.01) && s0.k > -1 && e0.k > -1 && gap < RS + RE + 5) { const k = Math.max(0.3, (gap - 5) / (RS + RE)); RS = Math.max(3, RS * k); RE = Math.max(4.5, RE * k); }
+  }
+  const sp = place(cur.sunAz, cur.sunEl, 0.2666, RS);
   if (sp.k > -1) {
     clipAbove("hz-clip-sun", sp);
     const g = el("g", sp.k < 1 ? { "clip-path": "url(#hz-clip-sun)" } : {}, svg), inner = el("g", { transform: `translate(${sp.cx},${sp.cy})` }, g);
-    el("circle", { r: 30, fill: "url(#hz-halo)" }, inner);
-    for (let a = 0; a < 180; a += 45) { const c = Math.cos(a * Math.PI / 180), s2 = Math.sin(a * Math.PI / 180), len = a % 90 ? 13 : 19; el("line", { x1: -c * len, y1: -s2 * len, x2: c * len, y2: s2 * len, stroke: "#fff2b0", "stroke-width": 1.2, opacity: 0.85 }, inner); }
+    el("circle", { r: RS * 3.4, fill: "url(#hz-halo)" }, inner);      // the glow and the rays are sized from the Sun itself, so they always fit it
+    for (let a = 0; a < 180; a += 22.5) { const c = Math.cos(a * Math.PI / 180), s2 = Math.sin(a * Math.PI / 180), len = RS * (a % 90 === 0 ? 2.7 : a % 45 === 0 ? 2.15 : 1.65); el("line", { x1: -c * len, y1: -s2 * len, x2: c * len, y2: s2 * len, stroke: "#fff2b0", "stroke-width": Math.max(1, RS * 0.14), "stroke-linecap": "round", opacity: a % 45 === 0 ? 0.9 : 0.6 }, inner); }
     el("circle", { r: RS, fill: "#fff3b8", stroke: "#ffd23c", "stroke-width": 1.5 }, inner);
   } else {
     el("circle", { cx: sp.cx, cy: sp.cy, r: RS, fill: "none", stroke: "#ffd23c", "stroke-width": 1.5, "stroke-dasharray": "3 3", opacity: 0.8 }, svg);
@@ -605,7 +657,7 @@ function renderHorizon(cur) {
 
   // Earth, with its real phase: the lit side faces the Sun.
   // Earth is drawn bigger than the Sun because it is: seen from the Moon its disc is about 3.6 times as wide.
-  const RE = Math.round(Math.max(13, Math.min(20, H * 0.11))), ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
+  const ep = place(cur.earthAz, cur.earthEl, cur.earthRadDeg || 0.95, RE);
   if (ep.k > -1) {
     clipAbove("hz-clip-earth", ep);
     const g = el("g", ep.k < 1 ? { "clip-path": "url(#hz-clip-earth)" } : {}, svg), e = el("g", { transform: `translate(${ep.cx},${ep.cy})` }, g);
@@ -638,7 +690,13 @@ function renderHorizon(cur) {
     label(ep.cx, ep.cy, earthText, earthCol, -RE - 1, RE + 6);
   }
 
-  el("title", {}, svg, "The Sun and Earth are drawn larger than life. Their positions, and how much of each the ground hides, are exact.");
+  // Light from the Sun along the top of the ridge beneath it.
+  if (sp.k > -1 && lit) {
+    const g2 = el("linearGradient", { id: "hz-rim", gradientUnits: "userSpaceOnUse", x1: sp.cx - 150, x2: sp.cx + 150, y1: 0, y2: 0 }, defs);
+    for (const [o, a] of [[0, 0], [0.5, 0.95], [1, 0]]) el("stop", { offset: o, "stop-color": "#fff4bf", "stop-opacity": a }, g2);
+    ridgeLine.after(el("path", { d: ln, fill: "none", stroke: "url(#hz-rim)", "stroke-width": 2.6 }));
+  }
+  el("title", {}, svg, "The Sun and Earth are drawn larger than life. Their positions, and how much of each the ground hides, are exact. The top edge of the ground is the real skyline; the darker bands in front of it are only there to give the picture depth.");
 }
 
 // ---------- this site next to Earth ----------
@@ -840,6 +898,15 @@ const assistantApi = {
   pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
   takeOption: (i) => state.mission.fixes[i]?.[2](),
   moveToExtreme: (what, which) => { showScreen("main"); return scan.extreme(what, which); },
+  placePanels: (radiusKm, count) => { showScreen("main"); return scan.panels(radiusKm, count); },
+  // two listed sites side by side at the landing time on screen
+  compareSites: (A, B) => { showScreen("main"); const name = (x) => `${siteName(x)}<small>${fmtLat(x.lat)} ${fmtLon(x.lon)}</small>`;
+    return showCompare({ title: "TWO SITES SIDE BY SIDE", lead: `LANDING ${stamp(state.t0)} · ${state.req.days}-DAY MISSION · YOUR MISSION NEEDS`, heads: ["SITE A", "SITE B"], gainHead: "B AGAINST A",
+      a: { label: name(A), site: A, t0: state.t0, terrain: terrainFor(A) }, b: { label: name(B), site: B, t0: state.t0, terrain: terrainFor(B) }, req: state.req,
+      buttons: [[`GO TO ${siteName(A)}`, () => selectSite(A)], [`GO TO ${siteName(B)}`, () => selectSite(B)], ["CLOSE", null, true]] }); },
+  energyText: () => { const b = energy.budget(), r = state.req; if (!energy.isOpen()) energy.toggle(true);
+    return `With the panel and power use set under ENERGY, the panel gives ${watts(b.peakW)} in full Sun. Over the ${r.days}-day mission it collects ${kwh(b.inWh)} and the lander uses ${kwh(b.usedWh)}. ` +
+      (b.enough ? (b.batteryWh > 0 ? `That is enough, with a battery of at least ${kwh(b.batteryWh)}; the longest time on the battery is ${b.onBatteryLongestH} hours.` : "That is enough, and the panel never drops below what the lander uses.") : "That is not enough energy: it needs a bigger panel, less power use, or more Sun."); },
   openProof: (show) => { if (proof.isOpen() !== show) proof.toggle(show); },
   openHistory: (show) => { if (past.isOpen() !== show) showScreen(show ? "history" : "main"); },
   openMoonMap: (show, layerId) => { if (moonmap.isOpen() !== show) showScreen(show ? "moon" : "main"); if (show && layerId) moonmap.setLayer(layerId); },
@@ -992,17 +1059,19 @@ async function init() {
   initSources();
   $("ops").addEventListener("click", (e) => { const g = e.target.closest(".ops-b"); if (g) setIdx(+g.dataset.i); });
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
+  energy = createEnergyPanel({ getContext: () => ({ site: state.site, t0: state.t0, req: state.req, terrain: state.scenario.terrain, samples: state.scenario.samples }),
+    fmt: { site: siteName, stamp }, onChange: () => renderMoment() });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
-  $("tools-btn").addEventListener("click", () => setTools(document.documentElement.classList.contains("simple")));
+  $("tools-btn").addEventListener("click", () => { const all = document.documentElement.classList.contains("simple"); setTools(all); setSetup(all); });      // SIMPLE VIEW also folds the left side away
   $("needs-more").addEventListener("click", () => openNeeds(!document.querySelector(".needs").classList.contains("open")));
   openNeeds(document.querySelector(".needs").classList.contains("open"));
-  { let all = /^#test-[a-d]\b/.test(location.hash) || !!globalThis.LUNO_ALL_TOOLS;      // the older test sets use every key
-    try { all ||= localStorage.getItem("luno-view") === "all"; } catch {}
-    setTools(all, false); }
+  let allAtStart = /^#test-[a-d]\b/.test(location.hash) || !!globalThis.LUNO_ALL_TOOLS;      // the older test sets use every key
+  try { allAtStart ||= localStorage.getItem("luno-view") === "all"; } catch {}
+  setTools(allAtStart, false);
   // The left side (site, time, needs) pops in and out; the answer and charts take the freed room.
-  const setSetup = (show) => {
+  setSetup = (show) => {
     document.querySelector(".cols").classList.toggle("setup-off", !show);
     $("setup-tab").textContent = show ? "◀ HIDE" : "▶ SHOW SITE · TIME · NEEDS";
     requestAnimationFrame(relayout);
@@ -1011,17 +1080,22 @@ async function init() {
   // Before each tutorial card: the main screen with nothing open over it, so the part being explained is in view.
   tourPrepare = () => {
     showScreen("main"); if (document.querySelector(".cols").classList.contains("setup-off")) setSetup(true);
+    closeCompare(); if (energy.isOpen()) energy.toggle(false);
     if (scan.isOpen()) scan.toggle(false); if (proof.isOpen()) proof.toggle(false); if (surface.isOpen()) surface.toggle(false); if (comms.isOpen()) comms.toggle(false);
     setMore(false); showPlan("plan");
   };
-  setSetup(true);
+  // SIMPLE VIEW starts with the left side folded away (the user: "left panel defaulted collapsed"): the answer gets
+  // the whole screen and one tab opens site, time and needs. ALL TOOLS, the test sets and the tutorial start with it open.
+  setSetup(allAtStart || /^#test/.test(location.hash) || !!globalThis.LUNO_TEST || !!globalThis.LUNO_SETUP_OPEN);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req, terrain: state.scenario.terrain }),
     onPick: (lat, lon) => {
       const from = state.site;
+      pendingCompare = { site: from, t0: state.t0 };
       selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
       toast(`LANDING SITE MOVED ${moveText(from, { lat, lon })} · NOW AT ${fmtLat(lat)} ${fmtLon(lon)}`);
+      flushCompare();
     },
     getSiteYears: () => (state.site.id !== CUSTOM_ID && terrainFor(state.site).real ? siteYears(state.site) : null),
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
@@ -1031,7 +1105,7 @@ async function init() {
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
     fmt: { site: siteName, stamp },
   });
-  $("surface-btn").addEventListener("click", () => surface.toggle(true));
+  $("surface-btn").addEventListener("click", () => { surface.toggle(true); showData("surface"); });
   buildNeeds();
   // OpenSpace link: off until asked for; not offered on the preview page, which cannot reach programs on this computer.
   if (globalThis.LUNO_B64) $("os-box").hidden = true;
@@ -1072,6 +1146,8 @@ async function init() {
     else if (k === "Escape" && (past.isOpen() || moonmap.isOpen())) showScreen("main");
     else if (k === "h" || k === "H") showScreen(past.isOpen() ? "main" : "history");
     else if (k === "m" || k === "M") showScreen(moonmap.isOpen() ? "main" : "moon");
+    else if (k === "Escape" && compareOpen()) closeCompare();
+    else if (k === "Escape" && energy.isOpen()) energy.toggle(false);
     else if (k === "Escape" && proof.isOpen()) proof.toggle(false);
     else if (k === "Escape" && !$("more-panel").hidden) setMore(false);
     else if (k === "Escape" && comms.isOpen()) comms.toggle(false);
@@ -1091,7 +1167,7 @@ async function init() {
 
   renderCompare();
   selectSite(state.site);
-  const testing = initTestMode({
+  const testing = quietCompare = initTestMode({
     snapshot: () => ({ site: state.site, t0: state.t0, req: state.req, missionOk: state.cal.a.at(calIdx()).ok }),
     relayout,
     onExplore: () => startGuide({ prepare: tourPrepare }),

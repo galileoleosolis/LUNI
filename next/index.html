@@ -116,11 +116,21 @@
         <div id="scan" class="scan" hidden>
           <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-close" class="scan-home" title="Close the Best Site Finder (Esc)">◂ BACK TO THE MAIN SCREEN</button></span></div>
           <div class="scan-body">
-            <div class="scan-map"><div class="scan-ctl" id="scan-ctl"><div class="scan-pick"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><label class="scan-pick"><b>MAP SHOWS</b><select id="scan-metric" aria-label="What the map's colors show"></select></label></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
+            <div class="scan-map"><div class="scan-row" id="scan-row"><div class="scan-stack" id="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><div class="scan-stack" id="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric" role="group" aria-label="What the map's colors show"></div></div></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
               <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
               <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
               <div id="scan-progress"></div>
+              <h3 class="band" data-band="2"><b class="h-t">SOLAR PANELS</b> · <b class="h-do">PLACE THEM AT THE SUNNIEST SPOTS</b></h3>
+              <div id="scan-panels" class="scan-panels">
+                <button id="panels-open" class="panels-open">☀ PLACE SOLAR PANELS ▸</button>
+                <div id="panels-form" class="panels-form" hidden>
+                  <label>WITHIN <input id="panels-radius" type="number" min="0.1" step="0.1" inputmode="decimal"> KM OF THE LANDING SITE</label>
+                  <label>HOW MANY PANELS <input id="panels-count" type="number" min="1" max="20" step="1" value="4" inputmode="numeric"></label>
+                  <div class="panels-btns"><button id="panels-go" class="primary">PLACE THEM ▸</button><button id="panels-clear">CLEAR</button></div>
+                </div>
+                <div id="panels-out" class="panels-out"></div>
+              </div>
               <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
               <div id="scan-legend" class="scan-legend"></div>
               <div id="scan-rank" class="scan-rank"></div>
@@ -136,6 +146,10 @@
           <div class="scan-head"><span><b class="h-t">PROOF</b> · HOW YOU CAN TELL LUNI IS RIGHT, AND WHERE IT STOPS</span><span class="scan-head-btns"><button id="proof-close" title="Close (Esc)">✕ CLOSE</button></span></div>
           <div id="proof-body" class="proof-body"></div>
         </div>
+        <div id="energy" class="scan proof energy" hidden>
+          <div class="scan-head"><span><b class="h-t">ENERGY</b> · WHAT THIS PLAN COLLECTS, WHAT THE LANDER USES, AND THE BATTERY IN BETWEEN</span><span class="scan-head-btns"><button id="energy-close" title="Close (Esc)">✕ CLOSE</button></span></div>
+          <div id="energy-body" class="proof-body"></div>
+        </div>
         <div id="story" class="story" hidden></div>
         <div class="tiles-head ans-head"><h3 data-step="4"><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
           <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE SITES · MORE</button></span></div>
@@ -146,6 +160,7 @@
             <div class="hero-title" id="mission-title"></div>
             <div class="hero-why" id="mission-why"></div>
           </div>
+          <div class="hero-warn" id="mission-warn" hidden></div>
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
           <div class="answer-side">
@@ -161,6 +176,7 @@
               <div class="mini">HEIGHT <b id="sun-el"></b> · DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
               <div class="mini note-low" id="sun-low" hidden></div>
+              <button id="energy-btn" class="energy-btn" title="How much power this plan collects and uses, hour by hour, and the battery it needs"><b id="sun-watts"></b> · ENERGY ▸</button>
             </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
           </div>

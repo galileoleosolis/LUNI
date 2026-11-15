@@ -3,6 +3,9 @@
 // slides away. One place, every screen. showData("verdict") or showData([["WHAT", "SOURCE"], ...]).
 const SETS = {
   verdict: [["SUN + EARTH POSITIONS", "NASA NAIF SPICE (DE440)"], ["SKYLINE AT THE SITE", "NASA LRO LOLA ELEVATION"]],
+  compare: [["BOTH PLANS, SUN + EARTH", "NASA NAIF SPICE (DE440)"], ["BOTH SKYLINES", "NASA LRO LOLA ELEVATION"]],
+  energy: [["SUNLIGHT STRENGTH AT THE MOON", "NASA: 1,361 W PER SQUARE METER"], ["HOURS OF SUN", "NASA NAIF SPICE + NASA LRO LOLA"]],
+  panels: [["SUNLIGHT ON EVERY SQUARE", "NASA NAIF SPICE (DE440) + NASA LRO LOLA"]],
   finder: [["TERRAIN OF EVERY SQUARE", "NASA LRO LOLA ELEVATION"], ["SUN + EARTH", "NASA NAIF SPICE (DE440)"]],
   history: [["LUNI'S NUMBERS", "NASA NAIF SPICE + NASA LRO LOLA"], ["MISSION RECORDS", "THE SOURCES LISTED FOR EACH LANDING"]],
   surface: [["THE GROUND", "NASA LRO LOLA ELEVATION (40 M NEAR THE POLAR SITES)"], ["SUN + EARTH", "NASA NAIF SPICE (DE440)"]],
@@ -17,7 +20,7 @@ const SETS = {
   },
 };
 let band = null, timer = 0;
-const HOLD_MS = 6500;
+const HOLD_MS = 8000;
 
 export function initSources() {
   const bar = document.querySelector("header.bar"); if (!bar || band) return;
@@ -30,8 +33,8 @@ export function showData(what, extra = null) {
   let rows = Array.isArray(what) ? what : what.startsWith("layer:") ? SETS.layers[what.slice(6)] || SETS.layers.none : SETS[what];
   if (!rows) return;
   if (extra) rows = [...rows, extra];
-  band.innerHTML = `<b>NASA DATA USED</b>` + rows.map(([k, v]) => `<span><i>${k}</i> ${v}</span>`).join("");
+  // White with a red tag: on purpose not the unit's own blue, so it cannot blend into the screen behind it.
+  band.innerHTML = `<b>NASA DATA USED</b>` + rows.map(([k, v]) => `<span><i>${k}</i> <u>${v}</u></span>`).join("");
   band.hidden = true; void band.offsetWidth; band.hidden = false;      // restart the slide-in if one is already showing
-  band.style.animationDuration = HOLD_MS + "ms";
   clearTimeout(timer); timer = setTimeout(() => { band.hidden = true; }, HOLD_MS);
 }
