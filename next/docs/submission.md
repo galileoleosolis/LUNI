@@ -56,6 +56,8 @@ Source code: https://github.com/galileoleosolis/LUNI
 - **Mission plan, operations and mission windows.** A 30-day timeline with a slider for any moment of the mission; an
   operations view that lays the mission out as stretches in order (power and link, power only, on battery, eclipse);
   and every good landing day for the next 12 months.
+- **Where water ice could last.** A map layer and a data card row from NASA's Diviner Polar Resource Product: how deep
+  below the surface water ice would stay frozen, at both poles.
 - **All sites side by side.** Every site in the list carries a green or red dot for the landing time on screen, and
   a ranked table shows how many good landing days each site has. Any latitude and longitude can be typed in.
 - **Best Site Finder.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
