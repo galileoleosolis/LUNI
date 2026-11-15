@@ -399,6 +399,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   Utility Navigational Intelligence" without "for". Change every readable place at once, check, then it needs a
   "release it". Not started. The deck cover already says it with "for"; its team name was corrected to
   "Mystic Research" (members: Galileo Solis and Jove Solis, as the user typed them on the cover).
+- **SUBMITTED for global judging** (the user, Sun 15 Nov, mid-afternoon New York: "ok its submitted, we can still edit
+  this later"). The Project page was filled from `docs/submission.md`: name "LUNI: Lunar Utility for Navigational
+  Intelligence", final project link https://galileoleosolis.github.io/LUNI/, the demo link is the user's own
+  PowerPoint on a public share (a fallback PDF is at `docs/LUNI-deck.pdf`, rendered here with a stand-in font).
+  It can be edited and resubmitted until Sun 11:59 PM New York; only the last saved submission is judged, and it must
+  be SUBMITTED again after edits. Rules from the official guide: at most seven slides or the entry is not eligible;
+  no likeness of anyone under 18; English; public links with no login.
+  Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
+  Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
 - **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
   main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
   E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
