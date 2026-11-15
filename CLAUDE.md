@@ -375,6 +375,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   14 Jan 2027, 14 days); the side-by-side box covers the ASK LUNI reply; density; no outside users.
   The slide deck was updated for the batch (new screenshots; slide 3 shows ENERGY, slide 4 the finder with solar
   panels and the before-and-after box).
+- **GIFs** (the user, Sun 15 Nov about 2 PM New York: "Can you add gifs? i think the area scan one would be a cool
+  gif"): `docs/figures/luni-best-site-finder.gif` (800 x 398, 1.7 MB, 9 s: the scan fills in, the best spot is
+  starred, the lander moves, a new scan starts) and `docs/figures/luni-skyline-25-days.gif` (1280 x 197, 2.5 MB:
+  the Sun and Earth over 25 days at Nobile Rim 1, a frame every 6 hours). Recorded from the real app with
+  Playwright (`gifshots.js` in the scratchpad, `LUNO_NO_COMPARE` set) and put together with Pillow; nothing drawn
+  by hand or by an image model. In the deck: slide 4 left and slide 2. A PDF export shows one still frame.
 - **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
   main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
   E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
