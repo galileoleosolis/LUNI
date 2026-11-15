@@ -19,6 +19,8 @@ export const goodColor = (score) => ramp(GOOD_RAMP, score);
 export const elevColor = (t) => ramp(ELEV_RAMP, t);         // t = 0 (lowest) .. 1 (highest)
 export const SHADOW_COLOR = [140, 84, 255];
 const SHADOW_RGB = [140, 84, 255];
+const ICE_RAMP = [[20, 40, 90], [40, 110, 200], [120, 220, 255], [235, 252, 255]];      // deep ... at the surface
+const ICE_NONE = 99;                                     // NASA's "deeper than 2.87 m": no depth reported
 const TEMP_RAMP = [[18, 10, 60], [44, 60, 190], [120, 60, 190], [226, 80, 80], [250, 190, 70], [255, 250, 220]];
 const celsius = (k) => { const c = Math.round(k - 273.15); return `${c < 0 ? "−" : "+"}${Math.abs(c)} °C`; };
 const num = (v) => `${v >= 0 ? "+" : "−"}${Math.abs(Math.round(v)).toLocaleString("en-US")}`;
@@ -55,6 +57,14 @@ export const LAYERS = [
     ends: ["COLD", "WARM"], scale: ["−243 °C (30 K)", "+7 °C (280 K)"],
     meaning: "THE GROUND'S AVERAGE TEMPERATURE. THE COLDEST PLACES ARE THE PERMANENT SHADOWS AT THE POLES; COLD IS HARD ON A LANDER AND ITS BATTERIES. THE DATA PROFILE ALSO GIVES THE HOTTEST THE GROUND GETS (ABOUT +120 °C AT THE EQUATOR).",
     source: "NASA'S OWN NUMBERS, ONLY RE-GRIDDED BY LUNI, FROM THE LRO DIVINER RADIOMETER (NASA PDS GEOSCIENCES NODE). POLEWARD OF 80°: POLAR RESOURCE PRODUCT V2.0 (PAIGE ET AL., 2018), ANNUAL AVERAGE AND MAXIMUM FROM THERMAL MODELS FITTED TO THE MEASUREMENTS. ELSEWHERE: GLOBAL CUMULATIVE PRODUCTS V1.0 (WILLIAMS ET AL., 2017), MEASURED TEMPERATURES IN HALF-DEGREE SQUARES (ABOUT 15 KM), AVERAGED OVER THE LUNAR DAY (HOURS WITH NO MEASUREMENT ARE FILLED FROM THE HOURS BEFORE AND AFTER)." },
+  // Where water ice could last, from NASA's Diviner Polar Resource Product: the depth below which ice is stable.
+  { id: "ice", label: "WATER ICE", where: "BOTH POLES", polar: true, capsOnly: true, lo: 2.9, hi: 0, card: "ICE CAN LAST",
+    color: (v) => (v >= ICE_NONE ? null : ramp(ICE_RAMP, 1 - v / 2.9)), score: null,
+    text: (v) => (v >= ICE_NONE ? "NOT WITHIN THE TOP 2.9 M" : v < 0.006 ? "AT THE SURFACE" : `FROM ${v.toFixed(2)} M DOWN`),
+    brief: (v) => (v >= ICE_NONE ? "NOT IN 2.9 M" : v < 0.006 ? "AT SURFACE" : `${v.toFixed(2)} M DOWN`),
+    ends: ["ONLY DEEP DOWN", "AT THE SURFACE"], scale: ["2.9 M DOWN", "0 M"],
+    meaning: "WATER ICE IS WHY MISSIONS GO TO THE POLES. THIS SHOWS WHERE THE GROUND IS COLD ENOUGH FOR ICE TO LAST, AND HOW FAR DOWN YOU WOULD HAVE TO DIG: BRIGHT = RIGHT AT THE SURFACE, DARK BLUE = DEEPER. NO COLOR = TOO WARM FOR ICE IN THE TOP 2.9 M. IT SAYS WHERE ICE COULD SURVIVE, NOT THAT ICE IS THERE.",
+    source: "NASA'S OWN NUMBERS, ONLY RE-GRIDDED BY LUNI: LRO DIVINER POLAR RESOURCE PRODUCT V2.0 (PAIGE ET AL., 2018, NASA PDS GEOSCIENCES NODE), THE CALCULATED DEPTH AT WHICH WATER ICE WOULD BE LOST AT 1 KG PER SQUARE METER PER BILLION YEARS. 0 = STABLE AT THE SURFACE. NASA REPORTS NO DEPTH BEYOND 2.87 M. THE COLDEST GROUND (NEVER WARMER THAN 101 K) CARRIES A CODE OF −1 THAT NASA'S LABEL DOES NOT DESCRIBE; LUNI SHOWS IT AS AT THE SURFACE, LIKE THE 0 VALUES BESIDE IT." },
   // YOUR MIX: the layers above blended with weights you choose (see mixScore).
   { id: "mix", label: "YOUR MIX", where: "WHOLE MOON", polar: true, mix: true, lo: 0, hi: 100,
     color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)} OF 100`,
@@ -132,10 +142,11 @@ export function polarValue(id, lat, lon, slopeDeg = null) {
     const g = (k, f) => (P[k] && P[k][i] !== 255 ? P[k][i] * f : null);
     if (id === "mix") return mixScore({ sun: g("sun", 0.5), earth: g("earth", 0.5), temp: g("tavg", 2), slope: g("slope", 0.1) ?? slopeDeg });
     if (id === "shadow") return P.shadow[i];
+    if (id === "ice") { const r = P.ice ? P.ice[i] : 255; return r === 255 ? null : r === 254 ? ICE_NONE : r * 0.0125; }
     return id === "temp" ? g("tavg", 2) : id === "tmax" ? g("tmax", 2) : g(id, id === "slope" ? 0.1 : 0.5);
   }
   const G = DATA.gl;
-  if (!G || id === "shadow" || id === "slope") return null;
+  if (!G || id === "shadow" || id === "slope" || id === "ice") return null;
   const sun = glAt(G.sun, G.ppd, lat, lon), earth = glAt(G.earth, G.ppd, lat, lon), tp = G.temperature?.ppd || 2;
   const half = (v) => (v == null ? null : v / 2), dbl = (v) => (v == null ? null : v * 2);
   if (id === "mix") return mixScore({ sun: half(sun), earth: half(earth), temp: dbl(glAt(G.tavg, tp, lat, lon)), slope: slopeDeg });
@@ -165,6 +176,12 @@ export async function profileAt(lat, lon) {
   const hot = polarValue("tmax", lat, lon), at = rows.findIndex((r) => r.id === "temp"), T = layer("temp");
   if (hot != null && at >= 0) rows.splice(at + 1, 0, { id: "tmax", label: "TEMPERATURE (MAX)", value: hot, text: T.brief(hot), score: null, rgb: T.color(hot), share: clamp01((hot - T.lo) / (T.hi - T.lo)), note: "" });
   return rows;
+}
+
+// One card row for a layer and a value that did not come from the layer's own grid (a site's own long-term numbers).
+export function layerRow(id, v, note = "") {
+  const L = layer(id);
+  return { id, label: L.card || L.label, value: v, text: (L.brief || L.text)(v), score: L.score ? L.score(v) : null, rgb: L.color(v), share: clamp01((v - L.lo) / (L.hi - L.lo)), note };
 }
 
 // The card: one row per layer, a bar in the layer's own color, the number, and a GOOD / FAIR / BAD word where the layer has a say.
@@ -234,6 +251,7 @@ export async function polarCanvas(id, capKey = "sp") {
     else if (id === "slope") v = g(P.slope, i, 0.1);
     else if (id === "mix") v = mixScore({ sun: P.sun[i] / 2, earth: P.earth[i] / 2, temp: g(P.tavg, i, 2), slope: g(P.slope, i, 0.1) });
     else if (id === "temp") v = g(P.tavg, i, 2);
+    else if (id === "ice") v = !P.ice || P.ice[i] === 255 ? null : P.ice[i] === 254 ? ICE_NONE : P.ice[i] * 0.0125;
     else v = id === "shadow" ? P.shadow[i] : P[id][i] / 2;
     const rgb = v != null && Number.isFinite(v) ? L.color(v) : null;
     if (!rgb) continue;

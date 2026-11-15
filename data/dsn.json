@@ -1,0 +1,70 @@
+{
+ "start_utc": "2023-01-01T00:00:00Z",
+ "step_hours": 6,
+ "count": 18993,
+ "frame": "ITRF93 (Earth-fixed)",
+ "aberration": "LT+S",
+ "observer": "Earth center",
+ "layout": "per step: int16 lat*1000, uint16 lon*65536/360, uint16 (dist_km-340000)/2",
+ "stations": [
+  {
+   "id": "DSS-14",
+   "name": "GOLDSTONE",
+   "where": "California, USA",
+   "xyz_km": [
+    -2353.6219,
+    -4641.3413,
+    3677.0522
+   ],
+   "up": [
+    -0.3685408,
+    -0.7267624,
+    0.57965
+   ],
+   "lat": 35.4259,
+   "lon": -116.8895
+  },
+  {
+   "id": "DSS-63",
+   "name": "MADRID",
+   "where": "Spain",
+   "xyz_km": [
+    4849.0922,
+    -360.1797,
+    4115.1097
+   ],
+   "up": [
+    0.7590937,
+    -0.0563838,
+    0.648535
+   ],
+   "lat": 40.4312,
+   "lon": -4.248
+  },
+  {
+   "id": "DSS-43",
+   "name": "CANBERRA",
+   "where": "Australia",
+   "xyz_km": [
+    -4460.8958,
+    2682.3614,
+    -3674.7471
+   ],
+   "up": [
+    -0.6985426,
+    0.4200375,
+    -0.5793158
+   ],
+   "lat": -35.4024,
+   "lon": 148.9813
+  }
+ ],
+ "kernels": [
+  "naif0012.tls",
+  "pck00011.tpc",
+  "de440s.bsp",
+  "earth_1962_260806_2126_combined.bpc",
+  "earthstns_itrf93_260814.bsp"
+ ],
+ "source": "NASA NAIF SPICE generic kernels: station positions earthstns_itrf93_260814, Earth orientation earth_1962_260806_2126_combined (predicted after August 2026)"
+}

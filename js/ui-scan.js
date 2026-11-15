@@ -20,9 +20,10 @@ const METRICS = {
   yearth: { label: "EARTH LINK", lay: "earth", polar: true, rgb: (c) => { const v = polarValue("earth", c.lat, c.lon); return v == null ? null : goodColor(v / 100); } },
   temp:   { label: "TEMPERATURE", lay: "temp", polar: true, rgb: (c) => { const v = polarValue("temp", c.lat, c.lon); return v == null ? null : layer("temp").color(v); } },
   mix:    { label: "YOUR MIX", lay: "mix", polar: true, rgb: (c) => { const v = cellMix(c); return v == null ? null : goodColor(v / 100); } },
+  ice:    { label: "WATER ICE", lay: "ice", polar: true, capsOnly: true, rgb: (c) => { const v = polarValue("ice", c.lat, c.lon); return v == null ? null : layer("ice").color(v) || [58, 62, 70]; } },
   shadow: { label: "SHADOW", lay: "shadow", polar: true, capsOnly: true, rgb: (c) => { const v = polarValue("shadow", c.lat, c.lon); return v == null ? null : v ? SHADOW_COLOR : [58, 62, 70]; } },
 };
-const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow", "temp"]], ["BLENDED WITH YOUR WEIGHTS", ["mix"]]];
+const GROUPS = [["THIS MISSION", ["needs", "sun", "earth"]], ["THE GROUND", ["slope", "elev"]], ["ALL YEARS, 2023 TO 2035", ["ysun", "yearth", "shadow", "ice", "temp"]], ["BLENDED WITH YOUR WEIGHTS", ["mix"]]];
 const NO_DATA = [26, 28, 34];
 const lerp = (a, b, t) => a + (b - a) * t;
 function rampColor(ramp, v) {            // v in 0..100
@@ -271,7 +272,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   }
   // MAP SHOWS: one stack of buttons beside the map (a small gap between the groups). Their names say which
   // sunlight is meant, because the mission's and the all-years ones sit in the same stack.
-  const STACK = { needs: "GO / NO-GO", sun: "SUN · MISSION", earth: "EARTH · MISSION", slope: "SLOPE", elev: "ELEVATION", ysun: "SUN · ALL YEARS", yearth: "EARTH · ALL YEARS", shadow: "NEVER SUNLIT", temp: "TEMPERATURE", mix: "YOUR MIX" };
+  const STACK = { needs: "GO / NO-GO", sun: "SUN · MISSION", earth: "EARTH · MISSION", slope: "SLOPE", elev: "ELEVATION", ysun: "SUN · ALL YEARS", yearth: "EARTH · ALL YEARS", shadow: "NEVER SUNLIT", ice: "WATER ICE", temp: "TEMPERATURE", mix: "YOUR MIX" };
   function buildMetrics(polarOk, nearPole) {
     polarOkNow = polarOk;
     const box = $("scan-metric"); box.replaceChildren();

@@ -19,7 +19,8 @@
    "shadow": "sp_shadow.u8.gz",
    "tavg": "sp_tavg.u8.gz",
    "tmax": "sp_tmax.u8.gz",
-   "slope": "sp_slope.u8.gz"
+   "slope": "sp_slope.u8.gz",
+   "ice": "sp_ice.u8.gz"
   },
   "stats": {
    "sun_mean_pct": 26.3,
@@ -38,6 +39,14 @@
     26.9,
     347.6
    ],
+   "no_data_squares": 0
+  },
+  "ice": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018), column ice_depth",
+   "unit": "value * 0.0125 = meters; 254 = deeper than 2.87 m (not reported by NASA); 255 = no data",
+   "note": "NASA's code -1 (ground whose yearly maximum is 101 K or less; not described in the product label) is stored as 0, at the surface",
+   "share_with_depth_pct": 43.81,
+   "share_at_surface_pct": 6.17,
    "no_data_squares": 0
   }
  },
@@ -96,7 +105,8 @@
    "shadow": "np_shadow.u8.gz",
    "slope": "np_slope.u8.gz",
    "tavg": "np_tavg.u8.gz",
-   "tmax": "np_tmax.u8.gz"
+   "tmax": "np_tmax.u8.gz",
+   "ice": "np_ice.u8.gz"
   },
   "stats": {
    "sun_mean_pct": 26.9,
@@ -116,6 +126,78 @@
     353.7
    ],
    "no_data_squares": 0
+  },
+  "ice": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018), column ice_depth",
+   "unit": "value * 0.0125 = meters; 254 = deeper than 2.87 m (not reported by NASA); 255 = no data",
+   "note": "NASA's code -1 (ground whose yearly maximum is 101 K or less; not described in the product label) is stored as 0, at the surface",
+   "share_with_depth_pct": 46.33,
+   "share_at_surface_pct": 4.16,
+   "no_data_squares": 0
+  }
+ },
+ "nasa_check": {
+  "source": "NASA LRO LOLA polar illumination maps, 2016 release (LPSR, AVGVISIB, AVGVISIB_EARTH at 240 m; Mazarico et al. 2011), NASA PDS Geosciences Node, LOLA archive extras",
+  "note": "NASA: at the surface, share of the disc in view, long-term average. LUNI: 2 m above the surface, share of 2023 to 2035 with the disc's center above the skyline.",
+  "sp": {
+   "squares": 1260112,
+   "sun": {
+    "r": 0.992,
+    "mean_luni": 26.3,
+    "mean_nasa": 28.1,
+    "mean_abs_diff": 1.9,
+    "within_10_points_pct": 99.7
+   },
+   "earth": {
+    "r": 0.981,
+    "mean_luni": 23.8,
+    "mean_nasa": 29.0,
+    "mean_abs_diff": 5.2,
+    "within_10_points_pct": 84.7
+   },
+   "shadow": {
+    "same_answer_pct": 99.08,
+    "nasa_km2": 19081,
+    "luni_km2": 18857,
+    "of_nasa_shadow_luni_agrees_pct": 92.4,
+    "of_luni_shadow_nasa_agrees_pct": 93.5
+   },
+   "orientation_fit": {
+    "as is": 0.992,
+    "flipped up-down": 0.116,
+    "flipped left-right": 0.192,
+    "turned half round": 0.028
+   }
+  },
+  "np": {
+   "squares": 1260112,
+   "sun": {
+    "r": 0.99,
+    "mean_luni": 26.9,
+    "mean_nasa": 28.4,
+    "mean_abs_diff": 1.8,
+    "within_10_points_pct": 99.5
+   },
+   "earth": {
+    "r": 0.985,
+    "mean_luni": 28.6,
+    "mean_nasa": 34.0,
+    "mean_abs_diff": 5.4,
+    "within_10_points_pct": 84.7
+   },
+   "shadow": {
+    "same_answer_pct": 98.85,
+    "nasa_km2": 16545,
+    "luni_km2": 14998,
+    "of_nasa_shadow_luni_agrees_pct": 85.2,
+    "of_luni_shadow_nasa_agrees_pct": 94.0
+   },
+   "orientation_fit": {
+    "as is": 0.99,
+    "flipped up-down": 0.142,
+    "flipped left-right": 0.158,
+    "turned half round": 0.107
+   }
   }
  }
 }

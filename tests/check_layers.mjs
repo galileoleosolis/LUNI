@@ -83,5 +83,15 @@ setMix("sun", 0); setMix("slope", 0);
 if (mixScore({ sun: 80, slope: 3 }) !== null) { fail++; console.log("FAIL: all weights 0 must give no score"); }
 for (const [k, v] of Object.entries(w0)) setMix(k, v);
 console.log(`mean difference ${(sumAbs / n).toFixed(1)} points`);
+// Water ice (NASA Diviner ice depth, re-gridded): the permanently shadowed floor of Haworth must read "at the
+// surface" (0), a sunlit ridge must have no depth (99), and there is no value away from the poles.
+{
+  const by = Object.fromEntries(sites.map((s) => [s.id, s])), at = (id) => polarValue("ice", by[id].lat, by[id].lon);
+  console.log("ice depth (m; 99 = none within 2.87 m): haworth", at("haworth"), "| shackleton", at("shackleton"), "| nobile1", at("nobile1"), "| apollo11", at("apollo11"));
+  if (at("haworth") !== 0) { fail++; console.log("   ^ Haworth's floor should be ice-stable at the surface"); }
+  if (at("shackleton") !== 99) { fail++; console.log("   ^ the Shackleton ridge point should have no ice depth"); }
+  if (at("apollo11") !== null) { fail++; console.log("   ^ no ice value is expected away from the poles"); }
+}
+
 console.log(fail ? `${fail} layer checks FAILED` : "layer checks OK");
 process.exit(fail ? 1 : 0);

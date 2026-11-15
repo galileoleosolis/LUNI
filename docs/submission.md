@@ -56,6 +56,8 @@ Source code: https://github.com/galileoleosolis/LUNI
 - **Mission plan, operations and mission windows.** A 30-day timeline with a slider for any moment of the mission; an
   operations view that lays the mission out as stretches in order (power and link, power only, on battery, eclipse);
   and every good landing day for the next 12 months.
+- **Where water ice could last.** A map layer and a data card row from NASA's Diviner Polar Resource Product: how deep
+  below the surface water ice would stay frozen, at both poles.
 - **All sites side by side.** Every site in the list carries a green or red dot for the landing time on screen, and
   a ranked table shows how many good landing days each site has. Any latitude and longitude can be typed in.
 - **Best Site Finder.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
@@ -88,6 +90,9 @@ the rest of the Moon. Temperatures are NASA's own Diviner values, only re-gridde
 - Blue Ghost Mission 1: LUNI works out 347 hours of daylight after touchdown; Firefly reported 346. LUNI puts the
   14 March 2025 eclipse at 05:01 to 09:51 UTC with the Sun fully hidden from 06:18; the lander's pictures give about
   05:30, 06:18 and 09:52.
+- LUNI's polar map layers agree with NASA's own polar maps from the LRO LOLA team: sunlight correlates at 0.99 at
+  both poles with an average gap under 2 points, and "never sunlit" gives the same answer as NASA's permanently
+  shadowed regions map in about 99% of 1.26 million squares per pole.
 - Chandrayaan-3: LUNI's sunset is 4 September 2023, the day the lander was put to sleep ahead of the lunar night.
 - The app lists what it does not model: the landing itself, rocks and craters smaller than a map pixel, panel
   direction, lander tilt, antennas and relay satellites.
@@ -139,13 +144,21 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - **NASA NAIF SPICE** generic kernels (DE440 planetary ephemeris `de440s.bsp`, `naif0012.tls`, `pck00011.tpc`,
   `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf`): positions of the Sun and Earth as seen from the Moon, 2023 to
   2035. https://naif.jpl.nasa.gov/naif/data_generic.html
+- **NASA NAIF station and Earth-orientation kernels** (`earthstns_itrf93_260814.bsp`,
+  `earth_1962_260806_2126_combined.bpc`): the positions of the Deep Space Network sites at Goldstone, Madrid and
+  Canberra and the Earth's rotation, used to say which sites have the Moon in their sky.
+  https://naif.jpl.nasa.gov/pub/naif/generic_kernels/
 - **NASA JPL Horizons System:** 1,110 reference values used to check LUNI's positions, and live links from the app to
   NASA's own answer. https://ssd.jpl.nasa.gov/horizons/
 - **LRO LOLA (Lunar Orbiter Laser Altimeter) gridded elevation**, NASA PDS Geosciences Node: `ldem_80s_40m`,
   `ldem_60s_240m`, `ldem_60n_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
   https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/
+- **LRO LOLA polar illumination maps, 2016 release** (permanently shadowed regions, average visibility of the Sun
+  and of Earth, 240 m; Mazarico et al. 2011), NASA PDS, LOLA archive extras: used to check LUNI's own map layers.
+  https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/
 - **LRO Diviner Lunar Radiometer, Polar Resource Product V2.0** (Paige et al., LRO-L-DLRE-5-PRP-V2.0), NASA PDS:
-  annual average and maximum surface temperature around both poles.
+  annual average and maximum surface temperature around both poles, and the depth at which water ice would stay
+  frozen (the product's `ice_depth` column).
   https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/
 - **LRO Diviner Global Cumulative Products V1.0** (Williams et al. 2017, LRO-L-DLRE-5-GCP-V1.0), NASA PDS: measured
   surface temperature for the whole Moon in half-degree squares.

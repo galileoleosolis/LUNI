@@ -220,6 +220,20 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     of the PROOF panel (`layerCheck` in `js/ui-proof.js`). Sunlight: r 0.992 south / 0.990 north, mean gap 1.9 / 1.8
     points. Never sunlit: same answer in 99.1% / 98.9% of squares (south 18,857 km2 vs NASA 19,081). Earth: r 0.981 /
     0.985, mean gap 5.2 / 5.4 points, LUNI lower (center of the disc at 2 m vs any part of it at the surface).
+  - D (real photos under the Best Site Finder map): **not built.** Found: NASA Moon Trek serves map tiles from this
+    session, e.g. `https://trek.nasa.gov/tiles/Moon/SP/LRO_NAC_AvgMosaic_SPole855_1mp/1.0.0//default/default028mm/{z}/{row}/{col}.png`
+    (LROC NAC average mosaic, south pole to 85.5 S; top-left -1095930, 1095930 m; z = 6 is 133.8 m per pixel, tiles
+    28 to 35 both ways) and `LRO_LOLA_Shade_SPole875_5mp_v04`. The finder map is north-up at the site, so a polar
+    photo has to be turned and scaled per site, and a sharp backdrop needs live tiles (blocked on the preview page)
+    or a very large image: bigger than it looked. A cheaper variant is a REAL PHOTO layer on the MOON MAP's south cap.
+  - E (official Artemis III region outlines): **not built.** NASA published the nine regions as a picture; the outlines
+    as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
+    DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
+    sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- The user (Sun 15 Nov, about 10 AM New York) asked for the UI "all consolidated ... extremely intuitive". A sketch was
+  shown first (one row of tabs for every screen, bottom keys as the only action buttons, the duplicate buttons in
+  the left column and headings removed, extras under one MORE key). **Rejected: "Actually just leave it these are
+  worse".** Nothing was changed. Do not remove the duplicate shortcut buttons or re-arrange the navigation unprompted.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the

@@ -192,6 +192,48 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
      shares, the longest time without Sun against the user's limit, and a line for the stretch the mission clock is
      in. Clicking a stretch moves the clock there. It reads LUNI's own hourly answers; it is not a flight schedule.
      The chart headings were shortened to fit three buttons.
+- Extras item 5, built Sun 15 Nov about 10 AM New York ("let's go for it"), **on the pre-release only** (public is r4):
+  the MOON MAP data card for the landing site takes its SUNLIGHT and EARTH LINK (and YOUR MIX) from the site's own
+  skyline (`siteYears` in `js/model.js`: every 6 hours over the years covered, about 5 ms a site; `getSiteYears` passed
+  to `createMoonMap`, `layerRow` in `js/layers.js`), with a note naming what the coarser layer reads. Presets only;
+  the point under the pointer and custom points keep the layer values. `tests/check_site_years.mjs` prints both:
+  Nobile 78 / 53, Malapert 74 / 53, Shackleton 79 / 63, the others within about a point, Haworth 0 and never sunlit.
+- **More NASA data** (the user, Sun 15 Nov about 10:30 AM New York: "Can't we do them all" to five ideas, A to E). Each is
+  saved by itself on the pre-release. Done so far:
+  - B. WATER ICE layer (`ice` in `LAYERS`, both polar caps; MOON MAP button, data card row ICE CAN LAST, Best Site
+    Finder choice, "show the water ice layer" in ASK LUNI). `tools/build_ice.py south|north` re-grids the `ice_depth`
+    column of the Diviner Polar Resource Product files already downloaded: the depth at which water ice would be lost
+    at 1 kg per square meter per billion years; 0 = stable at the surface; -999 = deeper than 2.87 m (stored 254,
+    drawn with no color, value 99 in the code). **The file also holds an undocumented code, -1**: measured, every
+    such triangle has a yearly maximum of 101 K or less (0 values: 101 to 131 K), so it is stored as depth 0 and the
+    source text on screen says the label does not describe it. `data/layers/{sp,np}_ice.u8.gz` (value * 0.0125 = m).
+    `tests/check_layers.mjs` checks Haworth's floor (0), the Shackleton ridge (none) and Apollo 11 (no value).
+  - C. DEEP SPACE NETWORK line under EARTH LINK (`#earth-dsn`, only while Earth is in view): which of Goldstone,
+    Madrid and Canberra have the Moon above their horizon at the mission clock, and how high. `js/dsn.js`
+    (`loadDsn`, `dsnAt`), `data/dsn.bin` + `data/dsn.json` from `tools/build_dsn.py` (NAIF station kernel
+    earthstns_itrf93_260814 and Earth orientation earth_1962_260806_2126_combined, ITRF93, every 6 hours).
+    `tests/check_dsn.mjs`: within 0.016 degrees of SPICE at 720 values. Geometry only; the tooltip says it does not
+    know station schedules. The preview page needs `data/dsn.bin.b64.txt`.
+  - A. LUNI's polar layers against NASA's own maps (`tools/compare_lola_illum.py`; maps in `tools/dem/lola_illum/`,
+    490 MB, not in git: the LOLA team's 2016 polar illumination release in the LOLA archive's extras: LPSR, AVGVISIB,
+    AVGVISIB_EARTH at 240 m). Results are stored in `data/layers/index.json` under `nasa_check` and shown as section 3
+    of the PROOF panel (`layerCheck` in `js/ui-proof.js`). Sunlight: r 0.992 south / 0.990 north, mean gap 1.9 / 1.8
+    points. Never sunlit: same answer in 99.1% / 98.9% of squares (south 18,857 km2 vs NASA 19,081). Earth: r 0.981 /
+    0.985, mean gap 5.2 / 5.4 points, LUNI lower (center of the disc at 2 m vs any part of it at the surface).
+  - D (real photos under the Best Site Finder map): **not built.** Found: NASA Moon Trek serves map tiles from this
+    session, e.g. `https://trek.nasa.gov/tiles/Moon/SP/LRO_NAC_AvgMosaic_SPole855_1mp/1.0.0//default/default028mm/{z}/{row}/{col}.png`
+    (LROC NAC average mosaic, south pole to 85.5 S; top-left -1095930, 1095930 m; z = 6 is 133.8 m per pixel, tiles
+    28 to 35 both ways) and `LRO_LOLA_Shade_SPole875_5mp_v04`. The finder map is north-up at the site, so a polar
+    photo has to be turned and scaled per site, and a sharp backdrop needs live tiles (blocked on the preview page)
+    or a very large image: bigger than it looked. A cheaper variant is a REAL PHOTO layer on the MOON MAP's south cap.
+  - E (official Artemis III region outlines): **not built.** NASA published the nine regions as a picture; the outlines
+    as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
+    DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
+    sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- The user (Sun 15 Nov, about 10 AM New York) asked for the UI "all consolidated ... extremely intuitive". A sketch was
+  shown first (one row of tabs for every screen, bottom keys as the only action buttons, the duplicate buttons in
+  the left column and headings removed, extras under one MORE key). **Rejected: "Actually just leave it these are
+  worse".** Nothing was changed. Do not remove the duplicate shortcut buttons or re-arrange the navigation unprompted.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
@@ -200,8 +242,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
-- The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they
-  say "release it"; the time of the local judging is not known yet (asked, not answered).
+- **r4 released** on the user's "Release it, that was great" (Sun 15 Nov, 9:05 AM New York = 14:05 UTC; main 3093d3b):
+  the public site now has everything in this list. Later changes go to the pre-release and need a new "release it".
+  The time of the local judging is still not known (asked, not answered).
 - **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
   event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
   ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
@@ -261,6 +304,8 @@ added as a 14th preset for it. Stories carry `proof: true` when they also belong
 Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
 
 ## Extras list (the user: "keep track of those extras"). Not to be built unless the user picks one.
+**Done: 1 (operations plan), 3 (custom coordinates), 5 (the site's own data card). Left: 2, 4, 6, 7, 8.** The user
+asked about 2, 4 and 6 on 15 Nov and was told they are for after the deadline (hours each, medium to high risk).
 1. Operations plan / light scheduler: the mission's stretches in order (Sun and Earth: work and send data; Sun only;
    dark: sleep; eclipse) with dates and lengths, inside the MISSION PLAN tab. A full drag-and-drop expedition
    scheduler was advised against (big, and no sourced data on what activities need).
@@ -313,7 +358,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4) is the current public version.
+   main 9f099f4). **r4 (15 Nov, 14:05 UTC, main 3093d3b) is the current public version.** To roll back to r3:
+   `tools/release.sh promote 9f099f4`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
