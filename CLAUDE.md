@@ -408,6 +408,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   no likeness of anyone under 18; English; public links with no login.
   Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
   Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
+- **Batch waiting on `main` only, NOT on `/next/`, the preview or the public site** (the user, Sun 15 Nov about 4:15 PM
+  New York: "Dont publish yet ... ill have more so wait on publishing"). Checked: syntax, test set E 6/6, six window sizes.
+  - Skyline picture: a darker wash on the ground away from the Sun and seeded craters on the near ground (depth).
+  - NASA DATA USED band holds 14 s (`HOLD_MS` in `js/sources.js`), pauses under the pointer, and each source is a link
+    to where the data comes from (`LINKS`).
+  - FULL SCREEN button (`#fs-btn`) in the top strip and a one-time tip (`luno-fs-tip`) when the window is short.
+  - Best Site Finder side panel is cards with icons (`section.fcard`, `.fi`; ABOUT THIS SCAN is folded); `draw()` in
+    `js/ui-scan.js` sets the body's columns so the side panel gets all the leftover width (two columns of cards on wide screens).
+  - Bottom keys are glossy (one sheen over each key's own color, `--k1` / `--k2` at the end of `css/style.css`).
+  - Finder stack buttons: 3 px borders, 8 px corners; SCAN SIZE / MAP SHOWS headers 18 px.
 - **On the pre-release, waiting for "release it" (will be r8; public is r7), Sun 15 Nov about 3:45 PM New York:**
   the name with "for"; and `DEFAULT_REQ.earthMinPct = 25` in `js/mission.js` (the user: "ok for 3"; a judge found
   Shackleton, 14 Mar 2025 09:00, a GO with Earth in view 3% of the mission: it is now a NO-GO, "EARTH LINK 3% (NEED

@@ -134,6 +134,11 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
     const n = st.grid.n, row = $("scan-row"), sizes = $("scan-sizes"), shows = $("scan-shows"), flow = document.documentElement.classList.contains("flow");
     // The two button stacks stand against the map's left and right edges and are exactly as tall as the map, so no
     // room is left over between them (the user: "vertical selections", "get rid of empty space").
+    // A square map can only use as much width as it has height. Whatever is left over goes to the reading panel,
+    // which lays its cards out side by side when it is wide (a full-screen laptop left a third of the screen empty).
+    const body = panel.querySelector(".scan-body");
+    if (flow) body.style.gridTemplateColumns = "";
+    else { const availH = body.clientHeight - $("scan-go-best").offsetHeight - 14, stacks = sizes.offsetWidth + shows.offsetWidth; body.style.gridTemplateColumns = `${Math.round(Math.max(320, Math.min(body.clientWidth - 330, availH + stacks)))}px minmax(0, 1fr)`; }
     const size = Math.max(160, Math.floor(flow ? Math.min(row.clientWidth, window.innerHeight * 0.6) : Math.min(row.clientWidth - sizes.offsetWidth - shows.offsetWidth, row.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.style.width = canvas.style.height = size + "px";
     sizes.style.height = shows.style.height = flow ? "" : size + "px";
