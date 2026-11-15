@@ -18,6 +18,7 @@ import { encodeShare, decodeShare, copyText } from "./share.js";
 import { startGuide } from "./guide.js";
 import { createHistoryPanel } from "./ui-history.js";
 import { createMoonMap } from "./ui-moonmap.js";
+import { loadDsn, dsnAt } from "./dsn.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -460,6 +461,10 @@ function renderMoment() {
   $("earth-next-date").textContent = earthLeft == null ? "" : `${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1) + "°";
   lowNote("earth-low", cur.earthUp, cur.earthEl);
+  // Which Deep Space Network sites have the Moon in their sky right now (only said while Earth is in view from the site).
+  const dsn = cur.earthUp ? dsnAt(cur.t)?.filter((s) => s.el > 0) : null, dsnBox = $("earth-dsn");
+  dsnBox.hidden = !dsn;
+  if (dsn) dsnBox.innerHTML = dsn.length ? `<b>DEEP SPACE NETWORK:</b> ${dsn.map((s) => `${s.name} ${Math.round(s.el)}°`).join(" · ")}` : "NO DEEP SPACE NETWORK SITE HAS THE MOON IN ITS SKY NOW";
 
   $("sun-ico").className = "ro-ico " + (cur.sunUp ? "go" : "nogo");
   $("earth-ico").className = "ro-ico " + (cur.earthUp ? "go" : "nogo");
@@ -921,6 +926,7 @@ async function init() {
   if (/\/next\//.test(location.pathname)) document.querySelector(".unit-top span").insertAdjacentHTML("beforeend", ' <b class="wip">· TEST BUILD (NOT RELEASED)</b>');
   fitStage();
   await Promise.all([loadSites(), initModel()]);
+  loadDsn().then(() => { if (state.scenario) renderMoment(); }).catch((e) => console.warn("DSN table not loaded", e));
   // Where LUNI opens: on the question written in a share link, else on a real landing (IM-2 Athena, 6 March 2025).
   applyShare(decodeShare(location.hash, SITES) || { siteId: OPENING.site, t0: new Date(OPENING.t0), req: { ...DEFAULT_REQ, days: OPENING.days } });
   window.addEventListener("hashchange", () => { const sh = decodeShare(location.hash, SITES); if (sh) { applyShare(sh); syncNeeds(); selectSite(state.site); } });

@@ -855,3 +855,4 @@ html.flow .ans-head { flex-wrap: wrap; gap: 6px; } html.flow .ans-btns { flex-wr
 html.flow .plan-tabs { flex-wrap: wrap; } html.flow .plan-tabs button { font-size: 15px; padding: 4px 9px 5px; flex: 1 1 auto; }
 .prof-note { margin-top: 5px; font-size: 12.5px; line-height: 1.35; color: var(--dim); }
 .mm-side .prof-row { grid-template-columns: 142px 42px minmax(0, 1fr) 38px; gap: 6px; }
+#earth-dsn { color: var(--amb); } #earth-dsn b { color: var(--dim); font-weight: 600; }
