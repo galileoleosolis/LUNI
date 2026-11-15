@@ -1023,6 +1023,7 @@ async function init() {
       selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
       toast(`LANDING SITE MOVED ${moveText(from, { lat, lon })} · NOW AT ${fmtLat(lat)} ${fmtLon(lon)}`);
     },
+    getSiteYears: () => (state.site.id !== CUSTOM_ID && terrainFor(state.site).real ? siteYears(state.site) : null),
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());      // a plain open / close toggle for the scan menu (the user asked for this)
