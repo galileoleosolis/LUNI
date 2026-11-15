@@ -302,6 +302,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   "why is the south pole hard for landers" (status report instead of "I cannot answer that").
   The user then said (about 12:30 PM): "im going to just tell you stuff, and i want you to think about it and then
   build it all at once": wait for the full list, then build it in one batch.
+- **Slide deck** (the user, Sun 15 Nov about 12:40 PM New York: "i need you to make the slideshow", 3 minutes, 7 slides
+  at most, challenge objectives and NASA data in it, PowerPoint format wanted, "dont make ai looking slides"). Built as
+  a Claude Slides deck: https://claude.ai/artifact/QHG42wTJJ7oTapWm3wPmfh (private until the user shares it; it
+  downloads as .pptx or PDF from its Share menu). Seven slides: cover, THE CHALLENGE, ONE ANSWER: GO OR NO-GO, WHEN
+  THE PLAN SLIPS, CHALLENGE OBJECTIVES (all seven, as a table), NASA DATA, PROOF (with the AI line and the link).
+  Real app screenshots only (crops in the scratchpad, uploaded to the deck); Barlow Condensed / Barlow / JetBrains
+  Mono; navy and cool paper with the app's blue. Speaker notes hold a timed 3-minute script. The official guide
+  (spaceappschallenge.org/resources/project-submission-guide): up to seven slides including the title slide, in
+  English, on an external site with a public link, covering team name, member names and the challenge.
+  **Still placeholders on the cover: [Team name] and the two [Member name]s** (never told to Claude).
 - **THE WAITING BATCH (the user, Sun 15 Nov about 12:45 PM New York). NOT STARTED: "DONT DO THIS YET I NEED YOU TO DO
   SOMTHING ELSE FIRST".** Build it all at once only when the user says so. Skip the tests while building; run them
   when publishing to the public site (the user's words). The list:
