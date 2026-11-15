@@ -152,8 +152,26 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
-**Pre-release state (15 Nov, about 05:30 UTC): `next/` and the preview page (Version 44) carry the north pole layers,
-the fixes from the mother's test and her second list of notes. The public site is still r3 (9f099f4).**
+**Pre-release state (15 Nov, about 06:00 UTC = Sun 1 AM New York): `next/` and the preview page (Version 45) carry
+everything below. The public site is still r3 (9f099f4) and needs a new "release it".**
+A friend from a NASA SEES internship (15 Nov): "a lot going on", "hard to navigate", "cut down on some of the
+features or make a more streamlined ui", did not know what to do in the scan, the tutorial "not really" helped. A
+second screenshot: "WHAT REALLY HAPPENED / WHAT LUNI WORKS OUT" and the ASK LUNI directions are "not professionally
+written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK LUNI panel). Done on the pre-release:
+- **SIMPLE VIEW is the default** (`html.simple`, `setTools` in `js/app.js`, kept under `luno-view`): five keys (PLAY,
+  ASK LUNI, NEXT WINDOW, SCAN FOR BETTER SPOT, ALL TOOLS) and the mission length only; `#needs-more` unfolds the
+  other four needs, and they open by themselves when one is not at its default. ALL TOOLS shows every key and need.
+  The older test sets (`#test-a` to `#test-d`) and `window.LUNO_ALL_TOOLS` start in ALL TOOLS.
+- Scan panel: one sentence on what it is, BEST SPOT FOUND and a large MOVE MY SITE TO THE BEST SPOT button first,
+  the green / red GO map by default (`st.metric = "needs"`), the SHOW choices folded under MORE MAP CHOICES.
+- **The guided tutorial** (`js/guide.js`, the user asked for it: "really guided", "understood by a middle school
+  student", "black out the ones they don't need", a "do you understand" button, quick). 13 cards; everything but one
+  part is dimmed (four `.tour-dim` boxes around a hole, so the real control can be used through it); each card has
+  WHAT IT IS / WHY IT MATTERS / HOW TO USE IT, NOT SURE? EXPLAIN IT ANOTHER WAY (`alt`), four TRY IT steps and two
+  quick checks. Remembered under `luno-tour-v2`; `? TUTORIAL` (`#tour-btn`) in the top strip restarts it;
+  `tourPrepare` in `js/app.js` puts the main screen back before each card. Body-level and fixed, so no zoom math.
+- Wording: MISSION RECORD / LUNI'S CALCULATION (PROOF), CALCULATED BY LUNI (layer sources), ASK LUNI says
+  ENTER A QUESTION OR A COMMAND; icons (`IC` in `js/ui-assistant.js`) on TALK, SEND, SPOKEN ANSWERS, HANDS-FREE, CLOSE.
 Second list of notes (15 Nov, dictated; "more feedback as well" is coming), done on the pre-release:
 - Steps 1 to 4 are colored bands (`h3[data-step]`, `--sc`); the Moon map side panel has three bands (`h3.band`).
 - Tour wording: CHOOSE YOUR SITE AND TIME / GET THE VERDICT / MOVE THROUGH THE MISSION; the word "relax" is gone

@@ -52,12 +52,12 @@ export function createProofPanel({ fmt, onReplay, links }) {
     let h = `<section><h3><b class="step">1</b><b class="h-t">SUN AND EARTH POSITIONS</b> · CHECKED AGAINST NASA'S OWN CALCULATOR</h3>
       <div class="proof-big"><b>0.0007°</b><span>THE WORST DIFFERENCE BETWEEN LUNI AND NASA JPL HORIZONS IN 1,110 SUN AND EARTH POSITIONS<br>(6 SITES FROM THE EQUATOR TO THE SOUTH POLE, 2023 TO 2035). THE SUN'S DISC IS 0.53° WIDE: THE ERROR IS ABOUT 1/750 OF IT.</span></div>
       <p><b class="h-do">CHECK ANY MOMENT YOURSELF:</b> NASA'S ANSWER FOR THE SITE AND TIME ON SCREEN NOW: <a href="${l.sun}" target="_blank" rel="noopener">SUN ↗</a> <a href="${l.earth}" target="_blank" rel="noopener">EARTH ↗</a> · ITS AZIMUTH IS LUNI'S DIRECTION, ITS ELEVATION IS LUNI'S HEIGHT.</p></section>`;
-    h += `<section><h3><b class="step">2</b><b class="h-t">REAL LANDINGS, REPLAYED</b> · WHAT HAPPENED ON THE MOON NEXT TO WHAT LUNI WORKS OUT</h3>`;
+    h += `<section><h3><b class="step">2</b><b class="h-t">REAL LANDINGS, REPLAYED</b> · THE MISSION RECORD COMPARED WITH LUNI'S CALCULATION</h3>`;
     for (const st of STORIES.filter((x) => x.proof)) {
       let rows;
-      try { rows = replay(st, fmt); } catch (e) { console.error(e); rows = [["", "", "COULD NOT BE WORKED OUT"]]; }
+      try { rows = replay(st, fmt); } catch (e) { console.error(e); rows = [["", "", "COULD NOT BE CALCULATED"]]; }
       h += `<div class="proof-card" data-card="${st.id}"><div class="proof-card-head"><span><b>${st.name}</b> · ${st.when} · ${st.where}</span><button class="mini-btn" data-replay="${st.id}">REPLAY IT IN LUNI ▸</button></div>
-        <table><tr><th></th><th>WHAT REALLY HAPPENED</th><th>WHAT LUNI WORKS OUT (LIVE, FROM NASA DATA)</th></tr>
+        <table><tr><th></th><th>MISSION RECORD (PUBLISHED SOURCES)</th><th>LUNI'S CALCULATION (LIVE, FROM NASA DATA)</th></tr>
         ${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="luni">${esc(r[2])}</td></tr>`).join("")}</table>
         <div class="proof-src">SOURCES: ${st.sources.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(n.toUpperCase())} ↗</a>`).join(" · ")}</div></div>`;
     }
