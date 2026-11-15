@@ -170,6 +170,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   WHAT IT IS / WHY IT MATTERS / HOW TO USE IT, NOT SURE? EXPLAIN IT ANOTHER WAY (`alt`), four TRY IT steps and two
   quick checks. Remembered under `luno-tour-v2`; `? TUTORIAL` (`#tour-btn`) in the top strip restarts it;
   `tourPrepare` in `js/app.js` puts the main screen back before each card. Body-level and fixed, so no zoom math.
+- Names (the user, 15 Nov): the scan is **BEST SITE FINDER** on every button, key, title and tutorial card (was SCAN
+  FOR BETTER SPOT), and the jump is **NEXT LANDING WINDOW** (was NEXT WINDOW, before that NEXT GOOD TIME). ASK LUNI
+  understands the old and new phrases. The keys split the name over their two lines (BEST SITE / FINDER).
 - Wording: MISSION RECORD / LUNI'S CALCULATION (PROOF), CALCULATED BY LUNI (layer sources), ASK LUNI says
   ENTER A QUESTION OR A COMMAND; icons (`IC` in `js/ui-assistant.js`) on TALK, SEND, SPOKEN ANSWERS, HANDS-FREE, CLOSE.
 Second list of notes (15 Nov, dictated; "more feedback as well" is coming), done on the pre-release:

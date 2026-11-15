@@ -200,7 +200,7 @@ export function parse(text, sites = []) {
   else if (take(/\b(?:moon map|big moon|map layers?|layers)\b/)) call("open_view", { view: "moon" });
   else if (take(/\b(?:mission )?history\b|\b(?:past|previous|earlier|real|old) (?:missions?|landings?)\b/)) call("open_view", { view: "history" });
   else if (take(/\b(?:proof|prove it|how accurate|accuracy|can (?:i|we) trust|how do (?:you|we|i) know)\b/)) call("open_view", { view: "proof" });
-  else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b/)) call("open_view", { view: "scan" });
+  else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b|\b(?:best )?site finder\b|\bbest site\b/)) call("open_view", { view: "scan" });
   else if (take(/\b(?:surface|3d|3 d|first person|look around|ground view|stand on)\b/)) call("open_view", { view: "surface" });
   if (take(/\b(?:share|copy|send)\b[a-z ]{0,15}\b(?:link|address|url)\b|\bshare (?:this|it)\b/)) call("share_link");
   if (take(/\b(?:pin|bookmark|save this|remember this|keep this)\b/)) call("pin");
@@ -297,7 +297,7 @@ export function createAssistant(api) {
     "I would tell you a joke about the far side, but there is no Earth link to deliver it.",
   ];
   const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
-  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT WINDOW. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
+  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT LANDING WINDOW. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BEST SITE FINDER. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
 
@@ -365,7 +365,7 @@ export function createAssistant(api) {
         return { say: "", clock: true };
       }
       case "open_view": {
-        if (input.view === "scan") { api.openScan(true); return { say: "Scanning the ground around this site for a better spot. Bright cells are better. When it finishes, say MOVE TO THE BEST POINT." }; }
+        if (input.view === "scan") { api.openScan(true); return { say: "Best Site Finder: scanning the ground around this site. Green squares meet the mission needs. When it finishes, say MOVE TO THE BEST POINT." }; }
         if (input.view === "surface") { api.openSurface(true); return { say: "Opening the 3D view from the surface. Say CLOSE to come back." }; }
         if (input.view === "proof") { api.openProof(true); return { say: "Opening the proof: LUNI against NASA's own calculator, three real landings replayed, and what LUNI does not know. Say CLOSE to come back." }; }
         if (input.view === "moon") { api.openMoonMap(true, input.layer); return { say: input.layer ? "Opening the Moon map with that layer on it. Say CLOSE to come back." : "Opening the Moon map. Pick a layer on the right, or say, for example, SUNLIGHT LAYER. Say CLOSE to come back." }; }
@@ -379,7 +379,7 @@ export function createAssistant(api) {
         const o = s.options[input.number - 1];
         if (!o) return { say: optionsText(s) };
         api.takeOption(input.number - 1);
-        return /BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
+        return /BEST SITE FINDER|BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
       }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };

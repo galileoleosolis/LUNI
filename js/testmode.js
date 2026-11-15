@@ -216,7 +216,7 @@ const SET_E = [
     type: "choice", options: ["WARMER THAN −100 °C", "BETWEEN −100 AND −200 °C", "COLDER THAN −200 °C"],
     expected: () => { const c = Number((profileRow("TEMPERATURE (AVG)") || "").replace("−", "-").replace(/[^\d.+-]/g, "")); return !Number.isFinite(c) || !profileRow("TEMPERATURE (AVG)") ? "(the Moon map was not open on Haworth)" : c > -100 ? "WARMER THAN −100 °C" : c >= -200 ? "BETWEEN −100 AND −200 °C" : "COLDER THAN −200 °C"; } },
   { id: "e-scan-move", short: "Find and move to a better spot near Malapert",
-    text: "Last one. Go back to the MAIN SCREEN. Choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC, MISSION LENGTH 10. It is a NO-GO. Have LUNI scan for a better spot, wait until it has finished, and move the landing site to the best point. Press DONE when the screen shows the site there.",
+    text: "Last one. Go back to the MAIN SCREEN. Choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC, MISSION LENGTH 10. It is a NO-GO. Open the BEST SITE FINDER, wait until it has finished, and move the landing site to the best point. Press DONE when the screen shows the site there.",
     type: "done",
     expected: () => "a GO point within 25 km of Malapert Massif, same date and needs",
     answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"} needs ${snap.req.days}d/${snap.req.maxDarkH}h/${snap.req.earthAtLanding ? "E" : "-"}`,

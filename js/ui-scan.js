@@ -88,7 +88,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (!polarMeta()) loadPolar().then(() => schedule()).catch(() => {});
     if (METRICS[st.metric].capsOnly && Math.abs(c.site.lat) < 79.5) st.metric = "needs";
     buildMetrics(polarOk, Math.abs(c.site.lat) >= 79.5);
-    $("scan-title").innerHTML = `<b class="h-t">SCAN FOR A BETTER SPOT</b> · AROUND <span id="scan-of"></span> · LANDING ${fmt.stamp(c.t0)}`; $("scan-of").textContent = fmt.site(c.site);
+    $("scan-title").innerHTML = `<b class="h-t">BEST SITE FINDER</b> · AROUND <span id="scan-of"></span> · LANDING ${fmt.stamp(c.t0)}`; $("scan-of").textContent = fmt.site(c.site);
     const res = mapResFor(c.site.lat);
     // Slope depends on the distance it is measured over: the scan's map is coarser than a listed site's own map.
     const slopeNote = () => { const t = c.terrain; return `SLOPES IN THE SCAN ARE MEASURED OVER ${fmtStep(2 * res)}${t?.real && !t.reduced && t.slopeBaseM < 2 * res ? `; THIS SITE'S OWN FIGURE, ${t.slopeDeg.toFixed(1)}° OVER ${fmtStep(t.slopeBaseM)}, COMES FROM A FINER MAP` : ""}. `; };
@@ -222,7 +222,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     const cur = st.cells[center.r * n + center.k];
     $("scan-here").innerHTML = cur ? cellText(cur) : "…";
     const far = best && away(best);
-    $("scan-best").innerHTML = !finished ? "…" : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT WINDOW</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
+    $("scan-best").innerHTML = !finished ? "…" : !best ? `<b class="dist bad">NO POINT IN THIS AREA MEETS THE MISSION NEEDS AT THIS LANDING TIME</b><br><b class="h-do">TRY A BIGGER SCAN SIZE</b>, OR CLOSE THE SCAN AND PRESS <b class="h-do">NEXT LANDING WINDOW</b>` : (best.r === center.r && best.k === center.k ? `<b class="dist">YOU ARE ALREADY AT THE BEST POINT IN THIS AREA</b><br>` : `<b class="dist">${far[0]} KM AWAY, TO THE ${far[1]}</b><br>`) + cellText(best);
     if (finished && best && st.rank === "mix" && polarOkNow) { const v = cellMix(best); if (v != null) $("scan-best").insertAdjacentHTML("beforeend", `<br><b class="h-do">PICKED BY YOUR MIX</b>: ${Math.round(v)} OF 100 (${mixText()})`); }
     const canMove = finished && best && !(best.r === center.r && best.k === center.k);
     $("scan-go-best").disabled = !canMove;
