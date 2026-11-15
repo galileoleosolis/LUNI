@@ -124,8 +124,9 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   buttons (Nobile Rim 1, 14 NOV 2026 20:00). Nothing in the middle column may overflow at 1100 x 700 and up.
 - Since 15 Nov (the user: "the ui is a bit cluttered still"): the POWER and EARTH LINK blocks have big icons
   (`#sun-ico`, `#earth-ico`, green when available, red with a slash when not) and less text; the NASA CHECK links
-  sit in that block's heading. The lower chart shows ONE thing at a time, switched by MISSION PLAN / GOOD DAYS
-  (`showPlan` in `js/app.js`; MISSION PLAN, the 30-day slider, is the default). The freed room goes to the skyline
+  sit in that block's heading. The lower chart shows ONE thing at a time, switched by two large buttons, MISSION PLAN / MISSION WINDOWS
+  (the user renamed GOOD DAYS to MISSION WINDOWS and asked for bigger buttons; `showPlan` in `js/app.js`; MISSION
+  PLAN, the 30-day slider, is the default). The freed room goes to the skyline
   picture (165 px at 1440 x 900, was 90).
 
 ## Next batch (asked for on 14 Nov): work ONE TASK AT A TIME
