@@ -58,8 +58,8 @@ Source code: https://github.com/galileoleosolis/LUNI
 - **Scan for a better spot.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
   one that meets the needs. The skylines are computed on the graphics chip when one is available, and each run first
   checks itself against the processor.
-- **Moon map with layers.** The 3D Moon with elevation and slope for the whole Moon, and sunlight, Earth link,
-  permanent shadow and temperature for the south polar region. Green is good, red is bad, and each layer names its
+- **Moon map with layers.** The 3D Moon with elevation, slope, sunlight, Earth link and temperature for the whole
+  Moon, at finer detail around both poles, where permanent shadow is mapped as well. Green is good, red is bad, and each layer names its
   data source. A data profile card gives every layer's value at any point. The layers can be blended with your own
   weights into one score, and that mix can pick the best point in the scan.
 - **Mission history.** Six real landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6, Blue Ghost Mission 1, IM-2)
@@ -73,8 +73,9 @@ Source code: https://github.com/galileoleosolis/LUNI
 LUNI is a static web page with no server. Sun and Earth directions come from a table built from NASA SPICE (DE440) for
 2023 to 2035, in the same Moon-fixed frame as the elevation maps. For each site LUNI builds the terrain skyline from
 LRO LOLA elevation and compares the Sun's disc and the Earth with it, hour by hour. "Sun" means at least half of the
-Sun's disc is in view from 2 m above the ground. The map layers were worked out the same way for 1.26 million points
-south of 80°S, every 6 hours over 2023 to 2035. Temperatures are NASA's own Diviner values, only re-gridded.
+Sun's disc is in view from 2 m above the ground. The map layers were worked out the same way: for 1.26 million points
+around each pole (480 m squares, every 6 hours over 2023 to 2035) and for about a million quarter-degree squares over
+the rest of the Moon. Temperatures are NASA's own Diviner values, only re-gridded.
 
 **How we know it is right**
 
@@ -133,11 +134,14 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - **NASA JPL Horizons System:** 1,110 reference values used to check LUNI's positions, and live links from the app to
   NASA's own answer. https://ssd.jpl.nasa.gov/horizons/
 - **LRO LOLA (Lunar Orbiter Laser Altimeter) gridded elevation**, NASA PDS Geosciences Node: `ldem_80s_40m`,
-  `ldem_60s_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
+  `ldem_60s_240m`, `ldem_60n_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
   https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/
 - **LRO Diviner Lunar Radiometer, Polar Resource Product V2.0** (Paige et al., LRO-L-DLRE-5-PRP-V2.0), NASA PDS:
-  annual average and maximum surface temperature for the south polar region.
+  annual average and maximum surface temperature around both poles.
   https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/
+- **LRO Diviner Global Cumulative Products V1.0** (Williams et al. 2017, LRO-L-DLRE-5-GCP-V1.0), NASA PDS: measured
+  surface temperature for the whole Moon in half-degree squares.
+  https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/
 - **LRO Wide Angle Camera global mosaic** (NASA/GSFC/Arizona State University), through NASA Moon Trek: the picture on
   the 3D Moon and the mission-history map. https://trek.nasa.gov/moon/
 - **LROC landing-site pages** for coordinates of Blue Ghost Mission 1, SLIM and Apollo 11.
@@ -176,6 +180,7 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 **Papers**
 
 - Paige et al., Science 330, 497 (2010): the Diviner polar temperature model.
+- Williams et al., Icarus 283, 300-325 (2017): the global surface temperatures of the Moon measured by Diviner.
 
 **Software and fonts**
 

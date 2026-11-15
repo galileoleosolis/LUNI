@@ -152,6 +152,19 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
+**Whole Moon and north pole (15 Nov, the user: "not really impressive to just have south pole ... at least the best we
+can get on the other parts of the moon"):** on the pre-release, not released.
+- `data/layers/index.json` now has three sets: `sp` and `np` (caps poleward of 80 degrees, 480 m: sun, earth, shadow,
+  slope, tavg, tmax) and `gl` (whole Moon: sun and earth at quarter-degree squares, tavg and tmax at half-degree).
+  `polarValue` in `js/layers.js` gives the cap's value inside a cap and the whole-Moon value elsewhere; shadow exists
+  in the caps only. `globalCanvas` draws every layer but shadow; `polarCanvas(id, "sp" | "np")` draws a cap.
+- `tools/build_layers.py 480 north` (needs `ldem_60n_240m.img`; the north LOLA map has longitude 0 pointing DOWN,
+  checked against the global map: correlation 0.997) and `tools/build_layers_global.py` (ldem_16, 24 directions,
+  every 12 h; about 13 minutes). Both keep finished parts in `tools/dem/layers_*` and resume.
+- Temperature: caps from the Diviner Polar Resource Product (`build_temperature.py south|north`); the rest from the
+  Diviner Global Cumulative Products, 18 files, 2.8 GB (`build_temperature_global.py`: mean and highest bolometric
+  temperature over the lunar day per half-degree square; equator 217 K average, 392 K highest).
+- The scan's ALL YEARS group now shows everywhere (SHADOW only within 10 degrees of a pole).
 Layers as built:
 - `js/layers.js` — the one definition of the layers (`LAYERS`: elev, slope, sun, earth, shadow): colors, good / bad
   score, the source sentence shown on screen, `profileAt` + `profileHtml` (the data profile card), `globalCanvas` /
