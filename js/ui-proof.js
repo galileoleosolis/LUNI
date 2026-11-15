@@ -91,15 +91,26 @@ export function createProofPanel({ fmt, onReplay, links }) {
       <li><b>DATES.</b> 2023 TO 2035 (THE SPAN OF THE POSITION DATA LUNI CARRIES).</li>
       <li><b>THE 3D VIEW.</b> ANYTHING SMALLER THAN THE 40 M DATA (ROCKS, THE LANDER) IS ILLUSTRATIVE.</li>
       <li><b>HOW IT WAS MADE.</b> THE CODE WAS WRITTEN WITH AN AI ASSISTANT (CLAUDE), DIRECTED AND TESTED BY THE TEAM. EVERY NUMBER COMES FROM NASA DATA AND THE CHECKS ABOVE, NONE FROM THE AI.</li></ul></section>`;
-    $("proof-body").innerHTML = h;
+    // Headline numbers first; each section's detail opens on a click, so the panel is calm at first sight.
+    const bg = STORIES.find((x) => x.id === "bg1"); let hours = null;
+    try { hours = /(\d+) HOURS/.exec(replay(bg, fmt)[0][2])?.[1] || null; } catch {}
+    const tiles = `<div class="proof-tiles">
+      <div><b>0.0007°</b><span>LARGEST GAP BETWEEN LUNI AND NASA JPL HORIZONS IN 1,110 SUN AND EARTH POSITIONS</span></div>
+      <div><b>${hours ? hours + " H" : "3 LANDINGS"}</b><span>${hours ? "OF DAYLIGHT AFTER BLUE GHOST 1 LANDED, BY LUNI. FIREFLY COUNTED 346 H" : "REAL LANDINGS REPLAYED NEXT TO THEIR MISSION RECORDS"}</span></div>
+      <div><b id="proof-t3">…</b><span>HOW CLOSELY LUNI'S SUNLIGHT MAP FOLLOWS NASA'S OWN POLAR MAP (1.00 = THE SAME)</span></div>
+      <div><b id="proof-t4">…</b><span>OF "NEVER SUNLIT" SQUARES GIVE THE SAME ANSWER AS NASA'S PERMANENT-SHADOW MAP</span></div></div>
+      <p class="proof-hint"><b class="h-do">CLICK A LINE BELOW TO OPEN ITS DETAILS</b></p>`;
+    $("proof-body").innerHTML = tiles + h.replace(/<section><h3>([\s\S]*?)<\/h3>/g, '<details class="proof-sec"><summary><h3>$1</h3></summary>').replace(/<\/section>/g, "</details>");
     layerCheck().then((c) => { const at = $("proof-layers"); if (at) at.innerHTML = c; });
+    fetch("data/layers/index.json").then((r) => r.json()).then((ix) => { const c = ix.nasa_check; if (!c) return;
+      const t3 = $("proof-t3"), t4 = $("proof-t4"); if (t3) t3.textContent = Math.min(c.sp.sun.r, c.np.sun.r).toFixed(2); if (t4) t4.textContent = Math.min(c.sp.shadow.same_answer_pct, c.np.shadow.same_answer_pct).toFixed(1) + "%"; }).catch(() => {});
     $("proof-body").querySelectorAll("[data-replay]").forEach((b) => b.addEventListener("click", () => { toggle(false); onReplay(STORIES.find((s) => s.id === b.dataset.replay)); }));
   }
   // card: the id of a real landing to bring into view (from the story strip)
   function toggle(show = box.hidden, card = null) {
     if (show) build();
     box.hidden = !show; $("proof-btn").classList.toggle("on", show);
-    if (show) { $("proof-body").scrollTop = 0; if (card) { const c = $("proof-body").querySelector(`[data-card="${card}"]`); c?.classList.add("hot"); c?.scrollIntoView({ block: "center" }); } }
+    if (show) { $("proof-body").scrollTop = 0; if (card) { const c = $("proof-body").querySelector(`[data-card="${card}"]`); const d = c?.closest("details"); if (d) d.open = true; c?.classList.add("hot"); c?.scrollIntoView({ block: "center" }); } }
   }
   $("proof-btn").addEventListener("click", () => toggle());
   $("proof-close").addEventListener("click", () => toggle(false));

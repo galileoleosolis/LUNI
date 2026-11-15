@@ -2,6 +2,7 @@
 import { runScan, runScanGpu } from "./scan.js";
 import { createGpuSkyline } from "./scan-gpu.js";
 import { scanOptions, bestCell, keepUp } from "./scan-core.js";
+import { showData } from "./sources.js";
 import { mapResFor } from "./terrain.js";
 import { layer, legendHtml, loadPolar, polarValue, polarMeta, goodColor, elevColor, SHADOW_COLOR, profileHtml, mixScore, mixText } from "./layers.js";
 
@@ -49,14 +50,6 @@ const away = (c) => { const d = Math.hypot(c.eastKm, c.northKm); return [d < 10 
 export function createScanPanel({ getContext, onPick, fmt }) {
   const panel = $("scan"), canvas = $("scan-canvas"), ctx = canvas.getContext("2d");
   const tile = document.createElement("canvas"), tctx = tile.getContext("2d");
-  // BIG MAP: the panel moves from the middle column to the whole screen area, and back.
-  const home = panel.parentElement, wide = document.querySelector(".cols");
-  const setBig = (on) => {
-    (on ? wide : home).appendChild(panel); panel.classList.toggle("big", on);
-    $("scan-big").textContent = on ? "⤡ SMALL MAP" : "⤢ BIG MAP"; $("scan-big").classList.toggle("on", on);
-    try { localStorage.setItem("luno-scan-big", on ? "1" : ""); } catch {}
-    schedule();
-  };
   let st = { metric: "needs", opt: 1, cells: [], grid: null, run: null, key: "", done: 0, total: 0, hover: null, engine: "" };
   // The graphics chip, if this computer has a usable one: made on first use, dropped for good if it ever fails a check.
   let gpu;
@@ -103,6 +96,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     st.run?.cancel();
     if (!st.moving) st.under = null;                       // a backdrop only makes sense right after a move
     st.moving = false;
+    showData("finder");
     st.key = key; st.cells = new Array(o.n * o.n).fill(null); st.done = 0; st.total = o.n * o.n; st.hover = null; st.took = ""; st.onChip = !!chip;
     const t00 = performance.now(), secs = () => ((performance.now() - t00) / 1000).toFixed(1);
     const common = { site: c.site, radiusKm: o.radiusKm, n: o.n, up, t0: c.t0, req: c.req,
@@ -112,11 +106,11 @@ export function createScanPanel({ getContext, onPick, fmt }) {
       st.engine = "SKYLINES: ON THE GRAPHICS CHIP.";
       st.run = runScanGpu({ ...common, gpu: chip,
         onCheck: (diff) => { check = ` CHECKED AGAINST THE PROCESSOR AT THE SITE: SAME SKYLINE WITHIN ${diff < 0.001 ? "0.001" : diff.toFixed(3)}°.`; st.engine = `SKYLINES: ON THE GRAPHICS CHIP.${check}`; note(); },
-        onDone: () => { st.took = secs(); st.under = null; note(); draw(); },
+        onDone: () => { st.took = secs(); st.under = null; note(); draw(); runPending(); },
         onFail: (why) => { console.warn("GPU scan dropped:", why); gpu = null; st.key = ""; st.engine = ""; start(); } });      // back to the processor, for good
     } else {
       st.engine = "SKYLINES: ON THE PROCESSOR.";
-      st.run = runScan({ ...common, onDone: () => { st.took = secs(); st.under = null; draw(); } });
+      st.run = runScan({ ...common, onDone: () => { st.took = secs(); st.under = null; draw(); runPending(); } });
     }
     note();
     st.grid = st.run.grid;
@@ -131,7 +125,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (panel.hidden || !st.grid) return;
     const n = st.grid.n, box = canvas.parentElement;
     const size = Math.max(160, Math.floor(Math.min(box.clientWidth, box.clientHeight))), dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.style.width = canvas.style.height = size + "px"; $("scan-go-best").style.width = size + "px";
+    canvas.style.width = canvas.style.height = size + "px"; $("scan-go-best").style.width = $("scan-ctl").style.width = size + "px";
     canvas.width = canvas.height = size * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#050402"; ctx.fillRect(0, 0, size, size);
     const cw = size / n, m = METRICS[st.metric], H = (r, k) => st.cells[r * n + k]?.heightM;
@@ -280,23 +274,22 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     }
     return rows;
   }
-  // MAP SHOWS: one stack of buttons beside the map (a small gap between the groups). Their names say which
-  // sunlight is meant, because the mission's and the all-years ones sit in the same stack.
+  // MAP SHOWS: one drop-down over the map, grouped. The names say which sunlight is meant, because the mission's
+  // and the all-years ones sit in the same list.
   const STACK = { needs: "GO / NO-GO", sun: "SUN · MISSION", earth: "EARTH · MISSION", slope: "SLOPE", elev: "ELEVATION", ysun: "SUN · ALL YEARS", yearth: "EARTH · ALL YEARS", shadow: "NEVER SUNLIT", ice: "WATER ICE", temp: "TEMPERATURE", mix: "YOUR MIX" };
   function buildMetrics(polarOk, nearPole) {
     polarOkNow = polarOk;
     const box = $("scan-metric"); box.replaceChildren();
     for (const [title, ids] of GROUPS) {
       if (METRICS[ids[0]].polar && !polarOk) continue;
-      const g = document.createElement("div"); g.className = "scan-mgroup"; g.title = title;
+      const g = document.createElement("optgroup"); g.label = title;
       for (const id of ids) {
-        if (METRICS[id].capsOnly && !nearPole) continue;     // permanent shadow is only worked out near the poles
-        const b = document.createElement("button"); b.textContent = STACK[id]; b.dataset.m = id; b.classList.toggle("on", st.metric === id);
-        b.addEventListener("click", () => { st.metric = id; box.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x.dataset.m === id)); draw(); });
-        g.appendChild(b);
+        if (METRICS[id].capsOnly && !nearPole) continue;     // permanent shadow and ice are only worked out near the poles
+        const o = document.createElement("option"); o.textContent = STACK[id]; o.value = id; g.appendChild(o);
       }
       box.appendChild(g);
     }
+    box.value = st.metric;
     const rank = $("scan-rank"); rank.replaceChildren();
     if (polarOk) {      // who picks the best point
       rank.innerHTML = `<span>★ BEST SPOT IS PICKED BY</span><div class="seg"></div>`;
@@ -319,8 +312,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
   canvas.addEventListener("click", (e) => { const c = cellAt(e); if (c) pick(c); });
   $("scan-go-best").addEventListener("click", () => { const b = bestNow(); if (b) pick(b); });
   $("scan-close").addEventListener("click", () => toggle(false));
-  $("scan-big").addEventListener("click", () => setBig(!panel.classList.contains("big")));
-  try { if (localStorage.getItem("luno-scan-big")) setBig(true); } catch {}
+  $("scan-metric").addEventListener("change", (e) => { st.metric = e.target.value; draw(); });
   new ResizeObserver(() => schedule()).observe(canvas.parentElement);
 
   // Moving the site from the scan: stay here, show the lander travel to the point, slide the map so the new site is
@@ -343,6 +335,35 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     };
     requestAnimationFrame(step);
   }
+  // "Move to the highest elevation", "go to the coldest spot": the point of the scanned area with the largest or
+  // smallest value of one map choice (ties go to the nearest point). If the scan is not finished the move waits for it.
+  const EXT = {
+    elev: [(c) => c.heightM, (v) => `${Math.round(v).toLocaleString("en-US")} m`], slope: [(c) => c.slopeDeg, (v) => `${v.toFixed(1)} degrees`],
+    sun: [(c) => c.sunPct, (v) => `${Math.round(v)}%`], earth: [(c) => c.earthPct, (v) => `${Math.round(v)}%`],
+    ysun: [(c) => polarValue("sun", c.lat, c.lon), (v) => `${Math.round(v)}%`], yearth: [(c) => polarValue("earth", c.lat, c.lon), (v) => `${Math.round(v)}%`],
+    temp: [(c) => polarValue("temp", c.lat, c.lon), (v) => `${Math.round(v - 273.15)} °C`],
+    ice: [(c) => { const v = polarValue("ice", c.lat, c.lon); return v == null || v >= 99 ? null : v; }, (v) => (v < 0.006 ? "at the surface" : `${v.toFixed(2)} m down`)],
+    mix: [(c) => cellMix(c), (v) => `${Math.round(v)} of 100`],
+  };
+  function extreme(id, which) {
+    if (!EXT[id]) return { state: "none" };
+    if (panel.hidden) toggle(true);
+    if (METRICS[id] && !(METRICS[id].capsOnly && !$("scan-metric").querySelector(`option[value="${id}"]`))) { st.metric = id; $("scan-metric").value = id; schedule(); }
+    if (!st.grid || st.done < st.total || st.anim) { st.pendingExtreme = [id, which]; return { state: "pending" }; }
+    const [get, show] = EXT[id], sign = which === "lowest" ? -1 : 1, mid = (st.grid.n - 1) / 2;
+    let best = null, bv = null;
+    for (const c of st.cells) {
+      if (!c) continue; const v = get(c); if (v == null || !Number.isFinite(v)) continue;
+      const better = bv == null || sign * (v - bv) > 1e-9 || (Math.abs(v - bv) <= 1e-9 && Math.hypot(c.r - mid, c.k - mid) < Math.hypot(best.r - mid, best.k - mid));
+      if (better) { best = c; bv = v; }
+    }
+    if (!best) return { state: "none" };
+    const [km, dir] = away(best);
+    if (best.r === mid && best.k === mid) return { state: "same", value: show(bv) };
+    pick(best);
+    return { state: "moved", value: show(bv), km, dir: dir.toLowerCase() };
+  }
+  const runPending = () => { const p = st.pendingExtreme; st.pendingExtreme = null; if (p && !panel.hidden) extreme(p[0], p[1]); };
   globalThis.lunoScanDebug = () => st;                   // for the checks: the scan's current grid and cells
   function toggle(show = panel.hidden) {
     panel.hidden = !show;
@@ -350,7 +371,7 @@ export function createScanPanel({ getContext, onPick, fmt }) {
     if (!show) { st.anim = null; st.under = null; }
     if (show) start(); else st.run?.cancel(), (st.done < st.total && (st.key = ""));
   }
-  return { toggle, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
+  return { toggle, extreme, isOpen: () => !panel.hidden, refresh: () => { if (!panel.hidden) start(); },
            // From the MOON MAP: show the scan colored by the mix, with the best point picked by the mix.
            useMix() { st.metric = "mix"; st.rank = "mix";  if (panel.hidden) toggle(true); else start(); } };
 }
