@@ -15,7 +15,7 @@
   <span class="bolt a"></span><span class="bolt b"></span><span class="bolt c"></span><span class="bolt d"></span>
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
-    <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
+    <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
     <span id="data-badge" class="demo" >LOADING DATA</span>
   </div>
 
@@ -43,6 +43,24 @@
         <div id="sv-status" class="sv-status" hidden></div>
         <div class="sv-bottom"><div id="sv-look"></div><div id="sv-info"></div><div class="sv-key"><i></i> <span id="sv-keytext"></span> · DRAG TO LOOK AROUND · USE PLAY OR ← → TO RUN THE MISSION CLOCK</div></div>
       </div>
+      <div id="moonmap" class="moonmap" hidden>
+        <div class="scan-head"><span><b class="h-t">MOON MAP</b> · NASA DATA AS LAYERS ON THE MOON · <b class="h-do">PICK A LAYER · CLICK ANY SPOT TO LAND THERE</b></span><span class="scan-head-btns"><button id="mm-close" title="Close (Esc)">✕ BACK TO THE MAIN SCREEN</button></span></div>
+        <div class="mm-body">
+          <div id="mm-globe" class="mm-globe"><div id="mm-status" class="mm-status" hidden></div><div class="mm-view"><span>LOOK AT</span><div id="mm-view"></div></div></div>
+          <div class="mm-side">
+            <h3><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
+            <div id="mm-layers" class="mm-layers"></div>
+            <div id="mm-legend"></div>
+            <label class="mm-strength">LAYER STRENGTH <input id="mm-strength" type="range" min="25" max="100" value="80" aria-label="How strongly the layer covers the picture"></label>
+            <div id="mm-meaning" class="mm-meaning"></div>
+            <h3 class="gap"><b class="h-t">DATA PROFILE</b> · EVERY LAYER AT ONE POINT</h3>
+            <div id="mm-prof-where" class="mm-prof-where"></div>
+            <div id="mm-profile"></div>
+            <h3 class="gap"><b class="h-t">WHERE THIS LAYER'S DATA COMES FROM</b></h3>
+            <div id="mm-source" class="dimtxt"></div>
+          </div>
+        </div>
+      </div>
       <div id="history" class="history" hidden>
         <div class="scan-head"><span><b class="h-t">MISSION HISTORY</b> · REAL LANDINGS SINCE 2023, REPLAYED WITH LUNI'S NASA DATA · <b class="h-do">PICK ONE, THEN LOAD IT</b></span><span class="scan-head-btns"><button id="hist-close" title="Close (Esc)">✕ BACK TO THE MAIN SCREEN</button></span></div>
         <div class="hist-top">
@@ -66,7 +84,7 @@
           <div class="globe-key"><span class="k-sun">━ SUN</span><span class="k-earth">━ EARTH</span></div>
           <div class="k-hint"><b>DRAG</b><span class="long"> TO TURN</span> · <b>SCROLL</b><span class="long"> TO ZOOM</span> · <b>CLICK</b> A SPOT<span class="long"> TO LAND THERE</span></div>
           <div id="globe-verdict" class="globe-verdict"></div>
-          <button id="globe-big" class="globe-big" title="Make the Moon big, to look around and pick any spot">⤢ BIG MOON</button>
+          <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">SCAN FOR BETTER SPOT ▸</button>
         </div>
         <h3 class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
@@ -95,15 +113,15 @@
             <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
             <div class="scan-side">
               <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
-              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-metric"></div>
+              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>
               <div id="scan-legend" class="scan-legend"></div>
+              <h3><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
+              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
+              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
               <div id="scan-progress"></div>
               <div id="scan-engine" class="dimtxt"></div>
               <div id="scan-scale" class="dimtxt"></div>
-              <h3><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell"></div>
-              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
-              <h3><b class="h-t">INSPECT</b></h3><div id="scan-hover" class="scan-cell"></div>
+              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell" hidden></div>
               <div id="scan-note" class="credit"></div>
             </div>
           </div>

@@ -21,7 +21,7 @@ export function missionFacts(story) {
            eclipses: siteEclipses(site, t0, new Date(+t0 + SPAN_DAYS * DAY), tr).filter((e) => e.maxCover >= 0.05) };
 }
 
-export function createHistoryPanel({ fmt, onLoad }) {
+export function createHistoryPanel({ fmt, onLoad, onClose }) {
   const $ = (id) => document.getElementById(id), box = $("history");
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   let rows = null, sel = STORIES[0].id, sort = "date";
@@ -83,7 +83,7 @@ export function createHistoryPanel({ fmt, onLoad }) {
         ${f.eclipses.map((e) => `<span class="warn">⚠ ECLIPSE ON ${fmt.day(e.peak)}</span>`).join(" ")}</div>
       <button id="hist-load" class="hist-load" title="${esc(needs)}">LOAD INTO THE MAIN SCREEN ▸<small>${fmt.stamp(f.t0)} · ${f.req.days}-DAY MISSION${f.req.earthAtLanding ? "" : " · NO DIRECT EARTH LINK ASKED FOR"}</small></button>
       <div class="hist-src">SOURCES: ${st.sources.map(([name, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(name.toUpperCase())} ↗</a>`).join(" · ")}</div></div>`;
-    $("hist-load").addEventListener("click", () => { toggle(false); onLoad({ site: st.site, t0: st.t0, days: st.days, needs: st.needs }); });
+    $("hist-load").addEventListener("click", () => { onClose(); onLoad({ site: st.site, t0: st.t0, days: st.days, needs: st.needs }); });
   }
 
   function drawTable() {
@@ -105,7 +105,7 @@ export function createHistoryPanel({ fmt, onLoad }) {
         <div class="c-go"><button class="mini-btn" data-load="${st.id}">LOAD ▸</button></div>`;
       tr.querySelector(".c-strip").appendChild(strip(st, f));
       tr.addEventListener("click", (e) => { if (e.target.closest("[data-load]")) return; sel = st.id; render(); });
-      tr.querySelector("[data-load]").addEventListener("click", () => { toggle(false); onLoad({ site: st.site, t0: st.t0, days: st.days, needs: st.needs }); });
+      tr.querySelector("[data-load]").addEventListener("click", () => { onClose(); onLoad({ site: st.site, t0: st.t0, days: st.days, needs: st.needs }); });
       body.appendChild(tr);
     }
   }
@@ -114,10 +114,7 @@ export function createHistoryPanel({ fmt, onLoad }) {
   function toggle(show = box.hidden) {
     if (show) { if (!rows) compute(); render(); }
     box.hidden = !show;
-    $("tab-history").classList.toggle("on", show); $("tab-main").classList.toggle("on", !show);
   }
-  $("tab-history").addEventListener("click", () => toggle(true));
-  $("tab-main").addEventListener("click", () => toggle(false));
-  $("hist-close").addEventListener("click", () => toggle(false));
+  $("hist-close").addEventListener("click", () => onClose());
   return { toggle, isOpen: () => !box.hidden };
 }
