@@ -230,6 +230,19 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
     DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
     sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- **Source bubbles** (the user, Sun 15 Nov about 11 AM New York, from a screenshot: the green "NASA DATA · SPICE DE440
+  + LOLA TERRAIN" line "can go away", the top-row buttons "need to be bigger", and the NASA data should "appear in
+  like a bubble whenever something is calculated or displayed saying where the data came from"). **On the pre-release
+  only; the public site is r5.**
+  - `#data-badge` is still in the page but `hidden` (test set D reads its text); what it said about the terrain in
+    use is on the skyline's bubble (`#src-sky`: NASA LRO LOLA, or NASA LRO LOLA · REDUCED MAP in orange).
+  - Tabs and ? TUTORIAL are 16 px with more padding; the top row is 35 px tall (was about 23), so the skyline is
+    about 10 px shorter (139 / 162 px at 1440 x 900).
+  - `js/sources.js` (`initSources`, `pulseSources`): any element with class `src` is a green pill naming the NASA data
+    behind the result beside it (`data-src` key into `SOURCES`, or its own `data-long` sentence). Pointing at it or
+    tapping it opens a "WHERE THIS COMES FROM" bubble (one fixed element on `body`); every pill pulses when
+    `recompute` runs. Pills: the verdict strip, the Sun / Earth readouts heading, the skyline heading, the small
+    Moon, the Best Site Finder header, MISSION HISTORY, and the MOON MAP (`#mm-src`, text and sentence follow the layer).
 - The user (Sun 15 Nov, about 10 AM New York) asked for the UI "all consolidated ... extremely intuitive". A sketch was
   shown first (one row of tabs for every screen, bottom keys as the only action buttons, the duplicate buttons in
   the left column and headings removed, extras under one MORE key). **Rejected: "Actually just leave it these are
@@ -242,6 +255,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- **r5 released** on the user's "release it" (Sun 15 Nov, 10:26 AM New York = 15:26 UTC; main 90e2028; GitHub reports the
+  deployment as a success): the public site now also has the site's own data card, the WATER ICE layer, the DEEP
+  SPACE NETWORK line and the PROOF section against NASA's polar maps. Nothing newer is waiting on the pre-release.
 - **r4 released** on the user's "Release it, that was great" (Sun 15 Nov, 9:05 AM New York = 14:05 UTC; main 3093d3b):
   the public site now has everything in this list. Later changes go to the pre-release and need a new "release it".
   The time of the local judging is still not known (asked, not answered).
@@ -358,8 +374,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). **r4 (15 Nov, 14:05 UTC, main 3093d3b) is the current public version.** To roll back to r3:
-   `tools/release.sh promote 9f099f4`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). **r5 (15 Nov, 15:26 UTC, main 90e2028) is the current public version.**
+   To roll back to r4: `tools/release.sh promote 3093d3b`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

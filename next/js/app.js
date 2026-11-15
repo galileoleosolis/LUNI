@@ -19,6 +19,7 @@ import { startGuide } from "./guide.js";
 import { createHistoryPanel } from "./ui-history.js";
 import { createMoonMap } from "./ui-moonmap.js";
 import { loadDsn, dsnAt } from "./dsn.js";
+import { initSources, pulseSources } from "./sources.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -213,6 +214,10 @@ function renderBrief() {
   $("brief-lola").innerHTML = h;
   const badge = $("data-badge");
   badge.className = "demo" + (t.real ? " ok" : "");
+  // the skyline's source bubble also carries what the old top-right badge said about the terrain in use
+  const sky = $("src-sky");
+  sky.textContent = t.real ? (t.reduced ? "NASA LRO LOLA · REDUCED MAP" : "NASA LRO LOLA") : state.terrainBusy ? "LOADING NASA LOLA…" : "FLAT HORIZON · NO TERRAIN";
+  sky.classList.toggle("warn", !t.real || !!t.reduced);
   badge.textContent = t.real ? `NASA DATA · SPICE DE440 + LOLA TERRAIN${t.reduced ? " (REDUCED DETAIL)" : ""}`
     : state.terrainBusy ? "NASA SPICE POSITIONS · LOADING LOLA TERRAIN…" : "NASA SPICE POSITIONS · FLAT HORIZON (TERRAIN UNAVAILABLE)";
 }
@@ -232,6 +237,7 @@ function recompute({ keepIdx = false } = {}) {
   $("pct-both").textContent = pct(s.pctBoth);
   $("max-dark").textContent = s.maxDarkHours ? fmtT(s.maxDarkHours) : "NONE";
   renderBrief();
+  pulseSources();
   updateCalendar();
   renderTimeline();
   renderMission();
@@ -974,6 +980,7 @@ async function init() {
   $("tab-plan").addEventListener("click", () => showPlan("plan"));
   $("tab-days").addEventListener("click", () => showPlan("days"));
   $("tab-ops").addEventListener("click", () => showPlan("ops"));
+  initSources();
   $("ops").addEventListener("click", (e) => { const g = e.target.closest(".ops-b"); if (g) setIdx(+g.dataset.i); });
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
