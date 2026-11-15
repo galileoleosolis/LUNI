@@ -1065,3 +1065,13 @@ html.flow .fs-btn { display: none; }
 .scan-stack button { border-width: 3px; border-radius: 8px; } .scan-stack .seg { gap: 5px; } .scan-stack .scan-metric { gap: 4px; }
 .scan-stack button.on, .scan-stack .seg button.on { border-color: #fff; }
 #scan-sizes { width: 92px; } #scan-shows { width: 158px; }
+
+/* Finder choice buttons, second pass (the user: they "look cheap"): the same glazed family as the bottom keys, in a dark glass */
+.scan-stack button, .scan-stack .seg button { color: #eaf4ff; border: 3px solid #05070c; border-radius: 9px; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  background: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.2) 100%), linear-gradient(180deg, #2b4f8f, #10224a);
+  box-shadow: 0 3px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px rgba(124,184,255,.35); }
+.scan-stack button:hover { filter: brightness(1.2); }
+.scan-stack button.on, .scan-stack .seg button.on { color: #fff; border-color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, #6fd0ff, #1263f2);
+  box-shadow: 0 3px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), 0 0 16px rgba(65,182,255,.6); }
+.scan-stack .seg, .scan-stack .scan-metric { gap: 7px; }
