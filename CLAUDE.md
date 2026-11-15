@@ -152,7 +152,7 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
-**Pre-release state (15 Nov, about 21:00 UTC): `next/` and the preview page (Version 43) are at main 09c145e: north
+**Pre-release state (15 Nov, about 04:15 UTC): `next/` and the preview page (Version 43) are at main 09c145e: north
 pole layers and the fixes from the mother's test. The public site is still r3 (9f099f4).**
 **Whole Moon and north pole (15 Nov, the user: "not really impressive to just have south pole ... at least the best we
 can get on the other parts of the moon"):** on the pre-release, not released.
