@@ -677,3 +677,9 @@ html.flow .globe-big { display: block; }
 html.flow .mm-globe { height: 56vh; } html.flow .mm-globe .globe-wrap.big { height: 100% !important; } html.flow .mm-globe .globe-wrap.big .k-hint, html.flow .mm-globe .globe-wrap.big .globe-key { display: none; }
 html.flow .moonmap .scan-head, html.flow .history .scan-head { flex-wrap: wrap; } html.flow .mm-globe .globe-wrap.big .globe-verdict { max-width: 60%; font-size: 12.5px; } html.flow .mm-globe .globe-wrap.big .side-go { display: none; }
 .scan-legend.lay .ends { flex-wrap: nowrap; } .scan-legend.lay .ends span { max-width: 50%; }
+
+/* YOUR MIX: weight sliders on the Moon map */
+.mm-mix { margin-top: 7px; border: 1px solid var(--hi); padding: 6px 8px 7px; } .mm-mix[hidden] { display: none; }
+.mm-mix label { display: grid; grid-template-columns: 124px 1fr 38px; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--wht); } .mm-mix input { accent-color: var(--hi); width: 100%; } .mm-mix label b { text-align: right; color: var(--hi); }
+.mm-mix-use { margin-top: 6px; width: 100%; font-family: var(--cond); font-size: 16px; font-weight: 700; letter-spacing: .05em; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b)); border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; } .mm-mix-use:hover { filter: brightness(1.15); }
+.scan-mgroup .seg { flex-wrap: wrap; }

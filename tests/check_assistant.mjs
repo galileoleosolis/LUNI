@@ -75,6 +75,8 @@ expect("show me the proof", [["open_view", { view: "proof" }]]);
 expect("open mission history", [["open_view", { view: "history" }]]);
 expect("show the sunlight layer", [["open_view", { view: "moon", layer: "sun" }]]);
 expect("slope map", [["open_view", { view: "moon", layer: "slope" }]]);
+expect("show the temperature map", [["open_view", { view: "moon", layer: "temp" }]]);
+expect("combined layer", [["open_view", { view: "moon", layer: "mix" }]]);
 expect("open the moon map", [["open_view", { view: "moon" }]]);
 expect("where is the sun", [rep("sun")]);
 expect("show past missions", [["open_view", { view: "history" }]]);

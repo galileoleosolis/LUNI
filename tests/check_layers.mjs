@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { initEphemeris, siteFrame, sunEarthAltAz, MOON_RADIUS_KM } from "../js/ephem.js";
 import { setHorizons, terrainFor, horizonAt } from "../js/model.js";
-import { setPolar, polarValue } from "../js/layers.js";
+import { setPolar, polarValue, mixScore, getMix, setMix } from "../js/layers.js";
 
 const root = new URL("..", import.meta.url), read = (p) => readFileSync(new URL(p, root));
 const bin = read("data/ephem.bin"), meta = JSON.parse(read("data/ephem.json"));
@@ -41,6 +41,20 @@ const haworth = sites.find((s) => s.id === "haworth"), ridge = sites.find((s) =>
 if (polarValue("shadow", haworth.lat, haworth.lon) !== 1) { fail++; console.log("FAIL: Haworth's floor is not marked as permanent shadow"); }
 if (polarValue("shadow", ridge.lat, ridge.lon) !== 0) { fail++; console.log("FAIL: the Shackleton ridge is marked as permanent shadow"); }
 if (polarValue("sun", 0, 0) !== null) { fail++; console.log("FAIL: a value outside the region"); }
+// Temperature (NASA Diviner, re-gridded): the shadowed crater floor must be far colder than the sunlit ridge.
+const tH = polarValue("temp", haworth.lat, haworth.lon), tR = polarValue("temp", ridge.lat, ridge.lon), hot = polarValue("tmax", ridge.lat, ridge.lon);
+console.log(`temperature: Haworth floor ${tH} K average, Shackleton ridge ${tR} K average, ${hot} K at its hottest; region ${JSON.stringify(ix.temperature.avg_k)} K`);
+if (!(tH > 15 && tH < 80 && tR > tH + 40 && hot >= tR)) { fail++; console.log("FAIL: temperatures do not look like Diviner's"); }
+// YOUR MIX: a weighted average of the parts' scores.
+const w0 = getMix();
+for (const k of Object.keys(w0)) setMix(k, 0);
+setMix("sun", 3); setMix("slope", 1);
+const m1 = mixScore({ sun: 80, earth: 0, slope: 10, temp: 100 });      // (3 * 0.8 + 1 * 0.5) / 4 = 72.5
+if (Math.abs(m1 - 72.5) > 1e-9) { fail++; console.log("FAIL: mix of sun 80% and slope 10 deg should be 72.5, got", m1); }
+if (mixScore({ sun: null, slope: 3 }) !== null) { fail++; console.log("FAIL: a mix with a missing weighted part must be null"); }
+setMix("sun", 0); setMix("slope", 0);
+if (mixScore({ sun: 80, slope: 3 }) !== null) { fail++; console.log("FAIL: all weights 0 must give no score"); }
+for (const [k, v] of Object.entries(w0)) setMix(k, v);
 console.log(`mean difference ${(sumAbs / n).toFixed(1)} points`);
 console.log(fail ? `${fail} layer checks FAILED` : "layer checks OK");
 process.exit(fail ? 1 : 0);

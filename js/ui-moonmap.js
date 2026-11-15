@@ -1,9 +1,9 @@
 // MOON MAP screen: the 3D Moon made big, with NASA data as layers on it and a data profile for any point.
 // The Moon itself is the same one as on the main screen (it moves in here while this screen is open), so a click
 // still picks a landing site.
-import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml } from "./layers.js";
+import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
 
-export function createMoonMap({ globe, getSite, fmt, onClose }) {
+export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
   const $ = (id) => document.getElementById(id), box = $("moonmap");
   const wrap = document.querySelector(".globe-wrap"), home = wrap.parentElement, homeNext = wrap.nextElementSibling;
   let current = "none", strength = 0.8, job = 0, hover = null, profJob = 0;
@@ -23,6 +23,7 @@ export function createMoonMap({ globe, getSite, fmt, onClose }) {
     const L = layer(id);
     $("mm-legend").innerHTML = L ? legendHtml(L) : "";
     $("mm-meaning").textContent = L ? L.meaning : "THE MOON AS A CAMERA SEES IT: NASA LRO WIDE-ANGLE CAMERA MOSAIC. PICK A LAYER TO PUT DATA ON IT.";
+    $("mm-mix").hidden = !L?.mix;
     $("mm-source").textContent = L ? L.source : "PICTURE: NASA / GSFC / ARIZONA STATE UNIVERSITY (LRO WAC MOSAIC).";
     if (!L) { globe?.setOverlay(null); return; }
     $("mm-status").hidden = false; $("mm-status").textContent = "DRAWING THE LAYER…";
@@ -58,6 +59,16 @@ export function createMoonMap({ globe, getSite, fmt, onClose }) {
                              ["NEAR SIDE", () => globe?.lookAt(0, 0, 4.4)], ["FAR SIDE", () => globe?.lookAt(0, 180, 4.4)]]) {
     const b = document.createElement("button"); b.textContent = label; b.addEventListener("click", go); $("mm-view").appendChild(b);
   }
+  // YOUR MIX: one slider per part (0 = left out, 5 = counts most); the map is redrawn when a slider is let go.
+  for (const part of MIX_PARTS) {
+    const row = document.createElement("label"), w = getMix()[part.id];
+    row.innerHTML = `<span>${part.label}</span><input type="range" min="0" max="5" step="1" value="${w}" aria-label="Weight of ${part.label}"><b>${w ? "×" + w : "OFF"}</b>`;
+    const inp = row.querySelector("input"), out = row.querySelector("b");
+    inp.addEventListener("input", () => { setMix(part.id, +inp.value); out.textContent = +inp.value ? "×" + inp.value : "OFF"; schedule(); });
+    inp.addEventListener("change", () => { delete cache.mix; if (current === "mix") setLayer("mix"); });
+    $("mm-mix-rows").appendChild(row);
+  }
+  $("mm-mix-use").addEventListener("click", () => onUseMix?.());
   $("mm-strength").addEventListener("input", (e) => { strength = +e.target.value / 100; globe?.setOverlayOpacity(strength); });
   $("mm-close").addEventListener("click", () => onClose());
   window.addEventListener("luno:state", schedule);
