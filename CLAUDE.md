@@ -190,8 +190,10 @@ Other planets: nothing to build (their light is negligible; their pull on the Mo
 7. Windows .exe wrapper (Electron). 8. Earth-campers mode (advised against; keep as a story point).
 
 ## Deadline
-The user was surprised on 15 Nov that the deadline is that night (23:59 local, per these notes and the official FAQ's
-dates; the exact cutoff was not found on an official page: the user was told to check their event page).
+Confirmed by the user from their team page: submissions close **Sunday 15 Nov 2026 at 11:59 PM, the user's LOCAL time**.
+This session's clock and "today's date" are UTC, and the user's local time is not known (it was still Saturday for
+them when the UTC date turned to 15 Nov, and Claude wrongly said "tonight"). Never say "today" or "tonight" about the
+deadline from the UTC date: ask the user for their local time, or give the time in UTC and say so.
 The public site is still r2. Releasing needs the user's "release it". The submission text and video do not exist.
 
 ## Open work, roughly in priority order
