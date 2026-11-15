@@ -24,7 +24,7 @@ const STEPS = [
   { at: ['h3[data-step="3"]', ".needs", "#needs-more"], title: "3 · MISSION NEEDS",
     what: "How long the mission has to keep working after it lands.",
     why: "A short visit is easier. A long stay has to get through more hours without sunlight.",
-    how: "Click a number of days. Other needs (time in the dark, Earth link, ground slope) are folded under 4 MORE MISSION NEEDS for when you want them.",
+    how: "Click a number of days. Other needs (time in the dark, Earth link, ground slope) are folded under 3 MORE MISSION NEEDS for when you want them.",
     doIt: { on: "click", sel: ".needs .seg button", say: "CLICK A DIFFERENT NUMBER OF DAYS" },
     alt: "It is like packing for a trip. A weekend needs little planning. A month needs much more. Here you tell LUNI how long the trip is." },
   { at: ['h3[data-step="4"]', "#mission"], title: "4 · THE ANSWER: GO OR NO-GO",

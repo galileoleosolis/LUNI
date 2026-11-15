@@ -1,6 +1,7 @@
 // MOON MAP screen: the 3D Moon made big, with NASA data as layers on it and a data profile for any point.
 // The Moon itself is the same one as on the main screen (it moves in here while this screen is open), so a click
 // still picks a landing site.
+import { showData } from "./sources.js";
 import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, layerRow, mixScore, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
 
 export function createMoonMap({ globe, getSite, getNow, getSiteYears, fmt, onClose, onUseMix }) {
@@ -22,6 +23,10 @@ export function createMoonMap({ globe, getSite, getNow, getSiteYears, fmt, onClo
     [...$("mm-layers").children].forEach((b) => b.classList.toggle("on", b.dataset.id === id));
     const L = layer(id);
     $("mm-legend").innerHTML = L ? legendHtml(L) : "";
+    // which NASA data this layer is made of: a line here, and the NASA DATA USED band at the top of the screen
+    const SHORT = { elev: "NASA LRO LOLA", slope: "NASA LRO LOLA", sun: "NASA SPICE + LRO LOLA", earth: "NASA SPICE + LRO LOLA", shadow: "NASA SPICE + LRO LOLA", temp: "NASA LRO DIVINER", ice: "NASA LRO DIVINER", mix: "NASA DATA · YOUR WEIGHTS" };
+    $("mm-src").textContent = L ? SHORT[L.id] || "NASA DATA" : "NASA LRO PHOTO";
+    if (!box.hidden) showData("layer:" + (L ? L.id : "none"));
     $("mm-meaning").textContent = L ? L.meaning : "THE MOON AS A CAMERA SEES IT: NASA LRO WIDE-ANGLE CAMERA MOSAIC. PICK A LAYER TO PUT DATA ON IT.";
     $("mm-mix").hidden = !L?.mix;
     $("mm-source").textContent = L ? L.source : "PICTURE: NASA / GSFC / ARIZONA STATE UNIVERSITY (LRO WAC MOSAIC).";

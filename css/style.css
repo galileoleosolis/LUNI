@@ -856,3 +856,76 @@ html.flow .plan-tabs { flex-wrap: wrap; } html.flow .plan-tabs button { font-siz
 .prof-note { margin-top: 5px; font-size: 12.5px; line-height: 1.35; color: var(--dim); }
 .mm-side .prof-row { grid-template-columns: 142px 42px minmax(0, 1fr) 38px; gap: 6px; }
 #earth-dsn { color: var(--amb); } #earth-dsn b { color: var(--dim); font-weight: 600; }
+/* the unit's top row: larger buttons; the green data line is gone (its words live in the source bubbles) */
+.tabs button { font-size: 16px; padding: 7px 20px; letter-spacing: .14em; } .tour-btn { font-size: 16px; padding: 7px 18px; }
+html.flow .tabs button { font-size: 13px; padding: 5px 10px; letter-spacing: .08em; } html.flow .tour-btn { font-size: 13px; padding: 5px 10px; }
+/* source bubbles: where a result's NASA data came from */
+.src, .scan-head button.src { flex: none; font-family: var(--cond); font-size: 13px; font-weight: 700; letter-spacing: .07em; line-height: 1.3; white-space: nowrap; cursor: help;
+  color: #8ff5bf; background: rgba(33, 224, 122, .1); border: 1px solid rgba(33, 224, 122, .65); border-radius: 999px; padding: 1px 10px 1px 8px; }
+.src::before { content: "● "; color: var(--grn); } .src:hover, .scan-head button.src:hover { background: rgba(33, 224, 122, .24); color: #fff; }
+.src.warn { color: #ffd9a8; border-color: rgba(255, 138, 61, .8); background: rgba(255, 138, 61, .12); } .src.warn::before { color: #ff8a3d; }
+.src.fresh { animation: src-fresh 1.5s ease-out; } @keyframes src-fresh { 0% { box-shadow: 0 0 0 0 rgba(33, 224, 122, .9); background: rgba(33, 224, 122, .45); } 100% { box-shadow: 0 0 0 9px rgba(33, 224, 122, 0); } }
+@media (prefers-reduced-motion: reduce) { .src.fresh { animation: none; } }
+.hero { position: relative; } .hero > .src { position: absolute; top: 6px; right: 8px; }
+html:not(.flow) .answer-row .hero-title { padding-right: 190px; }
+.src-globe { position: absolute; left: 6px; bottom: 6px; z-index: 2; } .globe-wrap.big .src-globe { left: 26px; bottom: 60px; }
+.mm-srcline { margin: 6px 0 2px; }
+.src-pop { position: fixed; z-index: 70; width: min(360px, calc(100vw - 12px)); box-sizing: border-box; padding: 9px 12px 10px; background: #04120b; color: #e9eef5; border: 1.5px solid var(--grn); border-radius: 12px;
+  box-shadow: 0 10px 34px #000; font-family: var(--mono); font-size: 13.5px; line-height: 1.4; pointer-events: none; }
+.src-pop[hidden] { display: none; } .src-pop b { display: block; font-family: var(--cond); font-size: 14.5px; letter-spacing: .1em; color: var(--grn); margin-bottom: 3px; }
+html.flow .hero > .src { position: static; order: -1; }
+html.flow .col-main .tiles-head { flex-wrap: wrap; gap: 4px 8px; }
+.tiles-head > .src { margin: 0 auto 0 10px; align-self: center; } .tiles-head > .src + * { margin-left: 10px; }
+/* Best Site Finder, condensed: size and "map shows" sit in one row over the map; the reading panel on the right is wider */
+.scan-body, .scan.big .scan-body { grid-template-columns: minmax(0, 1fr) minmax(300px, 43%); gap: 14px; }
+.scan-map { gap: 7px; } .scan-ctl { flex: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; max-width: 100%; }
+.scan-pick { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .scan-pick > b { font-family: var(--cond); font-size: 14px; letter-spacing: .1em; color: var(--hi); }
+.scan-pick .seg { display: flex; } .scan-pick .seg button, .scan-pick select { font-family: var(--cond); font-size: 17px; font-weight: 700; letter-spacing: .03em; line-height: 1.1; padding: 6px 9px; color: var(--amb); background: #000; border: 1px solid var(--dim); cursor: pointer; white-space: nowrap; }
+.scan-pick .seg button.on { background: var(--hi); border-color: var(--hi); color: #00101f; } .scan-pick select { color: var(--wht); border-color: var(--hi); max-width: 100%; }
+.scan-side { padding-left: 14px; }
+html.flow .scan-ctl { flex-wrap: wrap; width: auto !important; }
+/* the verdict strip: one fact a row (what it is, then the value); on a NO-GO the word and the ways out pulse */
+html:not(.flow) .answer-row .hero-why, .hero-why { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 14px; align-items: baseline; }
+.hw { display: contents; } .hw > span { font-family: var(--cond); font-size: 14px; font-weight: 700; letter-spacing: .1em; color: var(--dim); white-space: nowrap; } .hw > b { font-weight: 600; color: var(--wht); }
+.hero-why .warn { grid-column: 1 / -1; justify-self: start; }
+html:not(.flow) .answer-row .hero-title { padding-right: 0; } .hero-title[hidden] { display: none; }
+.hero.nogo .hero-word { animation: nogo-pulse 1.6s ease-in-out infinite; } @keyframes nogo-pulse { 50% { opacity: .45; text-shadow: 0 0 18px rgba(255, 61, 61, .9); } }
+.hero.nogo .hero-next { animation: fix-pulse 1.6s ease-in-out infinite; }
+.key.fixit, .side-go.fixit { animation: fix-pulse 1.6s ease-in-out infinite; }
+@keyframes fix-pulse { 50% { box-shadow: 0 0 0 4px var(--key-y, #ffd23c), 0 0 22px 4px rgba(255, 210, 60, .65); filter: brightness(1.25); } }
+@media (prefers-reduced-motion: reduce) { .hero.nogo .hero-word, .hero.nogo .hero-next, .key.fixit, .side-go.fixit { animation: none; } .key.fixit, .side-go.fixit, .hero.nogo .hero-next { box-shadow: 0 0 0 3px var(--key-y, #ffd23c); } }
+.col-site .need .seg button { white-space: nowrap; }
+/* NASA DATA USED: a band over the screen's top line whenever something is calculated or shown */
+header.bar { position: relative; }
+.data-band { position: absolute; left: -6px; right: -6px; top: -5px; bottom: 2px; z-index: 6; display: flex; align-items: center; flex-wrap: wrap; gap: 2px 22px; padding: 2px 12px; overflow: hidden;
+  background: var(--hi); color: #00101f; font-family: var(--cond); font-size: 18px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; pointer-events: none;
+  box-shadow: 0 0 0 2px #000, 0 6px 22px rgba(65, 182, 255, .55); animation: data-band 6500ms ease both; }
+.data-band[hidden] { display: none; } .data-band > b { background: #00101f; color: var(--hi); padding: 1px 10px; letter-spacing: .12em; white-space: nowrap; }
+.data-band span { white-space: nowrap; } .data-band i { font-style: normal; font-weight: 600; opacity: .72; margin-right: 4px; }
+@keyframes data-band { 0% { transform: translateY(-110%); opacity: 0; } 5% { transform: none; opacity: 1; } 9% { filter: brightness(1.5); } 14% { filter: none; } 92% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .data-band { animation: none; } }
+.src-note { flex: none; margin: 0 auto 0 10px; font-family: var(--cond); font-size: 14px; font-weight: 700; letter-spacing: .08em; color: #ff8a3d; white-space: nowrap; } .src-note:empty { display: none; }
+.tiles-head > .src-note + * { margin-left: 10px; }
+.mm-srcline { font-size: 12.5px; color: var(--dim); letter-spacing: .04em; } .mm-srcline b { color: var(--wht); }
+html.flow .data-band { font-size: 14px; position: fixed; top: 0; left: 0; right: 0; bottom: auto; z-index: 45; padding: 6px 10px; }
+/* PROOF, calmer: four headline numbers, then one line a section that opens on a click */
+.proof-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 4px 0 10px; }
+.proof-tiles > div { border: 1px solid var(--grid0); border-top: 4px solid var(--grn); background: rgba(33, 224, 122, .05); padding: 9px 12px 10px; }
+.proof-tiles b { display: block; font-family: var(--cond); font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: .01em; color: var(--grn); margin-bottom: 5px; }
+.proof-tiles span { display: block; font-size: 12.5px; line-height: 1.35; color: var(--amb); }
+.proof-hint { margin: 0 0 4px; font-size: 13px; }
+.proof-sec { border-top: 1px solid var(--grid0); padding: 7px 0; } .proof-sec > summary { cursor: pointer; list-style: none; } .proof-sec > summary::-webkit-details-marker { display: none; }
+.proof-sec > summary h3 { display: inline-block; margin: 0; font-size: 14.5px; } .proof-sec > summary h3::after { content: "  ▸ OPEN"; color: var(--wht); font-weight: 700; letter-spacing: .06em; }
+.proof-sec[open] > summary h3::after { content: "  ▾ CLOSE"; } .proof-sec[open] > summary { margin-bottom: 8px; } .proof-sec > summary:hover h3 { filter: brightness(1.3); }
+html.flow .proof-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } html.flow .proof-tiles b { font-size: 30px; }
+/* the main screen's sections stand apart: every section starts with a band, with air above it */
+.col-main > .tiles-head:not(.ans-head), .answer-side > .tiles-head { margin-top: 9px; padding: 3px 8px 3px 7px; border-left: 5px solid var(--hi); background: linear-gradient(90deg, color-mix(in srgb, var(--hi) 24%, #000), color-mix(in srgb, var(--hi) 5%, #000)); }
+.col-main > .tiles-head:not(.ans-head) h3, .answer-side > .tiles-head h3 { margin-bottom: 0; }
+.answer-row { border-bottom: none; padding-bottom: 0; margin-bottom: 0; } .col-main .horizon { border-bottom: none; margin-top: 5px; } .answer-side .readouts { margin-top: 5px; }
+.col-main > .plan-head { margin-bottom: 5px; }
+.col-site h3.gap { margin-top: 17px; } .col-site .globe-wrap { margin-top: 2px; }
+html.flow .col-main > .tiles-head:not(.ans-head), html.flow .answer-side > .tiles-head { margin-top: 14px; }
+.col-main > .tiles-head:not(.ans-head), .answer-side > .tiles-head { margin-top: 6px; padding: 1px 8px 1px 7px; }
+.col-main .horizon { margin-top: 2px; margin-bottom: 2px; padding-bottom: 2px; } .answer-side .readouts { margin-top: 2px; } .col-main > .plan-head { margin-bottom: 3px; }
+html:not(.flow) .answer-row .hero { margin-bottom: 0; }
+html.flow .col-main > .plan-head { padding-right: 0; } html.flow .plan-tabs { width: 100%; } html.flow .plan-tabs button { padding: 4px 5px 5px; font-size: 14px; }

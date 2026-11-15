@@ -42,6 +42,8 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { to_hours: { type: "number" }, by_hours: { type: "number" }, play: { type: "boolean" } }, additionalProperties: false } },
   { name: "open_view", description: "Open a view: 'scan' (map of nearby points, to find a better spot), 'surface' (3D first-person view), 'proof' (how LUNI was checked against NASA and real landings, and its limits), 'history' (real landings since 2023 compared, each loadable into the main screen), 'moon' (the big Moon with data layers; give 'layer': elev, slope, sun, earth, shadow, temp or mix) or 'main' (close them all).",
     input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "proof", "history", "moon", "main"] }, layer: { type: "string", enum: ["elev", "slope", "sun", "earth", "shadow", "ice", "temp", "mix"] } }, required: ["view"], additionalProperties: false } },
+  { name: "move_to_extreme", description: "In the Best Site Finder's scanned area, move the landing site to the point with the highest or lowest value of one map choice. what: elev (elevation), slope, sun / earth (sunlight or Earth link during the mission), ysun / yearth (the same over all years), temp (average temperature), ice (depth to stable water ice; lowest = nearest the surface), mix (the user's blended score). Opens the finder and waits for the scan if needed.",
+    input_schema: { type: "object", properties: { what: { type: "string", enum: ["elev", "slope", "sun", "earth", "ysun", "yearth", "temp", "ice", "mix"] }, which: { type: "string", enum: ["highest", "lowest"] } }, required: ["what", "which"], additionalProperties: false } },
   { name: "share_link", description: "Copy a link that opens LUNI on exactly this site, landing time and mission needs.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "take_option", description: "After a NO-GO, LUNI offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
@@ -193,7 +195,15 @@ export function parse(text, sites = []) {
 
   // --- views, options, pin, clock run ---
   if ((m = take(/\b(?:option|choice|number|way)(?: number)? ([123])\b/)) || (m = take(/\b(?:the |do the |take the )([123]) (?:1\b|option\b|choice\b|$)/))) call("take_option", { number: +m[1] });
-  if (take(/\b(?:move|go|jump|switch)\b[a-z ]{0,12}\bbest (?:point|spot|place|one)\b|\buse the best (?:point|spot|place)\b/)) call("take_option", { best_point: true });
+  // "move to the highest elevation", "go to the coldest spot", "take me to the least sunlight over all years"
+  if ((m = take(/\b(?:move|go|jump|switch|head|land|take (?:me|us)|bring (?:me|us))\b[a-z ]{0,16}?\b(?!best (?:point|spot|place|one)\b)(highest|lowest|most|least|best|worst|max(?:imum)?|min(?:imum)?|sunniest|brightest|darkest|coldest|coolest|warmest|hottest|flattest|steepest|shallowest)\b ?(?:amount of |level of |share of )?(elevation|height|altitude|ground|point|spot|place|slope|sun(?:light)?|illumination|earth(?: link)?|communications?|link|temperature|temp|(?:water )?ice|mix|score)?\b ?(all years|over (?:the|all) years|long term)?/))) {
+    const adj = m[1], noun = m[2] || "", years = !!m[3];
+    const fixed = { sunniest: ["sun", "highest"], brightest: ["sun", "highest"], darkest: ["sun", "lowest"], coldest: ["temp", "lowest"], coolest: ["temp", "lowest"], warmest: ["temp", "highest"], hottest: ["temp", "highest"], flattest: ["slope", "lowest"], steepest: ["slope", "highest"], shallowest: ["ice", "lowest"] }[adj];
+    let what = /slope/.test(noun) ? "slope" : /sun|illum/.test(noun) ? "sun" : /earth|comm|link/.test(noun) ? "earth" : /temp/.test(noun) ? "temp" : /ice/.test(noun) ? "ice" : /mix|score/.test(noun) ? "mix" : fixed ? fixed[0] : "elev";
+    if (years && (what === "sun" || what === "earth")) what = "y" + what;
+    call("move_to_extreme", { what, which: fixed && !/slope|sun|illum|earth|comm|link|temp|ice|mix|score/.test(noun) ? fixed[1] : fixed ? fixed[1] : /^(?:highest|most|best|max)/.test(adj) ? "highest" : "lowest" });
+  }
+  else if (take(/\b(?:move|go|jump|switch)\b[a-z ]{0,12}\bbest (?:point|spot|place|one)\b|\buse the best (?:point|spot|place)\b/)) call("take_option", { best_point: true });
   else if (take(/\b(?:close|exit|leave|hide)\b[a-z ]{0,10}\b(?:scan|map|surface|3d|view)?\b|\bmain screen\b|^ (?:cancel|go back|back) $/)) call("open_view", { view: "main" });
   else if ((m = take(/\b(elevation|height|slope|sunlight|illumination|solar(?: power)?|earth(?: link)?|communications?|comms|shadows?|psr|temperature|thermal|heat|(?:water )?ice|water|mix|combined|blend(?:ed)?)\b[a-z ]{0,14}\b(?:layer|map)\b/)))
     call("open_view", { view: "moon", layer: /elev|height/.test(m[1]) ? "elev" : /slope/.test(m[1]) ? "slope" : /sun|illum|solar/.test(m[1]) ? "sun" : /earth|comm/.test(m[1]) ? "earth" : /ice|water/.test(m[1]) ? "ice" : /temp|therm|heat/.test(m[1]) ? "temp" : /mix|comb|blend/.test(m[1]) ? "mix" : "shadow" });
@@ -380,6 +390,14 @@ export function createAssistant(api) {
         if (!o) return { say: optionsText(s) };
         api.takeOption(input.number - 1);
         return /BEST SITE FINDER|BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
+      }
+      case "move_to_extreme": {
+        const NAME = { elev: "elevation", slope: "slope", sun: "sunlight during the mission", earth: "Earth link during the mission", ysun: "sunlight over all years", yearth: "Earth link over all years", temp: "average temperature", ice: "depth to stable water ice", mix: "mix score" };
+        const what = `${input.which} ${NAME[input.what] || input.what}`, r = api.moveToExtreme(input.what, input.which) || { state: "none" };
+        if (r.state === "pending") return { say: `Opening the Best Site Finder. I will move to the ${what} in this area as soon as the scan finishes.` };
+        if (r.state === "moved") return { say: `Moving to the ${what} in the scanned area: ${r.value}, ${r.km} km to the ${r.dir}.`, changed: true, wait: true };
+        if (r.state === "same") return { say: `You are already at the ${what} in the scanned area: ${r.value}.` };
+        return { say: `The scanned area has no value for ${NAME[input.what] || input.what} to compare.` };
       }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };

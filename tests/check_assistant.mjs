@@ -66,6 +66,14 @@ expect("play", [["mission_clock", { play: true }]]);
 expect("pause", [["mission_clock", { play: false }]]);
 // views and options
 expect("find a better spot", [["open_view", { view: "scan" }]]);
+expect("move to the highest elevation", [["move_to_extreme", { what: "elev", which: "highest" }]]);
+expect("go to the lowest point", [["move_to_extreme", { what: "elev", which: "lowest" }]]);
+expect("take me to the coldest spot", [["move_to_extreme", { what: "temp", which: "lowest" }]]);
+expect("move to the flattest ground", [["move_to_extreme", { what: "slope", which: "lowest" }]]);
+expect("go to the most sunlight over all years", [["move_to_extreme", { what: "ysun", which: "highest" }]]);
+expect("move to the least earth link", [["move_to_extreme", { what: "earth", which: "lowest" }]]);
+expect("go to the shallowest ice", [["move_to_extreme", { what: "ice", which: "lowest" }]]);
+expect("move to the best point", [["take_option", { best_point: true }]]);
 expect("open the 3D surface view", [["open_view", { view: "surface" }]]);
 expect("close", [["open_view", { view: "main" }]]);
 expect("move to the best point", [["take_option", { best_point: true }]]);

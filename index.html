@@ -16,7 +16,7 @@
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
     <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
-    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><span id="data-badge" class="demo" >LOADING DATA</span></span>
+    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
   </div>
 
   <div class="screen">
@@ -50,6 +50,7 @@
           <div class="mm-side">
             <h3 class="band" data-band="1"><b class="h-t">LAYER</b> · <b class="h-do">PICK ONE</b></h3>
             <div id="mm-layers" class="mm-layers"></div>
+            <div class="mm-srcline">DATA: <b id="mm-src">NASA LRO PHOTO</b></div>
             <div id="mm-legend"></div>
             <label class="mm-strength">LAYER STRENGTH <input id="mm-strength" type="range" min="25" max="100" value="80" aria-label="How strongly the layer covers the picture"></label>
             <div id="mm-mix" class="mm-mix" hidden>
@@ -91,7 +92,6 @@
           <div class="k-hint"><b>DRAG</b><span class="long"> TO TURN</span> · <b>SCROLL</b><span class="long"> TO ZOOM</span> · <b>CLICK</b> A SPOT<span class="long"> TO LAND THERE</span></div>
           <div id="globe-verdict" class="globe-verdict"></div>
           <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
-          <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">BEST SITE FINDER ▸</button>
         </div>
         <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · DATE</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT LANDING WINDOW ▸</button></h3>
         <div class="t0">
@@ -105,8 +105,7 @@
         <div class="needs">
           <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
           <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
-          <div class="need"><span>EARTH LINK AT LEAST</span><div class="seg" data-req="earthMinPct"></div><span>%</span></div>
-          <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
+          <div class="need" title="How much direct link to Earth the mission needs. NONE: no link needed (a relay satellite does the talking). AT LANDING: Earth must be in view when the lander touches down. 25 / 50 / 75%: also in view for at least that share of the mission."><span>EARTH LINK</span><div class="seg" data-req="earthLink"></div></div>
           <div class="need" title="The steepest ground the lander accepts. ANY = slope is not judged. Slope comes from NASA's LOLA elevation maps."><span>GROUND SLOPE AT MOST</span><div class="seg" data-req="maxSlopeDeg"></div><span>°</span></div>
         </div>
         <button id="needs-more" class="needs-more"></button>
@@ -115,11 +114,9 @@
       <!-- CENTER: the answer -->
       <section class="col col-main">
         <div id="scan" class="scan" hidden>
-          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-big" title="Use the whole screen for the map">⤢ BIG MAP</button><button id="scan-close" class="scan-home" title="Close the Best Site Finder (Esc)">◂ BACK TO THE MAIN SCREEN</button></span></div>
+          <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-close" class="scan-home" title="Close the Best Site Finder (Esc)">◂ BACK TO THE MAIN SCREEN</button></span></div>
           <div class="scan-body">
-            <div class="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div><small>HOW FAR OUT TO LOOK</small></div>
-            <div class="scan-map"><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
-            <div class="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric"></div></div>
+            <div class="scan-map"><div class="scan-ctl" id="scan-ctl"><div class="scan-pick"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><label class="scan-pick"><b>MAP SHOWS</b><select id="scan-metric" aria-label="What the map's colors show"></select></label></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
               <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
               <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
@@ -184,7 +181,7 @@
           </div>
         </div>
 
-        <div class="tiles-head" id="hz-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
+        <div class="tiles-head" id="hz-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><span id="src-sky" class="src-note"></span><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
         <div class="tiles-head plan-head">

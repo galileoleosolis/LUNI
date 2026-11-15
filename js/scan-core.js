@@ -17,15 +17,29 @@ export function scanOptions(lat, fine = false) {
   return [{ radiusKm: 40, n: 21 }, { radiusKm: 100, n: 21 }, { radiusKm: 250, n: 21 }];
 }
 
-// n x n points, north up: row 0 is the northern edge, column 0 the western edge.
-export function scanGrid(site, radiusKm, n) {
-  const step = (2 * radiusKm * 1000) / (n - 1), c = (n - 1) / 2, pts = [];
+// n x n points: row 0 is the top edge, column 0 the left edge. up = the compass bearing (degrees, clockwise from
+// north) that points up the grid: 0 is a north-up map. Near a pole north turns quickly from place to place, so a
+// map that is re-centered after a move keeps the old map's direction (see keepUp) and its points stay on the same ground.
+// eastKm / northKm are always true east and north of the site, whatever the grid's direction.
+export function scanGrid(site, radiusKm, n, up = 0) {
+  const step = (2 * radiusKm * 1000) / (n - 1), c = (n - 1) / 2, pts = [], DEG = Math.PI / 180;
   for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) {
-    const e = (k - c) * step, nn = (c - r) * step, d = Math.hypot(e, nn);
-    const p = d < 1e-6 ? { lat: site.lat, lon: site.lon } : destination(site.lat, site.lon, Math.atan2(e, nn) * 180 / Math.PI, d);
-    pts.push({ r, k, eastKm: e / 1000, northKm: nn / 1000, lat: p.lat, lon: p.lon, dist: d });
+    const e = (k - c) * step, nn = (c - r) * step, d = Math.hypot(e, nn), az = Math.atan2(e, nn) / DEG + up;
+    const p = d < 1e-6 ? { lat: site.lat, lon: site.lon } : destination(site.lat, site.lon, az, d);
+    pts.push({ r, k, eastKm: (up ? d * Math.sin(az * DEG) : e) / 1000, northKm: (up ? d * Math.cos(az * DEG) : nn) / 1000, lat: p.lat, lon: p.lon, dist: d });
   }
-  return { n, stepM: step, radiusKm, points: pts };
+  return { n, stepM: step, radiusKm, up, points: pts };
+}
+
+// The bearing that points up a map re-centered on `to`, so that it stays parallel to a map centered on `from`
+// whose up is `up`: the straight path between the two keeps the same angle to "up" at both ends.
+export function keepUp(from, to, up = 0) {
+  const D = Math.PI / 180, bearing = (a, b) => {
+    const p1 = a.lat * D, p2 = b.lat * D, dl = (b.lon - a.lon) * D;
+    return Math.atan2(Math.sin(dl) * Math.cos(p2), Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl)) / D;
+  };
+  const leaving = bearing(from, to), arriving = bearing(to, from) + 180;
+  return ((up + arriving - leaving + 540) % 360) - 180;
 }
 
 // One grid point: terrain skyline from the reduced LOLA maps, then the mission verdict for landing at t0.

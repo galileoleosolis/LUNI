@@ -19,6 +19,7 @@ import { startGuide } from "./guide.js";
 import { createHistoryPanel } from "./ui-history.js";
 import { createMoonMap } from "./ui-moonmap.js";
 import { loadDsn, dsnAt } from "./dsn.js";
+import { initSources, showData } from "./sources.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -213,6 +214,10 @@ function renderBrief() {
   $("brief-lola").innerHTML = h;
   const badge = $("data-badge");
   badge.className = "demo" + (t.real ? " ok" : "");
+  // the skyline's source bubble also carries what the old top-right badge said about the terrain in use
+  const sky = $("src-sky");
+  sky.textContent = t.real ? (t.reduced ? "REDUCED MAP" : "") : state.terrainBusy ? "LOADING TERRAIN…" : "FLAT HORIZON · NO TERRAIN";
+  sky.classList.toggle("warn", !t.real || !!t.reduced);
   badge.textContent = t.real ? `NASA DATA · SPICE DE440 + LOLA TERRAIN${t.reduced ? " (REDUCED DETAIL)" : ""}`
     : state.terrainBusy ? "NASA SPICE POSITIONS · LOADING LOLA TERRAIN…" : "NASA SPICE POSITIONS · FLAT HORIZON (TERRAIN UNAVAILABLE)";
 }
@@ -232,6 +237,8 @@ function recompute({ keepIdx = false } = {}) {
   $("pct-both").textContent = pct(s.pctBoth);
   $("max-dark").textContent = s.maxDarkHours ? fmtT(s.maxDarkHours) : "NONE";
   renderBrief();
+  // say where this answer's data came from (only while the main screen is the one in view)
+  if (!scan?.isOpen() && !moonmap?.isOpen() && !past?.isOpen() && !proof?.isOpen()) showData("verdict", state.scenario.terrain.reduced ? ["DETAIL", "REDUCED LOLA MAP (TYPED-IN POINT)"] : null);
   updateCalendar();
   renderTimeline();
   renderMission();
@@ -306,17 +313,16 @@ function renderMission() {
   const r = state.req, v = state.cal.a.at(calIdx()), nx = state.cal.windows.find((w) => w.start > state.t0);
   $("mission").className = "hero " + (v.ok ? "go" : "nogo");
   $("mission-word").textContent = v.ok ? "GO" : "NO-GO";
-  $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
-  const line = (s) => `<div>${s}</div>`;
+  $("mission-title").textContent = ""; $("mission-title").hidden = true;      // the landing time and mission length are already on screen
+  const line = (label, value) => `<div class="hw"><span>${label}</span><b>${value}</b></div>`;      // one fact a row: what it is, then the value
   $("mission-why").innerHTML = v.ok
-    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN NEEDED`) + line(`EARTH IN VIEW ${Math.round(v.earthPct)}% OF THE MISSION`)
-    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT LANDING WINDOW: ${stamp(nx.start)}` : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO LANDING WINDOW IN THE NEXT 12 MONTHS"}</div>`;
+    ? line("SUNLIGHT", `${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN NEEDED`) + line("EARTH LINK", `IN VIEW ${Math.round(v.earthPct)}% OF THE MISSION`)
+    : v.reasons.map((x, i) => line(i ? "AND" : "WHY", x)).join("") + line(nx ? "NEXT WINDOW" : "NEXT STEP", nx ? stamp(nx.start) : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO LANDING WINDOW IN THE NEXT 12 MONTHS");
   // A NO-GO comes with ways out: another time, another spot, or a mission need that could be relaxed.
   const fixes = [];
   if (!v.ok) {
     const tr = state.scenario.terrain, tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS, tr).at(calIdx()).ok;
     if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
-    fixes.push(["mission-scan", "BEST SITE FINDER", () => scan.toggle(true)]);
     if (v.steep) {                                               // too steep: the next slope limit that fits, or no limit at all
       const sl = REQ_OPTIONS.maxSlopeDeg.find((x) => x > r.maxSlopeDeg && tryReq({ maxSlopeDeg: x })) ?? (tryReq({ maxSlopeDeg: 0 }) ? 0 : null);
       if (sl != null) fixes.push(["mission-fix-slope", sl ? `ALLOW SLOPES UP TO ${sl}°` : "ACCEPT ANY SLOPE", () => setReq("maxSlopeDeg", sl)]);
@@ -327,7 +333,9 @@ function renderMission() {
     const days = [...REQ_OPTIONS.days].reverse().find((d) => d < r.days && tryReq({ days: d }));
     if (days) fixes.push(["mission-fix-days", `SHORTEN THE MISSION TO ${days} DAYS`, () => setReq("days", days)]);
   }
-  fixes.length = Math.min(fixes.length, 3);                      // keep it to one row: another time, another spot, one need to relax
+  fixes.length = Math.min(fixes.length, 3);                      // keep it to one row
+  // On a NO-GO the keys that can fix it pulse: the next landing window (when there is one) and the Best Site Finder.
+  for (const [id, on] of [["next-window-btn", !v.ok && !!nx], ["side-next", !v.ok && !!nx], ["scan-btn", !v.ok]]) $(id).classList.toggle("fixit", on);
   $("mission-fix").hidden = !fixes.length;
   $("mission-fix-list").replaceChildren(...fixes.map(([id, label, run]) => {
     const b = document.createElement("button"); b.id = id; b.className = "hero-next"; b.textContent = label + " ▸"; b.addEventListener("click", run); return b;
@@ -372,19 +380,21 @@ function nextWindow() {
 }
 
 // Change one mission need (from its buttons or from a "way to get a GO" button) and keep the buttons in step.
-function setReq(k, val) {
-  state.req = { ...state.req, [k]: val };
+function setReq(k, val) { setReqs({ [k]: val }); }
+function setReqs(change) {
+  state.req = { ...state.req, ...change };
   syncNeeds();
   recompute({ keepIdx: true });
 }
+const earthLinkValue = (r) => (r.earthMinPct > 0 ? String(r.earthMinPct) : r.earthAtLanding ? "landing" : "none");
 function syncNeeds() {
-  document.querySelectorAll(".seg[data-req] button").forEach((x) => x.classList.toggle("on", x.dataset.v === String(state.req[x.parentElement.dataset.req])));
+  document.querySelectorAll(".seg[data-req] button").forEach((x) => { const k = x.parentElement.dataset.req; x.classList.toggle("on", x.dataset.v === (k === "earthLink" ? earthLinkValue(state.req) : String(state.req[k]))); });
   // SIMPLE VIEW shows the mission length only; a need that is not at its usual setting brings the rest into view.
   if (Object.keys(DEFAULT_REQ).some((k) => k !== "days" && state.req[k] !== DEFAULT_REQ[k])) openNeeds(true);
 }
 function openNeeds(open) {
   document.querySelector(".needs").classList.toggle("open", open);
-  $("needs-more").textContent = open ? "▾ SHOW FEWER NEEDS" : "▸ 4 MORE MISSION NEEDS";
+  $("needs-more").textContent = open ? "▾ SHOW FEWER NEEDS" : "▸ 3 MORE MISSION NEEDS";
 }
 // SIMPLE VIEW (the default): the few keys and needs most people use. ALL TOOLS: everything. Kept under "luno-view".
 function setTools(all, keep = true) {
@@ -397,11 +407,14 @@ function setTools(all, keep = true) {
 function buildNeeds() {
   document.querySelectorAll(".seg[data-req]").forEach((seg) => {
     const k = seg.dataset.req;
-    const opts = k === "earthAtLanding" ? [[true, "REQUIRED"], [false, "NO"]] : REQ_OPTIONS[k].map((v) => [v, (k === "earthMinPct" || k === "maxSlopeDeg") && v === 0 ? "ANY" : String(v)]);
+    // EARTH LINK is one row for two needs: a link at landing (earthAtLanding) and a share of the mission (earthMinPct).
+    const opts = k === "earthLink" ? [["none", "NONE"], ["landing", "AT LANDING"], ...REQ_OPTIONS.earthMinPct.filter((v) => v > 0).map((v) => [v, v + "%"])]
+      : REQ_OPTIONS[k].map((v) => [v, k === "maxSlopeDeg" && v === 0 ? "ANY" : String(v)]);
     for (const [val, label] of opts) {
       const b = document.createElement("button");
-      b.textContent = label; b.dataset.v = String(val); b.classList.toggle("on", state.req[k] === val);
-      b.addEventListener("click", () => setReq(k, val));
+      b.textContent = label; b.dataset.v = String(val);
+      b.classList.toggle("on", b.dataset.v === (k === "earthLink" ? earthLinkValue(state.req) : String(state.req[k])));
+      b.addEventListener("click", () => (k === "earthLink" ? setReqs(val === "none" ? { earthAtLanding: false, earthMinPct: 0 } : { earthAtLanding: true, earthMinPct: val === "landing" ? 0 : val }) : setReq(k, val)));
       seg.appendChild(b);
     }
   });
@@ -578,7 +591,7 @@ function renderHorizon(cur) {
   const clipAbove = (id, p) => { const c = el("clipPath", { id }, defs); el("rect", { x: 0, y: 0, width: W, height: Math.max(0, p.ySky) }, c); };
 
   // Sun
-  const RS = 7, sp = place(cur.sunAz, cur.sunEl, 0.2666, RS);
+  const RS = Math.round(Math.max(8, Math.min(11, H * 0.06))), sp = place(cur.sunAz, cur.sunEl, 0.2666, RS);      // drawn larger than life; Earth stays the bigger of the two, as it is from the Moon (about 3.6 times wider)
   if (sp.k > -1) {
     clipAbove("hz-clip-sun", sp);
     const g = el("g", sp.k < 1 ? { "clip-path": "url(#hz-clip-sun)" } : {}, svg), inner = el("g", { transform: `translate(${sp.cx},${sp.cy})` }, g);
@@ -826,6 +839,7 @@ const assistantApi = {
   openSurface: (show) => { if (surface.isOpen() !== show) surface.toggle(show); },
   pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
   takeOption: (i) => state.mission.fixes[i]?.[2](),
+  moveToExtreme: (what, which) => { showScreen("main"); return scan.extreme(what, which); },
   openProof: (show) => { if (proof.isOpen() !== show) proof.toggle(show); },
   openHistory: (show) => { if (past.isOpen() !== show) showScreen(show ? "history" : "main"); },
   openMoonMap: (show, layerId) => { if (moonmap.isOpen() !== show) showScreen(show ? "moon" : "main"); if (show && layerId) moonmap.setLayer(layerId); },
@@ -837,6 +851,7 @@ const assistantApi = {
 // Which screen is up: "main", "moon" (MOON MAP) or "history" (MISSION HISTORY).
 function showScreen(name) {
   past.toggle(name === "history"); moonmap.toggle(name === "moon");
+  if (name === "history") showData("history");
   for (const [id, n] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).classList.toggle("on", n === name);
   $("globe-big").textContent = name === "moon" ? "⤡ SMALL MOON" : "⤢ MOON MAP"; $("globe-big").classList.toggle("on", name === "moon");
 }
@@ -974,6 +989,7 @@ async function init() {
   $("tab-plan").addEventListener("click", () => showPlan("plan"));
   $("tab-days").addEventListener("click", () => showPlan("days"));
   $("tab-ops").addEventListener("click", () => showPlan("ops"));
+  initSources();
   $("ops").addEventListener("click", (e) => { const g = e.target.closest(".ops-b"); if (g) setIdx(+g.dataset.i); });
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
@@ -1010,7 +1026,6 @@ async function init() {
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());      // a plain open / close toggle for the scan menu (the user asked for this)
-  $("side-scan").addEventListener("click", () => { showScreen("main"); scan.toggle(true); });
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
     fmt: { site: siteName, stamp },
