@@ -302,6 +302,32 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   "why is the south pole hard for landers" (status report instead of "I cannot answer that").
   The user then said (about 12:30 PM): "im going to just tell you stuff, and i want you to think about it and then
   build it all at once": wait for the full list, then build it in one batch.
+- **THE WAITING BATCH (the user, Sun 15 Nov about 12:45 PM New York). NOT STARTED: "DONT DO THIS YET I NEED YOU TO DO
+  SOMTHING ELSE FIRST".** Build it all at once only when the user says so. Skip the tests while building; run them
+  when publishing to the public site (the user's words). The list:
+  1. SOLAR PANEL PLACEMENT: a button; it asks for a radius around the landing site and a number of panels, and
+     places them at the best points.
+  2. Sun in the skyline picture: the rays must grow with the bigger Sun. The Sun changes size when the left panel is
+     hidden and the rays do not follow.
+  3. Verdict strip: the eclipse (or other) warning goes to the RIGHT of GO / NO-GO, not underneath.
+  4. Best Site Finder: bring back the VERTICAL button stacks for the choices (the user only wanted the empty space
+     gone), and the chosen one must be highlighted blue.
+  5. NASA DATA USED must be more prominent still: flash more, or a different color, so it does not blend in; more
+     NASA data shown in a noticeable way (also covers the band overlapping the top line as it fades).
+  6. The view from the site (skyline picture) should look nicer: a little depth, for example layered 2D slices.
+  7. Earth is drawn large, so it sometimes looks like an eclipse when there is none.
+  8. Judges, density: SIMPLE VIEW stays the default, and in it the left panel starts collapsed.
+  9. Judges, comparison: when the finder (site) or the next window (date) changes the plan, a good-sized popup
+     compares the original with the new one and shows the gain in each number.
+  10. Judges, power: add an energy estimate, "make it good" (only sourced physics; the panel's size is the user's input).
+  11. ASK LUNI: fix the four questions the judges got wrong (best time in a given year, compare two sites, go to
+      typed coordinates, an open "why" question).
+  12. Finder: do not show "…" under BEST SPOT FOUND while scanning.
+  13. Project page: "a better spot nearby" is no longer a one-press button in the NO-GO strip; fix the wording.
+  No change wanted: a GO being the team's rule ("conditions will be set by NASA if it is used"); IM-2 opening as GO
+  (the tip-over was "an engineering and control failure", not the site); the finder offering a move from a GO site
+  ("a sign that there could be a better site"); phones ("idc about phones rn"). Outside users: "we can try to fix
+  that a little" (the user's side).
 - **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
   deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
   controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
