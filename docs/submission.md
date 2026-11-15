@@ -16,12 +16,14 @@ LUNI: Lunar Utility Navigational Intelligence
 
 LUNI is a web app that answers one question fast: can this mission land here, at this time? You pick a landing site
 on the Moon and a landing time, and LUNI gives a plain GO or NO-GO for power and for a direct link to Earth, with the
-reason, countdowns to sunset and Earthset, and one-press ways out of a NO-GO: the next landing window, a better
-spot nearby, or a mission need to change.
+reason, countdowns to sunset and Earthset, and ways out of a NO-GO: one press for the next landing window or for a
+mission need to change, and the Best Site Finder for a better spot nearby. Each move ends with a before-and-after
+box that shows what was gained.
 
 It addresses the challenge directly: it compares sites and dates quickly, shows the Sun and Earth against the real
-terrain skyline, and makes the result readable by a planner, a teacher or a curious visitor. Every answer is computed
-from NASA data (SPICE positions, LRO LOLA elevation, LRO Diviner temperatures), and the app shows its own proof: it
+terrain skyline, and makes the result readable by a planner, a teacher or a curious visitor. Every number is computed
+from NASA data (SPICE positions, LRO LOLA elevation, LRO Diviner temperatures); the rule that turns the numbers into
+GO or NO-GO is the mission needs the user sets. The app shows its own proof: it
 matches NASA JPL Horizons to 0.0007° and replays real landings next to the published mission record.
 
 It matters because a launch slip or a few hundred meters can turn a workable landing into a dead lander, and today
@@ -58,6 +60,15 @@ Source code: https://github.com/galileoleosolis/LUNI
   and every good landing day for the next 12 months.
 - **Where water ice could last.** A map layer and a data card row from NASA's Diviner Polar Resource Product: how deep
   below the surface water ice would stay frozen, at both poles.
+- **Energy.** An hour-by-hour power budget for the plan: what a solar panel collects (NASA's measured sunlight
+  strength, 1,361 W per square meter, times LUNI's own share of the Sun's disc in view each hour), what the lander
+  uses, and the battery needed to ride out every stretch without enough Sun. The panel size, its efficiency and the
+  lander's power use are the user's to set.
+- **Before and after.** When the Best Site Finder moves the site or Next Landing Window moves the date, a box puts
+  the original plan next to the new one: verdict, sunlight, time without Sun, Earth link and energy, with the change
+  in each and a button to go back. Two listed sites can be put side by side the same way.
+- **Solar panel placement.** In the Best Site Finder, give a distance from the lander and a number of panels; LUNI
+  marks the sunniest squares within that distance and adds up the energy they would collect.
 - **All sites side by side.** Every site in the list carries a green or red dot for the landing time on screen, and
   a ranked table shows how many good landing days each site has. Any latitude and longitude can be typed in.
 - **Best Site Finder.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
@@ -92,7 +103,7 @@ the rest of the Moon. Temperatures are NASA's own Diviner values, only re-gridde
   05:30, 06:18 and 09:52.
 - LUNI's polar map layers agree with NASA's own polar maps from the LRO LOLA team: sunlight correlates at 0.99 at
   both poles with an average gap under 2 points, and "never sunlit" gives the same answer as NASA's permanently
-  shadowed regions map in about 99% of 1.26 million squares per pole.
+  shadowed regions map in 99.1% of the 1.26 million squares at the south pole and 98.9% at the north pole.
 - Chandrayaan-3: LUNI's sunset is 4 September 2023, the day the lander was put to sleep ahead of the lunar night.
 - The app lists what it does not model: the landing itself, rocks and craters smaller than a map pixel, panel
   direction, lander tilt, antennas and relay satellites.

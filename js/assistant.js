@@ -34,8 +34,8 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { year: { type: "integer" }, month: { type: "integer" }, day: { type: "integer" }, hour: { type: "integer" }, now: { type: "boolean" } }, additionalProperties: false } },
   { name: "shift_landing_time", description: "Move the landing time later (positive) or earlier (negative) by a number of hours.",
     input_schema: { type: "object", properties: { hours: { type: "number" } }, required: ["hours"], additionalProperties: false } },
-  { name: "next_good_time", description: "Jump the landing time to the start of the next landing window that meets the mission needs.",
-    input_schema: { type: "object", properties: {}, additionalProperties: false } },
+  { name: "next_good_time", description: "Jump the landing time to the start of the next landing window that meets the mission needs. from_here=true stays put when the landing time on screen is already inside a window.",
+    input_schema: { type: "object", properties: { from_here: { type: "boolean" } }, additionalProperties: false } },
   { name: "set_mission_need", description: "Change one mission need. days: mission length. maxDarkH: longest dark spell the mission can sit out, in hours. earthMinPct: least share of the mission with Earth in view. maxSlopeDeg: steepest ground accepted, in degrees (0 = any slope). earthAtLanding: whether Earth must be in view at landing; give it with 'required' (true or false), the others with 'value' (a number). step (+1 or -1) moves days to the next longer or shorter choice instead of giving a value.",
     input_schema: { type: "object", properties: { need: { type: "string", enum: ["days", "maxDarkH", "earthMinPct", "maxSlopeDeg", "earthAtLanding"] }, value: { type: "number" }, required: { type: "boolean" }, step: { type: "integer" } }, required: ["need"], additionalProperties: false } },
   { name: "mission_clock", description: "Move the mission clock (the moment shown for the Sun and Earth). to_hours: hours after landing. by_hours: relative move. play: true starts it running, false pauses it.",
@@ -44,6 +44,10 @@ export const TOOLS = [
     input_schema: { type: "object", properties: { view: { type: "string", enum: ["scan", "surface", "proof", "history", "moon", "main"] }, layer: { type: "string", enum: ["elev", "slope", "sun", "earth", "shadow", "ice", "temp", "mix"] } }, required: ["view"], additionalProperties: false } },
   { name: "move_to_extreme", description: "In the Best Site Finder's scanned area, move the landing site to the point with the highest or lowest value of one map choice. what: elev (elevation), slope, sun / earth (sunlight or Earth link during the mission), ysun / yearth (the same over all years), temp (average temperature), ice (depth to stable water ice; lowest = nearest the surface), mix (the user's blended score). Opens the finder and waits for the scan if needed.",
     input_schema: { type: "object", properties: { what: { type: "string", enum: ["elev", "slope", "sun", "earth", "ysun", "yearth", "temp", "ice", "mix"] }, which: { type: "string", enum: ["highest", "lowest"] } }, required: ["what", "which"], additionalProperties: false } },
+  { name: "compare_sites", description: "Put two preset sites side by side at the landing time on screen: verdict, sunlight, Earth link, slope and energy for each. Opens the comparison box.",
+    input_schema: { type: "object", properties: { a: { type: "string", description: "id of the first site" }, b: { type: "string", description: "id of the second site" } }, required: ["a", "b"] } },
+  { name: "place_solar_panels", description: "In the Best Site Finder, place solar panels on the sunniest squares within a distance of the landing site. radius_km: the distance. count: how many panels.",
+    input_schema: { type: "object", properties: { radius_km: { type: "number" }, count: { type: "integer" } }, additionalProperties: false } },
   { name: "share_link", description: "Copy a link that opens LUNI on exactly this site, landing time and mission needs.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "take_option", description: "After a NO-GO, LUNI offers up to three numbered ways to get a GO. Take one (1-3). 'best_point' moves the site to the best point found by the area scan.",
@@ -126,7 +130,19 @@ export function parse(text, sites = []) {
       || (m = take(/(?: |^)(minus |-)?(\d+(?:\.\d+)?)(?: degrees?)? (north|south)(?: and)? (minus |-)?(\d+(?:\.\d+)?)(?: degrees?)? (east|west)\b/))) {
     const lat = num(m[2]) * (m[1] || /^s/.test(m[3] || "") ? -1 : 1), lon = num(m[5]) * (m[4] || /^w/.test(m[6] || "") ? -1 : 1);
     call("select_point", { lat, lon });
-  } else if ((m = take(/\b(?:next|following) (?:site|one)\b/))) call("step_site", { by: 1 });
+  } else if ((m = take(/(?: |^)(\d+(?:\.\d+)?) ?(n|s) (?:and |by )?(\d+(?:\.\d+)?) ?(e|w)\b/))) {      // "85.5S 30E"
+    call("select_point", { lat: num(m[1]) * (m[2] === "s" ? -1 : 1), lon: num(m[3]) * (m[4] === "w" ? -1 : 1) });
+  } else if (/\b(?:compare|comparison|versus|vs|side by side|which is better|better than)\b/.test(t) && (() => {
+    // "compare shackleton and malapert": two listed sites in one sentence
+    const found = [];
+    for (const [alias, id] of aliasList(sites)) { const at = t.indexOf(` ${alias} `); if (at >= 0 && !found.some((f) => f.id === id)) found.push({ id, at, alias }); }
+    if (found.length < 2) return false;
+    found.sort((x, y) => x.at - y.at);
+    for (const f of found.slice(0, 2)) t = t.replace(` ${f.alias} `, "  ");
+    take(/\b(?:compare|comparison|versus|vs|side by side|which is better|better than)\b/);
+    call("compare_sites", { a: found[0].id, b: found[1].id });
+    return true;
+  })()) { /* handled */ } else if ((m = take(/\b(?:next|following) (?:site|one)\b/))) call("step_site", { by: 1 });
   else if ((m = take(/\b(?:previous|prior|last) site\b|\bsite before\b/))) call("step_site", { by: -1 });
   else if ((m = take(/\b(?:site|preset)(?: number| no)? (\d{1,2})\b/))) call("select_site", { number: +m[1] });
   else {
@@ -157,8 +173,7 @@ export function parse(text, sites = []) {
   else if ((m = take(/\b(?:slopes?|tilt|steep(?:ness|er)?)\b[a-z ]{0,30}?(\d+)(?: ?(?:°|deg|degrees?))?/)) || (m = take(/\b(\d+) ?(?:°|deg|degrees?)[a-z ]{0,12}\b(?:slopes?|tilt)\b/))) call("set_mission_need", { need: "maxSlopeDeg", value: +m[1] });
 
   // --- when ---
-  if (take(/\bnext (?:good |best |open |available |landing )*(?:time|window|chance|opportunity|slot|date)\b|\bwhen (?:can|could|should|do) (?:i|we) land\b|\bfind (?:me )?(?:a |the |the next )?(?:good )?(?:landing )?(?:time|window|date)\b|\bbest time to land\b/))
-    call("next_good_time");
+  const wantNext = !!take(/\bnext (?:good |best |open |available |landing )*(?:time|window|chance|opportunity|slot|date)\b|\bwhen (?:can|could|should|do) (?:i|we) land\b|\bfind (?:me )?(?:a |the |the next )?(?:good )?(?:landing )?(?:time|window|date)\b|\b(?:best|good|first) (?:time|date|day|window) to land\b|\bwhen is (?:the )?(?:best|a good|the next)\b[a-z ]{0,12}\bland\b/);
   const when = {};
   if ((m = take(new RegExp(`\\b(\\d{1,2}) (?:of )?${MONTH_RE}\\b(?: (\\d{4}))?`)))) { when.day = +m[1]; when.month = monthIndex(m[2]) + 1; if (m[3]) when.year = +m[3]; }
   else if ((m = take(new RegExp(`\\b${MONTH_RE} (\\d{1,2})\\b(?: (\\d{4}))?`)))) { when.month = monthIndex(m[1]) + 1; when.day = +m[2]; if (m[3]) when.year = +m[3]; }
@@ -170,8 +185,13 @@ export function parse(text, sites = []) {
       || (m = take(/\b(\d{1,2})()() utc\b/)) || (m = take(/\b(?:at|hour) (\d{1,2})()()\b/))) when.hour = hour(+m[1], m[3]);
   else if (take(/\b(?:noon|midday)\b/)) when.hour = 12;
   else if (take(/\bmidnight\b/)) when.hour = 0;
-  if (Object.keys(when).length) call("set_landing_time", when);
+  if (Object.keys(when).length) {
+    // "the best time to land in 2027": start at the beginning of the period named, then find the first window in it
+    if (wantNext) { if (when.month == null) when.month = 1; if (when.day == null) when.day = 1; if (when.hour == null) when.hour = 0; }
+    call("set_landing_time", when);
+  }
   else if (take(/\b(?:right now|now|today|current time)\b/)) call("set_landing_time", { now: true });
+  if (wantNext) call("next_good_time", Object.keys(when).length ? { from_here: true } : {});
 
   // --- mission clock (hours after landing) ---
   if ((m = take(/\b(?:mission )?day (\d+)\b/)) || (m = take(/\b(\d+) days? (?:in|into|after landing|after touchdown)\b/))) call("mission_clock", { to_hours: +m[1] * 24 });
@@ -192,6 +212,13 @@ export function parse(text, sites = []) {
   else if (take(/\b(?:yesterday|previous day|day before)\b/)) call("shift_landing_time", { hours: -24 });
   else if (take(/\bnext week\b/)) call("shift_landing_time", { hours: 168 });
   else if (take(/\b(?:last|previous) week\b/)) call("shift_landing_time", { hours: -168 });
+
+  // --- solar panels: "place 4 solar panels within 2 km" ---
+  if (/\b(?:solar )?panels?\b/.test(t) && /\b(?:place|put|set up|lay out|deploy|add|position)\b/.test(t)) {
+    const n = t.match(/\b(\d{1,2}) (?:solar )?panels?\b/), r = t.match(/\b(\d+(?:\.\d+)?) ?(?:km|kilometers?|kilometres?)\b/);
+    take(/\b(?:place|put|set up|lay out|deploy|add|position)\b[a-z0-9. ]*\bpanels?\b(?:[a-z ]{0,12}\b\d+(?:\.\d+)? ?(?:km|kilometers?|kilometres?)\b)?(?: of| from| around)?(?: the)?(?: landing)?(?: site| lander)?/);
+    call("place_solar_panels", { ...(n ? { count: +n[1] } : {}), ...(r ? { radius_km: +r[1] } : {}) });
+  }
 
   // --- views, options, pin, clock run ---
   if ((m = take(/\b(?:option|choice|number|way)(?: number)? ([123])\b/)) || (m = take(/\b(?:the |do the |take the )([123]) (?:1\b|option\b|choice\b|$)/))) call("take_option", { number: +m[1] });
@@ -223,9 +250,13 @@ export function parse(text, sites = []) {
   // --- questions ---
   const q = (re) => re.test(t);
   if (q(/\b(?:go to|select|switch to|fly to|land at|take me to|move to)\b/) || q(/\b(?:which|what|list)(?: are)?(?: the)? sites\b/)) call("report", { topic: "sites" });   // a place LUNI does not know, or asking for the list
-  else if (q(/\b(?:compared? (?:with|to)|different from|differ from|versus|vs|than|like) (?:on )?(?:the )?earth\b|\bon earth\b|\bwhy is the moon (?:so )?hard\b/)) call("report", { topic: "versus" });
+  else if (q(/\b(?:compared? (?:with|to)|different from|differ from|versus|vs|than|like) (?:on )?(?:the )?earth\b|\bon earth\b|\bwhy is the moon (?:so )?hard\b|\bcompare\b[a-z ]{0,14}\b(?:with|to|and|against)\b[a-z ]{0,6}\bearth\b/)) call("report", { topic: "versus" });
+  else if (q(/\bwhy\b[a-z ]{0,40}\b(?:south pole|north pole|poles?|polar)\b|\b(?:south pole|poles?|polar)\b[a-z ]{0,30}\b(?:hard|difficult|tough|tricky|special|dangerous)\b/)) call("report", { topic: "pole" });
+  else if (q(/\benergy\b|\bpower budget\b|\bbatter(?:y|ies)\b|\bkilowatts?\b|\bkwh\b|\bwatts?\b|\bhow much power\b|\bsolar panels?\b/)) call("report", { topic: "energy" });
+  else if (q(/\btemperatures?\b|\bhow (?:cold|hot|warm)\b|\bcold\b|\bfreezing\b/)) call("report", { topic: "temp" });
   else if (q(/\beclipse/)) call("report", { topic: "eclipse" });
   else if (q(/\bhow (?:do|can|could|would) (?:i|we) (?:get|make|fix|turn)\b|\bwhat (?:can|could|should) (?:i|we) (?:do|change|try)\b|\bways\b|\bfix (?:it|this)\b|\boptions\b|\bsuggest/)) call("report", { topic: "options" });
+  else if (q(/\b(?:why|how come|explain)\b/) && t.trim().split(/\s+/).length > 3 && !q(/\b(?:no go|nogo|go|verdict|red|wrong|problem|fail(?:s|ed|ing)?|not|can t|cannot|this|here|it|landing|window|site)\b/)) call("report", { topic: "cant" });      // a general question LUNI has no numbers for
   else if (q(/\bwhy\b|\bwhat s wrong\b|\bwhat is wrong\b|\breasons?\b|\bproblem\b/)) call("report", { topic: "status" });
   else if (q(/\bsun\b|\bsunset\b|\bsunrise\b|\bsunlight\b|\bsunlit\b|\bpower\b|\bdaylight\b|\bdark\b|\bnight\b|\bsolar\b/)) call("report", { topic: "sun" });
   else if (q(/\bearth(?:rise|set)?\b|\blink\b|\bcomms?\b|\bcommunications?\b|\bcontact\b|\bsignal\b|\bground control\b|\bhouston\b|\bradio\b/)) call("report", { topic: "earth" });
@@ -264,14 +295,14 @@ export function createAssistant(api) {
       out = `NO-GO for a ${r.days}-day mission: ${why.join(", and ")}. ` + (s.next ? `Next good landing time: ${stamp(s.next)}.` : v.steep ? "The slope is the same on every date, so only another spot or a higher slope limit helps." : "No good landing time in the next 12 months.");
       if (s.options.length) out += ` Say OPTIONS to hear ways to get a GO.`;
     }
-    for (const e of s.eclipses) out += ` Warning: eclipse on ${day(e.peak)}, Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`;
+    for (const e of s.eclipses) out += ` Warning: eclipse on ${day(e.peak)}, Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for ${(e.end - e.start) < 5400000 ? "about an hour or less" : "up to " + plural(Math.round((e.end - e.start) / 3600000), "hour")}.`;
     return out;
   }
   const momentHead = (s) => (s.idx ? `${dur(s.idx)} after landing (${stamp(s.cur.t)})` : `At landing (${stamp(s.cur.t)})`);
   function sunText(s = snap(), head = true) {
     const c = s.cur, where = `height ${deg(c.sunEl)}, direction ${Math.round(c.sunAz)}° (${compass(c.sunAz)})`;
     const frac = Math.round(c.sunFrac * 100);
-    let out = (head ? `${momentHead(s)}: ` : "") + (c.sunUp ? `the Sun is up${frac < 100 ? `, ${frac}% of its disc usable` : ""}, ${where}.` : `no usable Sun${frac > 0 ? ` (only ${frac}% of its disc)` : ""}, ${where}.`);
+    let out = (head ? `${momentHead(s)}: ` : "") + (c.sunUp ? `the Sun is up${frac < 100 ? `, ${frac}% of its disc usable` : ""}, ${where}${c.sunEl < 0 ? " (below level, but the skyline in that direction dips lower)" : ""}.` : `no usable Sun${frac > 0 ? ` (only ${frac}% of its disc)` : ""}, ${where}.`);
     if (c.eclipse > 0.01 && c.sunTerrain > 0) out += ` Eclipse: Earth hides ${Math.round(c.eclipse * 100)}% of the Sun.`;
     if (s.sunLeft == null) out += c.sunUp ? " It stays up for the rest of the 30 days shown." : " It stays down for the rest of the 30 days shown.";
     else out += ` ${c.sunUp ? (s.sunNextIsEclipse ? "An eclipse cuts the sunlight" : "Sunset") : "Sunrise"} in ${dur(s.sunLeft)}, on ${stamp(new Date(+c.t + s.sunLeft * 3600000))}.`;
@@ -346,9 +377,10 @@ export function createAssistant(api) {
         return { say: `Landing moved ${dur(Math.abs(input.hours))} ${input.hours < 0 ? "earlier" : "later"}, to ${stamp(snap().t0)}.`, changed: true };
       }
       case "next_good_time": {
+        if (input.from_here && s.verdict.ok) return { say: `${stamp(s.t0)} is already inside a landing window.` };
         if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Change a mission need or try another site." };
         api.setT0(s.next);
-        return { say: `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
+        return { say: input.from_here ? `The first landing window from there opens ${stamp(s.next)}. That is the first one, not a ranking of the whole period: the MISSION WINDOWS strip shows every good day.` : `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
       }
       case "set_mission_need": {
         const k = input.need, opts = api.needOptions();
@@ -399,13 +431,27 @@ export function createAssistant(api) {
         if (r.state === "same") return { say: `You are already at the ${what} in the scanned area: ${r.value}.` };
         return { say: `The scanned area has no value for ${NAME[input.what] || input.what} to compare.` };
       }
+      case "compare_sites": {
+        const sites = api.sites(), A = sites.find((x) => x.id === input.a), B = sites.find((x) => x.id === input.b);
+        if (!A || !B || A === B) return { say: "Name two different sites from the list to compare, for example: compare Shackleton and Malapert." };
+        const r = api.compareSites(A, B), one = (site, p) => `${site.name.split(" · ")[0]}: ${p.ok ? "GO" : "NO-GO"}, sunlight ${Math.round(p.sunPct)}% of the mission, Earth link ${Math.round(p.earthPct)}%${p.slopeDeg == null ? "" : `, slope ${p.slopeDeg.toFixed(1)} degrees`}.`;
+        return { say: `For landing ${stamp(s.t0)} and a ${s.req.days}-day mission. ${one(A, r.A)} ${one(B, r.B)} The two are side by side on screen.` };
+      }
+      case "place_solar_panels": {
+        const r = api.placePanels(input.radius_km, input.count);
+        return { say: r.placed ? `Placed ${plural(r.placed, "solar panel")} on the sunniest squares within ${r.radiusKm} km of the landing site. They are numbered on the Best Site Finder map, with the energy each one collects.` : `Opening the Best Site Finder. I will place ${plural(r.count, "solar panel")} within ${r.radiusKm} km as soon as the scan finishes.` };
+      }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };
       case "report":
         return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO, joke: () => JOKES[jokeAt++ % JOKES.length],
           versus: () => { const v = api.versus(); return `${s.siteName} next to a place on Earth's equator. ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
-          eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
+          eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for ${(e.end - e.start) < 5400000 ? "about an hour or less" : "up to " + plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),
+          pole: () => { const v = api.versus(); return "Near a pole the Sun never climbs far above the horizon, so one hill can hide it, and the same hills can hide the Earth. Sunlight and the Earth link then depend on the exact spot and the exact day. " + `${s.siteName} next to a place on Earth's equator: ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
+          energy: () => api.energyText(),
+          temp: () => { const k = api.siteTempK(); return k == null ? "The temperature layer is still loading. Ask again in a moment, or open the MOON MAP and pick TEMPERATURE." : `The ground at ${s.siteName} averages ${Math.round(k - 273.15)} °C (${Math.round(k)} kelvin) over the lunar day and night, measured by NASA's LRO Diviner. The MOON MAP shows it as a layer.`; },
+          cant: () => "I cannot answer a general question like that. I answer from LUNI's own numbers: ask about this site's Sun, Earth link, eclipses, energy or the verdict, or say HELP for examples.",
           time: () => `Landing time ${stamp(s.t0)}. The mission clock shows ${s.idx ? dur(s.idx) + " after landing, " + stamp(s.cur.t) : "the landing time"}.` }[input.topic]?.(s) ?? HELP };
       default: return { say: `There is no tool called ${tool}.` };
     }

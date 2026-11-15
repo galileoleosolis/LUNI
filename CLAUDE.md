@@ -289,6 +289,97 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- **Judge runs after r6** (Sun 15 Nov about 12:20 PM New York; three sub-agents on three models, Presentation fixed at
+  4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5). The project notes reached all three
+  as instructions, so the runs were not fully blind (told to the user). Common points: the main screen is dense;
+  side-by-side comparison of sites and dates is hidden in COMPARE SITES · MORE; a GO reads as more official than the
+  team's own rule; power is yes / no only; no outside users. Fixed **on the pre-release only** (public is r6):
+  the finder's card for a listed site uses the site's own skyline numbers for SUNLIGHT / EARTH LINK 2023–35
+  (`getSiteYears` passed to `createScanPanel`), and the square you stand on is judged with the site's own skyline
+  (`judgePoint` with `c.terrain` in `start()` of `js/ui-scan.js`), so the finder and the main verdict cannot differ.
+  **Not fixed**, ASK LUNI: "when is the best time to land at Nobile Rim 1 in 2027" (jumps, then sets the year and
+  reports a NO-GO), "compare shackleton and malapert" (only moves the site), "go to 85.5S 30E" (lists presets),
+  "why is the south pole hard for landers" (status report instead of "I cannot answer that").
+  The user then said (about 12:30 PM): "im going to just tell you stuff, and i want you to think about it and then
+  build it all at once": wait for the full list, then build it in one batch.
+- **Slide deck** (the user, Sun 15 Nov about 12:40 PM New York: "i need you to make the slideshow", 3 minutes, 7 slides
+  at most, challenge objectives and NASA data in it, PowerPoint format wanted, "dont make ai looking slides"). Built as
+  a Claude Slides deck: https://claude.ai/artifact/QHG42wTJJ7oTapWm3wPmfh (private until the user shares it; it
+  downloads as .pptx or PDF from its Share menu). Seven slides: cover, THE CHALLENGE, ONE ANSWER: GO OR NO-GO, WHEN
+  THE PLAN SLIPS, CHALLENGE OBJECTIVES (all seven, as a table), NASA DATA, PROOF (with the AI line and the link).
+  Real app screenshots only (crops in the scratchpad, uploaded to the deck); Barlow Condensed / Barlow / JetBrains
+  Mono; navy and cool paper with the app's blue. Speaker notes hold a timed 3-minute script. The official guide
+  (spaceappschallenge.org/resources/project-submission-guide): up to seven slides including the title slide, in
+  English, on an external site with a public link, covering team name, member names and the challenge.
+  **Still placeholders on the cover: [Team name] and the two [Member name]s** (never told to Claude).
+- **The afternoon batch (the user's list, built Sun 15 Nov about 1:30 to 3 PM New York on "Build the new batch now").
+  On the pre-release only; the public site is r6.** The user: run only the checks that touch the change; the full set
+  at the release. Checked: syntax, `check_assistant` (111), `check_scan`, `check_mission`, test set E (6/6), and a
+  browser run of every new feature with no page errors. NOT checked: phones (the user: "idc about phones rn"),
+  test set D, the other Node checks, real hardware.
+  1. SOLAR PANELS in the Best Site Finder (`#scan-panels`, `placePanels` / `st.panelCfg` / `st.panels` in
+     `js/ui-scan.js`; `scan.panels(radiusKm, count)`; ASK LUNI "place 6 solar panels within 3 km"): a distance from
+     the lander and a number of panels; one panel on each of the squares inside that distance with the most sunlight
+     in the mission (ties: sunlight to spare, then nearest), numbered on the map inside a dashed circle, with a table
+     and the energy for the user's panel. Cables and panel-to-panel shadows are not modeled (said on screen).
+  2. Skyline picture (`renderHorizon`): the Sun's glow and 8 rays are sized from the Sun's own radius. The Sun and
+     Earth are FIXED sizes (`RS = 9`, `RE = 15`; the user: "Earth and the sun change sizes when they get close", so
+     the first fix, shrinking them, was replaced, and they no longer follow the picture's height either). When the
+     two are close the pair is placed by the real gap between them (`cur.sepDeg` over the sum of the two real
+     radii): standing clear until the real discs touch, then overlapping by as much as the real discs do; two darker, smoother bands
+     of ground in front of the true skyline for depth (always below the real top edge, said in the tooltip); light
+     along the ridge under the Sun.
+  3. Verdict strip: warnings live in `#mission-warn` (`.hero-warn`), to the right of the verdict. Test scripts that
+     read the eclipse date must read `#mission-warn`, not `#mission-why`.
+  4. Finder: `#scan-row` = the SCAN SIZE stack (`#scan-sizes`), the map, the MAP SHOWS stack (`#scan-shows`;
+     `#scan-metric` is a box of buttons again, `setMetric` / `hasMetric`). `draw()` sizes the map from the row and
+     makes both stacks exactly as tall as the map; the chosen button is blue with a white edge. The side panel is 36%.
+     While scanning, BEST SPOT FOUND shows the progress and the best so far, not "…".
+  5. NASA DATA USED band: white with a red tag and a red frame, three flashes in 1.5 s, wiped in and out (no fade over
+     the top line), held 8 s; also shown for PROOF, the 3D view, ENERGY, the comparison box and the panels.
+  6. SIMPLE VIEW starts with the left side folded away (`setSetup` is module-level in `js/app.js`; the tab is large,
+     blue and pulses three times). ALL TOOLS, the test sets (`#test…`, `LUNO_TEST`), `LUNO_SETUP_OPEN` and the
+     tutorial open it. The ALL TOOLS / SIMPLE VIEW key opens / folds it too.
+  7. BEFORE AND AFTER (`js/ui-compare.js`, `offerCompare` / `flushCompare` in `js/app.js`): after NEXT LANDING
+     WINDOW or a move in the finder, a box on `body` puts the original plan next to the new one (verdict, sunlight,
+     sunlight to spare, longest time without Sun, Earth link, energy; slope and elevation when the site changed) with
+     the change in each, KEEP THE NEW PLAN / GO BACK TO THE ORIGINAL, and a "show this after every move" box
+     (`luno-compare`). Not during a test, the tutorial or with `LUNO_NO_COMPARE`. ASK LUNI "compare shackleton and
+     malapert" opens it for two sites (`compare_sites`, `assistantApi.compareSites`).
+  8. ENERGY (`js/plan.js`: `planStats`, `energyBudget`, `SOLAR_W_M2` = 1361; `js/ui-energy.js`; `#energy` panel,
+     the yellow `#energy-btn` in the POWER block showing PANEL NOW n W): panel size, efficiency and the lander's power
+     use are the user's (`ENERGY_OPTIONS`, kept under `luno-energy`, defaults 2 m2, 30%, 200 W, labeled as values to
+     start from); each hour = size x efficiency x 1361 x LUNI's share of the Sun's disc; a battery that starts full;
+     tiles, an hour-by-hour chart, the longest time on the battery, a flat-panel comparison, and what is not modeled.
+     Sources: NASA SORCE TIM 1360.8 W/m2 (Kopp & Lean 2011). The 30% default has no sourced figure behind it; NASA's
+     small-spacecraft report only says multi-junction cells are the state of the art and single-junction about 20%.
+     The GO / NO-GO rule does NOT use energy (unchanged on purpose).
+  9. ASK LUNI: "go to 85.5S 30E" (compact coordinates), "compare A and B", "best time to land at X in 2027" (sets the
+     start of the period, then `next_good_time { from_here }`), "why is the south pole hard" (`pole`), "how much
+     energy" (`energy`, opens the panel), a general why-question LUNI has no numbers for (`cant`), "place n solar
+     panels within r km".
+  10. `docs/submission.md` and `docs/pitch-3min.md`: 99.1% south / 98.9% north instead of "about 99%"; "every number
+      is computed from NASA data; the rule is the user's needs"; the better-spot wording; the three new features.
+  No change, by the user's word: a GO being the team's rule, IM-2 opening as GO, the finder offering a move from a GO
+  site, phones.
+- **Judge runs on the afternoon batch** (Sun 15 Nov about 3:45 PM New York; same brief, three models, Presentation
+  fixed at 4): 20, 21, 21 of 25 (Impact 3/4/4, Creativity 4, Validity 4, Relevance 5): the same as before the batch.
+  Two of the three never opened ENERGY, the solar panels or the before-and-after box. Fixed afterwards, on the
+  pre-release: the comparison box now measures "sunlight to spare" over the same span as the verdict (`planSpan`,
+  `planStats(..., spanHours)`; it said OVER 3D 12H where the strip said 67D 07H); a hidden Sun or Earth above level
+  says BEHIND THE GROUND: THE SKYLINE THERE IS n° HIGH; the PROOF tile gives 99.1% south and 98.9% north; no more
+  "for up to 0 hours"; ASK LUNI answers "what is the temperature here" and says a year's first window is the first
+  one, not the best. Judges' points NOT acted on (the user's calls): the folded left side hides the site list on
+  first load (judge A's top weakness); the default Earth-link need (AT LANDING) lets a mission with 3% Earth link be
+  a GO (Shackleton, 14 Mar 2025 09:00); the finder's reduced map can call a GO site's neighbors NO-GO (Malapert,
+  14 Jan 2027, 14 days); the side-by-side box covers the ASK LUNI reply; density; no outside users.
+  The slide deck was updated for the batch (new screenshots; slide 3 shows ENERGY, slide 4 the finder with solar
+  panels and the before-and-after box).
+- **r6 released** on the user's "publish it" (Sun 15 Nov, 12:05 PM New York = 17:05 UTC; main 8c8cb9c; GitHub reports the
+  deployment as a success): the public site now has the batch of fixes (NASA DATA USED band, the one-row finder
+  controls, the single EARTH LINK need, pulsing NO-GO, PROOF tiles, `move_to_extreme`), the finder's kept map
+  direction and the source text. Nothing newer is waiting on the pre-release. Every note above that says
+  "on the pre-release only" is released as of r6.
 - **r5 released** on the user's "release it" (Sun 15 Nov, 10:26 AM New York = 15:26 UTC; main 90e2028; GitHub reports the
   deployment as a success): the public site now also has the site's own data card, the WATER ICE layer, the DEEP
   SPACE NETWORK line and the PROOF section against NASA's polar maps. Nothing newer is waiting on the pre-release.
@@ -408,8 +499,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). **r5 (15 Nov, 15:26 UTC, main 90e2028) is the current public version.**
-   To roll back to r4: `tools/release.sh promote 3093d3b`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). **r6 (15 Nov, 17:05 UTC, main 8c8cb9c) is the current public version.**
+   To roll back to r5: `tools/release.sh promote 90e2028`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
