@@ -121,7 +121,12 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   (plain, dim), and what you can do with it (`.h-do`, bold white with a pointer). Any text that points at a feature
   uses `.h-do`; do not leave an instruction in the dim voice.
 - The crowded case to check after any layout change in the middle column: a NO-GO with three "ways to get a GO"
-  buttons (Nobile Rim 1, 14 NOV 2026 20:00). The landing-day strip must stay fully visible at 1100 x 700 and up.
+  buttons (Nobile Rim 1, 14 NOV 2026 20:00). Nothing in the middle column may overflow at 1100 x 700 and up.
+- Since 15 Nov (the user: "the ui is a bit cluttered still"): the POWER and EARTH LINK blocks have big icons
+  (`#sun-ico`, `#earth-ico`, green when available, red with a slash when not) and less text; the NASA CHECK links
+  sit in that block's heading. The lower chart shows ONE thing at a time, switched by MISSION PLAN / GOOD DAYS
+  (`showPlan` in `js/app.js`; MISSION PLAN, the 30-day slider, is the default). The freed room goes to the skyline
+  picture (165 px at 1440 x 900, was 90).
 
 ## Next batch (asked for on 14 Nov): work ONE TASK AT A TIME
 The user: "one task at a time, and then let me confirm before moving onto the next task". Build one, show it on the
@@ -172,6 +177,22 @@ Blue Ghost 1, IM-2) with LUNI's live numbers (Sun height at landing, sunlight le
 `needs` such as no direct Earth link for Chang'e 6; other needs go back to the defaults). SLIM (Shioli crater) was
 added as a 14th preset for it. Stories carry `proof: true` when they also belong on the PROOF panel.
 Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
+
+## Extras list (the user: "keep track of those extras"). Not to be built unless the user picks one.
+1. Operations plan / light scheduler: the mission's stretches in order (Sun and Earth: work and send data; Sun only;
+   dark: sleep; eclipse) with dates and lengths, inside the MISSION PLAN tab. A full drag-and-drop expedition
+   scheduler was advised against (big, and no sourced data on what activities need).
+2. Finer scan (40 m) near the seven polar presets, where `data/patch/` exists ("that's gonna be an extra").
+3. Custom coordinates out in the open on the main screen (task 1 of the layers batch, skipped by the user).
+4. Sunlight layer at finer detail, so the best-lit ridge tops stop reading low (now 480 m; a 240 m run takes hours).
+5. The landing site's own data profile from its own skyline, instead of the 480 m layer value.
+6. Replays before 2023 (Apollo, Chang'e 4): needs the position data extended back; the app covers 2023 to 2035.
+7. Windows .exe wrapper (Electron). 8. Earth-campers mode (advised against; keep as a story point).
+
+## Deadline
+The user was surprised on 15 Nov that the deadline is that night (23:59 local, per these notes and the official FAQ's
+dates; the exact cutoff was not found on an official page: the user was told to check their event page).
+The public site is still r2. Releasing needs the user's "release it". The submission text and video do not exist.
 
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment

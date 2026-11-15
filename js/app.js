@@ -409,6 +409,8 @@ function renderMoment() {
   $("earth-next-date").textContent = earthLeft == null ? "" : `${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1) + "°";
 
+  $("sun-ico").className = "ro-ico " + (cur.sunUp ? "go" : "nogo");
+  $("earth-ico").className = "ro-ico " + (cur.earthUp ? "go" : "nogo");
   $("hz-sun").href = horizonsUrl(10, cur.t);
   $("hz-earth").href = horizonsUrl(399, cur.t);
   renderHorizon(cur);
@@ -775,6 +777,16 @@ function showScreen(name) {
   $("globe-big").textContent = name === "moon" ? "⤡ SMALL MOON" : "⤢ MOON MAP"; $("globe-big").classList.toggle("on", name === "moon");
 }
 
+// The lower chart shows one thing at a time: the MISSION PLAN (30 days after landing, with the slider) or GOOD DAYS
+// (the 12-month landing-day strip). The room this saves goes to the skyline picture.
+function showPlan(which) {
+  const plan = which !== "days";
+  $("timeline").toggleAttribute("hidden", !plan); $("plan-title-a").hidden = !plan;
+  $("calendar").toggleAttribute("hidden", plan); $("cal-title").hidden = plan;
+  $("tab-plan").classList.toggle("on", plan); $("tab-days").classList.toggle("on", !plan);
+  relayout();
+}
+
 // Redraw everything whose size depends on the layout (after the window, the test bar or the story strip changes).
 function relayout() { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); }
 
@@ -840,6 +852,8 @@ async function init() {
   $("pin-btn").addEventListener("click", pinCurrent);
   $("more-btn").addEventListener("click", () => setMore());
   $("share-btn").addEventListener("click", shareLink);
+  $("tab-plan").addEventListener("click", () => showPlan("plan"));
+  $("tab-days").addEventListener("click", () => showPlan("days"));
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));

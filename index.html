@@ -147,22 +147,28 @@
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
         </div>
           <div class="answer-side">
-        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3></div>
+        <div class="tiles-head"><h3 id="clock-head">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>
         <div class="readouts">
           <div class="ro">
+            <div class="ro-ico" id="sun-ico" title="Power: sunlight on the solar panels">
+              <svg viewBox="0 0 64 64" aria-hidden="true"><g class="i-sun"><circle cx="21" cy="20" r="9"/><path d="M21 4v5M21 31v5M5 20h5M32 20h5M9.7 8.7l3.5 3.5M28.8 27.8l3.5 3.5M9.7 31.3l3.5-3.5M28.8 12.2l3.5-3.5"/></g><g class="i-panel"><path d="M27 40h33l-6 19H21z"/><path d="M38 40l-6 19M49 40l-6 19M24 49.500h33"/></g><path class="i-off" d="M8 58L58 8"/></svg>
+              <span>POWER</span>
+            </div>
             <div class="ro-a">
-              <div class="lab">☀ POWER <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">NASA CHECK ↗</a></div>
               <div class="st" id="sun-state"></div>
-              <div class="mini">HEIGHT <b id="sun-el"></b> &nbsp; DIRECTION <b id="sun-az"></b></div>
+              <div class="mini">HEIGHT <b id="sun-el"></b> · DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
             </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
           </div>
           <div class="ro">
+            <div class="ro-ico" id="earth-ico" title="Earth link: a direct line to Earth for talking to the lander">
+              <svg viewBox="0 0 64 64" aria-hidden="true"><g class="i-earth"><circle cx="22" cy="42" r="15"/><path class="land" d="M12 36q5-6 10-3t3 7q-5 4-10 1zM24 46q5-2 8 2l-3 6q-6 0-5-8z"/></g><g class="i-waves"><path d="M36 26a8 8 0 0 0-8-8M44 26a16 16 0 0 0-16-16M52 26a24 24 0 0 0-24-24"/></g><path class="i-off" d="M36 8l18 18M54 8L36 26"/></svg>
+              <span>EARTH LINK</span>
+            </div>
             <div class="ro-a">
-              <div class="lab">⊕ EARTH LINK <a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">NASA CHECK ↗</a></div>
               <div class="st" id="earth-state"></div>
-              <div class="mini">HEIGHT <b id="earth-el"></b> &nbsp; DIRECTION <b id="earth-az"></b></div>
+              <div class="mini">HEIGHT <b id="earth-el"></b> · DIRECTION <b id="earth-az"></b></div>
             </div>
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
           </div>
@@ -173,11 +179,13 @@
         <div class="tiles-head"><h3><b class="h-t">VIEW FROM THE SITE</b> · <span class="long">THE SKYLINE ALL THE WAY ROUND · </span><span class="hz-key">╌● SUN</span> <span class="hz-key"><i>╌● EARTH</i></span> NEXT 3 DAYS<span class="long">, ONE DOT A DAY</span></h3><button id="surface-btn" class="mini-btn">OPEN THE 3D SURFACE VIEW ▸</button></div>
         <svg id="horizon" class="horizon" role="img" aria-label="The skyline all the way round, with the Sun and Earth and the paths they will take"></svg>
 
-        <h3><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
+        <div class="tiles-head plan-head">
+          <h3 id="plan-title-a"><b class="h-t">FIRST 30 DAYS AFTER LANDING</b> · <b class="h-do">DRAG THE SLIDER TO SEE ANY MOMENT</b></h3>
+          <h3 id="cal-title" hidden><b class="h-t">GOOD LANDING DAYS</b> · NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
+          <span class="plan-tabs"><button id="tab-plan" class="on" title="The 30 days after landing: when there is Sun and Earth, with the slider">MISSION PLAN</button><button id="tab-days" title="Every good landing day in the next 12 months">GOOD DAYS</button></span>
+        </div>
         <svg id="timeline" class="timeline" role="img" aria-label="Sunlight and Earth visibility over 30 days"></svg>
-
-        <h3 id="cal-title"><b class="h-t">GOOD LANDING DAYS</b> · NEXT 12 MONTHS · <b class="h-do">CLICK A DAY TO LAND THEN</b></h3>
-        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months"></svg>
+        <svg id="calendar" class="calendar" role="img" aria-label="Good landing days over the next 12 months" hidden></svg>
       </section>
 
       <!-- RIGHT: summary + compare -->
