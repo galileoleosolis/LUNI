@@ -230,6 +230,10 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     as data are in a USGS release ("Down-selected Artemis III Candidate Landing Site navigational grids",
     DOI 10.5066/P1MEQ6UK, ScienceBase item 671a6fa8d34efed5620f89f8, shapefiles from LROC QuickMap), and
     sciencebase.gov / usgs.gov are refused by this environment's network rules. It needs the user to allow those hosts.
+- The user (Sun 15 Nov, about 10 AM New York) asked for the UI "all consolidated ... extremely intuitive". A sketch was
+  shown first (one row of tabs for every screen, bottom keys as the only action buttons, the duplicate buttons in
+  the left column and headings removed, extras under one MORE key). **Rejected: "Actually just leave it these are
+  worse".** Nothing was changed. Do not remove the duplicate shortcut buttons or re-arrange the navigation unprompted.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
