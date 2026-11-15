@@ -67,6 +67,26 @@ export function siteEclipses(site, t0, t1, terrain = terrainFor(site)) {
 }
 
 // Hourly Sun/Earth samples for a site over `hours`, judged against its terrain skyline.
+// A site's own long-term numbers, from its own skyline: the share of all the years covered in which the Sun's center
+// (and the Earth's) stands above the skyline, checked every 6 hours like the map layers, and whether any part of the
+// Sun's disc ever shows. Kept per site: about 19,000 moments.
+const YEARS = new Map();
+export function siteYears(site, terrain = terrainFor(site), stepHours = 6) {
+  const k = key(site) + "|" + stepHours;
+  if (YEARS.has(k)) return YEARS.get(k);
+  const cov = coverage(), frame = siteFrame(site.lat, site.lon, MOON_RADIUS_KM + (terrain.heightM + terrain.mastM) / 1000);
+  const t0 = +cov.start, step = stepHours * 3600000, n = Math.floor((cov.end - cov.start) / step);
+  let sun = 0, earth = 0, anySun = 0;
+  for (let i = 0; i < n; i++) {
+    const v = sunEarthAltAz(frame, t0 + i * step), hs = horizonAt(terrain.horizon, v.sunAz);
+    if (v.sunEl > hs) sun++;
+    if (v.sunEl + SUN_RADIUS_DEG > hs) anySun++;
+    if (v.earthEl > horizonAt(terrain.horizon, v.earthAz)) earth++;
+  }
+  const out = { sun: sun / n * 100, earth: earth / n * 100, everSun: anySun > 0, moments: n };
+  YEARS.set(k, out); return out;
+}
+
 export function sampleSite(site, startDate, hours, terrain = terrainFor(site)) {
   const horizon = terrain.horizon;
   const frame = siteFrame(site.lat, site.lon, MOON_RADIUS_KM + (terrain.heightM + terrain.mastM) / 1000);

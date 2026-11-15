@@ -192,6 +192,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
      shares, the longest time without Sun against the user's limit, and a line for the stretch the mission clock is
      in. Clicking a stretch moves the clock there. It reads LUNI's own hourly answers; it is not a flight schedule.
      The chart headings were shortened to fit three buttons.
+- Extras item 5, built Sun 15 Nov about 10 AM New York ("let's go for it"), **on the pre-release only** (public is r4):
+  the MOON MAP data card for the landing site takes its SUNLIGHT and EARTH LINK (and YOUR MIX) from the site's own
+  skyline (`siteYears` in `js/model.js`: every 6 hours over the years covered, about 5 ms a site; `getSiteYears` passed
+  to `createMoonMap`, `layerRow` in `js/layers.js`), with a note naming what the coarser layer reads. Presets only;
+  the point under the pointer and custom points keep the layer values. `tests/check_site_years.mjs` prints both:
+  Nobile 78 / 53, Malapert 74 / 53, Shackleton 79 / 63, the others within about a point, Haworth 0 and never sunlit.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
@@ -200,8 +206,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
-- The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they
-  say "release it"; the time of the local judging is not known yet (asked, not answered).
+- **r4 released** on the user's "Release it, that was great" (Sun 15 Nov, 9:05 AM New York = 14:05 UTC; main 3093d3b):
+  the public site now has everything in this list. Later changes go to the pre-release and need a new "release it".
+  The time of the local judging is still not known (asked, not answered).
 - **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
   event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
   ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
@@ -261,6 +268,8 @@ added as a 14th preset for it. Stories carry `proof: true` when they also belong
 Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
 
 ## Extras list (the user: "keep track of those extras"). Not to be built unless the user picks one.
+**Done: 1 (operations plan), 3 (custom coordinates), 5 (the site's own data card). Left: 2, 4, 6, 7, 8.** The user
+asked about 2, 4 and 6 on 15 Nov and was told they are for after the deadline (hours each, medium to high risk).
 1. Operations plan / light scheduler: the mission's stretches in order (Sun and Earth: work and send data; Sun only;
    dark: sleep; eclipse) with dates and lengths, inside the MISSION PLAN tab. A full drag-and-drop expedition
    scheduler was advised against (big, and no sourced data on what activities need).
@@ -313,7 +322,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4) is the current public version.
+   main 9f099f4). **r4 (15 Nov, 14:05 UTC, main 3093d3b) is the current public version.** To roll back to r3:
+   `tools/release.sh promote 9f099f4`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

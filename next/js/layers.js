@@ -167,6 +167,12 @@ export async function profileAt(lat, lon) {
   return rows;
 }
 
+// One card row for a layer and a value that did not come from the layer's own grid (a site's own long-term numbers).
+export function layerRow(id, v, note = "") {
+  const L = layer(id);
+  return { id, label: L.card || L.label, value: v, text: (L.brief || L.text)(v), score: L.score ? L.score(v) : null, rgb: L.color(v), share: clamp01((v - L.lo) / (L.hi - L.lo)), note };
+}
+
 // The card: one row per layer, a bar in the layer's own color, the number, and a GOOD / FAIR / BAD word where the layer has a say.
 export const verdictWord = (score) => (score == null ? "" : score >= 0.67 ? "GOOD" : score >= 0.34 ? "FAIR" : "BAD");
 export function profileHtml(rows) {

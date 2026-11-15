@@ -4,7 +4,7 @@ import { hasTerrain, terrainFor, setCustomTerrain, initModel, getScenario, summa
 import { createGlobe } from "./globe.js";
 import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
-import { sampleSite, siteEclipses } from "./model.js";
+import { sampleSite, siteEclipses, siteYears } from "./model.js";
 import { createScanPanel } from "./ui-scan.js";
 import { initTestMode } from "./testmode.js";
 import { createSurfacePanel } from "./ui-surface.js";
@@ -945,6 +945,7 @@ async function init() {
   // Screens: MAIN, MOON MAP (the Moon made big, with data layers) and MISSION HISTORY. One at a time.
   moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon, stamp }, onClose: () => showScreen("main"),
     getNow: () => state.scenario?.samples[state.idx],
+    getSiteYears: () => (state.site.id !== CUSTOM_ID && terrainFor(state.site).real ? siteYears(state.site) : null),
     onUseMix: () => { showScreen("main"); scan.useMix(); } });
   $("globe-big").addEventListener("click", () => showScreen(moonmap.isOpen() ? "main" : "moon"));
   for (const [id, name] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).addEventListener("click", () => showScreen(name));

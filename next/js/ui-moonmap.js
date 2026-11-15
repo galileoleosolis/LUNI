@@ -1,9 +1,9 @@
 // MOON MAP screen: the 3D Moon made big, with NASA data as layers on it and a data profile for any point.
 // The Moon itself is the same one as on the main screen (it moves in here while this screen is open), so a click
 // still picks a landing site.
-import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
+import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, layerRow, mixScore, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
 
-export function createMoonMap({ globe, getSite, getNow, fmt, onClose, onUseMix }) {
+export function createMoonMap({ globe, getSite, getNow, getSiteYears, fmt, onClose, onUseMix }) {
   const $ = (id) => document.getElementById(id), box = $("moonmap");
   const wrap = document.querySelector(".globe-wrap"), home = wrap.parentElement, homeNext = wrap.nextElementSibling;
   let current = "none", strength = 0.8, job = 0, hover = null, profJob = 0;
@@ -49,7 +49,21 @@ export function createMoonMap({ globe, getSite, getNow, fmt, onClose, onUseMix }
       // and "permanent shadow" cannot be mixed up (a tester could not tell them apart).
       const now = hover ? null : getNow?.(), on = (ok, yes, no) => ({ text: ok ? yes : no, score: ok ? 1 : 0, share: 1, rgb: ok ? [34, 208, 112] : [176, 22, 36], note: "" });
       const first = now ? [{ head: `RIGHT NOW · ${fmt.stamp(now.t)}` }, { label: "SUN RIGHT NOW", ...on(now.sunUp, "UP", "DOWN") }, { label: "EARTH RIGHT NOW", ...on(now.earthUp, "IN VIEW", "HIDDEN") }] : [];
-      $("mm-profile").innerHTML = profileHtml([...first, { head: "ALL YEARS, 2023 TO 2035 (NOT THIS MOMENT)" }, ...rows]);
+      // The landing site has its own detailed skyline: its sunlight and Earth link come from that, not from the
+      // coarser map layer (which reads low on narrow ridges). The layer's values are named beside them.
+      const own = hover ? null : getSiteYears?.();
+      let foot = "";
+      if (own) {
+        const was = {};
+        for (const [id, v] of [["sun", own.sun], ["earth", own.earth]]) {
+          const at = rows.findIndex((r) => r.id === id); if (at < 0) continue;
+          was[id] = rows[at].text; rows[at] = layerRow(id, v);
+        }
+        const val = (id) => rows.find((r) => r.id === id)?.value, m = mixScore({ sun: own.sun, earth: own.earth, slope: val("slope"), temp: val("temp") }), mixAt = rows.findIndex((r) => r.id === "mix");
+        if (m != null && mixAt >= 0) rows[mixAt] = layerRow("mix", m);
+        foot = `<div class="prof-note">SUNLIGHT AND EARTH LINK: FROM THIS SITE'S OWN DETAILED SKYLINE${was.sun != null ? ` (THE COARSER MAP LAYER READS ${was.sun} AND ${was.earth})` : ""}.</div>`;
+      }
+      $("mm-profile").innerHTML = profileHtml([...first, { head: "ALL YEARS, 2023 TO 2035 (NOT THIS MOMENT)" }, ...rows]) + foot;
     } catch (e) { console.error(e); }
   }
   let raf = 0;
