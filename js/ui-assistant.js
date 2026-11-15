@@ -9,7 +9,8 @@ import { PRESETS } from "./assistant-llm.js";
 const $ = (id) => document.getElementById(id);
 const SR = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
 const WAKE = /^\s*(?:hey |ok |okay |yo )?(?:luni|lunie|luny|lunee|looney|loony|loonie|loonee|lunny|luno|luna|lunar|loono|you know|uno)\b[\s,.:!]*/i;      // LUNI, and what recognizers hear instead
-const TIPS = ["NEXT GOOD TIME", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BETTER SPOT", "HELP"];
+const IC = { mic: '<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 9.500a6 6 0 0 0 12 0M10 15.500V18.500M6.500 18.500h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>', spk: '<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7.500h3.500L10 3.500v13L5.500 12.500H2z"/><path d="M13 7a4.500 4.500 0 0 1 0 6M15.500 4.500a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>', mute: '<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7.500h3.500L10 3.500v13L5.500 12.500H2z"/><path d="M3 2.500l15 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>', ear: '<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.500 11V9.500a6.500 6.500 0 0 1 13 0V11" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2" y="10.500" width="4" height="6.500" rx="1.500"/><rect x="14" y="10.500" width="4" height="6.500" rx="1.500"/></svg>' };      // icons for the panel's buttons
+const TIPS = ["NEXT LANDING WINDOW", "GO TO SHACKLETON", "MISSION 14 DAYS", "STATUS", "WHERE IS THE SUN?", "DO WE HAVE A LINK?", "BEST SITE FINDER", "HELP"];
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 
 export function createAssistantPanel({ assistant, model }) {
@@ -155,7 +156,7 @@ export function createAssistantPanel({ assistant, model }) {
   function setListening(on) {
     st.listening = on;
     mic.classList.toggle("on", on); key.classList.toggle("on", on || st.hands);
-    mic.textContent = on ? (st.hands ? "● LISTENING FOR “LUNI…”" : "● LISTENING… SPEAK NOW") : canListen() ? "● TALK" : "NO MICROPHONE · TYPE";
+    mic.innerHTML = IC.mic + (on ? (st.hands ? "LISTENING FOR “LUNI…”" : "LISTENING… SPEAK NOW") : canListen() ? "TALK" : "NO MICROPHONE · TYPE");
   }
   function heard(text) {
     if (!st.hands) return run(text, "voice");
@@ -191,11 +192,11 @@ export function createAssistantPanel({ assistant, model }) {
 
   // ---------- options ----------
   function syncOpts() {
-    $("comms-voice").textContent = `SPOKEN ANSWERS ${st.speak ? "ON" : "OFF"}`; $("comms-voice").classList.toggle("on", st.speak);
-    $("comms-hands").textContent = `HANDS-FREE ${st.hands ? "ON · SAY “LUNI, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
+    $("comms-voice").innerHTML = (st.speak ? IC.spk : IC.mute) + `SPOKEN ANSWERS ${st.speak ? "ON" : "OFF"}`; $("comms-voice").classList.toggle("on", st.speak);
+    $("comms-hands").innerHTML = IC.ear + `HANDS-FREE ${st.hands ? "ON · SAY “LUNI, …”" : "OFF"}`; $("comms-hands").classList.toggle("on", st.hands);
     $("comms-hands").hidden = !canListen(); mic.classList.toggle("off", !canListen());
     key.classList.toggle("on", st.listening || st.hands);
-    if (!st.listening) mic.textContent = canListen() ? "● TALK" : "NO MICROPHONE · TYPE";
+    if (!st.listening) mic.innerHTML = IC.mic + (canListen() ? "TALK" : "NO MICROPHONE · TYPE");
   }
   $("comms-voice").addEventListener("click", () => { st.speak = !st.speak; store.set("luno-speak", st.speak ? "on" : "off"); if (!st.speak) globalThis.speechSynthesis?.cancel(); syncOpts(); });
   $("comms-hands").addEventListener("click", () => {

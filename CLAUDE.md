@@ -152,6 +152,87 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
+**Pre-release state (15 Nov, about 05:20 UTC = Sun 12:20 AM New York): `next/` and the preview page (Version 45) carry
+everything below. The public site is still r3 (9f099f4) and needs a new "release it".**
+A friend from a NASA SEES internship (15 Nov): "a lot going on", "hard to navigate", "cut down on some of the
+features or make a more streamlined ui", did not know what to do in the scan, the tutorial "not really" helped. A
+second screenshot: "WHAT REALLY HAPPENED / WHAT LUNI WORKS OUT" and the ASK LUNI directions are "not professionally
+written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK LUNI panel). Done on the pre-release:
+- **SIMPLE VIEW is the default** (`html.simple`, `setTools` in `js/app.js`, kept under `luno-view`): five keys (PLAY,
+  ASK LUNI, NEXT WINDOW, SCAN FOR BETTER SPOT, ALL TOOLS) and the mission length only; `#needs-more` unfolds the
+  other four needs, and they open by themselves when one is not at its default. ALL TOOLS shows every key and need.
+  The older test sets (`#test-a` to `#test-d`) and `window.LUNO_ALL_TOOLS` start in ALL TOOLS.
+- Scan panel: one sentence on what it is, BEST SPOT FOUND and a large MOVE MY SITE TO THE BEST SPOT button first,
+  the green / red GO map by default (`st.metric = "needs"`), the SHOW choices folded under MORE MAP CHOICES.
+- **The guided tutorial** (`js/guide.js`, the user asked for it: "really guided", "understood by a middle school
+  student", "black out the ones they don't need", a "do you understand" button, quick). 13 cards; everything but one
+  part is dimmed (four `.tour-dim` boxes around a hole, so the real control can be used through it); each card has
+  WHAT IT IS / WHY IT MATTERS / HOW TO USE IT, NOT SURE? EXPLAIN IT ANOTHER WAY (`alt`), four TRY IT steps and two
+  quick checks. Remembered under `luno-tour-v2`; `? TUTORIAL` (`#tour-btn`) in the top strip restarts it;
+  `tourPrepare` in `js/app.js` puts the main screen back before each card. Body-level and fixed, so no zoom math.
+- Answer area (the user, 15 Nov, from a sketch they approved: "yes right is good"): the GO / NO-GO block is one wide
+  strip, the POWER and EARTH LINK readouts sit side by side under it, and the skyline gets the freed room (at
+  1440 x 900: 150 px on a GO, 173 px on a NO-GO; was 133 / 126). CSS only, under `html:not(.flow)`; phones unchanged.
+  The verdict lines were shortened to fit one row ("SUNLIGHT LASTS 3D 03H LONGER THAN NEEDED", "NEXT LANDING WINDOW: ...").
+- Best Site Finder panel (the user, 15 Nov): a large BEST SITE FINDER header with no "around <site>" text, a blue
+  BACK TO THE MAIN SCREEN button, scan sizes as a vertical stack left of the map (`.scan-sizes`), and the
+  MOVE MY SITE TO THE BEST SPOT button under the map at the map's width (`#scan-go-best` in `.scan-map`; its text
+  says SCANNING / YOU ARE AT THE BEST SPOT / NO SPOT HERE MEETS THE NEEDS when it cannot be pressed).
+- The user (Sun, about 2 AM New York): "work until it runs out" (the weekly Fable allowance was at 90%). Built, in this
+  order, each saved by itself:
+  1. Sun / Earth in view at a negative height shows a note (`#sun-low`, `#earth-low`): the skyline there dips below level.
+  2. Custom coordinates in the open: `.coord-row` under the site list (`#lat-input`, `#lon-input`, `#coord-go`); the
+     boxes are gone from COMPARE SITES · MORE. Extras item 3 is done.
+  3. All sites side by side (`renderRank` in `js/app.js`): a green / red dot on every row of the site list (GO or
+     NO-GO at the landing time on screen) and a ranked table at the top of COMPARE SITES · MORE (good landing days
+     in the months the calendar shows, GO / NO-GO now; click to go there). About 110 ms for 14 sites when a need changes.
+  4. OPERATIONS plan (extras item 1): a third chart button between MISSION PLAN and MISSION WINDOWS (`#tab-ops`,
+     `#ops`, `renderOps` / `opsStretches` / `OPS` in `js/app.js`; `showPlan("plan" | "ops" | "days")`). The mission
+     length as stretches in order: POWER + LINK, POWER, NO LINK, BATTERY, LINK, BATTERY, NO LINK, ECLIPSE, with the
+     shares, the longest time without Sun against the user's limit, and a line for the stretch the mission clock is
+     in. Clicking a stretch moves the clock there. It reads LUNI's own hourly answers; it is not a flight schedule.
+     The chart headings were shortened to fit three buttons.
+- Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
+  (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
+  between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
+  side panel (`#scan-rank`). The keys carry no small caption any more (only the four launch-slip keys do): PLAY
+  ORBITAL DATA (the user's wording), NEXT LANDING WINDOW, ASK LUNI (in the middle in both views), BEST SITE FINDER,
+  NEXT SITE, PIN TO COMPARE, ALL TOOLS / SIMPLE VIEW.
+- Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
+  FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they
+  say "release it"; the time of the local judging is not known yet (asked, not answered).
+- **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
+  event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
+  ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
+- Names (the user, 15 Nov): the scan is **BEST SITE FINDER** on every button, key, title and tutorial card (was SCAN
+  FOR BETTER SPOT), and the jump is **NEXT LANDING WINDOW** (was NEXT WINDOW, before that NEXT GOOD TIME). ASK LUNI
+  understands the old and new phrases. The keys split the name over their two lines (BEST SITE / FINDER).
+- Wording: MISSION RECORD / LUNI'S CALCULATION (PROOF), CALCULATED BY LUNI (layer sources), ASK LUNI says
+  ENTER A QUESTION OR A COMMAND; icons (`IC` in `js/ui-assistant.js`) on TALK, SEND, SPOKEN ANSWERS, HANDS-FREE, CLOSE.
+Second list of notes (15 Nov, dictated; "more feedback as well" is coming), done on the pre-release:
+- Steps 1 to 4 are colored bands (`h3[data-step]`, `--sc`); the Moon map side panel has three bands (`h3.band`).
+- Tour wording: CHOOSE YOUR SITE AND TIME / GET THE VERDICT / MOVE THROUGH THE MISSION; the word "relax" is gone
+  everywhere ("change one mission need").
+- Slider: thicker rail and handle, bigger SUN / EARTH / BOTH / SLIDER labels, and a blinking "DRAG THIS ALONG THE BAR"
+  pointer (`#tl-hint`) until it is first used. The chart is 128 px tall (was 112).
+- The key and the step 2 button read NEXT WINDOW (was NEXT GOOD TIME); ASK LUNI still understands both.
+- Action words (`h3 .h-do`) and the ASK LUNI example buttons are larger and bold.
+- The left side pops in and out (`#setup-tab`, `.cols.setup-off`; `setSetup` in `js/app.js`); not on phones.
+- Found on the way: test set E's shadow answer choices did not match the card's new wording (fixed: YES, ALWAYS / NO).
+**Whole Moon and north pole (15 Nov, the user: "not really impressive to just have south pole ... at least the best we
+can get on the other parts of the moon"):** on the pre-release, not released.
+- `data/layers/index.json` now has three sets: `sp` and `np` (caps poleward of 80 degrees, 480 m: sun, earth, shadow,
+  slope, tavg, tmax) and `gl` (whole Moon: sun and earth at quarter-degree squares, tavg and tmax at half-degree).
+  `polarValue` in `js/layers.js` gives the cap's value inside a cap and the whole-Moon value elsewhere; shadow exists
+  in the caps only. `globalCanvas` draws every layer but shadow; `polarCanvas(id, "sp" | "np")` draws a cap.
+- `tools/build_layers.py 480 north` (needs `ldem_60n_240m.img`; the north LOLA map has longitude 0 pointing DOWN,
+  checked against the global map: correlation 0.997) and `tools/build_layers_global.py` (ldem_16, 24 directions,
+  every 12 h; about 13 minutes). Both keep finished parts in `tools/dem/layers_*` and resume.
+- Temperature: caps from the Diviner Polar Resource Product (`build_temperature.py south|north`); the rest from the
+  Diviner Global Cumulative Products, 18 files, 2.8 GB (`build_temperature_global.py`: mean and highest bolometric
+  temperature over the lunar day per half-degree square; equator 217 K average, 392 K highest).
+- The scan's ALL YEARS group now shows everywhere (SHADOW only within 10 degrees of a pole).
 Layers as built:
 - `js/layers.js` — the one definition of the layers (`LAYERS`: elev, slope, sun, earth, shadow): colors, good / bad
   score, the source sentence shown on screen, `profileAt` + `profileHtml` (the data profile card), `globalCanvas` /
@@ -197,7 +278,29 @@ them when the UTC date turned to 15 Nov, and Claude wrongly said "tonight"). Nev
 deadline from the UTC date: ask the user for their local time, or give the time in UTC and say so.
 **The user is in New York (US Eastern, UTC-5 in November).** The deadline is Sunday 15 Nov 23:59 New York time, which
 is **Monday 16 Nov 04:59 UTC**. New York time = this session's UTC clock minus 5 hours.
-The public site is still r2. Releasing needs the user's "release it". The submission text and video do not exist.
+**r3 released** on the user's "release it" (Sat 14 Nov, about 10 PM New York; main 9f099f4): the public site now has
+everything through the layers, mix, temperature, history, icons and the NEXT SITE fix. Later changes go to the
+pre-release again and need a new "release it". The submission: the user chose a 7-slide deck (GIFs on hold; "we can do
+slide decks tomorrow") over the 30-second video; the Project page takes JPG / PNG / GIF up to 10 MB and public links
+only. The Project page text and the deck do not exist yet; the box titles of the Project tab were asked for.
+**Test set E** (15 Nov, for the user's mother, who had one run-through first): now the default with `#test`; A to D
+run with `#test-a` ... `#test-d`. Six tasks on the newer screens: load Blue Ghost 1 from MISSION HISTORY, read the
+eclipse date, next good landing date at Nobile Rim 1, permanent shadow and temperature of Haworth's floor from the
+MOON MAP data profile (answers read from her own screen), scan and move near Malapert. An automated run scores 6/6.
+Her run (15 Nov): 6/6, 5:55, ease 3/5. She set dates with the pickers (30 clicks), never used NEXT GOOD TIME, the
+verdict buttons, ASK LUNI or the MISSION PLAN / WINDOWS buttons, and clicked the best square in the scan directly.
+Most confusing: could not tell "permanent" shadow from dark at that moment. Asked for sections in different colors
+and "a cool easter egg". Done since: the Moon map data profile shows RIGHT NOW (Sun, Earth on the mission clock)
+apart from ALL YEARS; the layer button reads NEVER SUNLIT; steps 1 to 4 each have a color (`--s1` to `--s4`, blue /
+violet / amber / green); Apollo 11 on any 20 July shows a one-time note, and ASK LUNI answers "tell me a joke".
+`docs/submission.md` holds the drafted text for every Project-tab box. The user makes the slide deck themselves at the
+end (no deck or GIFs from Claude unless asked), will have their mother test the app, and wants the Use of SI "ideas"
+line to say the idea and direction were theirs; it says that, and keeps one clause that Claude offered suggestions,
+because some features were Claude's proposals.
+Three independent judge runs (15 Nov UTC, sub-agents on three models, Presentation fixed at 4): 19, 21, 21 of 25
+(Impact 3/4/4, Creativity 3/4/4, Validity 4, Relevance 5). Asked for: outside users, an operations schedule or a
+best site-and-date search, a richer power model; found the NEXT SITE bug (fixed), ASK LUNI misreading open questions,
+a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW buttons.
 
 ## Open work, roughly in priority order
 1. **GitHub Pages is ON** (switched on by the user on 14 Nov, serving the `release` branch; GitHub's deployment
@@ -209,7 +312,8 @@ The public site is still r2. Releasing needs the user's "release it". The submis
    `tools/release.sh` writes to `release`: `next` after pushing work the user wants to try on the real site,
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
-   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name.
+   r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
+   main 9f099f4) is the current public version.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

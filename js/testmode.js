@@ -3,11 +3,11 @@
 // sessionStorage, so a refresh does not lose it) until the tester copies the report themselves.
 // Enabled by "#test" in the address, or by window.LUNO_TEST on a build made for testing.
 import { SITES } from "./sites.js";
-import { sampleSite, hoursUntilChange, siteEclipses } from "./model.js";
+import { sampleSite, hoursUntilChange, siteEclipses, terrainFor } from "./model.js";
 import { analyze, windowsFrom, DEFAULT_REQ } from "./mission.js";
 
 const $ = (id) => document.getElementById(id);
-const KEY = "luno-test-v8";
+const KEY = "luno-test-v9";
 const site = (id) => SITES.find((s) => s.id === id);
 const mission = (id, iso, req = {}) => {
   const t0 = new Date(iso), s = sampleSite(site(id), t0, 400 * 24), a = analyze(s, { ...DEFAULT_REQ, ...req });
@@ -183,9 +183,50 @@ const SET_D = [
       && snap.req.days === 10 && snap.req.maxDarkH === 12 && snap.req.earthAtLanding === true },
 ];
 
-// Which set runs: D by default; "#test-a", "#test-b" or "#test-c" in the address (or window.LUNO_TEST_SET) picks an earlier one.
-const SET_NAME = (location.hash.match(/^#test-([abc])$/)?.[1] || globalThis.LUNO_TEST_SET || "D").toUpperCase();
-const TASKS = { A: SET_A, B: SET_B, C: SET_C, D: SET_D }[SET_NAME] || SET_D;
+// Set E (15 Nov): for a tester new to the app, built around the screens added since set D: MISSION HISTORY, the
+// eclipse warning, the next good landing time, the MOON MAP and its data profile, and the scan.
+// Answers read from the data profile card are taken from the tester's own screen, like the scan answer in set D.
+const E_BG = { site: "bg1", t0: "2025-03-02T09:00" }, E_NOB = { site: "nobile1", t0: "2026-11-14T20:00" };
+const profileRow = (label) => [...document.querySelectorAll("#mm-profile .prof-row")].find((r) => r.firstElementChild?.textContent.startsWith(label))?.querySelector("b")?.textContent.trim();
+const SET_E = [
+  { id: "e-history", short: "Load Blue Ghost 1 from mission history: GO?",
+    text: "At the very top of the unit, open MISSION HISTORY. Find BLUE GHOST 1 in the list and load it into the main screen. Question: is it a GO?",
+    setup: E_BG, reach: { label: "got Blue Ghost 1 on its real landing date on screen", test: (s) => s.site.id === E_BG.site && s.t0.toISOString().slice(0, 16) === E_BG.t0 },
+    type: "choice", options: ["GO", "NO-GO"],
+    expected: () => (mission(E_BG.site, E_BG.t0 + ":00Z", { days: 14 }).v.ok ? "GO" : "NO-GO") },
+  { id: "e-eclipse", short: "Date of the eclipse during Blue Ghost's mission",
+    text: "Stay on BLUE GHOST 1 as you loaded it. LUNI warns about an eclipse during this mission. Question: on what date is the eclipse?",
+    setup: E_BG, type: "date",
+    expected: () => { const t0 = new Date(E_BG.t0 + ":00Z"); return day(siteEclipses(site(E_BG.site), t0, new Date(+t0 + 14 * 86400000), terrainFor(site(E_BG.site)))[0].peak); },
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "e-next", short: "Next good landing date at Nobile Rim 1",
+    text: "New situation: choose the landing site NOBILE RIM 1, set the landing time to 14 November 2026, 20:00 UTC, and set MISSION LENGTH to 10. It is a NO-GO. Question: on what date does the next landing window open?",
+    reach: { label: "ended with a GO at Nobile Rim 1 on screen", test: (s) => s.site.id === E_NOB.site && s.missionOk },
+    type: "date",
+    expected: () => day(mission(E_NOB.site, E_NOB.t0 + ":00Z").next.start),
+    check: (ans, exp) => Math.abs(new Date(ans) - new Date(exp)) <= 86400000 },
+  { id: "e-shadow", short: "Is Haworth's floor in permanent shadow?",
+    text: "Choose the landing site HAWORTH CRATER FLOOR. Then open MOON MAP at the very top of the unit and look at the DATA PROFILE on the right. Question: is this site in PERMANENT SHADOW?",
+    reach: { label: "had Haworth selected with the Moon map open when answering", test: (s) => s.site.id === "haworth" && !$("moonmap").hidden },
+    type: "choice", options: ["YES, ALWAYS", "NO"],
+    expected: () => profileRow("PERMANENT SHADOW") ?? "(the Moon map was not open on Haworth)" },
+  { id: "e-temp", short: "How cold is Haworth's floor?",
+    text: "Stay on the MOON MAP with HAWORTH CRATER FLOOR. Question: what is this site's average temperature?",
+    reach: { label: "had Haworth selected with the Moon map open when answering", test: (s) => s.site.id === "haworth" && !$("moonmap").hidden },
+    type: "choice", options: ["WARMER THAN −100 °C", "BETWEEN −100 AND −200 °C", "COLDER THAN −200 °C"],
+    expected: () => { const c = Number((profileRow("TEMPERATURE (AVG)") || "").replace("−", "-").replace(/[^\d.+-]/g, "")); return !Number.isFinite(c) || !profileRow("TEMPERATURE (AVG)") ? "(the Moon map was not open on Haworth)" : c > -100 ? "WARMER THAN −100 °C" : c >= -200 ? "BETWEEN −100 AND −200 °C" : "COLDER THAN −200 °C"; } },
+  { id: "e-scan-move", short: "Find and move to a better spot near Malapert",
+    text: "Last one. Go back to the MAIN SCREEN. Choose MALAPERT MASSIF, landing 8 February 2027, 00:00 UTC, MISSION LENGTH 10. It is a NO-GO. Open the BEST SITE FINDER, wait until it has finished, and move the landing site to the best point. Press DONE when the screen shows the site there.",
+    type: "done",
+    expected: () => "a GO point within 25 km of Malapert Massif, same date and needs",
+    answerFrom: (snap) => `${snap.site.id} ${snap.site.lat.toFixed(3)},${snap.site.lon.toFixed(3)} mission ${snap.missionOk ? "GO" : "NO-GO"} needs ${snap.req.days}d/${snap.req.maxDarkH}h/${snap.req.earthAtLanding ? "E" : "-"}`,
+    check: (ans, exp, snap) => snap.missionOk && snap.site.id !== D_SCAN.site && kmBetween(snap.site, site(D_SCAN.site)) <= 25 && snap.t0.toISOString().slice(0, 16) === D_SCAN.t0
+      && snap.req.days === 10 && snap.req.maxDarkH === 12 && snap.req.earthAtLanding === true },
+];
+
+// Which set runs: E by default; "#test-a" ... "#test-d" in the address (or window.LUNO_TEST_SET) picks an earlier one.
+const SET_NAME = (location.hash.match(/^#test-([abcd])$/)?.[1] || globalThis.LUNO_TEST_SET || "E").toUpperCase();
+const TASKS = { A: SET_A, B: SET_B, C: SET_C, D: SET_D, E: SET_E }[SET_NAME] || SET_E;
 
 
 const FEATURES = {      // click targets -> the feature they belong to
@@ -193,6 +234,7 @@ const FEATURES = {      // click targets -> the feature they belong to
   "launch-slip keys": /^slip/, "NEXT WINDOW": /^(next-window-btn|side-next)/, "AREA SCAN": /^(scan|side-scan)/, "mission needs": /^need:/,
   "verdict-block buttons": /^mission-/, "calendar": /^calendar/, "window list": /^windows/, "timeline": /^timeline/, "PLAY": /^play-btn/, "PIN / compare": /^(pin-btn|compare)/, "NEXT SITE": /^next-site-btn/,
   "ASK LUNI (typed or spoken commands)": /^(talk-btn|comms:|typed:|voice:)/,
+  "MISSION HISTORY": /^(tab-history|hist-)/, "MOON MAP": /^(tab-moon|mm-|globe-big)/, "PROOF": /^proof/, "MISSION PLAN / MISSION WINDOWS buttons": /^tab-(plan|days)/, "COPY LINK": /^share-btn/,
 };
 
 let T = null, api = null;       // T = test state, api = hooks from app.js
@@ -389,7 +431,7 @@ function showReport() {
 }
 
 export function initTestMode(hooks) {
-  const wanted = /^#test(-[abc])?$/.test(location.hash) || globalThis.LUNO_TEST;
+  const wanted = /^#test(-[abcd])?$/.test(location.hash) || globalThis.LUNO_TEST;
   if (!wanted) return false;
   api = hooks;
   wireTracking();

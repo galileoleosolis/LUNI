@@ -1,6 +1,6 @@
 import { SITES, CUSTOM_ID, loadSites } from "./sites.js";
 import { computeTerrain } from "./terrain.js";
-import { hasTerrain, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
+import { hasTerrain, terrainFor, setCustomTerrain, initModel, getScenario, summarize, hoursUntilChange, horizonAt, subPoints, coverage, inCoverage, STEP_HOURS } from "./model.js";
 import { createGlobe } from "./globe.js";
 import { DEFAULT_REQ, REQ_OPTIONS, analyze, windowsFrom, dailyStats, fmtDH } from "./mission.js";
 import { renderCalendar, dayFromEvent } from "./ui-calendar.js";
@@ -99,7 +99,7 @@ function buildSiteList() {
     if (s.group !== grp) { grp = s.group; const g = document.createElement("div"); g.className = "grp"; g.textContent = grp.toUpperCase(); box.appendChild(g); }
     const b = document.createElement("button");
     b.className = "site-row"; b.dataset.id = s.id;
-    b.innerHTML = `<span>${pad(++n)} ${s.name}</span><span>${fmtLat(s.lat)}</span>`;
+    b.innerHTML = `<span>${pad(++n)} ${s.name}</span><span><i class="site-ok"></i>${fmtLat(s.lat)}</span>`;
     b.addEventListener("click", () => selectSite(s));
     box.appendChild(b);
   }
@@ -160,7 +160,7 @@ function syncSiteUI() {
     const over = (row.getBoundingClientRect().bottom - list.getBoundingClientRect().bottom) / zoomOf(list) + 24;
     if (over > 0) list.scrollTop += over;
   }
-  $("lat-input").value = s.lat; $("lon-input").value = s.lon;
+  $("lat-input").value = +(+s.lat).toFixed(3); $("lon-input").value = +(+s.lon).toFixed(3);
   syncT0();
   $("bar-site").textContent = `${siteName(s)} ${fmtLat(s.lat)} ${fmtLon(s.lon)}`;
   $("bar-t0").textContent = stamp(state.t0);
@@ -181,7 +181,7 @@ function renderStory() {
   if (box.hidden || box.dataset.id === st.id) return;
   box.dataset.id = st.id;
   box.innerHTML = `<span class="story-text" title="${st.real}"><b class="h-t">REAL LANDING</b> · <b>${st.name}, ${st.when}</b> · ${st.strip}</span>
-    <span class="story-btns"><button id="story-proof" title="What really happened, with sources, next to what LUNI works out">THE STORY ▸</button><button id="story-now" title="Moves the landing time to the current hour">GO TO TODAY ▸</button><button id="story-x" title="Hide this note">✕</button></span>`;
+    <span class="story-btns"><button id="story-proof" title="The mission record, with sources, compared with LUNI's calculation">THE STORY ▸</button><button id="story-now" title="Moves the landing time to the current hour">GO TO TODAY ▸</button><button id="story-x" title="Hide this note">✕</button></span>`;
   $("story-proof").addEventListener("click", () => proof.toggle(true, st.id));
   $("story-now").addEventListener("click", () => setT0(roundToHour(new Date())));
   $("story-x").addEventListener("click", () => { state.storyOff = st.id; box.hidden = true; relayout(); });
@@ -238,6 +238,10 @@ function recompute({ keepIdx = false } = {}) {
   scan?.refresh();
   surface?.refresh();
   window.dispatchEvent(new Event("luno:state"));
+  // A small surprise: Apollo 11's own site on its own day of the year (it landed there on 20 July 1969, 20:17 UTC).
+  if (state.site.id === "apollo11" && state.t0.getUTCMonth() === 6 && state.t0.getUTCDate() === 20 && !state.eagle) {
+    state.eagle = true; toast("20 JULY · ON THIS DAY IN 1969, APOLLO 11 LANDED RIGHT HERE: “THE EAGLE HAS LANDED.”", 9000);
+  }
 }
 
 // ---------- mission needs, landing windows, calendar ----------
@@ -262,8 +266,39 @@ function updateCalendar() {
   }
   renderCalendar($("calendar"), state.cal.daily, { t0Day: Math.floor((state.t0 - state.cal.start) / DAY), missionDays: state.req.days });
   renderWindows();
+  renderRank();
 }
 const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HOURS);
+
+// Every preset for this mission, side by side: GO or NO-GO at the landing time on screen, the number of good landing
+// days in the months the calendar shows, and the next window. Worked out once per (months shown, mission needs).
+let rank = { key: "", rows: [] };
+function renderRank() {
+  const c = state.cal, key = `${+c.start},${c.days},${JSON.stringify(state.req)}`;
+  if (rank.key !== key) {
+    rank = { key, rows: SITES.map((site) => {
+      const terrain = terrainFor(site), samples = sampleSite(site, c.start, (c.days + state.req.days + 3) * 24, terrain), a = analyze(samples, state.req, STEP_HOURS, terrain);
+      for (let i = c.days * 24; i < a.mask.length; i++) a.mask[i] = 0;
+      let good = 0;
+      for (let d = 0; d < c.days; d++) { let any = 0; for (let i = d * 24; i < (d + 1) * 24; i++) any |= a.mask[i]; good += any; }
+      return { site, mask: a.mask, good, windows: windowsFrom(a.mask, samples) };
+    }) };
+  }
+  const i = calIdx(), box = $("rank");
+  for (const r of rank.rows) {                       // the dots in the site list
+    const dot = document.querySelector(`.site-row[data-id="${r.site.id}"] .site-ok`);
+    if (dot) { dot.className = "site-ok " + (r.mask[i] ? "go" : "nogo"); dot.title = r.mask[i] ? "GO at this landing time" : "NO-GO at this landing time"; }
+  }
+  box.replaceChildren(...[...rank.rows].sort((a, b) => b.good - a.good || a.site.name.localeCompare(b.site.name)).map((r, n) => {
+    const b = document.createElement("button"), ok = !!r.mask[i], nx = r.windows.find((w) => w.end >= state.t0);
+    b.className = "rank-row" + (r.site.id === state.site.id ? " cur" : ""); b.style.setProperty("--f", (r.good / c.days * 100).toFixed(1) + "%");
+    b.innerHTML = `<span class="rk-n">${n + 1}</span><span class="rk-name">${siteName(r.site)}</span><span class="rk-ok ${ok ? "go" : "nogo"}">${ok ? "GO" : "NO-GO"}</span><span class="rk-days">${r.good} DAYS</span>`;
+    b.title = nx ? `Next landing window opens ${stamp(nx.start)}` : "No landing window in the months shown";
+    b.addEventListener("click", () => selectSite(r.site));
+    return b;
+  }));
+  $("rank-note").textContent = `DAYS = DAYS WITH A GOOD LANDING HOUR, OUT OF THE ${c.days} FROM ${dayStamp(c.start)}, FOR A ${state.req.days}-DAY MISSION WITH YOUR NEEDS. GO / NO-GO IS FOR THE LANDING TIME ON SCREEN.`;
+}
 
 // The answer: can this mission land at this site at this time?
 function renderMission() {
@@ -273,14 +308,14 @@ function renderMission() {
   $("mission-title").textContent = `${r.days}-DAY MISSION · LANDING ${stamp(state.t0)}`;
   const line = (s) => `<div>${s}</div>`;
   $("mission-why").innerHTML = v.ok
-    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN THE MISSION NEEDS`) + line(`EARTH IS IN VIEW FOR ${Math.round(v.earthPct)}% OF THE MISSION`)
-    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT GOOD LANDING TIME: ${stamp(nx.start)}` : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO GOOD LANDING TIME IN THE NEXT 12 MONTHS"}</div>`;
+    ? line(`SUNLIGHT LASTS ${v.marginOpen ? "MORE THAN " : ""}${fmtDH(Math.max(0, v.marginHours))} LONGER THAN NEEDED`) + line(`EARTH IN VIEW ${Math.round(v.earthPct)}% OF THE MISSION`)
+    : v.reasons.map(line).join("") + `<div class="next">${nx ? `NEXT LANDING WINDOW: ${stamp(nx.start)}` : v.steep ? "THE SLOPE IS THE SAME ON EVERY DATE: TRY ANOTHER SPOT" : "NO LANDING WINDOW IN THE NEXT 12 MONTHS"}</div>`;
   // A NO-GO comes with ways out: another time, another spot, or a mission need that could be relaxed.
   const fixes = [];
   if (!v.ok) {
     const tr = state.scenario.terrain, tryReq = (change) => analyze(state.cal.samples, { ...r, ...change }, STEP_HOURS, tr).at(calIdx()).ok;
     if (nx) fixes.push(["mission-next", `LAND ON ${dayStamp(nx.start)} INSTEAD`, nextWindow]);
-    fixes.push(["mission-scan", "SCAN FOR BETTER SPOT", () => scan.toggle(true)]);
+    fixes.push(["mission-scan", "BEST SITE FINDER", () => scan.toggle(true)]);
     if (v.steep) {                                               // too steep: the next slope limit that fits, or no limit at all
       const sl = REQ_OPTIONS.maxSlopeDeg.find((x) => x > r.maxSlopeDeg && tryReq({ maxSlopeDeg: x })) ?? (tryReq({ maxSlopeDeg: 0 }) ? 0 : null);
       if (sl != null) fixes.push(["mission-fix-slope", sl ? `ALLOW SLOPES UP TO ${sl}°` : "ACCEPT ANY SLOPE", () => setReq("maxSlopeDeg", sl)]);
@@ -316,7 +351,7 @@ function renderWindows() {
   const from = all.findIndex((w) => w.end >= state.t0);
   const list = from < 0 ? [] : all.slice(from, from + 4);
   box.replaceChildren();
-  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">RELAX THE MISSION NEEDS OR TRY ANOTHER SITE</b></div>`; return; }
+  if (!list.length) { box.innerHTML = `<div class="empty">NONE IN THIS 12-MONTH VIEW. <b class="h-do">CHANGE A MISSION NEED OR TRY ANOTHER SITE</b></div>`; return; }
   for (const w of list) {
     const b = document.createElement("button"), cur = w.start <= state.t0 && state.t0 <= w.end;
     if (cur) b.className = "cur";
@@ -343,6 +378,19 @@ function setReq(k, val) {
 }
 function syncNeeds() {
   document.querySelectorAll(".seg[data-req] button").forEach((x) => x.classList.toggle("on", x.dataset.v === String(state.req[x.parentElement.dataset.req])));
+  // SIMPLE VIEW shows the mission length only; a need that is not at its usual setting brings the rest into view.
+  if (Object.keys(DEFAULT_REQ).some((k) => k !== "days" && state.req[k] !== DEFAULT_REQ[k])) openNeeds(true);
+}
+function openNeeds(open) {
+  document.querySelector(".needs").classList.toggle("open", open);
+  $("needs-more").textContent = open ? "▾ SHOW FEWER NEEDS" : "▸ 4 MORE MISSION NEEDS";
+}
+// SIMPLE VIEW (the default): the few keys and needs most people use. ALL TOOLS: everything. Kept under "luno-view".
+function setTools(all, keep = true) {
+  document.documentElement.classList.toggle("simple", !all);
+  $("tools-btn").innerHTML = all ? "SIMPLE VIEW" : "ALL TOOLS";
+  if (keep) try { localStorage.setItem("luno-view", all ? "all" : "simple"); } catch {}
+  requestAnimationFrame(relayout);
 }
 
 function buildNeeds() {
@@ -374,7 +422,7 @@ function togglePlay(on = !state.playing) {
   if (on === !!state.playing) return;
   if (state.playing) {
     clearInterval(state.playing); state.playing = null;
-    $("play-label").textContent = "▶ PLAY"; btn.classList.remove("on");
+    $("play-label").textContent = "▶ PLAY ORBITAL DATA"; btn.classList.remove("on");
     return;
   }
   $("play-label").textContent = "❚❚ PAUSE"; btn.classList.add("on");
@@ -403,11 +451,15 @@ function renderMoment() {
   $("sun-next").textContent = fmtBig(sunLeft);
   $("sun-next-date").textContent = sunLeft == null ? "" : `${stamp(new Date(+cur.t + sunLeft * 3600000))}`;
   $("sun-el").textContent = sgn(cur.sunEl) + "°"; $("sun-az").textContent = cur.sunAz.toFixed(1) + "°";
+  // In view below level: the site stands high, so the skyline in that direction dips under the horizontal.
+  const lowNote = (id, up, el) => { const n = $(id); n.hidden = !(up && el < 0); if (!n.hidden) n.textContent = "BELOW LEVEL, BUT THE SKYLINE THERE DIPS LOWER"; };
+  lowNote("sun-low", cur.sunUp, cur.sunEl);
   set("earth-state", cur.earthUp, "EARTH IN VIEW", "NO LINK");
   $("earth-next-label").textContent = cur.earthUp ? "EARTHSET IN" : "EARTHRISE IN";
   $("earth-next").textContent = fmtBig(earthLeft);
   $("earth-next-date").textContent = earthLeft == null ? "" : `${stamp(new Date(+cur.t + earthLeft * 3600000))}`;
   $("earth-el").textContent = sgn(cur.earthEl) + "°"; $("earth-az").textContent = cur.earthAz.toFixed(1) + "°";
+  lowNote("earth-low", cur.earthUp, cur.earthEl);
 
   $("sun-ico").className = "ro-ico " + (cur.sunUp ? "go" : "nogo");
   $("earth-ico").className = "ro-ico " + (cur.earthUp ? "go" : "nogo");
@@ -415,10 +467,12 @@ function renderMoment() {
   $("hz-earth").href = horizonsUrl(399, cur.t);
   renderHorizon(cur);
   renderTimelineCursor();
+  renderOps();
   const sp = subPoints(cur.t);
   globe?.setBodies(sp.sun, sp.earth);
   surface?.update();
   openspace?.update(osState());
+  window.dispatchEvent(new Event("luno:clock"));
 }
 const osState = () => { const cur = state.scenario.samples[state.idx]; return { site: state.site, t: cur.t, heightM: state.scenario.terrain.heightM, sunAz: cur.sunAz }; };
 
@@ -609,7 +663,7 @@ function renderVersus() {
 }
 
 // ---------- timeline ----------
-const TL = { left: 58, right: 4, top: 18, rowH: 14, gap: 4, rail: 27 };      // rail = distance from the axis line down to the slider rail
+const TL = { left: 64, right: 4, top: 18, rowH: 16, gap: 4, rail: 32 };      // rail = distance from the axis line down to the slider rail
 
 function renderTimeline() {
   const svg = $("timeline");
@@ -628,7 +682,7 @@ function renderTimeline() {
       el("rect", { x: TL.left + i * w, y: yy, width: Math.max(1, (j - i) * w), height: TL.rowH, fill: color }, svg);
       i = j;
     }
-    el("text", { x: 0, y: yy + TL.rowH / 2 + 4.5, fill: color, "font-size": 13.5, "font-weight": 600 }, svg, name);
+    el("text", { x: 0, y: yy + TL.rowH / 2 + 4.5, fill: color, "font-size": 15.5, "font-weight": 700 }, svg, name);
   });
   const yAxis = TL.top + 3 * (TL.rowH + TL.gap);
   const every = W < 520 ? 10 : 5;
@@ -657,13 +711,15 @@ function renderTimeline() {
   }
   // The slider: a rail under the chart and a handle that carries the moment it stands on.
   const yRail = yAxis + TL.rail;
-  el("rect", { x: TL.left, y: yRail - 2, width: W - TL.left - TL.right, height: 4, rx: 2, fill: C.dim, opacity: 0.55 }, svg);
-  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 12, "font-weight": 700 }, svg, "SLIDER");
+  el("rect", { x: TL.left, y: yRail - 4, width: W - TL.left - TL.right, height: 8, rx: 4, fill: C.dim, opacity: 0.7 }, svg);
+  el("text", { x: 0, y: yRail + 4, fill: C.amb, "font-size": 15.5, "font-weight": 700 }, svg, "SLIDER");
   el("path", { id: "tl-cursor", d: "", fill: "none", stroke: C.amb, "stroke-width": 2 }, svg);
   el("path", { id: "tl-cursor-top", d: "", fill: C.amb }, svg);
   const g = el("g", { id: "tl-handle", class: state.scrubbed ? "" : "nudge" }, svg);
-  el("rect", { id: "tl-handle-box", y: yRail - 10, height: 20, rx: 10, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
-  el("text", { id: "tl-handle-text", y: yRail + 4, fill: "#000", "font-size": 12, "font-weight": 700, "text-anchor": "middle" }, g, "");
+  el("rect", { id: "tl-handle-box", y: yRail - 13, height: 26, rx: 13, fill: C.amb, stroke: "#000", "stroke-width": 1.5 }, g);
+  el("text", { id: "tl-handle-text", y: yRail + 5, fill: "#000", "font-size": 14, "font-weight": 700, "text-anchor": "middle" }, g, "");
+  el("rect", { id: "tl-hint-bg", y: yRail - 10, height: 20, width: 236, fill: "#000" }, g);
+  el("text", { id: "tl-hint", y: yRail + 5, fill: cssVar("--key-y"), "font-size": 14, "font-weight": 700 }, g, "");      // shown until the slider is first used
 }
 
 function renderTimelineCursor() {
@@ -674,9 +730,12 @@ function renderTimelineCursor() {
   c.setAttribute("d", `M${xx},6V${yRail}`);
   svg.querySelector("#tl-cursor-top").setAttribute("d", `M${xx - 5},0H${xx + 5}L${xx},7Z`);
   // handle: "◀ +9D 00H ▶", kept inside the chart at both ends
-  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 7.6 + 16, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
+  const label = `◀ ${h ? "+" + fmtT(h) : "LANDING"} ▶`, bw = label.length * 8.8 + 18, bx = Math.max(TL.left, Math.min(W - TL.right - bw, xx - bw / 2));
   const box = svg.querySelector("#tl-handle-box"), txt = svg.querySelector("#tl-handle-text");
   box.setAttribute("x", bx); box.setAttribute("width", bw); txt.setAttribute("x", bx + bw / 2); txt.textContent = label;
+  const hint = svg.querySelector("#tl-hint"), right = bx + bw + 250 < W;      // the pointer to the handle sits on whichever side has room
+  svg.querySelector("#tl-hint-bg").setAttribute("x", right ? bx + bw + 4 : bx - 240);
+  hint.setAttribute("x", right ? bx + bw + 10 : bx - 10); hint.setAttribute("text-anchor", right ? "start" : "end"); hint.textContent = right ? "◀◀ DRAG THIS ALONG THE BAR" : "DRAG THIS ALONG THE BAR ▶▶";
 }
 
 function scrubFromEvent(e) {
@@ -780,15 +839,66 @@ function showScreen(name) {
 // The lower chart shows one thing at a time: the MISSION PLAN (30 days after landing, with the slider) or MISSION WINDOWS
 // (the 12-month landing-day strip). The room this saves goes to the skyline picture.
 function showPlan(which) {
-  const plan = which !== "days";
-  $("timeline").toggleAttribute("hidden", !plan); $("plan-title-a").hidden = !plan;
-  $("calendar").toggleAttribute("hidden", plan); $("cal-title").hidden = plan;
-  $("tab-plan").classList.toggle("on", plan); $("tab-days").classList.toggle("on", !plan);
+  for (const [name, svg, title, tab] of [["plan", "timeline", "plan-title-a", "tab-plan"], ["ops", "ops", "ops-title", "tab-ops"], ["days", "calendar", "cal-title", "tab-days"]]) {
+    const on = name === (which === "days" || which === "ops" ? which : "plan");
+    $(svg).toggleAttribute("hidden", !on); $(title).hidden = !on; $(tab).classList.toggle("on", on);
+  }
   relayout();
 }
 
+// ---------- operations plan ----------
+// The mission, stretch by stretch: what the Sun and Earth allow, in order. It is a reading of LUNI's own hourly
+// answers (Sun up, Earth in view, eclipse), not a flight schedule: nothing here knows what the lander has to do.
+const OPS = {
+  both:  { name: "POWER + LINK", long: "SUN UP AND EARTH IN VIEW: POWER AND A LINK TO EARTH", fill: "#e9eef5", ink: "#06101f" },
+  sun:   { name: "POWER, NO LINK", long: "SUN UP, EARTH HIDDEN: POWER, BUT NO LINK TO EARTH", fill: "#21e07a", ink: "#04210f" },
+  earth: { name: "BATTERY, LINK", long: "NO SUN, EARTH IN VIEW: ON BATTERY, WITH A LINK", fill: "#1f8f9c", ink: "#fff" },
+  dark:  { name: "BATTERY, NO LINK", long: "NO SUN AND NO EARTH: ON BATTERY, NO LINK", fill: "#2b3340", ink: "#dfe6ee" },
+  ecl:   { name: "ECLIPSE", long: "ECLIPSE: EARTH IS IN FRONT OF THE SUN, ON BATTERY", fill: "#ffd23c", ink: "#1a1300" },
+};
+function opsStretches() {
+  const { samples } = state.scenario, n = Math.min(samples.length, state.req.days * 24 / STEP_HOURS), out = [];
+  const kind = (s) => (!s.sunUp && s.eclipse > 0.05 && s.sunTerrain > 0 ? "ecl" : s.sunUp ? (s.earthUp ? "both" : "sun") : s.earthUp ? "earth" : "dark");
+  for (let i = 0; i < n;) { const k = kind(samples[i]); let j = i; while (j < n && kind(samples[j]) === k) j++; out.push({ k, i, j }); i = j; }
+  return { list: out, n };
+}
+function renderOps() {
+  const svg = $("ops"); if (svg.hasAttribute("hidden")) return;
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 128, L = 4, R = 4;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.replaceChildren();
+  const { samples } = state.scenario, { list, n } = opsStretches(), w = (W - L - R) / n, y0 = 30, bh = 46;
+  const hrs = {}, noSun = list.filter((s) => s.k !== "both" && s.k !== "sun");
+  for (const s of list) hrs[s.k] = (hrs[s.k] || 0) + (s.j - s.i) * STEP_HOURS;
+  let longest = 0, run = 0; for (let i = 0; i < n; i++) { run = samples[i].sunUp ? 0 : run + STEP_HOURS; longest = Math.max(longest, run); }
+  const total = n * STEP_HOURS, share = (k) => Math.round((hrs[k] || 0) / total * 100);
+  const slim = W < 620;                              // phones: the short forms
+  el("text", { x: L, y: 15, fill: C.wht, "font-size": slim ? 12.5 : 13.5, "font-weight": 600 }, svg,
+    `${slim ? "BOTH" : "POWER + LINK"} ${share("both")}% · ${slim ? "POWER" : "POWER ONLY"} ${share("sun")}% · BATTERY ${100 - share("both") - share("sun")}%` + (noSun.length && !slim ? ` · LONGEST WITHOUT SUN ${fmtDH(longest)} (YOUR LIMIT ${state.req.maxDarkH} H)` : ""));
+  for (const s of list) {
+    const o = OPS[s.k], x = L + s.i * w, bw = Math.max(1.5, (s.j - s.i) * w - 1), dur = fmtDH((s.j - s.i) * STEP_HOURS);
+    const g = el("g", { class: "ops-b", "data-i": s.i }, svg);
+    el("rect", { x, y: y0, width: bw, height: bh, fill: o.fill, stroke: "#000", "stroke-width": 1 }, g);
+    el("title", {}, g, `${o.long}\n${stamp(samples[s.i].t)} TO ${stamp(samples[Math.min(samples.length - 1, s.j)].t)} · ${dur}`);
+    if (bw > o.name.length * 8.2 + 8) { el("text", { x: x + bw / 2, y: y0 + 20, fill: o.ink, "font-size": 13.5, "font-weight": 700, "text-anchor": "middle" }, g, o.name); el("text", { x: x + bw / 2, y: y0 + 37, fill: o.ink, "font-size": 13, "text-anchor": "middle" }, g, dur); }
+    else if (bw > dur.length * 8 + 6) el("text", { x: x + bw / 2, y: y0 + 29, fill: o.ink, "font-size": 13, "font-weight": 700, "text-anchor": "middle" }, g, dur);
+  }
+  const every = state.req.days <= 7 ? 1 : state.req.days <= 14 ? 2 : 7;
+  for (let d = 0; d <= state.req.days; d += every) {
+    const i = Math.min(n, d * 24 / STEP_HOURS), xx = L + i * w, t = samples[Math.min(samples.length - 1, i)].t;
+    el("line", { x1: xx, x2: xx, y1: y0 + bh, y2: y0 + bh + 5, stroke: C.dim, "stroke-width": 1 }, svg);
+    el("text", { x: xx, y: y0 + bh + 18, fill: C.dim, "font-size": 12.5, "text-anchor": d === 0 ? "start" : d + every > state.req.days ? "end" : "middle" }, svg, !d ? "LANDING" : slim ? `+${d}D` : `+${d}D · ${pad(t.getUTCDate())} ${MONTHS[t.getUTCMonth()]}`);
+  }
+  // the stretch the mission clock stands in
+  const cur = list.find((s) => state.idx >= s.i && state.idx < s.j);
+  if (state.idx < n) { const xx = L + (state.idx + 0.5) * w; el("path", { d: `M${xx},${y0 - 5}V${y0 + bh + 3}`, stroke: C.amb, "stroke-width": 2 }, svg); el("path", { d: `M${xx - 5},${y0 - 9}H${xx + 5}L${xx},${y0 - 2}Z`, fill: C.amb }, svg); }
+  const until = cur && samples[Math.min(samples.length - 1, cur.j)].t;
+  el("text", { x: L, y: H - 6, fill: C.amb, "font-size": slim ? 12.5 : 13 }, svg, !cur ? "THE CLOCK IS PAST THE END OF THE MISSION"
+    : slim ? `NOW: ${OPS[cur.k].name} · UNTIL ${dayStamp(until)}` : `AT THE MISSION CLOCK: ${OPS[cur.k].name} · FROM ${stamp(samples[cur.i].t)} UNTIL ${stamp(until)}`);
+}
+
 // Redraw everything whose size depends on the layout (after the window, the test bar or the story strip changes).
-function relayout() { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); }
+let tourPrepare = () => {};
+function relayout() { fitStage(); renderTimeline(); renderOps(); updateCalendar(); renderMoment(); }
 
 // ---------- share link ----------
 const PUBLIC_URL = "https://galileoleosolis.github.io/LUNI/";      // the preview page has no address of its own to share
@@ -833,7 +943,8 @@ async function init() {
   });
 
   // Screens: MAIN, MOON MAP (the Moon made big, with data layers) and MISSION HISTORY. One at a time.
-  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon }, onClose: () => showScreen("main"),
+  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon, stamp }, onClose: () => showScreen("main"),
+    getNow: () => state.scenario?.samples[state.idx],
     onUseMix: () => { showScreen("main"); scan.useMix(); } });
   $("globe-big").addEventListener("click", () => showScreen(moonmap.isOpen() ? "main" : "moon"));
   for (const [id, name] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).addEventListener("click", () => showScreen(name));
@@ -843,6 +954,7 @@ async function init() {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90) return;
     selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon });
   };
+  $("coord-go").addEventListener("click", onCoord);
   $("lat-input").addEventListener("change", onCoord);
   $("lon-input").addEventListener("change", onCoord);
 
@@ -854,10 +966,32 @@ async function init() {
   $("share-btn").addEventListener("click", shareLink);
   $("tab-plan").addEventListener("click", () => showPlan("plan"));
   $("tab-days").addEventListener("click", () => showPlan("days"));
+  $("tab-ops").addEventListener("click", () => showPlan("ops"));
+  $("ops").addEventListener("click", (e) => { const g = e.target.closest(".ops-b"); if (g) setIdx(+g.dataset.i); });
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
+  $("tools-btn").addEventListener("click", () => setTools(document.documentElement.classList.contains("simple")));
+  $("needs-more").addEventListener("click", () => openNeeds(!document.querySelector(".needs").classList.contains("open")));
+  openNeeds(document.querySelector(".needs").classList.contains("open"));
+  { let all = /^#test-[a-d]\b/.test(location.hash) || !!globalThis.LUNO_ALL_TOOLS;      // the older test sets use every key
+    try { all ||= localStorage.getItem("luno-view") === "all"; } catch {}
+    setTools(all, false); }
+  // The left side (site, time, needs) pops in and out; the answer and charts take the freed room.
+  const setSetup = (show) => {
+    document.querySelector(".cols").classList.toggle("setup-off", !show);
+    $("setup-tab").textContent = show ? "◀ HIDE" : "▶ SHOW SITE · TIME · NEEDS";
+    requestAnimationFrame(relayout);
+  };
+  $("setup-tab").addEventListener("click", () => setSetup(document.querySelector(".cols").classList.contains("setup-off")));
+  // Before each tutorial card: the main screen with nothing open over it, so the part being explained is in view.
+  tourPrepare = () => {
+    showScreen("main"); if (document.querySelector(".cols").classList.contains("setup-off")) setSetup(true);
+    if (scan.isOpen()) scan.toggle(false); if (proof.isOpen()) proof.toggle(false); if (surface.isOpen()) surface.toggle(false); if (comms.isOpen()) comms.toggle(false);
+    setMore(false); showPlan("plan");
+  };
+  setSetup(true);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
     getContext: () => ({ site: state.site, t0: state.t0, req: state.req, terrain: state.scenario.terrain }),
@@ -937,9 +1071,10 @@ async function init() {
   const testing = initTestMode({
     snapshot: () => ({ site: state.site, t0: state.t0, req: state.req, missionOk: state.cal.a.at(calIdx()).ok }),
     relayout,
-    onExplore: () => startGuide({ zoomOf }),
+    onExplore: () => startGuide({ prepare: tourPrepare }),
   });
-  if (!testing) startGuide({ zoomOf, force: !!globalThis.LUNO_GUIDE });
+  if (!testing) startGuide({ prepare: tourPrepare, force: !!globalThis.LUNO_GUIDE });
+  $("tour-btn").addEventListener("click", () => startGuide({ prepare: tourPrepare, force: true }));
   document.fonts?.ready.then(relayout);
 }
 

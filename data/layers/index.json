@@ -1,10 +1,11 @@
 {
- "_about": "South polar map layers computed by tools/build_layers.py from LRO LOLA elevation (ldem_60s_240m, NASA PDS) and NASA NAIF SPICE DE440 positions (data/ephem.bin). North-up south polar stereographic grid, pole in the middle, x toward longitude 90E, y toward longitude 0. Values: sun / earth 0..200 = 0..100 % of the time, shadow 1 = no part of the Sun seen at any checked moment; 255 = outside the region.",
+ "_about": "Map layers computed by tools/build_layers.py (polar, sp and np) and build_layers_global.py (gl) from LRO LOLA elevation (NASA PDS) and NASA NAIF SPICE DE440 positions (data/ephem.bin); temperatures re-gridded from LRO Diviner by build_temperature.py. Polar grids: north-up polar stereographic, pole in the middle, x toward longitude 90E; y toward longitude 0 on the south grid and away from it on the north grid. sun / earth 0..200 = 0..100 % of the time; shadow 1 = no part of the Sun seen at any checked moment; slope in tenths of a degree; 255 = no data.",
  "sp": {
   "kind": "polar_south",
   "n": 1268,
   "scale_m": 480.0,
   "min_lat": -80.0,
+  "y_sign": 1.0,
   "mast_m": 2.0,
   "directions": 72,
   "reach_km": 200.0,
@@ -17,7 +18,8 @@
    "earth": "sp_earth.u8.gz",
    "shadow": "sp_shadow.u8.gz",
    "tavg": "sp_tavg.u8.gz",
-   "tmax": "sp_tmax.u8.gz"
+   "tmax": "sp_tmax.u8.gz",
+   "slope": "sp_slope.u8.gz"
   },
   "stats": {
    "sun_mean_pct": 26.3,
@@ -35,6 +37,83 @@
    "max_k": [
     26.9,
     347.6
+   ],
+   "no_data_squares": 0
+  }
+ },
+ "gl": {
+  "files": {
+   "tavg": "gl_tavg.u8.gz",
+   "tmax": "gl_tmax.u8.gz",
+   "sun": "gl_sun.u8.gz",
+   "earth": "gl_earth.u8.gz"
+  },
+  "temperature": {
+   "source": "LRO Diviner Global Cumulative Products V1.0 (Williams et al. 2017; LRO-L-DLRE-5-GCP-V1.0, NASA PDS)",
+   "rows": 360,
+   "cols": 720,
+   "ppd": 2,
+   "lon0": -180,
+   "unit": "value * 2 = kelvin",
+   "equator_avg_k": 217.1,
+   "equator_max_k": 392.3,
+   "avg_k": [
+    40.2,
+    230.8
+   ],
+   "squares_filled_from_neighbors": 0,
+   "squares_total": 259200
+  },
+  "kind": "cylindrical",
+  "rows": 720,
+  "cols": 1440,
+  "ppd": 4,
+  "lon0": -180,
+  "mast_m": 2.0,
+  "directions": 24,
+  "reach_km": 150.0,
+  "step_hours": 12,
+  "moments": 9497,
+  "years": "2023 to 2035",
+  "source_map": "ldem_16 (1.9 km)"
+ },
+ "np": {
+  "kind": "polar_north",
+  "n": 1268,
+  "scale_m": 480.0,
+  "min_lat": 80.0,
+  "y_sign": -1.0,
+  "mast_m": 2.0,
+  "directions": 72,
+  "reach_km": 200.0,
+  "step_hours": 6,
+  "moments": 18993,
+  "from_utc": "2023-01-01T00:00:00Z",
+  "years": "2023 to 2035",
+  "files": {
+   "sun": "np_sun.u8.gz",
+   "earth": "np_earth.u8.gz",
+   "shadow": "np_shadow.u8.gz",
+   "slope": "np_slope.u8.gz",
+   "tavg": "np_tavg.u8.gz",
+   "tmax": "np_tmax.u8.gz"
+  },
+  "stats": {
+   "sun_mean_pct": 26.9,
+   "sun_max_pct": 62.1,
+   "shadow_share_pct": 5.17,
+   "earth_mean_pct": 28.6
+  },
+  "temperature": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018)",
+   "unit": "value * 2 = kelvin",
+   "avg_k": [
+    24.5,
+    206.6
+   ],
+   "max_k": [
+    24.3,
+    353.7
    ],
    "no_data_squares": 0
   }

@@ -49,7 +49,7 @@ export const TOOLS = [
   { name: "pin", description: "Pin the current site and landing time to the compare list.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "report", description: "Read out LUNI's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, versus (this site next to a place on Earth), help.",
-    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "versus", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
+    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "versus", "help", "who", "joke"] } }, required: ["topic"], additionalProperties: false } },
 ];
 
 // ---------- understanding a sentence ----------
@@ -116,6 +116,7 @@ export function parse(text, sites = []) {
   let m;
 
   if (/^ (help|commands|examples|what can (i|you|we) (say|do|ask)|what do you (do|understand)) /.test(t)) return [{ tool: "report", input: { topic: "help" } }];
+  if (/\b(?:joke|make me laugh|something funny)\b/.test(t)) return [{ tool: "report", input: { topic: "joke" } }];
   if (/^ (who|what) are you |^ what(?: is| s| does) (?:your name|luni|luno)(?: stand for| mean)? |^ (?:your )?name /.test(t)) return [{ tool: "report", input: { topic: "who" } }];
 
   // --- where ---
@@ -199,7 +200,7 @@ export function parse(text, sites = []) {
   else if (take(/\b(?:moon map|big moon|map layers?|layers)\b/)) call("open_view", { view: "moon" });
   else if (take(/\b(?:mission )?history\b|\b(?:past|previous|earlier|real|old) (?:missions?|landings?)\b/)) call("open_view", { view: "history" });
   else if (take(/\b(?:proof|prove it|how accurate|accuracy|can (?:i|we) trust|how do (?:you|we|i) know)\b/)) call("open_view", { view: "proof" });
-  else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b/)) call("open_view", { view: "scan" });
+  else if (take(/\b(?:better|best|nearby|another|different) (?:spot|place|point|location)\b|\b(?:area )?scan\b|\bsearch (?:the )?(?:area|nearby)\b|\blook nearby\b|\bfind a better\b|\b(?:best )?site finder\b|\bbest site\b/)) call("open_view", { view: "scan" });
   else if (take(/\b(?:surface|3d|3 d|first person|look around|ground view|stand on)\b/)) call("open_view", { view: "surface" });
   if (take(/\b(?:share|copy|send)\b[a-z ]{0,15}\b(?:link|address|url)\b|\bshare (?:this|it)\b/)) call("share_link");
   if (take(/\b(?:pin|bookmark|save this|remember this|keep this)\b/)) call("pin");
@@ -279,7 +280,7 @@ export function createAssistant(api) {
     let out = `${s.siteName}, at ${fmtLat(s.site.lat)}, ${fmtLon(s.site.lon)}.`;
     const tr = s.terrain;
     if (tr.real) out += ` Ground height ${tr.heightM < 0 ? "−" : "+"}${Math.abs(Math.round(tr.heightM))} m, slope ${tr.slopeDeg.toFixed(1)}°, from NASA's LOLA elevation maps${tr.reduced ? " (reduced detail)" : ""}.`;
-    else out += s.terrainBusy ? " The skyline is still being worked out." : " No terrain loaded: flat horizon.";
+    else out += s.terrainBusy ? " The skyline is still being calculated." : " No terrain loaded: flat horizon.";
     return out;
   }
   const needsText = (s = snap()) => `Mission needs: ${s.req.days} days long; can sit ${s.req.maxDarkH} hours in the dark; Earth link at landing ${s.req.earthAtLanding ? "required" : "not required"}; Earth in view for ${s.req.earthMinPct ? `at least ${s.req.earthMinPct}%` : "any share"} of the mission; ground slope ${s.req.maxSlopeDeg ? `at most ${s.req.maxSlopeDeg}°` : "any"}.`;
@@ -289,8 +290,14 @@ export function createAssistant(api) {
     return "Ways to get a GO: " + s.options.map((o, i) => `${i + 1}: ${o.toLowerCase()}`).join(". ") + `. Say OPTION ${s.options.map((_, i) => i + 1).join(" or ")}.`;
   }
   const cap = (t) => t.charAt(0) + t.slice(1).toLowerCase();
+  let jokeAt = 0;
+  const JOKES = [
+    "I only know true ones. My skyline is real NASA data; my lander is, as the screen admits, illustrative.",
+    "A day here lasts about a month. Nobody on the Moon has ever said: see you tomorrow.",
+    "I would tell you a joke about the far side, but there is no Earth link to deliver it.",
+  ];
   const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
-  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
+  const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT LANDING WINDOW. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BEST SITE FINDER. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
   const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
 
@@ -329,7 +336,7 @@ export function createAssistant(api) {
         return { say: `Landing moved ${dur(Math.abs(input.hours))} ${input.hours < 0 ? "earlier" : "later"}, to ${stamp(snap().t0)}.`, changed: true };
       }
       case "next_good_time": {
-        if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Relax a mission need or try another site." };
+        if (!s.next) return { say: "There is no later good landing time in the 12 months shown. Change a mission need or try another site." };
         api.setT0(s.next);
         return { say: `Landing moved to the next good time, ${stamp(s.next)}.`, changed: true };
       }
@@ -358,7 +365,7 @@ export function createAssistant(api) {
         return { say: "", clock: true };
       }
       case "open_view": {
-        if (input.view === "scan") { api.openScan(true); return { say: "Scanning the ground around this site for a better spot. Bright cells are better. When it finishes, say MOVE TO THE BEST POINT." }; }
+        if (input.view === "scan") { api.openScan(true); return { say: "Best Site Finder: scanning the ground around this site. Green squares meet the mission needs. When it finishes, say MOVE TO THE BEST POINT." }; }
         if (input.view === "surface") { api.openSurface(true); return { say: "Opening the 3D view from the surface. Say CLOSE to come back." }; }
         if (input.view === "proof") { api.openProof(true); return { say: "Opening the proof: LUNI against NASA's own calculator, three real landings replayed, and what LUNI does not know. Say CLOSE to come back." }; }
         if (input.view === "moon") { api.openMoonMap(true, input.layer); return { say: input.layer ? "Opening the Moon map with that layer on it. Say CLOSE to come back." : "Opening the Moon map. Pick a layer on the right, or say, for example, SUNLIGHT LAYER. Say CLOSE to come back." }; }
@@ -372,12 +379,12 @@ export function createAssistant(api) {
         const o = s.options[input.number - 1];
         if (!o) return { say: optionsText(s) };
         api.takeOption(input.number - 1);
-        return /BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
+        return /BEST SITE FINDER|BETTER SPOT/.test(o) ? { say: "Scanning the ground around this site for a better spot." } : { say: `Done: ${o.toLowerCase()}.`, changed: true };
       }
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };
       case "report":
-        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO,
+        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO, joke: () => JOKES[jokeAt++ % JOKES.length],
           versus: () => { const v = api.versus(); return `${s.siteName} next to a place on Earth's equator. ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
           eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),

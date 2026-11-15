@@ -3,7 +3,7 @@
 // still picks a landing site.
 import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
 
-export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
+export function createMoonMap({ globe, getSite, getNow, fmt, onClose, onUseMix }) {
   const $ = (id) => document.getElementById(id), box = $("moonmap");
   const wrap = document.querySelector(".globe-wrap"), home = wrap.parentElement, homeNext = wrap.nextElementSibling;
   let current = "none", strength = 0.8, job = 0, hover = null, profJob = 0;
@@ -11,9 +11,9 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
 
   async function pictures(id) {
     if (cache[id]) return cache[id];
-    const L = layer(id), out = {};
-    if (!L.polar) out.global = await globalCanvas(id);
-    out.polar = await polarCanvas(id).catch((e) => { console.warn("south polar layer unavailable:", e); return null; });
+    const out = {}, quiet = (what) => (e) => { console.warn(what + " unavailable:", e); return null; };
+    out.global = await globalCanvas(id).catch(quiet("whole-Moon layer"));
+    out.polar = [await polarCanvas(id, "sp").catch(quiet("south polar layer")), await polarCanvas(id, "np").catch(quiet("north polar layer"))];
     return (cache[id] = out);
   }
 
@@ -33,7 +33,8 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
       if (mine !== job) return;
       globe?.setOverlay(pics, strength);
       $("mm-status").hidden = true;
-      if (L.polar) { if (!pics.polar) { $("mm-status").hidden = false; $("mm-status").textContent = "THIS LAYER'S DATA DID NOT LOAD."; } else globe?.lookAt(-86, 0, 1.75); }
+      if (!pics.global && !pics.polar.some(Boolean)) { $("mm-status").hidden = false; $("mm-status").textContent = "THIS LAYER'S DATA DID NOT LOAD."; }
+      else if (L.capsOnly) globe?.lookAt(-86, 0, 1.75);      // a layer that only exists at the poles: go and look at one
     } catch (e) { console.error(e); if (mine === job) $("mm-status").textContent = "THIS LAYER COULD NOT BE DRAWN."; }
   }
 
@@ -44,7 +45,11 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
       const rows = await profileAt(p.lat, p.lon);
       if (mine !== profJob) return;
       $("mm-prof-where").innerHTML = hover ? `UNDER THE POINTER · ${fmt.lat(p.lat)} ${fmt.lon(p.lon)} · <b class="h-do">CLICK TO LAND THERE</b>` : `THE LANDING SITE · ${fmt.site(site)} · ${fmt.lat(p.lat)} ${fmt.lon(p.lon)}`;
-      $("mm-profile").innerHTML = profileHtml(rows);
+      // For the landing site: the moment on the mission clock first, then the long-term values, so "dark right now"
+      // and "permanent shadow" cannot be mixed up (a tester could not tell them apart).
+      const now = hover ? null : getNow?.(), on = (ok, yes, no) => ({ text: ok ? yes : no, score: ok ? 1 : 0, share: 1, rgb: ok ? [34, 208, 112] : [176, 22, 36], note: "" });
+      const first = now ? [{ head: `RIGHT NOW · ${fmt.stamp(now.t)}` }, { label: "SUN RIGHT NOW", ...on(now.sunUp, "UP", "DOWN") }, { label: "EARTH RIGHT NOW", ...on(now.earthUp, "IN VIEW", "HIDDEN") }] : [];
+      $("mm-profile").innerHTML = profileHtml([...first, { head: "ALL YEARS, 2023 TO 2035 (NOT THIS MOMENT)" }, ...rows]);
     } catch (e) { console.error(e); }
   }
   let raf = 0;
@@ -55,7 +60,7 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
     const b = document.createElement("button"); b.dataset.id = id; b.innerHTML = `<b>${label}</b><small>${where}</small>`;
     b.addEventListener("click", () => setLayer(id)); $("mm-layers").appendChild(b);
   }
-  for (const [label, go] of [["THE SITE", () => { const s = getSite(); globe?.lookAt(s.lat, s.lon, 2.4); }], ["SOUTH POLE", () => globe?.lookAt(-86, 0, 1.75)],
+  for (const [label, go] of [["THE SITE", () => { const s = getSite(); globe?.lookAt(s.lat, s.lon, 2.4); }], ["SOUTH POLE", () => globe?.lookAt(-86, 0, 1.75)], ["NORTH POLE", () => globe?.lookAt(86, 0, 1.75)],
                              ["NEAR SIDE", () => globe?.lookAt(0, 0, 4.4)], ["FAR SIDE", () => globe?.lookAt(0, 180, 4.4)]]) {
     const b = document.createElement("button"); b.textContent = label; b.addEventListener("click", go); $("mm-view").appendChild(b);
   }
@@ -72,6 +77,7 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
   $("mm-strength").addEventListener("input", (e) => { strength = +e.target.value / 100; globe?.setOverlayOpacity(strength); });
   $("mm-close").addEventListener("click", () => onClose());
   window.addEventListener("luno:state", schedule);
+  window.addEventListener("luno:clock", schedule);
 
   function toggle(show = box.hidden) {
     if (show === !box.hidden) return;

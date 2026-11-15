@@ -19,6 +19,7 @@ expect("Hey LUNI, select the Malapert Massif please.", [site("malapert")]);
 expect("Luni, go to Haworth", [site("haworth")]);
 expect("looney next good time", [["next_good_time", {}]]);
 expect("who are you", [rep("who")]);
+expect("tell me a joke", [rep("joke")]);
 expect("what does LUNI stand for", [rep("who")]);
 expect("show me malapert a", [site("im1")]);
 expect("im-2", [site("im2")]);

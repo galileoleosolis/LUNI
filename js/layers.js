@@ -1,8 +1,9 @@
 // Map layers: what each one shows, where its data comes from, how a value is colored, and whether it is good or bad
 // for a lander. One definition, used by the MOON MAP screen, the scan map and the data profile card.
 //   elevation, slope            from the reduced LOLA elevation maps LUNI already carries (data/dem), whole Moon
-//   sunlight, Earth, shadow     from data/layers (tools/build_layers.py: LOLA skylines against SPICE positions,
-//                               every 6 hours over 2023 to 2035), south of 80S only
+//   sunlight, Earth, shadow     from data/layers (tools/build_layers.py and build_layers_global.py: LOLA skylines against
+//                               SPICE positions over 2023 to 2035): fine at both poles, coarse for the whole Moon
+//   temperature                 NASA Diviner values, re-gridded (tools/build_temperature*.py)
 import { getGrid, mapsFor, slopeAt } from "./terrain.js";
 import { fetchBytes, gunzip } from "./bin.js";
 
@@ -33,29 +34,29 @@ export const LAYERS = [
     color: (v) => goodColor(1 - v / 20), score: (v) => 1 - clamp01(v / 20), text: (v) => `${v.toFixed(1)}°`,
     ends: ["STEEP = BAD", "FLAT = GOOD"], scale: ["20° OR MORE", "0°"],
     meaning: "FLAT GROUND IS SAFER TO LAND ON. THE COLORS RUN FROM 0° (GREEN) TO 20° AND MORE (RED): A SCALE FOR THE EYE, NOT A SAFETY LIMIT.",
-    source: "WORKED OUT BY LUNI FROM THE NASA LRO LOLA ELEVATION MAPS, ACROSS TWO MAP PIXELS: 480 M NEAR THE SOUTH POLE, 7.6 KM ON THE WHOLE-MOON MAP." },
-  { id: "sun", label: "SUNLIGHT", where: "SOUTH POLE", polar: true, lo: 0, hi: 100,
+    source: "CALCULATED BY LUNI FROM THE NASA LRO LOLA ELEVATION MAPS, ACROSS TWO MAP PIXELS: 480 M POLEWARD OF 80°, 7.6 KM ON THE WHOLE-MOON MAP." },
+  { id: "sun", label: "SUNLIGHT", where: "WHOLE MOON", polar: true, lo: 0, hi: 100,
     color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "SUNLIGHT 2023–35", brief: (v) => `${Math.round(v)}%`,
     ends: ["RARELY SUNLIT = BAD", "MOSTLY SUNLIT = GOOD"], scale: ["0%", "100%"],
-    meaning: "HOW MUCH OF THE TIME A SOLAR PANEL HERE WOULD HAVE THE SUN, COUNTED OVER ALL OF 2023 TO 2035. ONE MAP SQUARE IS 480 M: THE BEST-LIT RIDGE TOPS ARE NARROWER, SO THEY READ LOWER HERE THAN ON THE MAIN SCREEN (SHACKLETON RIDGE: 63% HERE, 79% THERE).",
-    source: "WORKED OUT BY LUNI: THE SUN'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, EVERY 6 HOURS FROM 2023 TO 2035, 2 M ABOVE THE GROUND." },
-  { id: "earth", label: "EARTH LINK", where: "SOUTH POLE", polar: true, lo: 0, hi: 100,
+    meaning: "HOW MUCH OF THE TIME A SOLAR PANEL HERE WOULD HAVE THE SUN, COUNTED OVER ALL OF 2023 TO 2035. AWAY FROM THE POLES IT IS CLOSE TO HALF THE TIME EVERYWHERE; NEAR THE POLES IT RUNS FROM NEVER TO ALMOST ALWAYS. THE BEST-LIT RIDGE TOPS ARE NARROWER THAN A MAP SQUARE, SO THEY READ LOWER HERE THAN ON THE MAIN SCREEN (SHACKLETON RIDGE: 63% HERE, 79% THERE).",
+    source: "CALCULATED BY LUNI: THE SUN'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, 2023 TO 2035, 2 M ABOVE THE GROUND. POLEWARD OF 80°: 480 M SQUARES FROM THE 240 M MAP, CHECKED EVERY 6 HOURS. ELSEWHERE: QUARTER-DEGREE SQUARES (ABOUT 7.6 KM) FROM THE 1.9 KM MAP, EVERY 12 HOURS." },
+  { id: "earth", label: "EARTH LINK", where: "WHOLE MOON", polar: true, lo: 0, hi: 100,
     color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "EARTH LINK 2023–35", brief: (v) => `${Math.round(v)}%`,
     ends: ["EARTH RARELY IN VIEW = BAD", "EARTH MOSTLY IN VIEW = GOOD"], scale: ["0%", "100%"],
-    meaning: "HOW MUCH OF THE TIME EARTH IS ABOVE THE SKYLINE, SO A LANDER CAN TALK TO IT DIRECTLY, COUNTED OVER ALL OF 2023 TO 2035.",
-    source: "WORKED OUT BY LUNI: EARTH'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, EVERY 6 HOURS FROM 2023 TO 2035." },
-  { id: "shadow", label: "PERMANENT SHADOW", short: "SHADOW", where: "SOUTH POLE", polar: true, binary: true,
-    color: (v) => (v ? SHADOW_RGB : null), score: (v) => (v ? 0 : 1), text: (v) => (v ? "YES: NEVER SUNLIT" : "NO: SUNLIT AT TIMES"), brief: (v) => (v ? "YES" : "NO"),
-    ends: ["", "PURPLE = NEVER ANY SUNLIGHT"], scale: ["", ""],
-    meaning: "NO SOLAR POWER HERE AT ANY TIME. MISSIONS STILL WANT TO LAND NEAR THESE PLACES, BECAUSE WATER ICE CAN LAST IN THEM.",
-    source: "WORKED OUT BY LUNI: PLACES WHERE NO PART OF THE SUN'S DISC CLEARS THE SKYLINE (NASA LRO LOLA ELEVATION) AT ANY CHECKED MOMENT FROM 2023 TO 2035 (NASA NAIF SPICE). THE MOON'S FULL 18.6-YEAR CYCLE IS NOT COVERED." },
-  { id: "temp", label: "TEMPERATURE", where: "SOUTH POLE", polar: true, lo: 30, hi: 280, card: "TEMPERATURE, AVERAGE",
-    color: (v) => ramp(TEMP_RAMP, (v - 30) / 250), score: null, text: (v) => `${celsius(v)} (${Math.round(v)} K)`,
+    meaning: "HOW MUCH OF THE TIME EARTH IS ABOVE THE SKYLINE, SO A LANDER CAN TALK TO IT DIRECTLY, COUNTED OVER ALL OF 2023 TO 2035. THE NEAR SIDE ALWAYS SEES EARTH AND THE FAR SIDE NEVER DOES; IN BETWEEN, AND AT THE POLES, IT COMES AND GOES.",
+    source: "CALCULATED BY LUNI: EARTH'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, 2023 TO 2035. POLEWARD OF 80°: 480 M SQUARES, EVERY 6 HOURS. ELSEWHERE: QUARTER-DEGREE SQUARES (ABOUT 7.6 KM), EVERY 12 HOURS." },
+  { id: "shadow", label: "PERMANENT SHADOW", short: "NEVER SUNLIT", where: "BOTH POLES", polar: true, binary: true, capsOnly: true,
+    color: (v) => (v ? SHADOW_RGB : null), score: (v) => (v ? 0 : 1), text: (v) => (v ? "YES: NEVER SUNLIT" : "NO: SUNLIT AT TIMES"), brief: (v) => (v ? "YES, ALWAYS" : "NO"),
+    ends: ["", "PURPLE = NEVER SUNLIT, IN ANY YEAR CHECKED"], scale: ["", ""],
+    meaning: "PERMANENT MEANS ALWAYS: THE SUN NEVER REACHES THESE PLACES AT ANY TIME FROM 2023 TO 2035. THAT IS NOT THE SAME AS DARK RIGHT NOW (EVERY PLACE IS DARK FOR PART OF EACH MONTH). NO SOLAR POWER HERE, EVER. MISSIONS STILL WANT TO LAND NEARBY, BECAUSE WATER ICE CAN LAST IN SUCH PLACES.",
+    source: "CALCULATED BY LUNI: PLACES WHERE NO PART OF THE SUN'S DISC CLEARS THE SKYLINE (NASA LRO LOLA ELEVATION) AT ANY CHECKED MOMENT FROM 2023 TO 2035 (NASA NAIF SPICE). THE MOON'S FULL 18.6-YEAR CYCLE IS NOT COVERED." },
+  { id: "temp", label: "TEMPERATURE", where: "WHOLE MOON", polar: true, lo: 30, hi: 280, card: "TEMPERATURE (AVG)",
+    color: (v) => ramp(TEMP_RAMP, (v - 30) / 250), score: null, text: (v) => `${celsius(v)} (${Math.round(v)} K)`, brief: (v) => celsius(v),
     ends: ["COLD", "WARM"], scale: ["−243 °C (30 K)", "+7 °C (280 K)"],
-    meaning: "THE GROUND'S AVERAGE TEMPERATURE OVER A YEAR. THE COLDEST PLACES ARE THE PERMANENT SHADOWS; COLD IS HARD ON A LANDER AND ITS BATTERIES. THE DATA PROFILE ALSO GIVES THE HOTTEST THE GROUND GETS.",
-    source: "NASA'S OWN NUMBERS, ONLY RE-GRIDDED BY LUNI: LRO DIVINER RADIOMETER, POLAR RESOURCE PRODUCT V2.0 (PAIGE ET AL., NASA PDS GEOSCIENCES NODE, 2018): ANNUAL AVERAGE AND ANNUAL MAXIMUM SURFACE TEMPERATURE FROM THERMAL MODELS FITTED TO DIVINER'S MEASUREMENTS." },
+    meaning: "THE GROUND'S AVERAGE TEMPERATURE. THE COLDEST PLACES ARE THE PERMANENT SHADOWS AT THE POLES; COLD IS HARD ON A LANDER AND ITS BATTERIES. THE DATA PROFILE ALSO GIVES THE HOTTEST THE GROUND GETS (ABOUT +120 °C AT THE EQUATOR).",
+    source: "NASA'S OWN NUMBERS, ONLY RE-GRIDDED BY LUNI, FROM THE LRO DIVINER RADIOMETER (NASA PDS GEOSCIENCES NODE). POLEWARD OF 80°: POLAR RESOURCE PRODUCT V2.0 (PAIGE ET AL., 2018), ANNUAL AVERAGE AND MAXIMUM FROM THERMAL MODELS FITTED TO THE MEASUREMENTS. ELSEWHERE: GLOBAL CUMULATIVE PRODUCTS V1.0 (WILLIAMS ET AL., 2017), MEASURED TEMPERATURES IN HALF-DEGREE SQUARES (ABOUT 15 KM), AVERAGED OVER THE LUNAR DAY (HOURS WITH NO MEASUREMENT ARE FILLED FROM THE HOURS BEFORE AND AFTER)." },
   // YOUR MIX: the layers above blended with weights you choose (see mixScore).
-  { id: "mix", label: "YOUR MIX", where: "SOUTH POLE", polar: true, mix: true, lo: 0, hi: 100,
+  { id: "mix", label: "YOUR MIX", where: "WHOLE MOON", polar: true, mix: true, lo: 0, hi: 100,
     color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)} OF 100`,
     ends: ["BAD", "GOOD"], scale: ["0", "100"],
     meaning: "ONE SCORE PER PLACE: EACH LAYER'S GOOD / BAD SCORE (0 TO 100) AVERAGED WITH THE WEIGHTS YOU SET BELOW. A WEIGHT OF 0 LEAVES A LAYER OUT.",
@@ -90,48 +91,59 @@ export function mixScore(values) {
 }
 export const mixText = () => MIX_PARTS.filter((p) => mix[p.id] > 0).map((p) => `${p.label} ×${mix[p.id]}`).join(" + ") || "NOTHING (ALL WEIGHTS ARE 0)";
 
-// ---------- the south polar layers ----------
-let polar = null, polarLoading = null;
-export function loadPolar(base = "data/layers/") {
-  return (polarLoading ||= (async () => {
-    const meta = (await fetch(base + "index.json").then((r) => r.json())).sp, out = { ...meta };
-    await Promise.all(Object.entries(meta.files).map(async ([k, f]) => { out[k] = new Uint8Array(await gunzip(await fetchBytes(base + f))); }));
-    return (polar = out);
+// ---------- the layer data ----------
+// Three sets, all listed in data/layers/index.json:
+//   sp, np   the polar caps (poleward of 80 degrees), 480 m squares: sun, earth, shadow, slope, tavg, tmax
+//   gl       the whole Moon, coarse: sun, earth (quarter-degree squares), tavg, tmax (half-degree squares)
+// A point inside a cap gets the cap's value; anywhere else, the whole-Moon value.
+let DATA = null, loading = null;
+export function loadLayers(base = "data/layers/") {
+  return (loading ||= (async () => {
+    const ix = await fetch(base + "index.json").then((r) => r.json()), out = {};
+    await Promise.all(["sp", "np", "gl"].filter((k) => ix[k]).map(async (k) => {
+      const set = (out[k] = { ...ix[k] });
+      await Promise.all(Object.entries(ix[k].files).map(async ([name, f]) => { set[name] = new Uint8Array(await gunzip(await fetchBytes(base + f))); }));
+    }));
+    return (DATA = out);
   })());
 }
-export function setPolar(p) { polar = p; polarLoading = Promise.resolve(p); }      // for tests
-export const polarMeta = () => polar;
-
-// Value of a south polar layer at a point: percent for sun / earth, 0 or 1 for shadow; null outside the region.
-export function polarValue(id, lat, lon) {
-  if (!polar || lat > polar.min_lat) return null;
-  const r = 2 * R * Math.tan((90 + lat) * DEG / 2), c = (polar.n - 1) / 2;
-  const col = Math.round(c + r * Math.sin(lon * DEG) / polar.scale_m), row = Math.round(c - r * Math.cos(lon * DEG) / polar.scale_m);
-  if (col < 0 || row < 0 || col >= polar.n || row >= polar.n) return null;
-  const i = row * polar.n + col;
-  if (id === "mix") {
-    const g = (k, f) => (polar[k] && polar[k][i] !== 255 ? polar[k][i] * f : null);
-    return polar.sun[i] === 255 ? null : mixScore({ sun: g("sun", 0.5), earth: g("earth", 0.5), temp: g("tavg", 2), slope: polarSlope ? polarSlope[i] / 10 : null });
-  }
-  const arr = polar[id === "temp" ? "tavg" : id];
+export const loadPolar = loadLayers;
+export function setLayers(d) { DATA = d; loading = Promise.resolve(d); }      // for tests
+export const polarMeta = () => DATA;                       // truthy once the layer data is in memory
+const capFor = (lat) => (DATA?.sp && lat <= DATA.sp.min_lat ? DATA.sp : DATA?.np && lat >= DATA.np.min_lat ? DATA.np : null);
+function capIndex(P, lat, lon) {
+  const r = 2 * R * Math.tan((90 - Math.abs(lat)) * DEG / 2), c = (P.n - 1) / 2, ys = P.y_sign ?? 1;
+  const col = Math.round(c + r * Math.sin(lon * DEG) / P.scale_m), row = Math.round(c - ys * r * Math.cos(lon * DEG) / P.scale_m);
+  return col < 0 || row < 0 || col >= P.n || row >= P.n ? -1 : row * P.n + col;
+}
+const glAt = (arr, ppd, lat, lon) => {
   if (!arr) return null;
-  const v = arr[i];
-  return v === 255 ? null : id === "shadow" ? v : id === "temp" || id === "tmax" ? v * 2 : v / 2;
-}
+  const rows = 180 * ppd, cols = 360 * ppd, row = Math.min(rows - 1, Math.max(0, Math.floor((90 - lat) * ppd))), col = Math.floor((((lon + 180) % 360) + 360) % 360 * ppd) % cols;
+  const v = arr[row * cols + col];
+  return v === 255 ? null : v;
+};
 
-// Slope (tenths of a degree, capped at 25.5) for every square of the polar grid, from the 240 m map: made once, for the mix.
-let polarSlope = null;
-export async function loadPolarSlope() {
-  if (polarSlope) return polarSlope;
-  const P = await loadPolar(), n = P.n, fine = await getGrid("sp_cap"), pr = (fine.rows - 1) / 2, pc = (fine.cols - 1) / 2, k = P.scale_m / fine.scale_m, c = (n - 1) / 2;
-  const out = new Uint8Array(n * n), h = (row, col) => fine.sample(pr + (row - c) * k, pc + (col - c) * k);
-  for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
-    if (P.sun[row * n + col] === 255) continue;
-    const v = Math.atan(Math.hypot(h(row, col + 0.5) - h(row, col - 0.5), h(row - 0.5, col) - h(row + 0.5, col)) / P.scale_m) / DEG;
-    out[row * n + col] = Number.isFinite(v) ? Math.min(255, Math.round(v * 10)) : 255;
+// A layer's value at a point: percent for sun / earth, 0 or 1 for shadow (caps only), kelvin for temp / tmax,
+// 0..100 for mix (slopeDeg: the ground slope there, needed for the mix outside the caps). null where there is no data.
+export function polarValue(id, lat, lon, slopeDeg = null) {
+  if (!DATA) return null;
+  const P = capFor(lat), i = P ? capIndex(P, lat, lon) : -1;
+  if (P && i >= 0 && P.sun[i] !== 255) {
+    const g = (k, f) => (P[k] && P[k][i] !== 255 ? P[k][i] * f : null);
+    if (id === "mix") return mixScore({ sun: g("sun", 0.5), earth: g("earth", 0.5), temp: g("tavg", 2), slope: g("slope", 0.1) ?? slopeDeg });
+    if (id === "shadow") return P.shadow[i];
+    return id === "temp" ? g("tavg", 2) : id === "tmax" ? g("tmax", 2) : g(id, id === "slope" ? 0.1 : 0.5);
   }
-  return (polarSlope = out);
+  const G = DATA.gl;
+  if (!G || id === "shadow" || id === "slope") return null;
+  const sun = glAt(G.sun, G.ppd, lat, lon), earth = glAt(G.earth, G.ppd, lat, lon), tp = G.temperature?.ppd || 2;
+  const half = (v) => (v == null ? null : v / 2), dbl = (v) => (v == null ? null : v * 2);
+  if (id === "mix") return mixScore({ sun: half(sun), earth: half(earth), temp: dbl(glAt(G.tavg, tp, lat, lon)), slope: slopeDeg });
+  return id === "sun" ? half(sun) : id === "earth" ? half(earth) : id === "temp" ? dbl(glAt(G.tavg, tp, lat, lon)) : id === "tmax" ? dbl(glAt(G.tmax, tp, lat, lon)) : null;
 }
+// How fine the sunlight / Earth / temperature layers are at a latitude, in words.
+export const detailAt = (lat) => (capFor(lat) ? "480 M SQUARES" : "7.6 KM SQUARES (15 KM FOR TEMPERATURE)");
+export async function loadPolarSlope() { return null; }      // kept for older callers: slope now comes with the cap data
 
 // ---------- the data profile of one point ----------
 // Every layer's value at (lat, lon): [{ id, label, text, score, rgb, note }]. Layers with no data there are listed
@@ -140,76 +152,95 @@ export async function profileAt(lat, lon) {
   const [near, far] = mapsFor(lat), best = await getGrid(near || far);
   let h = best.height(lat, lon), slope = slopeAt(best, lat, lon);
   if (!Number.isFinite(h)) { const g = await getGrid(far); h = g.height(lat, lon); slope = slopeAt(g, lat, lon); }
-  if (lat <= -79.5) { await loadPolar().catch(() => null); await loadPolarSlope().catch(() => null); }
+  await loadLayers().catch(() => null);
   const base = 2 * best.res;
   const rows = LAYERS.map((L) => {
-    const v = L.id === "elev" ? (Number.isFinite(h) ? h : null) : L.id === "slope" ? slope : polarValue(L.id, lat, lon);
-    if (v == null) return { id: L.id, label: L.card || L.label, text: null, score: null, rgb: null, note: L.polar ? "SOUTH OF 80°S ONLY" : "NO DATA" };
+    const v = L.id === "elev" ? (Number.isFinite(h) ? h : null) : L.id === "slope" ? slope : polarValue(L.id, lat, lon, slope);
+    if (v == null) return { id: L.id, label: L.card || L.label, text: null, score: null, rgb: null, note: L.capsOnly ? "POLES ONLY" : "NO DATA" };
     const score = L.score ? L.score(v) : null;
     return { id: L.id, label: L.id === "slope" ? `SLOPE OVER ${base >= 1000 ? (base / 1000).toFixed(1) + " KM" : base + " M"}` : L.card || L.label, value: v, text: (L.brief || L.text)(v), score, rgb: L.id === "shadow" ? (v ? SHADOW_RGB : GOOD_RAMP[2]) : L.color(v),
              share: L.binary ? 1 : clamp01((v - L.lo) / (L.hi - L.lo)), note: "" };
   });
   // the hottest the ground gets in a year, next to the average
   const hot = polarValue("tmax", lat, lon), at = rows.findIndex((r) => r.id === "temp"), T = layer("temp");
-  if (hot != null && at >= 0) rows.splice(at + 1, 0, { id: "tmax", label: "TEMPERATURE, HOTTEST", value: hot, text: T.text(hot), score: null, rgb: T.color(hot), share: clamp01((hot - T.lo) / (T.hi - T.lo)), note: "" });
+  if (hot != null && at >= 0) rows.splice(at + 1, 0, { id: "tmax", label: "TEMPERATURE (MAX)", value: hot, text: T.brief(hot), score: null, rgb: T.color(hot), share: clamp01((hot - T.lo) / (T.hi - T.lo)), note: "" });
   return rows;
 }
 
 // The card: one row per layer, a bar in the layer's own color, the number, and a GOOD / FAIR / BAD word where the layer has a say.
 export const verdictWord = (score) => (score == null ? "" : score >= 0.67 ? "GOOD" : score >= 0.34 ? "FAIR" : "BAD");
 export function profileHtml(rows) {
-  return `<div class="prof">` + rows.map((r) => r.text == null
+  return `<div class="prof">` + rows.map((r) => r.head ? `<div class="prof-head">${r.head}</div>` : r.text == null
     ? `<div class="prof-row none"><span>${r.label}</span><i></i><b>${r.note}</b><em></em></div>`
     : `<div class="prof-row"><span>${r.label}</span><i><u style="width:${Math.round(r.share * 100)}%;background:rgb(${r.rgb})"></u></i><b>${r.text}${r.note ? ` <small>${r.note}</small>` : ""}</b><em style="color:rgb(${r.score == null ? "150,160,175" : goodColor(r.score)})">${verdictWord(r.score) || "—"}</em></div>`).join("") + `</div>`;
 }
 
 // ---------- pictures for the 3D Moon ----------
-// Whole Moon, as a flat picture with longitude -180..180 left to right and north at the top (elevation or slope).
+// Whole Moon, as a flat picture with longitude -180..180 left to right and north at the top. Elevation and slope
+// come from the elevation map itself; sunlight, Earth link, temperature and the mix from the whole-Moon layer data.
+// Returns null for a layer that only exists at the poles (shadow).
 export async function globalCanvas(id) {
-  const g = await getGrid("global"), W = g.cols, H = g.rows, L = layer(id), cv = document.createElement("canvas");
-  cv.width = W; cv.height = H;
-  const ctx = cv.getContext("2d"), img = ctx.createImageData(W, H), px = img.data, d = g.data, q = g.quant_m, pxM = R * DEG / g.ppd;
-  for (let r = 0; r < H; r++) {
-    const rn = Math.max(0, r - 1), rs = Math.min(H - 1, r + 1), cosLat = Math.max(0.02, Math.cos((90 - (r + 0.5) / g.ppd) * DEG));
-    for (let c = 0; c < W; c++) {
-      let v;
-      if (id === "elev") v = d[r * W + c] * q;
-      else {
-        const cw = (c + W - 1) % W, ce = (c + 1) % W;
-        v = Math.atan(Math.hypot((d[r * W + ce] - d[r * W + cw]) * q / (2 * pxM * cosLat), (d[rn * W + c] - d[rs * W + c]) * q / ((rs - rn) * pxM))) / DEG;
-      }
-      const rgb = L.color(v), o = (r * W + (c + W / 2) % W) * 4;      // the grid starts at longitude 0; the picture is centered on it
-      px[o] = rgb[0]; px[o + 1] = rgb[1]; px[o + 2] = rgb[2]; px[o + 3] = 255;
-    }
+  const L = layer(id);
+  if (L.capsOnly) return null;
+  const g = await getGrid("global"), d = g.data, q = g.quant_m, GW = g.cols, GH = g.rows, pxM = R * DEG / g.ppd;
+  const slopeAtCell = (r, c) => {
+    const rn = Math.max(0, r - 1), rs = Math.min(GH - 1, r + 1), cosLat = Math.max(0.02, Math.cos((90 - (r + 0.5) / g.ppd) * DEG)), cw = (c + GW - 1) % GW, ce = (c + 1) % GW;
+    return Math.atan(Math.hypot((d[r * GW + ce] - d[r * GW + cw]) * q / (2 * pxM * cosLat), (d[rn * GW + c] - d[rs * GW + c]) * q / ((rs - rn) * pxM))) / DEG;
+  };
+  let W = GW, H = GH, value;
+  if (id === "elev") value = (r, c) => d[r * GW + (c + GW / 2) % GW] * q;                // the elevation grid starts at longitude 0; the picture is centered on it
+  else if (id === "slope") value = (r, c) => slopeAtCell(r, (c + GW / 2) % GW);
+  else {
+    const G = (await loadLayers()).gl;
+    if (!G) return null;
+    const tp = G.temperature?.ppd || 2, f = g.ppd / G.ppd, ft = G.ppd / tp, tW = 360 * tp;
+    W = G.cols; H = G.rows;
+    const temp = (r, c) => { const v = G.tavg ? G.tavg[Math.floor(r / ft) * tW + Math.floor(c / ft)] : 255; return v === 255 ? null : v * 2; };
+    if (id === "sun" || id === "earth") value = (r, c) => { const v = G[id][r * W + c]; return v === 255 ? null : v / 2; };
+    else if (id === "temp") value = temp;
+    else value = (r, c) => mixScore({ sun: G.sun[r * W + c] / 2, earth: G.earth[r * W + c] / 2, temp: temp(r, c), slope: slopeAtCell(Math.min(GH - 1, Math.floor(r * f)), (Math.floor(c * f) + GW / 2) % GW) });
+  }
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d"), img = ctx.createImageData(W, H), px = img.data;
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+    const v = value(r, c), rgb = v != null && Number.isFinite(v) ? L.color(v) : null;
+    if (!rgb) continue;
+    const o = (r * W + c) * 4; px[o] = rgb[0]; px[o + 1] = rgb[1]; px[o + 2] = rgb[2]; px[o + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
   return cv;
 }
 
-// South polar region (south of 80S), north-up polar picture with the pole in the middle: any layer.
-export async function polarCanvas(id) {
-  const P = await loadPolar(), n = P.n, L = layer(id), cv = document.createElement("canvas");
-  cv.width = cv.height = n;
-  const ctx = cv.getContext("2d"), img = ctx.createImageData(n, n), px = img.data, c = (n - 1) / 2;
+// One polar cap ("sp" or "np", poleward of 80 degrees), as a north-up polar picture with the pole in the middle.
+// Returns null where the cap has nothing finer than the whole-Moon picture (elevation at the north pole).
+export async function polarCanvas(id, capKey = "sp") {
+  const P = (await loadLayers())[capKey], L = layer(id);
+  if (!P) return null;
+  const n = P.n, c = (n - 1) / 2;
   let fine = null, pr = 0, pc = 0, k = 1;
-  if (!L.polar) { fine = await getGrid("sp_cap"); pr = (fine.rows - 1) / 2; pc = (fine.cols - 1) / 2; k = P.scale_m / fine.scale_m; }
-  const hAt = (row, col) => fine.sample(pr + (row - c) * k, pc + (col - c) * k);
-  const slopes = id === "mix" ? await loadPolarSlope() : null;
+  if (id === "elev") {
+    if (capKey !== "sp") return null;
+    fine = await getGrid("sp_cap"); pr = (fine.rows - 1) / 2; pc = (fine.cols - 1) / 2; k = P.scale_m / fine.scale_m;
+  }
+  if (id === "slope" && !P.slope) return null;
+  const cv = document.createElement("canvas"); cv.width = cv.height = n;
+  const ctx = cv.getContext("2d"), img = ctx.createImageData(n, n), px = img.data;
+  const g = (arr, i, f) => (arr && arr[i] !== 255 ? arr[i] * f : null);
   for (let row = 0; row < n; row++) for (let col = 0; col < n; col++) {
     const i = row * n + col;
-    if (P.sun[i] === 255) continue;                        // outside the region: see-through
+    if (P.sun[i] === 255) continue;                        // outside the cap: see-through
     let v;
-    if (id === "elev") v = hAt(row, col);
-    else if (id === "slope") v = Math.atan(Math.hypot(hAt(row, col + 0.5) - hAt(row, col - 0.5), hAt(row - 0.5, col) - hAt(row + 0.5, col)) / P.scale_m) / DEG;
-    else if (id === "mix") v = mixScore({ sun: P.sun[i] / 2, earth: P.earth[i] / 2, temp: P.tavg && P.tavg[i] !== 255 ? P.tavg[i] * 2 : null, slope: slopes[i] === 255 ? null : slopes[i] / 10 });
-    else if (id === "temp") v = P.tavg && P.tavg[i] !== 255 ? P.tavg[i] * 2 : NaN;
+    if (id === "elev") v = fine.sample(pr + (row - c) * k, pc + (col - c) * k);
+    else if (id === "slope") v = g(P.slope, i, 0.1);
+    else if (id === "mix") v = mixScore({ sun: P.sun[i] / 2, earth: P.earth[i] / 2, temp: g(P.tavg, i, 2), slope: g(P.slope, i, 0.1) });
+    else if (id === "temp") v = g(P.tavg, i, 2);
     else v = id === "shadow" ? P.shadow[i] : P[id][i] / 2;
     const rgb = v != null && Number.isFinite(v) ? L.color(v) : null;
     if (!rgb) continue;
     px[i * 4] = rgb[0]; px[i * 4 + 1] = rgb[1]; px[i * 4 + 2] = rgb[2]; px[i * 4 + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
-  return { canvas: cv, minLat: P.min_lat, n, scaleM: P.scale_m };
+  return { canvas: cv, minLat: P.min_lat, n, scaleM: P.scale_m, ySign: P.y_sign ?? 1 };
 }
 
 // The legend strip for a layer, as HTML.
