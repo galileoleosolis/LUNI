@@ -16,13 +16,13 @@ LUNI: Lunar Utility Navigational Intelligence
 
 LUNI is a web app that answers one question fast: can this mission land here, at this time? You pick a landing site
 on the Moon and a landing time, and LUNI gives a plain GO or NO-GO for power and for a direct link to Earth, with the
-reason, countdowns to sunset and Earthset, and one-press ways out of a NO-GO: the next good landing time, a better
-spot nearby, or a mission need to relax.
+reason, countdowns to sunset and Earthset, and one-press ways out of a NO-GO: the next landing window, a better
+spot nearby, or a mission need to change.
 
 It addresses the challenge directly: it compares sites and dates quickly, shows the Sun and Earth against the real
 terrain skyline, and makes the result readable by a planner, a teacher or a curious visitor. Every answer is computed
 from NASA data (SPICE positions, LRO LOLA elevation, LRO Diviner temperatures), and the app shows its own proof: it
-matches NASA JPL Horizons to 0.0007° and replays real landings next to what really happened.
+matches NASA JPL Horizons to 0.0007° and replays real landings next to the published mission record.
 
 It matters because a launch slip or a few hundred meters can turn a workable landing into a dead lander, and today
 finding that out takes several specialist tools.
@@ -55,7 +55,7 @@ Source code: https://github.com/galileoleosolis/LUNI
   and flagged.
 - **Mission plan and mission windows.** A 30-day timeline with a slider for any moment of the mission, and every good
   landing day for the next 12 months.
-- **Scan for a better spot.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
+- **Best Site Finder.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
   one that meets the needs. The skylines are computed on the graphics chip when one is available, and each run first
   checks itself against the processor.
 - **Moon map with layers.** The 3D Moon with elevation, slope, sunlight, Earth link and temperature for the whole
@@ -64,7 +64,8 @@ Source code: https://github.com/galileoleosolis/LUNI
   weights into one score, and that mix can pick the best point in the scan.
 - **Mission history.** Six real landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6, Blue Ghost Mission 1, IM-2)
   side by side, each loadable into the main screen at its real date and hour.
-- **For every skill level.** A first-visit guide, plain-language labels, typed or spoken commands (ASK LUNI), a 3D
+- **For every skill level.** A simple view by default with every tool one press away, a guided tutorial that
+  lights up one part of the screen at a time, plain-language labels, typed or spoken commands (ASK LUNI), a 3D
   first-person view from the surface, a comparison of the site with a place on Earth, and a link that reopens LUNI on
   the exact same question.
 
@@ -99,7 +100,8 @@ We tested it with two people and changed the design after each round. The first 
 went from 2 of 6 in the first to 6 of 6 in the fifth. A second tester, after one walk-through, completed 6 of 6 tasks
 in under 6 minutes on the newest screens and rated ease of use 3 of 5. Her main confusion (whether "shadow" meant
 permanent or just dark at that moment) led to a change the same day: the data card now shows "right now" and
-"all years" separately.
+"all years" separately. A third person, a friend from a NASA internship program, said there was too much on screen
+at once; that led to the simple view, the reorganized Best Site Finder and the guided tutorial.
 
 **Tools**
 
