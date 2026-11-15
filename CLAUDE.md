@@ -192,6 +192,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
      shares, the longest time without Sun against the user's limit, and a line for the stretch the mission clock is
      in. Clicking a stretch moves the clock there. It reads LUNI's own hourly answers; it is not a flight schedule.
      The chart headings were shortened to fit three buttons.
+- Extras item 5, built Sun 15 Nov about 10 AM New York ("let's go for it"), **on the pre-release only** (public is r4):
+  the MOON MAP data card for the landing site takes its SUNLIGHT and EARTH LINK (and YOUR MIX) from the site's own
+  skyline (`siteYears` in `js/model.js`: every 6 hours over the years covered, about 5 ms a site; `getSiteYears` passed
+  to `createMoonMap`, `layerRow` in `js/layers.js`), with a note naming what the coarser layer reads. Presets only;
+  the point under the pointer and custom points keep the layer values. `tests/check_site_years.mjs` prints both:
+  Nobile 78 / 53, Malapert 74 / 53, Shackleton 79 / 63, the others within about a point, Haworth 0 and never sunlit.
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the
@@ -262,6 +268,8 @@ added as a 14th preset for it. Stories carry `proof: true` when they also belong
 Other planets: nothing to build (their light is negligible; their pull on the Moon is already inside DE440).
 
 ## Extras list (the user: "keep track of those extras"). Not to be built unless the user picks one.
+**Done: 1 (operations plan), 3 (custom coordinates), 5 (the site's own data card). Left: 2, 4, 6, 7, 8.** The user
+asked about 2, 4 and 6 on 15 Nov and was told they are for after the deadline (hours each, medium to high risk).
 1. Operations plan / light scheduler: the mission's stretches in order (Sun and Earth: work and send data; Sun only;
    dark: sleep; eclipse) with dates and lengths, inside the MISSION PLAN tab. A full drag-and-drop expedition
    scheduler was advised against (big, and no sourced data on what activities need).
