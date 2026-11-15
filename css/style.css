@@ -632,3 +632,45 @@ html.flow .unit-top { flex-wrap: wrap; gap: 6px; } html.flow .tabs button { font
 html.flow .hist-detail { grid-template-columns: minmax(0, 1fr); height: auto; }
 html.flow .history:not([hidden]) { position: fixed; z-index: 32; overflow-y: auto; display: block; padding: 10px; } html.flow .hist-top { grid-template-columns: minmax(0, 1fr); }
 html.flow .hist-table { overflow-x: auto; } html.flow .hist-row { min-width: 1100px; } html.flow .hist-foot { flex-wrap: wrap; }
+
+/* ---------- MOON MAP screen: the big Moon with data layers, and the data profile card ---------- */
+.moonmap { position: absolute; inset: 0; z-index: 10; background: #000; padding: 12px 16px 8px; display: flex; flex-direction: column; min-height: 0; }
+.moonmap[hidden] { display: none; }
+.mm-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 372px; gap: 16px; padding-top: 10px; }
+.mm-globe { position: relative; min-width: 0; min-height: 0; border: 1px solid var(--grid0); }
+.mm-globe .globe-wrap.big { position: absolute; inset: 0; z-index: 1; margin: 0; padding: 0; max-height: none !important; }
+.mm-globe .globe-wrap.big .globe { border: none; }
+.mm-globe .globe-wrap.big .k-hint { left: 12px; top: 8px; right: 240px; font-size: 13px; } .mm-globe .globe-wrap.big .globe-key { left: 12px; top: 32px; }
+.mm-globe .globe-wrap.big .globe-big { right: 10px; top: 8px; } .mm-globe .globe-wrap.big .side-go { right: 10px; bottom: 10px; }
+.mm-globe .globe-wrap.big .globe-verdict { left: 12px; bottom: 10px; }
+.mm-status { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 3; background: #000; border: 1px solid var(--hi); color: var(--wht); font-weight: 700; padding: 6px 16px; letter-spacing: .06em; pointer-events: none; }
+.mm-status[hidden] { display: none; }
+.mm-side { min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--dim) #000; padding-right: 4px; font-size: 13px; color: var(--amb); }
+.mm-side h3 { margin-bottom: 5px; } .mm-side h3.gap { margin-top: 11px; }
+.mm-layers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+.mm-view { position: absolute; right: 10px; top: 42px; z-index: 3; display: flex; flex-direction: column; gap: 3px; align-items: stretch; } .mm-view > span { font-size: 12.5px; color: var(--amb); text-align: right; font-weight: 600; }
+.mm-view > div { display: flex; flex-direction: column; gap: 3px; } .mm-view button { background: rgba(0,0,0,.8); border: 1px solid var(--dim); color: var(--wht); font: inherit; font-size: 12.5px; padding: 2px 9px; cursor: pointer; text-align: right; } .mm-view button:hover { background: var(--hi); color: #000; }
+.mm-layers button { text-align: left; background: #000; border: 1px solid var(--dim); color: var(--amb); font: inherit; padding: 4px 9px 5px; cursor: pointer; line-height: 1.15; }
+.mm-layers button { padding: 3px 7px 4px; } .mm-layers button b { display: block; font-family: var(--cond); font-size: 16px; letter-spacing: .05em; color: var(--wht); } .mm-layers button small { font-size: 12.5px; color: var(--dim); }
+.mm-layers button:hover { background: var(--faint); } .mm-layers button.on { background: var(--hi); border-color: var(--hi); } .mm-layers button.on b, .mm-layers button.on small { color: #00101f; }
+.lay-legend { margin-top: 8px; } .lay-legend i { display: block; height: 14px; border: 1px solid var(--grid0); }
+.lay-legend .ends { display: flex; justify-content: space-between; gap: 10px; margin-top: 3px; font-size: 12.5px; font-weight: 600; color: var(--wht); line-height: 1.25; } .lay-legend .ends span:last-child { text-align: right; }
+.lay-legend.flat { color: var(--wht); font-weight: 600; } .lay-legend.flat b { display: inline-block; width: 16px; height: 13px; vertical-align: -2px; margin-right: 4px; }
+.mm-strength { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12.5px; color: var(--dim); } .mm-strength input { flex: 1; accent-color: var(--hi); }
+.mm-meaning { margin-top: 6px; color: var(--wht); line-height: 1.35; } .mm-side .dimtxt { line-height: 1.35; font-size: 12.5px; }
+.mm-prof-where { font-size: 12.5px; color: var(--dim); margin-bottom: 4px; line-height: 1.3; } .mm-side .seg { display: flex; flex-wrap: wrap; }
+.prof { display: grid; gap: 3px; }
+.prof-row { display: grid; grid-template-columns: 152px 54px minmax(0, 1fr) 40px; gap: 7px; align-items: center; font-size: 12.5px; color: var(--amb); }
+.prof-row span { white-space: nowrap; color: var(--dim); font-weight: 600; }
+.prof-row i { display: block; height: 9px; background: var(--grid0); } .prof-row u { display: block; height: 100%; text-decoration: none; }
+.prof-row b { color: var(--wht); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .prof-row b small { color: var(--dim); font-weight: 400; font-size: 12.5px; }
+.prof-row em { font-style: normal; font-weight: 700; text-align: right; } .prof-row.none b { color: var(--quiet); font-weight: 400; }
+.tight .mm-body { grid-template-columns: minmax(0, 1fr) 352px; }
+html.flow .moonmap:not([hidden]) { position: fixed; z-index: 32; overflow-y: auto; display: block; padding: 10px; } html.flow .mm-body { display: block; } html.flow .mm-globe { height: 62vh; margin-bottom: 10px; }
+html.flow .globe-big { display: block; }
+
+/* the scan's SHOW groups, layer legends and the small data profile card */
+.scan-metric { display: grid; gap: 4px; } .scan-mgroup > span { display: block; font-size: 12.5px; color: var(--dim); margin-bottom: 2px; } .scan-mgroup .seg { display: flex; }
+.scan-legend.lay { display: block; } .scan-legend.lay .lay-legend { margin-top: 0; } .scan-legend.lay .ends { font-size: 12.5px; }
+.scan-src { margin-top: 5px; font-size: 12.5px; line-height: 1.3; color: var(--dim); }
+.scan-cell .prof { margin: 4px 0 5px; gap: 2px; } .scan-cell .prof-row { grid-template-columns: minmax(0, 1fr) auto 38px; gap: 6px; } .scan-cell .prof-row i { display: none; }

@@ -123,16 +123,33 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
 - The crowded case to check after any layout change in the middle column: a NO-GO with three "ways to get a GO"
   buttons (Nobile Rim 1, 14 NOV 2026 20:00). The landing-day strip must stay fully visible at 1100 x 700 and up.
 
-## Next batch (asked for on 14 Nov, not started): work ONE TASK AT A TIME
+## Next batch (asked for on 14 Nov): work ONE TASK AT A TIME
 The user: "one task at a time, and then let me confirm before moving onto the next task". Build one, show it on the
 pre-release (preview page and `next/`), stop, and wait for the user's confirmation before starting the next.
-Planned order: (1) custom coordinates out in the open: **skipped by the user**; (2) HISTORY tab: **built 14 Nov,
-on the pre-release, waiting for the user's confirmation** (see below); (3) Big Moon as its own screen with
-layer buttons: elevation and slope first; (4) sunlight, Earth link and PSR layers (south polar region); (5) the same
-layers in the scan map plus a "data profile" card for a point; (6) stack layers with weights into one combined map
-and send it to the scan; (7) temperature, only if NASA's LRO Diviner data can be fetched and reduced: never invented.
-Every layer names its data source on screen and shows good / bad visually. Still unanswered by the user: what "data
-profiles" means (assumed: a card of every layer's value at a point), and whether polar-only coverage is fine.
+(1) custom coordinates out in the open: **skipped by the user**. (2) HISTORY tab: built, **accepted** ("fine for
+now"). (3) + (4) + (5): the user asked for these three together on 15 Nov; **built, on the pre-release, waiting for
+the user's confirmation** (see "Layers as built"). **Not started:** (6) stack layers with weights into one combined
+map and send it to the scan; (7) temperature, only if NASA's LRO Diviner data can be fetched and reduced: never invented.
+The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
+(a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
+Layers as built:
+- `js/layers.js` — the one definition of the layers (`LAYERS`: elev, slope, sun, earth, shadow): colors, good / bad
+  score, the source sentence shown on screen, `profileAt` + `profileHtml` (the data profile card), `globalCanvas` /
+  `polarCanvas` (pictures for the 3D Moon), `polarValue`. Green = good, red = bad everywhere; elevation is neutral.
+  The slope colors run 0 to 20 degrees as a scale for the eye; it is labeled as not being a safety limit.
+- `tools/build_layers.py` → `data/layers/` (`sp_sun`, `sp_earth`, `sp_shadow`, 480 m grid south of 80S): LOLA 240 m
+  skylines in 72 directions against the positions in `data/ephem.bin` every 6 hours over 2023 to 2035, 2 m mast.
+  "Permanent shadow" means no part of the Sun's disc at any checked moment in those years (said on screen: the
+  18.6-year cycle is not covered). Takes about 15 minutes on 4 cores. `tests/check_layers.mjs` compares the layers
+  with LUNI's own numbers at the polar presets; a layer is coarser than a preset's skyline and reads lower on the
+  narrow best-lit ridges, which is expected and said in the notes.
+- `js/ui-moonmap.js` + the MOON MAP tab (key M; BIG MOON · LAYERS on the small Moon): the same globe moves into the
+  screen (`.globe-wrap.big` inside `#mm-globe`), layer buttons, legend, strength slider, LOOK AT buttons, and the
+  data profile for the point under the pointer (else the landing site). `js/globe.js` gained `setOverlay` (a skin
+  for whole-Moon layers, a south polar cap mesh for the fine ones), `onHoverPoint`, `lookAt`; site marks shrink as
+  the camera comes close. `showScreen("main" | "moon" | "history")` in `js/app.js` switches screens.
+- Scan (`js/ui-scan.js`): SHOW is three groups (THIS MISSION / THE GROUND / ALL YEARS, the last only south of 80S)
+  and the old INSPECT box is the data profile card for the hovered point (else where you are now).
 HISTORY tab as built: screen tabs MAIN SCREEN / MISSION HISTORY in the unit's top strip (`.tabs`; key H; "open
 mission history" in ASK LUNI). `js/ui-history.js` covers `.cols` with a flat Moon map with numbered markers, the
 chosen mission's sourced account, and a table of six landings since 2023 (Chandrayaan-3, SLIM, IM-1, Chang'e 6,

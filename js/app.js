@@ -17,6 +17,7 @@ import { createProofPanel } from "./ui-proof.js";
 import { encodeShare, decodeShare, copyText } from "./share.js";
 import { startGuide } from "./guide.js";
 import { createHistoryPanel } from "./ui-history.js";
+import { createMoonMap } from "./ui-moonmap.js";
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -37,7 +38,7 @@ const state = {
   req: { ...DEFAULT_REQ },       // mission needs
   cal: null,                     // year of landing-window data for the current site + needs
 };
-let globe = null, scan = null, surface = null, openspace = null, proof = null, past = null;
+let globe = null, scan = null, surface = null, openspace = null, proof = null, past = null, moonmap = null;
 
 // ---------- sizing ----------
 // Wide windows: lay the unit out at a design size and scale it to fit. Narrow windows: stacked layout.
@@ -760,11 +761,19 @@ const assistantApi = {
   pickBest: () => { const b = $("scan-go-best"); if (!scan.isOpen() || b.disabled) return false; b.click(); return true; },
   takeOption: (i) => state.mission.fixes[i]?.[2](),
   openProof: (show) => { if (proof.isOpen() !== show) proof.toggle(show); },
-  openHistory: (show) => { if (past.isOpen() !== show) past.toggle(show); },
+  openHistory: (show) => { if (past.isOpen() !== show) showScreen(show ? "history" : "main"); },
+  openMoonMap: (show, layerId) => { if (moonmap.isOpen() !== show) showScreen(show ? "moon" : "main"); if (show && layerId) moonmap.setLayer(layerId); },
   share: () => shareLink(),
   versus: () => versus(),
   pin: () => pinCurrent(),
 };
+
+// Which screen is up: "main", "moon" (MOON MAP) or "history" (MISSION HISTORY).
+function showScreen(name) {
+  past.toggle(name === "history"); moonmap.toggle(name === "moon");
+  for (const [id, n] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).classList.toggle("on", n === name);
+  $("globe-big").textContent = name === "moon" ? "⤡ SMALL MOON" : "⤢ MOON MAP"; $("globe-big").classList.toggle("on", name === "moon");
+}
 
 // Redraw everything whose size depends on the layout (after the window, the test bar or the story strip changes).
 function relayout() { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); }
@@ -802,6 +811,7 @@ async function init() {
     labels: $("globe-labels"),
     onPickSite: (s) => selectSite(s),
     onPickCoord: (lat, lon) => selectSite({ id: CUSTOM_ID, name: "Custom point", lat, lon }, { fly: false }),
+    onHoverPoint: (p) => moonmap?.hoverPoint(p),
     onHover: (s, e) => {
       if (!s) { tip.hidden = true; return; }
       const r = $("globe").getBoundingClientRect(), z = zoomOf($("globe"));
@@ -810,14 +820,10 @@ async function init() {
     },
   });
 
-  // BIG MOON: the picture moves from the left column to the middle of the screen, and back.
-  const gw = document.querySelector(".globe-wrap"), gwHome = gw.parentElement, gwNext = gw.nextElementSibling;
-  const setBigMoon = (on) => {
-    if (on) document.querySelector(".col-main").appendChild(gw); else gwHome.insertBefore(gw, gwNext);
-    gw.classList.toggle("big", on); $("globe-big").classList.toggle("on", on); $("globe-big").textContent = on ? "⤡ SMALL MOON" : "⤢ BIG MOON";
-  };
-  $("globe-big").addEventListener("click", () => setBigMoon(!gw.classList.contains("big")));
-  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && gw.classList.contains("big") && !/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) setBigMoon(false); });
+  // Screens: MAIN, MOON MAP (the Moon made big, with data layers) and MISSION HISTORY. One at a time.
+  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon }, onClose: () => showScreen("main") });
+  $("globe-big").addEventListener("click", () => showScreen(moonmap.isOpen() ? "main" : "moon"));
+  for (const [id, name] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).addEventListener("click", () => showScreen(name));
 
   const onCoord = () => {
     const lat = parseFloat($("lat-input").value), lon = parseFloat($("lon-input").value);
@@ -833,7 +839,7 @@ async function init() {
   $("pin-btn").addEventListener("click", pinCurrent);
   $("more-btn").addEventListener("click", () => setMore());
   $("share-btn").addEventListener("click", shareLink);
-  past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene });
+  past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
@@ -848,7 +854,7 @@ async function init() {
     fmt: { site: siteName, stamp, lat: fmtLat, lon: fmtLon },
   });
   $("scan-btn").addEventListener("click", () => scan.toggle());      // a plain open / close toggle for the scan menu (the user asked for this)
-  $("side-scan").addEventListener("click", () => scan.toggle(true));
+  $("side-scan").addEventListener("click", () => { showScreen("main"); scan.toggle(true); });
   surface = createSurfacePanel({
     getContext: () => ({ site: state.site, cur: state.scenario.samples[state.idx], horizon: state.scenario.horizon }),
     fmt: { site: siteName, stamp },
@@ -891,8 +897,9 @@ async function init() {
     else if (k === " ") togglePlay();
     else if (k === "t" || k === "T") comms.talk();
     else if (k === "/") comms.type();
-    else if (k === "Escape" && past.isOpen()) past.toggle(false);
-    else if (k === "h" || k === "H") past.toggle();
+    else if (k === "Escape" && (past.isOpen() || moonmap.isOpen())) showScreen("main");
+    else if (k === "h" || k === "H") showScreen(past.isOpen() ? "main" : "history");
+    else if (k === "m" || k === "M") showScreen(moonmap.isOpen() ? "main" : "moon");
     else if (k === "Escape" && proof.isOpen()) proof.toggle(false);
     else if (k === "Escape" && !$("more-panel").hidden) setMore(false);
     else if (k === "Escape" && comms.isOpen()) comms.toggle(false);
