@@ -7,6 +7,8 @@ how long you'll have solar power, when direct-to-Earth communication is possible
 
 **Try it: https://galileoleosolis.github.io/LUNI/** (the newest work in progress is at `/LUNI/next/`)
 
+**For teachers:** a ready-to-run 45-minute lesson, [Plan a Moon landing](docs/lesson.md), with a student worksheet and a teacher key.
+
 ## Run locally
 ```
 python -m http.server 8080
