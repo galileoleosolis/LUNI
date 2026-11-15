@@ -219,7 +219,12 @@ only. The Project page text and the deck do not exist yet; the box titles of the
 run with `#test-a` ... `#test-d`. Six tasks on the newer screens: load Blue Ghost 1 from MISSION HISTORY, read the
 eclipse date, next good landing date at Nobile Rim 1, permanent shadow and temperature of Haworth's floor from the
 MOON MAP data profile (answers read from her own screen), scan and move near Malapert. An automated run scores 6/6.
-Her link: https://galileoleosolis.github.io/LUNI/next/#test . Her feedback and report have not been pasted yet.
+Her run (15 Nov): 6/6, 5:55, ease 3/5. She set dates with the pickers (30 clicks), never used NEXT GOOD TIME, the
+verdict buttons, ASK LUNI or the MISSION PLAN / WINDOWS buttons, and clicked the best square in the scan directly.
+Most confusing: could not tell "permanent" shadow from dark at that moment. Asked for sections in different colors
+and "a cool easter egg". Done since: the Moon map data profile shows RIGHT NOW (Sun, Earth on the mission clock)
+apart from ALL YEARS; the layer button reads NEVER SUNLIT; steps 1 to 4 each have a color (`--s1` to `--s4`, blue /
+violet / amber / green); Apollo 11 on any 20 July shows a one-time note, and ASK LUNI answers "tell me a joke".
 `docs/submission.md` holds the drafted text for every Project-tab box. The user makes the slide deck themselves at the
 end (no deck or GIFs from Claude unless asked), will have their mother test the app, and wants the Use of SI "ideas"
 line to say the idea and direction were theirs; it says that, and keeps one clause that Claude offered suggestions,

@@ -76,5 +76,46 @@
   "moments": 9497,
   "years": "2023 to 2035",
   "source_map": "ldem_16 (1.9 km)"
+ },
+ "np": {
+  "kind": "polar_north",
+  "n": 1268,
+  "scale_m": 480.0,
+  "min_lat": 80.0,
+  "y_sign": -1.0,
+  "mast_m": 2.0,
+  "directions": 72,
+  "reach_km": 200.0,
+  "step_hours": 6,
+  "moments": 18993,
+  "from_utc": "2023-01-01T00:00:00Z",
+  "years": "2023 to 2035",
+  "files": {
+   "sun": "np_sun.u8.gz",
+   "earth": "np_earth.u8.gz",
+   "shadow": "np_shadow.u8.gz",
+   "slope": "np_slope.u8.gz",
+   "tavg": "np_tavg.u8.gz",
+   "tmax": "np_tmax.u8.gz"
+  },
+  "stats": {
+   "sun_mean_pct": 26.9,
+   "sun_max_pct": 62.1,
+   "shadow_share_pct": 5.17,
+   "earth_mean_pct": 28.6
+  },
+  "temperature": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018)",
+   "unit": "value * 2 = kelvin",
+   "avg_k": [
+    24.5,
+    206.6
+   ],
+   "max_k": [
+    24.3,
+    353.7
+   ],
+   "no_data_squares": 0
+  }
  }
 }

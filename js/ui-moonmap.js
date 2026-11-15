@@ -3,7 +3,7 @@
 // still picks a landing site.
 import { LAYERS, layer, globalCanvas, polarCanvas, legendHtml, profileAt, profileHtml, MIX_PARTS, getMix, setMix, mixText } from "./layers.js";
 
-export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
+export function createMoonMap({ globe, getSite, getNow, fmt, onClose, onUseMix }) {
   const $ = (id) => document.getElementById(id), box = $("moonmap");
   const wrap = document.querySelector(".globe-wrap"), home = wrap.parentElement, homeNext = wrap.nextElementSibling;
   let current = "none", strength = 0.8, job = 0, hover = null, profJob = 0;
@@ -45,7 +45,11 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
       const rows = await profileAt(p.lat, p.lon);
       if (mine !== profJob) return;
       $("mm-prof-where").innerHTML = hover ? `UNDER THE POINTER · ${fmt.lat(p.lat)} ${fmt.lon(p.lon)} · <b class="h-do">CLICK TO LAND THERE</b>` : `THE LANDING SITE · ${fmt.site(site)} · ${fmt.lat(p.lat)} ${fmt.lon(p.lon)}`;
-      $("mm-profile").innerHTML = profileHtml(rows);
+      // For the landing site: the moment on the mission clock first, then the long-term values, so "dark right now"
+      // and "permanent shadow" cannot be mixed up (a tester could not tell them apart).
+      const now = hover ? null : getNow?.(), on = (ok, yes, no) => ({ text: ok ? yes : no, score: ok ? 1 : 0, share: 1, rgb: ok ? [34, 208, 112] : [176, 22, 36], note: "" });
+      const first = now ? [{ head: `RIGHT NOW · ${fmt.stamp(now.t)}` }, { label: "SUN RIGHT NOW", ...on(now.sunUp, "UP", "DOWN") }, { label: "EARTH RIGHT NOW", ...on(now.earthUp, "IN VIEW", "HIDDEN") }] : [];
+      $("mm-profile").innerHTML = profileHtml([...first, { head: "ALL YEARS, 2023 TO 2035 (NOT THIS MOMENT)" }, ...rows]);
     } catch (e) { console.error(e); }
   }
   let raf = 0;
@@ -73,6 +77,7 @@ export function createMoonMap({ globe, getSite, fmt, onClose, onUseMix }) {
   $("mm-strength").addEventListener("input", (e) => { strength = +e.target.value / 100; globe?.setOverlayOpacity(strength); });
   $("mm-close").addEventListener("click", () => onClose());
   window.addEventListener("luno:state", schedule);
+  window.addEventListener("luno:clock", schedule);
 
   function toggle(show = box.hidden) {
     if (show === !box.hidden) return;

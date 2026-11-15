@@ -238,6 +238,10 @@ function recompute({ keepIdx = false } = {}) {
   scan?.refresh();
   surface?.refresh();
   window.dispatchEvent(new Event("luno:state"));
+  // A small surprise: Apollo 11's own site on its own day of the year (it landed there on 20 July 1969, 20:17 UTC).
+  if (state.site.id === "apollo11" && state.t0.getUTCMonth() === 6 && state.t0.getUTCDate() === 20 && !state.eagle) {
+    state.eagle = true; toast("20 JULY · ON THIS DAY IN 1969, APOLLO 11 LANDED RIGHT HERE: “THE EAGLE HAS LANDED.”", 9000);
+  }
 }
 
 // ---------- mission needs, landing windows, calendar ----------
@@ -419,6 +423,7 @@ function renderMoment() {
   globe?.setBodies(sp.sun, sp.earth);
   surface?.update();
   openspace?.update(osState());
+  window.dispatchEvent(new Event("luno:clock"));
 }
 const osState = () => { const cur = state.scenario.samples[state.idx]; return { site: state.site, t: cur.t, heightM: state.scenario.terrain.heightM, sunAz: cur.sunAz }; };
 
@@ -833,7 +838,8 @@ async function init() {
   });
 
   // Screens: MAIN, MOON MAP (the Moon made big, with data layers) and MISSION HISTORY. One at a time.
-  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon }, onClose: () => showScreen("main"),
+  moonmap = createMoonMap({ globe, getSite: () => state.site, fmt: { site: siteName, lat: fmtLat, lon: fmtLon, stamp }, onClose: () => showScreen("main"),
+    getNow: () => state.scenario?.samples[state.idx],
     onUseMix: () => { showScreen("main"); scan.useMix(); } });
   $("globe-big").addEventListener("click", () => showScreen(moonmap.isOpen() ? "main" : "moon"));
   for (const [id, name] of [["tab-main", "main"], ["tab-moon", "moon"], ["tab-history", "history"]]) $(id).addEventListener("click", () => showScreen(name));

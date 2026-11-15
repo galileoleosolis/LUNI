@@ -49,7 +49,7 @@ export const TOOLS = [
   { name: "pin", description: "Pin the current site and landing time to the compare list.",
     input_schema: { type: "object", properties: {}, additionalProperties: false } },
   { name: "report", description: "Read out LUNI's numbers. topic: status (GO / NO-GO and why), options (ways to get a GO), sun, earth, eclipse, site (the current one), sites (the list), time, needs, versus (this site next to a place on Earth), help.",
-    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "versus", "help", "who"] } }, required: ["topic"], additionalProperties: false } },
+    input_schema: { type: "object", properties: { topic: { type: "string", enum: ["status", "options", "sun", "earth", "eclipse", "site", "sites", "time", "needs", "versus", "help", "who", "joke"] } }, required: ["topic"], additionalProperties: false } },
 ];
 
 // ---------- understanding a sentence ----------
@@ -116,6 +116,7 @@ export function parse(text, sites = []) {
   let m;
 
   if (/^ (help|commands|examples|what can (i|you|we) (say|do|ask)|what do you (do|understand)) /.test(t)) return [{ tool: "report", input: { topic: "help" } }];
+  if (/\b(?:joke|make me laugh|something funny)\b/.test(t)) return [{ tool: "report", input: { topic: "joke" } }];
   if (/^ (who|what) are you |^ what(?: is| s| does) (?:your name|luni|luno)(?: stand for| mean)? |^ (?:your )?name /.test(t)) return [{ tool: "report", input: { topic: "who" } }];
 
   // --- where ---
@@ -289,6 +290,12 @@ export function createAssistant(api) {
     return "Ways to get a GO: " + s.options.map((o, i) => `${i + 1}: ${o.toLowerCase()}`).join(". ") + `. Say OPTION ${s.options.map((_, i) => i + 1).join(" or ")}.`;
   }
   const cap = (t) => t.charAt(0) + t.slice(1).toLowerCase();
+  let jokeAt = 0;
+  const JOKES = [
+    "I only know true ones. My skyline is real NASA data; my lander is, as the screen admits, illustrative.",
+    "A day here lasts about a month. Nobody on the Moon has ever said: see you tomorrow.",
+    "I would tell you a joke about the far side, but there is no Earth link to deliver it.",
+  ];
   const WHO = "I am LUNI, the Lunar Utility Navigational Intelligence. I work this unit's controls and read out its numbers.";
   const HELP = "You can say: GO TO SHACKLETON. LAND ON 14 JAN 2027 AT 5. NEXT GOOD TIME. MISSION 14 DAYS. ALLOW 24 HOURS OF DARK. STATUS. WHY? OPTIONS. WHERE IS THE SUN? DO WE HAVE A LINK? BETTER SPOT. SURFACE VIEW. DAY 5. PLAY. PIN.";
 
@@ -377,7 +384,7 @@ export function createAssistant(api) {
       case "pin": api.pin(); return { say: "Pinned to the compare list." };
       case "share_link": api.share(); return { say: "Copied a link that opens LUNI on this exact site, landing time and mission needs. Paste it anywhere." };
       case "report":
-        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO,
+        return { say: { status: () => `${s.siteName}, landing ${stamp(s.t0)}. ${verdictText(s)}`, options: optionsText, sun: (x) => sunText(x), earth: (x) => earthText(x), site: siteText, needs: needsText, help: () => HELP, who: () => WHO, joke: () => JOKES[jokeAt++ % JOKES.length],
           versus: () => { const v = api.versus(); return `${s.siteName} next to a place on Earth's equator. ` + v.rows.map((r) => `${cap(r[0])}: here ${r[1].toLowerCase()}, on Earth ${r[2].toLowerCase()}.`).join(" "); },
           sites: () => "The sites are: " + api.sites().map((x, i) => `${i + 1}, ${x.name.split(" · ")[0]}`).join("; ") + ". Say GO TO and a name, or SITE and a number.",
           eclipse: () => (s.eclipses.length ? s.eclipses.map((e) => `Eclipse on ${day(e.peak)}: Earth hides ${e.maxCover >= 0.995 ? "all" : Math.round(e.maxCover * 100) + "%"} of the Sun for up to ${plural(Math.round((e.end - e.start) / 3600000), "hour")}.`).join(" ") : `No eclipse touches this ${s.req.days}-day mission.`),

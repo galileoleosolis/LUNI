@@ -54,10 +54,19 @@ if (ALL.gl) {
   if (polarValue("shadow", a11.lat, a11.lon) !== null) { fail++; console.log("FAIL: permanent shadow is only worked out at the poles"); }
 } else console.log("whole-Moon layers not built yet");
 // North cap: same method as the south. The Sun cannot be up more than about half the time on average, and some ground is in permanent shadow.
+// A cap's near-side half must see Earth far more often than its far-side half (averaged over an area, because a
+// single point can sit in a crater).
+const areaMean = (id, sign, lon0) => { let sum = 0, n = 0; for (let la = 81; la <= 89; la += 0.25) for (let d = -50; d <= 50; d += 2.5) { const v = polarValue(id, sign * la, lon0 + d); if (v != null) { sum += v; n++; } } return sum / n; };
+for (const [name, key, sign] of [["south", "sp", -1], ["north", "np", 1]]) {
+  if (!ALL[key]) { console.log(`${name} cap not built yet`); continue; }
+  const near = areaMean("earth", sign, 0), far = areaMean("earth", sign, 180), east = areaMean("earth", sign, 90), west = areaMean("earth", sign, -90);
+  console.log(`${name} cap: Earth in view ${near.toFixed(1)}% on the near-side half, ${far.toFixed(1)}% on the far-side half, ${east.toFixed(1)}% / ${west.toFixed(1)}% toward 90E / 90W`);
+  if (!(near > far + 20 && Math.abs(east - west) < 8)) { fail++; console.log(`FAIL: the ${name} cap is turned the wrong way`); }
+}
 if (ALL.np) {
-  const st = index.np.stats, mid = polarValue("sun", 89.9, 0), e = polarValue("earth", 85, 0), e180 = polarValue("earth", 85, 180);
-  console.log(`north cap: stats ${JSON.stringify(st)}; near the pole sunlight ${mid}%; Earth at 85N on the near side ${e}%, on the far side ${e180}%`);
-  if (!(st.shadow_share_pct > 1 && st.shadow_share_pct < 20 && st.sun_mean_pct > 15 && st.sun_mean_pct < 45 && mid != null && e > e180)) { fail++; console.log("FAIL: north cap does not look right"); }
+  const st = index.np.stats;
+  console.log(`north cap: stats ${JSON.stringify(st)}`);
+  if (!(st.shadow_share_pct > 1 && st.shadow_share_pct < 20 && st.sun_mean_pct > 15 && st.sun_mean_pct < 45 && polarValue("temp", 89.9, 0) != null)) { fail++; console.log("FAIL: north cap does not look right"); }
 } else console.log("north cap not built yet");
 // Temperature (NASA Diviner, re-gridded): the shadowed crater floor must be far colder than the sunlit ridge.
 const tH = polarValue("temp", haworth.lat, haworth.lon), tR = polarValue("temp", ridge.lat, ridge.lon), hot = polarValue("tmax", ridge.lat, ridge.lon);

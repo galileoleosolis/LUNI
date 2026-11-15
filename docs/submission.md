@@ -95,8 +95,11 @@ student can see why the Moon's south pole is hard: a Sun that stays within a few
 hours, and craters that never see sunlight next to ridges that almost always do. We hope LUNI is useful as a first
 look before detailed analysis, and as a way for anyone to explore real mission conditions.
 
-We tested it with one first-time user over five rounds and changed the design after each; task success went from 2 of
-6 in the first round to 6 of 6 in the fifth. [After your mom tries it: add one sentence on what she managed and what she said.]
+We tested it with two people and changed the design after each round. The first tester did five rounds; task success
+went from 2 of 6 in the first to 6 of 6 in the fifth. A second tester, after one walk-through, completed 6 of 6 tasks
+in under 6 minutes on the newest screens and rated ease of use 3 of 5. Her main confusion (whether "shadow" meant
+permanent or just dark at that moment) led to a change the same day: the data card now shows "right now" and
+"all years" separately.
 
 **Tools**
 
