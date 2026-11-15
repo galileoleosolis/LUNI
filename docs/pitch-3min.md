@@ -4,7 +4,8 @@ For the local judging: 3 minutes to present, 5 minutes of questions. This was dr
 project as built. Say it in your own words; the numbers are the part to keep exact. Every number here is also in the
 app's PROOF panel or in `docs/submission.md`.
 
-Read aloud at a calm pace this is about 2 minutes 50 seconds. Time yourself, and cut the part marked (CUT FIRST)
+It is about 420 words, which is close to 2 minutes 50 seconds at a calm pace. That is an estimate from the word
+count, so time yourself with the clicks, and cut the part marked (CUT FIRST)
 if you run long.
 
 ## Before you walk up
@@ -29,13 +30,14 @@ fast and clear for anyone."
 "This is LUNI. You choose where and when, and it answers one question: can this mission land here, at this time?
 GO or NO-GO, with the reason."
 
-**0:40 to 1:50 · Live demo (70 seconds, four clicks)**
+**0:40 to 1:50 · Live demo (70 seconds, four moves)**
 
 1. Point at the screen. "Nobile Rim 1, one of the south pole regions, landing 14 November. NO-GO: no Earth link at
    landing. Here is the Sun above the skyline, and here is Earth, behind the ground."
-2. Press **NEXT LANDING WINDOW**. "Say the launch slips. One press finds the next window that works. Now it is a GO."
-3. Press **BEST SITE FINDER** (go back to the NO-GO time first, or just say it). "Or keep the date and move the
-   site. LUNI checks hundreds of points around us. Green works. The star is the best one, and one press moves us there."
+2. Press **BEST SITE FINDER**. "One way out: keep the date and move the site. LUNI checks hundreds of points around
+   us. Green works, and the star is the best one." Press **BACK TO THE MAIN SCREEN**.
+3. Press **NEXT LANDING WINDOW**. "The other way: keep the site and move the date. Say the launch slips. One press
+   finds the next window that works. Now it is a GO."
 4. Drag the **slider**. "And this is the whole mission, hour by hour: when we have Sun, when we have Earth, when it
    gets dark."
 
