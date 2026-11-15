@@ -53,11 +53,11 @@ export function createEnergyPanel({ getContext, fmt, onChange }) {
     const tile = (big, text) => `<div><b>${big}</b><span>${text}</span></div>`;
     body.innerHTML = `
       <p class="en-lead">${fmt.site(c.site)} · LANDING ${fmt.stamp(c.t0)} · ${c.req.days}-DAY MISSION</p>
-      <div class="en-top"><div class="en-inputs"><h3 class="band" data-band="2"><b class="h-t">YOUR LANDER</b> · <b class="h-do">CLICK TO CHANGE</b></h3>${seg}
+      <div class="en-top"><div class="en-inputs"><h3 class="band" data-band="2" data-ico="sliders"><b class="h-t">YOUR LANDER</b> · <b class="h-do">CLICK TO CHANGE</b></h3>${seg}
         <p class="en-note">THESE THREE ARE YOURS TO SET. THEY ARE VALUES TO START FROM, NOT A REAL LANDER'S NUMBERS.</p></div>
         <div class="en-out">${verdict}<div class="proof-tiles en-tiles">
           ${tile(watts(b.peakW), "FROM THE PANEL IN FULL SUN")}${tile(kwh(b.inWh), "COLLECTED OVER THE MISSION")}${tile(kwh(b.usedWh), "USED BY THE LANDER")}${tile(b.enough ? (b.batteryWh > 0 ? kwh(b.batteryWh) : "NONE") : "—", "BATTERY NEEDED")}</div></div></div>
-      <h3 class="band" data-band="1"><b class="h-t">HOUR BY HOUR</b> · PANEL POWER ON TOP, THE BATTERY BELOW</h3>
+      <h3 class="band" data-band="1" data-ico="bolt"><b class="h-t">HOUR BY HOUR</b> · PANEL POWER ON TOP, THE BATTERY BELOW</h3>
       ${chart(b, c.t0)}
       <ul class="en-facts">
         <li>${b.onBatteryLongestH ? `<b>LONGEST TIME ON THE BATTERY: ${b.onBatteryLongestH} H</b>, STARTING ${fmt.stamp(b.onBatteryStart)}.` : "<b>NEVER ON THE BATTERY:</b> THE PANEL ALWAYS GIVES AT LEAST WHAT THE LANDER USES."}</li>

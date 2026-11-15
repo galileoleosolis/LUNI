@@ -1099,3 +1099,37 @@ html.flow .fs-btn { display: none; }
   box-shadow: 0 3px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.8), inset 0 -3px 6px rgba(0,0,0,.25); }
 :is(.side-go, .hero-next, .scan-go, .scan-home, .hist-load, .mm-mix-use, .coord-row button, .cmp-btns button.primary):not(:disabled) { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
 .energy-btn, .tour-btn { --b1: #ffe9a8; --b2: #f2b01e; } .side-go.flash { --b1: #ff9a8c; --b2: #c22a1e; }
+
+/* ===== design system, stage 2: icons on bands, cards in the dense panels, marks in the state dots, text floor ===== */
+[data-ico]::before { content: ""; display: inline-block; flex: none; width: 1.25em; height: 1.25em; margin-right: .5em; vertical-align: -.25em; background: currentColor; -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+[data-ico="list"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M4 5h16v3H4zM4 10.5h16v3H4zM4 16h16v3H4z%27/%3E%3C/svg%3E"); }
+[data-ico="sliders"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M3 6h10v2H3zM17 6h4v2h-4zM13 4h3v6h-3zM3 16h4v2H3zM11 16h10v2H11zM7 14h3v6H7z%27/%3E%3C/svg%3E"); }
+[data-ico="layers"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M12 2l10 5-10 5L2 7zM4.5 11L12 14.7 19.5 11 22 12.2 12 17.2 2 12.2zM4.5 16L12 19.7 19.5 16 22 17.2 12 22.2 2 17.2z%27/%3E%3C/svg%3E"); }
+[data-ico="bars"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M3 20h18v2H3zM5 10h3v9H5zM10.500 4h3v15h-3zM16 13h3v6h-3z%27/%3E%3C/svg%3E"); }
+[data-ico="info"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM11 10h2v8h-2zM11 6h2v2.500h-2z%27/%3E%3C/svg%3E"); }
+[data-ico="sunearth"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M8 3a4.500 4.500 0 1 0 0 9 4.500 4.500 0 0 0 0-9zM17 12a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM17 14.500a2.500 2.500 0 1 1 0 5 2.500 2.500 0 0 1 0-5z%27/%3E%3C/svg%3E"); }
+[data-ico="mountain"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M1 20l7-11 4 6 3-4 8 9z%27/%3E%3C/svg%3E"); }
+[data-ico="timeline"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M2 11h20v2H2zM5 7h2v10H5zM11 4h2v16h-2zM17 7h2v10h-2z%27/%3E%3C/svg%3E"); }
+[data-ico="calendar"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M4 5h16v16H4zM6 10v9h12v-9zM7 2h2v4H7zM15 2h2v4h-2z%27/%3E%3C/svg%3E"); }
+[data-ico="pin"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zM12 6.500a2.500 2.500 0 1 1 0 5 2.500 2.500 0 0 1 0-5z%27/%3E%3C/svg%3E"); }
+[data-ico="globe"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 4.500a7.500 7.500 0 1 1 0 15 7.500 7.500 0 0 1 0-15zM11 4h2v16h-2zM4 11h16v2H4z%27/%3E%3C/svg%3E"); }
+[data-ico="bolt"] { --ico: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M13 2L4 14h6l-1 8 9-12h-6z%27/%3E%3C/svg%3E"); }
+/* cards */
+.fcard > h3 .h-do, .fcard > summary .h-do { color: var(--wht); } .fcard > h3.gap { margin-top: 0; }
+.mm-side .fcard, #more-panel .fcard { margin-bottom: 10px; padding: 9px 12px 10px; border-radius: 4px; } .fcard { border-radius: 4px; }
+.mm-side .fcard > h3, #more-panel .fcard > h3, #more-panel .fcard > summary { font-size: 17px; margin-bottom: 7px; padding-bottom: 6px; }
+.mm-side .mm-layers, .mm-side #mm-profile, .mm-side #mm-meaning { border-left: none; padding-left: 0; }
+#more-panel details.fcard > h3 { margin-top: 10px; } #more-panel details.fcard:not([open]) > summary { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+#more-panel .os-box.fcard h3.gap { margin-top: 0; }
+.en-inputs, .en-out, .hist-text, .comms-log { border: 1px solid var(--grid0); background: var(--fill); border-radius: 4px; padding: 9px 12px; }
+.hist-text { padding: 7px 11px; }
+/* state marks: never by color alone */
+.site-ok.go::after, .site-ok.nogo::after { position: absolute; inset: 0; display: grid; place-items: center; font: 700 9px/1 Arial, sans-serif; color: #00140a; }
+.site-ok { position: relative; } .site-ok.go::after { content: "✓"; } .site-ok.nogo::after { content: "✕"; color: #fff; }
+.site-ok { width: 14px; height: 14px; vertical-align: -2px; }
+/* text floor: nothing to read under 12.5 px (wide layout) */
+html:not(.flow) :is(.site-list .grp, .site-more, .globe-labels span, .k-hint, .k-hint b, #globe-big, .key small, .globe-key span, #comms-note):not(#_) { font-size: 12.5px; }
+/* left column: the glass choices must fit the row */
+.col-site .seg { gap: 2px; } .col-site .seg button:not(#_) { padding: 2px 4px; min-width: 24px; border-width: 1px; border-radius: 5px; box-shadow: 0 1px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
+.col-site .need { gap: 4px; }
+#mm-view button:not(#_) { color: #eaf4ff; border: 2px solid #05070c; border-radius: 6px; background: var(--sheen), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(124,184,255,.3); }

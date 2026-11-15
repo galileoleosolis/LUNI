@@ -7,6 +7,10 @@ Sun 15 Nov · after 2 PM · 126 saves
 
 - The full name with “for”: Lunar Utility for Navigational Intelligence.
 - The default Earth-link need is now 25% of the mission (was only "at landing"), so a plan with almost no Earth link is no longer a GO.
+- The look now follows the LUNI Console design system: glossy keys, dark glass choice buttons everywhere, glazed action buttons, cards with icons in the Best Site Finder, the Moon map and COMPARE SITES · MORE, an icon on every section band.
+- A check or a cross inside the green and red dots in the site list; no text to read under 12.5 px.
+- NASA DATA USED band stays 14 seconds and each source is a link.
+- View from the site: shaded ground and craters for depth. FULL SCREEN button.
 - Outside the app: the slide deck, three GIFs, the talk scripts.
 
 ## r7: Energy, before and after, solar panels
