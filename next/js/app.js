@@ -467,6 +467,7 @@ function renderMoment() {
   $("hz-earth").href = horizonsUrl(399, cur.t);
   renderHorizon(cur);
   renderTimelineCursor();
+  renderOps();
   const sp = subPoints(cur.t);
   globe?.setBodies(sp.sun, sp.earth);
   surface?.update();
@@ -838,16 +839,66 @@ function showScreen(name) {
 // The lower chart shows one thing at a time: the MISSION PLAN (30 days after landing, with the slider) or MISSION WINDOWS
 // (the 12-month landing-day strip). The room this saves goes to the skyline picture.
 function showPlan(which) {
-  const plan = which !== "days";
-  $("timeline").toggleAttribute("hidden", !plan); $("plan-title-a").hidden = !plan;
-  $("calendar").toggleAttribute("hidden", plan); $("cal-title").hidden = plan;
-  $("tab-plan").classList.toggle("on", plan); $("tab-days").classList.toggle("on", !plan);
+  for (const [name, svg, title, tab] of [["plan", "timeline", "plan-title-a", "tab-plan"], ["ops", "ops", "ops-title", "tab-ops"], ["days", "calendar", "cal-title", "tab-days"]]) {
+    const on = name === (which === "days" || which === "ops" ? which : "plan");
+    $(svg).toggleAttribute("hidden", !on); $(title).hidden = !on; $(tab).classList.toggle("on", on);
+  }
   relayout();
+}
+
+// ---------- operations plan ----------
+// The mission, stretch by stretch: what the Sun and Earth allow, in order. It is a reading of LUNI's own hourly
+// answers (Sun up, Earth in view, eclipse), not a flight schedule: nothing here knows what the lander has to do.
+const OPS = {
+  both:  { name: "POWER + LINK", long: "SUN UP AND EARTH IN VIEW: POWER AND A LINK TO EARTH", fill: "#e9eef5", ink: "#06101f" },
+  sun:   { name: "POWER, NO LINK", long: "SUN UP, EARTH HIDDEN: POWER, BUT NO LINK TO EARTH", fill: "#21e07a", ink: "#04210f" },
+  earth: { name: "BATTERY, LINK", long: "NO SUN, EARTH IN VIEW: ON BATTERY, WITH A LINK", fill: "#1f8f9c", ink: "#fff" },
+  dark:  { name: "BATTERY, NO LINK", long: "NO SUN AND NO EARTH: ON BATTERY, NO LINK", fill: "#2b3340", ink: "#dfe6ee" },
+  ecl:   { name: "ECLIPSE", long: "ECLIPSE: EARTH IS IN FRONT OF THE SUN, ON BATTERY", fill: "#ffd23c", ink: "#1a1300" },
+};
+function opsStretches() {
+  const { samples } = state.scenario, n = Math.min(samples.length, state.req.days * 24 / STEP_HOURS), out = [];
+  const kind = (s) => (!s.sunUp && s.eclipse > 0.05 && s.sunTerrain > 0 ? "ecl" : s.sunUp ? (s.earthUp ? "both" : "sun") : s.earthUp ? "earth" : "dark");
+  for (let i = 0; i < n;) { const k = kind(samples[i]); let j = i; while (j < n && kind(samples[j]) === k) j++; out.push({ k, i, j }); i = j; }
+  return { list: out, n };
+}
+function renderOps() {
+  const svg = $("ops"); if (svg.hasAttribute("hidden")) return;
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 128, L = 4, R = 4;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.replaceChildren();
+  const { samples } = state.scenario, { list, n } = opsStretches(), w = (W - L - R) / n, y0 = 30, bh = 46;
+  const hrs = {}, noSun = list.filter((s) => s.k !== "both" && s.k !== "sun");
+  for (const s of list) hrs[s.k] = (hrs[s.k] || 0) + (s.j - s.i) * STEP_HOURS;
+  let longest = 0, run = 0; for (let i = 0; i < n; i++) { run = samples[i].sunUp ? 0 : run + STEP_HOURS; longest = Math.max(longest, run); }
+  const total = n * STEP_HOURS, share = (k) => Math.round((hrs[k] || 0) / total * 100);
+  const slim = W < 620;                              // phones: the short forms
+  el("text", { x: L, y: 15, fill: C.wht, "font-size": slim ? 12.5 : 13.5, "font-weight": 600 }, svg,
+    `${slim ? "BOTH" : "POWER + LINK"} ${share("both")}% · ${slim ? "POWER" : "POWER ONLY"} ${share("sun")}% · BATTERY ${100 - share("both") - share("sun")}%` + (noSun.length && !slim ? ` · LONGEST WITHOUT SUN ${fmtDH(longest)} (YOUR LIMIT ${state.req.maxDarkH} H)` : ""));
+  for (const s of list) {
+    const o = OPS[s.k], x = L + s.i * w, bw = Math.max(1.5, (s.j - s.i) * w - 1), dur = fmtDH((s.j - s.i) * STEP_HOURS);
+    const g = el("g", { class: "ops-b", "data-i": s.i }, svg);
+    el("rect", { x, y: y0, width: bw, height: bh, fill: o.fill, stroke: "#000", "stroke-width": 1 }, g);
+    el("title", {}, g, `${o.long}\n${stamp(samples[s.i].t)} TO ${stamp(samples[Math.min(samples.length - 1, s.j)].t)} · ${dur}`);
+    if (bw > o.name.length * 8.2 + 8) { el("text", { x: x + bw / 2, y: y0 + 20, fill: o.ink, "font-size": 13.5, "font-weight": 700, "text-anchor": "middle" }, g, o.name); el("text", { x: x + bw / 2, y: y0 + 37, fill: o.ink, "font-size": 13, "text-anchor": "middle" }, g, dur); }
+    else if (bw > dur.length * 8 + 6) el("text", { x: x + bw / 2, y: y0 + 29, fill: o.ink, "font-size": 13, "font-weight": 700, "text-anchor": "middle" }, g, dur);
+  }
+  const every = state.req.days <= 7 ? 1 : state.req.days <= 14 ? 2 : 7;
+  for (let d = 0; d <= state.req.days; d += every) {
+    const i = Math.min(n, d * 24 / STEP_HOURS), xx = L + i * w, t = samples[Math.min(samples.length - 1, i)].t;
+    el("line", { x1: xx, x2: xx, y1: y0 + bh, y2: y0 + bh + 5, stroke: C.dim, "stroke-width": 1 }, svg);
+    el("text", { x: xx, y: y0 + bh + 18, fill: C.dim, "font-size": 12.5, "text-anchor": d === 0 ? "start" : d + every > state.req.days ? "end" : "middle" }, svg, !d ? "LANDING" : slim ? `+${d}D` : `+${d}D · ${pad(t.getUTCDate())} ${MONTHS[t.getUTCMonth()]}`);
+  }
+  // the stretch the mission clock stands in
+  const cur = list.find((s) => state.idx >= s.i && state.idx < s.j);
+  if (state.idx < n) { const xx = L + (state.idx + 0.5) * w; el("path", { d: `M${xx},${y0 - 5}V${y0 + bh + 3}`, stroke: C.amb, "stroke-width": 2 }, svg); el("path", { d: `M${xx - 5},${y0 - 9}H${xx + 5}L${xx},${y0 - 2}Z`, fill: C.amb }, svg); }
+  const until = cur && samples[Math.min(samples.length - 1, cur.j)].t;
+  el("text", { x: L, y: H - 6, fill: C.amb, "font-size": slim ? 12.5 : 13 }, svg, !cur ? "THE CLOCK IS PAST THE END OF THE MISSION"
+    : slim ? `NOW: ${OPS[cur.k].name} · UNTIL ${dayStamp(until)}` : `AT THE MISSION CLOCK: ${OPS[cur.k].name} · FROM ${stamp(samples[cur.i].t)} UNTIL ${stamp(until)}`);
 }
 
 // Redraw everything whose size depends on the layout (after the window, the test bar or the story strip changes).
 let tourPrepare = () => {};
-function relayout() { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); }
+function relayout() { fitStage(); renderTimeline(); renderOps(); updateCalendar(); renderMoment(); }
 
 // ---------- share link ----------
 const PUBLIC_URL = "https://galileoleosolis.github.io/LUNI/";      // the preview page has no address of its own to share
@@ -915,6 +966,8 @@ async function init() {
   $("share-btn").addEventListener("click", shareLink);
   $("tab-plan").addEventListener("click", () => showPlan("plan"));
   $("tab-days").addEventListener("click", () => showPlan("days"));
+  $("tab-ops").addEventListener("click", () => showPlan("ops"));
+  $("ops").addEventListener("click", (e) => { const g = e.target.closest(".ops-b"); if (g) setIdx(+g.dataset.i); });
   past = createHistoryPanel({ fmt: { stamp, day: dayStamp, lat: fmtLat, lon: fmtLon }, onLoad: applyScene, onClose: () => showScreen("main") });
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));

@@ -53,8 +53,11 @@ Source code: https://github.com/galileoleosolis/LUNI
 - **The view from the site.** The skyline all the way round, drawn from elevation data, with the Sun, the Earth in its
   real phase, and where each will go over the next 3 days. Eclipses (Earth passing in front of the Sun) are detected
   and flagged.
-- **Mission plan and mission windows.** A 30-day timeline with a slider for any moment of the mission, and every good
-  landing day for the next 12 months.
+- **Mission plan, operations and mission windows.** A 30-day timeline with a slider for any moment of the mission; an
+  operations view that lays the mission out as stretches in order (power and link, power only, on battery, eclipse);
+  and every good landing day for the next 12 months.
+- **All sites side by side.** Every site in the list carries a green or red dot for the landing time on screen, and
+  a ranked table shows how many good landing days each site has. Any latitude and longitude can be typed in.
 - **Best Site Finder.** LUNI checks a grid of points around the site, out to 60 km away, and marks the best
   one that meets the needs. The skylines are computed on the graphics chip when one is available, and each run first
   checks itself against the processor.

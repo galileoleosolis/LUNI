@@ -849,3 +849,7 @@ html.flow .key { font-size: 16px; }
 .note-low { color: var(--dim); font-size: 12.5px !important; white-space: normal !important; }
 html.flow .coord-row { flex-wrap: wrap; }
 html.flow .ans-head { flex-wrap: wrap; gap: 6px; } html.flow .ans-btns { flex-wrap: wrap; }
+/* operations plan: the mission as stretches in order */
+.ops { cursor: default; } .ops .ops-b { cursor: pointer; } .ops .ops-b:hover rect { stroke: #fff; stroke-width: 2; } .ops text { pointer-events: none; }
+.plan-tabs button { padding: 4px 13px 5px; } .plan-tabs { gap: 5px; }
+html.flow .plan-tabs { flex-wrap: wrap; } html.flow .plan-tabs button { font-size: 15px; padding: 4px 9px 5px; flex: 1 1 auto; }
