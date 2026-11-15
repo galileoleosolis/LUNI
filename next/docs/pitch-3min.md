@@ -67,7 +67,9 @@ no install and no server. Thank you."
 Positions agree with NASA JPL Horizons within 0.0007 degrees across 1,110 values at 6 sites. Blue Ghost: 347 hours of
 daylight calculated, 346 reported. The eclipse on 14 March 2025: LUNI gives 05:01 to 09:51 UTC with the Sun fully
 hidden from 06:18; the lander's pictures give about 05:30, 06:18 and 09:52. Chandrayaan-3: LUNI's sunset is
-4 September 2023, the day the lander was put to sleep.
+4 September 2023, the day the lander was put to sleep. The map layers were checked against NASA's own polar maps from
+the LOLA team: sunlight matches at 0.99, and "never sunlit" gives the same answer as NASA's permanent-shadow map in
+about 99% of the squares.
 
 **What NASA data does it use?**
 NASA NAIF SPICE (the DE440 ephemeris) for Sun and Earth positions, 2023 to 2035. LRO LOLA elevation maps for terrain

@@ -90,6 +90,9 @@ the rest of the Moon. Temperatures are NASA's own Diviner values, only re-gridde
 - Blue Ghost Mission 1: LUNI works out 347 hours of daylight after touchdown; Firefly reported 346. LUNI puts the
   14 March 2025 eclipse at 05:01 to 09:51 UTC with the Sun fully hidden from 06:18; the lander's pictures give about
   05:30, 06:18 and 09:52.
+- LUNI's polar map layers agree with NASA's own polar maps from the LRO LOLA team: sunlight correlates at 0.99 at
+  both poles with an average gap under 2 points, and "never sunlit" gives the same answer as NASA's permanently
+  shadowed regions map in about 99% of 1.26 million squares per pole.
 - Chandrayaan-3: LUNI's sunset is 4 September 2023, the day the lander was put to sleep ahead of the lunar night.
 - The app lists what it does not model: the landing itself, rocks and craters smaller than a map pixel, panel
   direction, lander tilt, antennas and relay satellites.
@@ -150,6 +153,9 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - **LRO LOLA (Lunar Orbiter Laser Altimeter) gridded elevation**, NASA PDS Geosciences Node: `ldem_80s_40m`,
   `ldem_60s_240m`, `ldem_60n_240m`, `ldem_16`. Used for every skyline, slope, the area scan, the map layers and the 3D surface view.
   https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/
+- **LRO LOLA polar illumination maps, 2016 release** (permanently shadowed regions, average visibility of the Sun
+  and of Earth, 240 m; Mazarico et al. 2011), NASA PDS, LOLA archive extras: used to check LUNI's own map layers.
+  https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/extras/illumination/
 - **LRO Diviner Lunar Radiometer, Polar Resource Product V2.0** (Paige et al., LRO-L-DLRE-5-PRP-V2.0), NASA PDS:
   annual average and maximum surface temperature around both poles, and the depth at which water ice would stay
   frozen (the product's `ice_depth` column).
