@@ -45,10 +45,10 @@ export const LAYERS = [
     ends: ["EARTH RARELY IN VIEW = BAD", "EARTH MOSTLY IN VIEW = GOOD"], scale: ["0%", "100%"],
     meaning: "HOW MUCH OF THE TIME EARTH IS ABOVE THE SKYLINE, SO A LANDER CAN TALK TO IT DIRECTLY, COUNTED OVER ALL OF 2023 TO 2035. THE NEAR SIDE ALWAYS SEES EARTH AND THE FAR SIDE NEVER DOES; IN BETWEEN, AND AT THE POLES, IT COMES AND GOES.",
     source: "WORKED OUT BY LUNI: EARTH'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, 2023 TO 2035. POLEWARD OF 80°: 480 M SQUARES, EVERY 6 HOURS. ELSEWHERE: QUARTER-DEGREE SQUARES (ABOUT 7.6 KM), EVERY 12 HOURS." },
-  { id: "shadow", label: "PERMANENT SHADOW", short: "SHADOW", where: "BOTH POLES", polar: true, binary: true, capsOnly: true,
-    color: (v) => (v ? SHADOW_RGB : null), score: (v) => (v ? 0 : 1), text: (v) => (v ? "YES: NEVER SUNLIT" : "NO: SUNLIT AT TIMES"), brief: (v) => (v ? "YES" : "NO"),
-    ends: ["", "PURPLE = NEVER ANY SUNLIGHT"], scale: ["", ""],
-    meaning: "NO SOLAR POWER HERE AT ANY TIME. MISSIONS STILL WANT TO LAND NEAR THESE PLACES, BECAUSE WATER ICE CAN LAST IN THEM.",
+  { id: "shadow", label: "PERMANENT SHADOW", short: "NEVER SUNLIT", where: "BOTH POLES", polar: true, binary: true, capsOnly: true,
+    color: (v) => (v ? SHADOW_RGB : null), score: (v) => (v ? 0 : 1), text: (v) => (v ? "YES: NEVER SUNLIT" : "NO: SUNLIT AT TIMES"), brief: (v) => (v ? "YES, ALWAYS" : "NO"),
+    ends: ["", "PURPLE = NEVER SUNLIT, IN ANY YEAR CHECKED"], scale: ["", ""],
+    meaning: "PERMANENT MEANS ALWAYS: THE SUN NEVER REACHES THESE PLACES AT ANY TIME FROM 2023 TO 2035. THAT IS NOT THE SAME AS DARK RIGHT NOW (EVERY PLACE IS DARK FOR PART OF EACH MONTH). NO SOLAR POWER HERE, EVER. MISSIONS STILL WANT TO LAND NEARBY, BECAUSE WATER ICE CAN LAST IN SUCH PLACES.",
     source: "WORKED OUT BY LUNI: PLACES WHERE NO PART OF THE SUN'S DISC CLEARS THE SKYLINE (NASA LRO LOLA ELEVATION) AT ANY CHECKED MOMENT FROM 2023 TO 2035 (NASA NAIF SPICE). THE MOON'S FULL 18.6-YEAR CYCLE IS NOT COVERED." },
   { id: "temp", label: "TEMPERATURE", where: "WHOLE MOON", polar: true, lo: 30, hi: 280, card: "TEMPERATURE (AVG)",
     color: (v) => ramp(TEMP_RAMP, (v - 30) / 250), score: null, text: (v) => `${celsius(v)} (${Math.round(v)} K)`, brief: (v) => celsius(v),
@@ -170,7 +170,7 @@ export async function profileAt(lat, lon) {
 // The card: one row per layer, a bar in the layer's own color, the number, and a GOOD / FAIR / BAD word where the layer has a say.
 export const verdictWord = (score) => (score == null ? "" : score >= 0.67 ? "GOOD" : score >= 0.34 ? "FAIR" : "BAD");
 export function profileHtml(rows) {
-  return `<div class="prof">` + rows.map((r) => r.text == null
+  return `<div class="prof">` + rows.map((r) => r.head ? `<div class="prof-head">${r.head}</div>` : r.text == null
     ? `<div class="prof-row none"><span>${r.label}</span><i></i><b>${r.note}</b><em></em></div>`
     : `<div class="prof-row"><span>${r.label}</span><i><u style="width:${Math.round(r.share * 100)}%;background:rgb(${r.rgb})"></u></i><b>${r.text}${r.note ? ` <small>${r.note}</small>` : ""}</b><em style="color:rgb(${r.score == null ? "150,160,175" : goodColor(r.score)})">${verdictWord(r.score) || "—"}</em></div>`).join("") + `</div>`;
 }

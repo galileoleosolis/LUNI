@@ -704,3 +704,16 @@ html.flow .moonmap .scan-head, html.flow .history .scan-head { flex-wrap: wrap; 
 .timeline[hidden], .calendar[hidden] { display: none !important; }
 .col-main .calendar { height: 112px; margin-bottom: 4px; }
 html.flow .plan-head { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- each numbered section has its own color (a tester asked for the sections to be told apart) ---------- */
+:root { --s1: #41b6ff; --s2: #c79bff; --s3: #ffb648; --s4: #21e07a; }
+h3[data-step="1"] .step { background: var(--s1); } h3[data-step="1"] .h-t { color: var(--s1); }
+h3[data-step="2"] .step { background: var(--s2); } h3[data-step="2"] .h-t { color: var(--s2); }
+h3[data-step="3"] .step { background: var(--s3); } h3[data-step="3"] .h-t { color: var(--s3); }
+h3[data-step="4"] .step { background: var(--s4); } h3[data-step="4"] .h-t { color: var(--s4); }
+.col-site .site-list { border-color: var(--s1); border-left-width: 3px; }
+.col-site .t0 select { border-color: var(--s2); border-left-width: 3px; }
+.col-site .needs { border-left: 3px solid var(--s3); padding-left: 7px; }
+.col-site .needs .seg button.on { background: var(--s3); border-color: var(--s3); color: #1a0f00; }
+.prof-head { margin-top: 5px; padding-top: 4px; border-top: 1px solid var(--grid0); font-size: 12.5px; font-weight: 700; color: var(--wht); letter-spacing: .03em; } .prof-head:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+.mm-side .mm-meaning { margin-top: 0; margin-bottom: 5px; }

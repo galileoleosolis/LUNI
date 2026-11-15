@@ -52,7 +52,6 @@
             <div id="mm-layers" class="mm-layers"></div>
             <div id="mm-legend"></div>
             <label class="mm-strength">LAYER STRENGTH <input id="mm-strength" type="range" min="25" max="100" value="80" aria-label="How strongly the layer covers the picture"></label>
-            <div id="mm-meaning" class="mm-meaning"></div>
             <div id="mm-mix" class="mm-mix" hidden>
               <div id="mm-mix-rows"></div>
               <button id="mm-mix-use" class="mm-mix-use" title="Opens the scan around the landing site, colored by your mix, with the best point picked by your mix among the points that meet the mission needs">USE THIS MIX IN THE SCAN ▸</button>
@@ -60,7 +59,8 @@
             <h3 class="gap"><b class="h-t">DATA PROFILE</b> · EVERY LAYER AT ONE POINT</h3>
             <div id="mm-prof-where" class="mm-prof-where"></div>
             <div id="mm-profile"></div>
-            <h3 class="gap"><b class="h-t">WHERE THIS LAYER'S DATA COMES FROM</b></h3>
+            <h3 class="gap"><b class="h-t">ABOUT THIS LAYER</b> · AND WHERE ITS DATA COMES FROM</h3>
+            <div id="mm-meaning" class="mm-meaning"></div>
             <div id="mm-source" class="dimtxt"></div>
           </div>
         </div>
@@ -79,7 +79,7 @@
       </div>
       <!-- LEFT: site + date -->
       <section class="col col-site">
-        <h3><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
+        <h3 data-step="1"><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
         <div id="site-list" class="site-list"></div>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
@@ -91,7 +91,7 @@
           <button id="globe-big" class="globe-big" title="Opens the MOON MAP screen: the Moon made big, with data layers (M)">⤢ MOON MAP</button>
           <button id="side-scan" class="side-go" title="Maps the ground around this site and shows where the mission needs are met (A)">SCAN FOR BETTER SPOT ▸</button>
         </div>
-        <h3 class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
+        <h3 data-step="2" class="gap step-head"><span><b class="step">2</b><b class="h-t">WHEN</b> · LANDING TIME</span><button id="side-next" class="side-go" title="Moves the landing time to the start of the next landing window that meets the mission needs (N)">NEXT GOOD TIME ▸</button></h3>
         <div class="t0">
           <select id="t0-day" aria-label="Day"></select>
           <select id="t0-month" aria-label="Month"></select>
@@ -99,7 +99,7 @@
           <select id="t0-hour" aria-label="Hour, UTC"></select>
         </div>
         <p class="note">UTC = WORLD TIME (SAME AS GMT)</p>
-        <h3 class="gap"><b class="step">3</b><b class="h-t">MISSION NEEDS</b> · <b class="h-do">CLICK TO CHANGE</b></h3>
+        <h3 data-step="3" class="gap"><b class="step">3</b><b class="h-t">MISSION NEEDS</b> · <b class="h-do">CLICK TO CHANGE</b></h3>
         <div class="needs">
           <div class="need"><span>MISSION LENGTH</span><div class="seg" data-req="days"></div><span>D</span></div>
           <div class="need"><span>CAN SIT IN THE DARK</span><div class="seg" data-req="maxDarkH"></div><span>H</span></div>
@@ -135,7 +135,7 @@
           <div id="proof-body" class="proof-body"></div>
         </div>
         <div id="story" class="story" hidden></div>
-        <div class="tiles-head ans-head"><h3><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
+        <div class="tiles-head ans-head"><h3 data-step="4"><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
           <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></span></div>
         <div class="answer-row">
         <div id="mission" class="hero">
