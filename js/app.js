@@ -181,7 +181,7 @@ function renderStory() {
   if (box.hidden || box.dataset.id === st.id) return;
   box.dataset.id = st.id;
   box.innerHTML = `<span class="story-text" title="${st.real}"><b class="h-t">REAL LANDING</b> · <b>${st.name}, ${st.when}</b> · ${st.strip}</span>
-    <span class="story-btns"><button id="story-proof" title="What really happened, with sources, next to what LUNI works out">THE STORY ▸</button><button id="story-now" title="Moves the landing time to the current hour">GO TO TODAY ▸</button><button id="story-x" title="Hide this note">✕</button></span>`;
+    <span class="story-btns"><button id="story-proof" title="The mission record, with sources, compared with LUNI's calculation">THE STORY ▸</button><button id="story-now" title="Moves the landing time to the current hour">GO TO TODAY ▸</button><button id="story-x" title="Hide this note">✕</button></span>`;
   $("story-proof").addEventListener("click", () => proof.toggle(true, st.id));
   $("story-now").addEventListener("click", () => setT0(roundToHour(new Date())));
   $("story-x").addEventListener("click", () => { state.storyOff = st.id; box.hidden = true; relayout(); });
@@ -811,6 +811,7 @@ function showPlan(which) {
 }
 
 // Redraw everything whose size depends on the layout (after the window, the test bar or the story strip changes).
+let tourPrepare = () => {};
 function relayout() { fitStage(); renderTimeline(); updateCalendar(); renderMoment(); }
 
 // ---------- share link ----------
@@ -895,6 +896,12 @@ async function init() {
     requestAnimationFrame(relayout);
   };
   $("setup-tab").addEventListener("click", () => setSetup(document.querySelector(".cols").classList.contains("setup-off")));
+  // Before each tutorial card: the main screen with nothing open over it, so the part being explained is in view.
+  tourPrepare = () => {
+    showScreen("main"); if (document.querySelector(".cols").classList.contains("setup-off")) setSetup(true);
+    if (scan.isOpen()) scan.toggle(false); if (proof.isOpen()) proof.toggle(false); if (surface.isOpen()) surface.toggle(false); if (comms.isOpen()) comms.toggle(false);
+    setMore(false); showPlan("plan");
+  };
   setSetup(true);
   $("side-next").addEventListener("click", nextWindow);
   scan = createScanPanel({
@@ -975,9 +982,10 @@ async function init() {
   const testing = initTestMode({
     snapshot: () => ({ site: state.site, t0: state.t0, req: state.req, missionOk: state.cal.a.at(calIdx()).ok }),
     relayout,
-    onExplore: () => startGuide({ zoomOf }),
+    onExplore: () => startGuide({ prepare: tourPrepare }),
   });
-  if (!testing) startGuide({ zoomOf, force: !!globalThis.LUNO_GUIDE });
+  if (!testing) startGuide({ prepare: tourPrepare, force: !!globalThis.LUNO_GUIDE });
+  $("tour-btn").addEventListener("click", () => startGuide({ prepare: tourPrepare, force: true }));
   document.fonts?.ready.then(relayout);
 }
 

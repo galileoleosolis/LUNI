@@ -574,15 +574,6 @@ html.flow .proof { position: fixed; inset: 0; padding: 10px; z-index: 31; } html
 
 .toast.raw { text-transform: none; pointer-events: auto; user-select: all; background: #000; color: var(--wht); border-color: var(--hi); letter-spacing: 0; word-break: break-all; }
 
-.guide { position: absolute; z-index: 20; width: 360px; background: #000; border: 2px solid var(--key-y, #ffd23c); box-shadow: 0 0 0 4px rgba(0,0,0,.7), 0 10px 40px #000; padding: 10px 14px 12px; color: var(--wht); font-size: 14.5px; line-height: 1.38; }
-.guide-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; } .guide-head b { font-family: var(--cond); font-size: 19px; letter-spacing: .04em; color: var(--key-y, #ffd23c); } .guide-head span { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
-.guide p { margin: 6px 0 10px; }
-.guide-btns { display: flex; justify-content: space-between; gap: 10px; }
-.guide-btns button { font: inherit; font-size: 13.5px; font-weight: 700; padding: 3px 12px; cursor: pointer; border: 1px solid var(--dim); background: #000; color: var(--amb); }
-.guide-btns .guide-next { background: var(--key-y, #ffd23c); border-color: var(--key-y, #ffd23c); color: #000; } .guide-btns button:hover { filter: brightness(1.2); }
-.guide.flowing { position: fixed; left: 8px; right: 8px; bottom: 8px; width: auto; z-index: 40; }
-.guide-hot { outline: 3px solid var(--key-y, #ffd23c); outline-offset: 2px; animation: guide-pulse 1.3s ease-in-out infinite; }
-@keyframes guide-pulse { 50% { outline-color: transparent; } }
 a.nasa-check { margin-left: 8px; font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: .02em; color: var(--hi); text-decoration: underline; } a.nasa-check:hover { color: var(--wht); }
 .answer-row { margin-bottom: 7px; padding-bottom: 7px; } .horizon { margin-bottom: 6px; padding-bottom: 5px; }
 .tight .tiles-head .long { display: none; }
@@ -754,7 +745,6 @@ html.simple .col-site .needs:not(.open) .need:nth-child(n+2) { display: none; }
 .needs-more { display: none; margin-top: 6px; width: 100%; text-align: left; font: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: .03em; padding: 4px 9px; cursor: pointer; color: var(--wht); background: #000; border: 1px solid color-mix(in srgb, var(--s3) 60%, #000); border-left: 5px solid var(--s3); }
 .needs-more:hover { background: color-mix(in srgb, var(--s3) 18%, #000); }
 html.simple .needs-more { display: block; }
-.guide.intro { width: 470px; font-size: 16px; } .guide.intro .guide-head b { font-size: 24px; }
 /* the scan: what it is and the answer first, the choices folded away */
 .scan-how { font-size: 13.5px; line-height: 1.4; color: var(--amb); margin-bottom: 8px; } .scan-how b { color: var(--wht); }
 .band[data-band="4"] { --sc: var(--s4); }
@@ -765,3 +755,37 @@ html.simple .needs-more { display: block; }
 .scan-mgroup .seg { flex-wrap: wrap; } .scan-mgroup .seg button { flex: 1 1 46%; }
 .scan-legend.flat { line-height: 1.7; font-size: 13px; }
 html.flow.simple #play-btn { grid-column: span 2; } html.flow.simple #tools-btn { order: 9; grid-column: span 2; } html.flow:not(.simple) #tools-btn { order: 11; grid-column: span 4; }
+.ic { width: 1.25em; height: 1.25em; vertical-align: -0.24em; margin-right: 6px; fill: currentColor; }
+.comms-opt { font-size: 13px; padding: 5px 10px; } .comms-mic .ic { width: 1.35em; height: 1.35em; }
+
+/* the guided tutorial (js/guide.js): everything but one part is dimmed */
+.tour-dim { position: fixed; z-index: 60; background: rgba(0, 0, 0, .82); }
+.tour-ring { position: fixed; z-index: 61; pointer-events: none; border: 3px solid var(--key-y, #ffd23c); border-radius: 6px; box-sizing: border-box; animation: tour-ring 1.3s ease-in-out infinite; }
+@keyframes tour-ring { 50% { border-color: rgba(255, 210, 60, .25); } }
+.tour-card { position: fixed; z-index: 62; width: min(440px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box; background: #05080d; border: 2px solid var(--key-y, #ffd23c); border-radius: 8px;
+  box-shadow: 0 12px 50px #000; padding: 12px 16px 14px; color: #e9eef5; font-family: var(--mono); font-size: 15px; line-height: 1.45; }
+.tour-top { display: flex; align-items: center; gap: 10px; font-size: 12.5px; letter-spacing: .08em; color: #9fb0c6; }
+.tour-bar { flex: 1; height: 6px; background: #1b2634; border-radius: 3px; overflow: hidden; } .tour-bar b { display: block; height: 100%; background: var(--key-y, #ffd23c); }
+.tour-skip { font: inherit; font-size: 12.5px; color: #9fb0c6; background: none; border: 1px solid #3a4a5e; border-radius: 4px; padding: 2px 8px; cursor: pointer; } .tour-skip:hover { color: #fff; border-color: #fff; }
+.tour-card h2 { margin: 9px 0 6px; font-family: var(--cond); font-size: 25px; font-weight: 700; letter-spacing: .04em; line-height: 1.1; color: var(--key-y, #ffd23c); }
+.tour-card dl { margin: 0; } .tour-card dt { margin-top: 8px; font-family: var(--cond); font-size: 14.5px; font-weight: 700; letter-spacing: .12em; } .tour-card dd { margin: 1px 0 0; }
+.tour-card dt.w1 { color: var(--s1); } .tour-card dt.w2 { color: var(--s3); } .tour-card dt.w3 { color: var(--s4); }
+.tour-text { margin: 0; font-size: 16px; } .tour-text b { color: #fff; }
+.tour-try { margin-top: 10px; padding: 6px 10px; border: 1px dashed var(--s4); color: var(--s4); font-weight: 600; } .tour-try.ok { border-style: solid; background: color-mix(in srgb, var(--s4) 18%, #000); }
+.tour-check { margin-top: 10px; padding: 8px 10px; background: #0d141d; border-left: 4px solid var(--s2); } .tour-check > b { display: block; font-family: var(--cond); font-size: 15px; letter-spacing: .08em; color: var(--s2); margin-bottom: 5px; }
+.tour-check button { display: block; width: 100%; margin-top: 4px; text-align: left; font: inherit; font-size: 14.5px; color: #e9eef5; background: #000; border: 1px solid #3a4a5e; border-radius: 4px; padding: 5px 9px; cursor: pointer; }
+.tour-check button:hover { border-color: #fff; } .tour-check button.yes { border-color: var(--s4); background: color-mix(in srgb, var(--s4) 20%, #000); } .tour-check button.no { border-color: var(--red); background: color-mix(in srgb, var(--red) 18%, #000); }
+.tour-fb { margin: 7px 0 0; font-size: 14.5px; } .tour-fb.yes { color: var(--s4); } .tour-fb.no { color: #ff9b9b; }
+.tour-alt { margin-top: 10px; padding: 8px 10px; background: #0d141d; border-left: 4px solid var(--s1); } .tour-alt b { display: block; font-family: var(--cond); font-size: 14.5px; letter-spacing: .12em; color: var(--s1); margin-bottom: 2px; }
+.tour-btns { display: flex; gap: 8px; margin-top: 12px; align-items: stretch; }
+.tour-btns button { font: inherit; font-size: 13.5px; font-weight: 700; padding: 7px 11px; cursor: pointer; color: #e9eef5; background: #000; border: 1px solid #56677c; border-radius: 5px; } .tour-btns button:hover { border-color: #fff; }
+.tour-btns .tour-more { flex: 1; font-size: 12.5px; } .tour-btns .tour-next { margin-left: auto; background: var(--key-y, #ffd23c); border-color: var(--key-y, #ffd23c); color: #000; font-family: var(--cond); font-size: 17px; letter-spacing: .04em; white-space: nowrap; }
+.tour-next.pulse { animation: tour-next 1s ease-in-out infinite; } @keyframes tour-next { 50% { box-shadow: 0 0 0 5px rgba(255, 210, 60, .35); } }
+.tour-card.sheet { left: 8px !important; right: 8px; top: auto !important; bottom: 8px; width: auto; max-height: 50vh; font-size: 14.5px; }
+.tour-card.sheet.up { top: 8px !important; bottom: auto; }
+@media (prefers-reduced-motion: reduce) { .tour-ring, .tour-next.pulse { animation: none; } }
+.top-right { display: flex; align-items: center; gap: 12px; }
+.tour-btn { font: inherit; font-size: 13px; letter-spacing: .14em; padding: 3px 12px; cursor: pointer; color: #1a1300; background: var(--key-y, #ffd23c); border: 1px solid #000; border-radius: 4px; }
+.tour-btn:hover { filter: brightness(1.1); }
+html.flow .tour-btn { font-size: 11.5px; padding: 3px 8px; letter-spacing: .08em; }
+.comms-row .ic { display: inline-block; } .comms-row .comms-opt, .comms-row .comms-mic { display: inline-flex; align-items: center; }

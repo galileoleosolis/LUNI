@@ -280,7 +280,7 @@ export function createAssistant(api) {
     let out = `${s.siteName}, at ${fmtLat(s.site.lat)}, ${fmtLon(s.site.lon)}.`;
     const tr = s.terrain;
     if (tr.real) out += ` Ground height ${tr.heightM < 0 ? "−" : "+"}${Math.abs(Math.round(tr.heightM))} m, slope ${tr.slopeDeg.toFixed(1)}°, from NASA's LOLA elevation maps${tr.reduced ? " (reduced detail)" : ""}.`;
-    else out += s.terrainBusy ? " The skyline is still being worked out." : " No terrain loaded: flat horizon.";
+    else out += s.terrainBusy ? " The skyline is still being calculated." : " No terrain loaded: flat horizon.";
     return out;
   }
   const needsText = (s = snap()) => `Mission needs: ${s.req.days} days long; can sit ${s.req.maxDarkH} hours in the dark; Earth link at landing ${s.req.earthAtLanding ? "required" : "not required"}; Earth in view for ${s.req.earthMinPct ? `at least ${s.req.earthMinPct}%` : "any share"} of the mission; ground slope ${s.req.maxSlopeDeg ? `at most ${s.req.maxSlopeDeg}°` : "any"}.`;
