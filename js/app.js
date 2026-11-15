@@ -347,6 +347,19 @@ function setReq(k, val) {
 }
 function syncNeeds() {
   document.querySelectorAll(".seg[data-req] button").forEach((x) => x.classList.toggle("on", x.dataset.v === String(state.req[x.parentElement.dataset.req])));
+  // SIMPLE VIEW shows the mission length only; a need that is not at its usual setting brings the rest into view.
+  if (Object.keys(DEFAULT_REQ).some((k) => k !== "days" && state.req[k] !== DEFAULT_REQ[k])) openNeeds(true);
+}
+function openNeeds(open) {
+  document.querySelector(".needs").classList.toggle("open", open);
+  $("needs-more").textContent = open ? "▾ SHOW FEWER NEEDS" : "▸ 4 MORE MISSION NEEDS";
+}
+// SIMPLE VIEW (the default): the few keys and needs most people use. ALL TOOLS: everything. Kept under "luno-view".
+function setTools(all, keep = true) {
+  document.documentElement.classList.toggle("simple", !all);
+  $("tools-btn").innerHTML = all ? "<small>BACK TO</small>SIMPLE" : "<small>SHOW</small>ALL TOOLS";
+  if (keep) try { localStorage.setItem("luno-view", all ? "all" : "simple"); } catch {}
+  requestAnimationFrame(relayout);
 }
 
 function buildNeeds() {
@@ -869,6 +882,12 @@ async function init() {
   proof = createProofPanel({ fmt: { stamp }, links: () => ({ sun: $("hz-sun").href, earth: $("hz-earth").href }), onReplay: applyScene });
   $("more-close").addEventListener("click", () => setMore(false));
   $("next-window-btn").addEventListener("click", nextWindow);
+  $("tools-btn").addEventListener("click", () => setTools(document.documentElement.classList.contains("simple")));
+  $("needs-more").addEventListener("click", () => openNeeds(!document.querySelector(".needs").classList.contains("open")));
+  openNeeds(document.querySelector(".needs").classList.contains("open"));
+  { let all = /^#test-[a-d]\b/.test(location.hash) || !!globalThis.LUNO_ALL_TOOLS;      // the older test sets use every key
+    try { all ||= localStorage.getItem("luno-view") === "all"; } catch {}
+    setTools(all, false); }
   // The left side (site, time, needs) pops in and out; the answer and charts take the freed room.
   const setSetup = (show) => {
     document.querySelector(".cols").classList.toggle("setup-off", !show);

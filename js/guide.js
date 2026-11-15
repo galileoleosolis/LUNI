@@ -2,6 +2,8 @@
 // (remembered under "luno-guide-v1"), never to automated browsers, and it can be skipped at any card.
 const KEY = "luno-guide-v1";
 const STEPS = [
+  { at: null, head: "WHAT LUNI DOES", next: "SHOW ME HOW ▸",
+    text: "LUNI answers one question for a Moon mission: if we land at this spot, at this time, will the lander have sunlight for power and a clear line to Earth for as long as the mission lasts? The answer is a GO or a NO-GO, worked out from NASA data." },
   { at: ".col-site", side: "right", head: "1 · CHOOSE YOUR SITE AND TIME",
     text: "Choose a landing site from the list (or click any spot on the Moon), then the landing time and what the mission needs. LUNI opens on a real landing: IM-2 Athena, 6 March 2025." },
   { at: "#mission", side: "below", head: "2 · GET THE VERDICT",
@@ -22,7 +24,8 @@ export function startGuide({ zoomOf, force = false } = {}) {
   function place() {
     const flow = document.documentElement.classList.contains("flow");
     card.classList.toggle("flowing", flow);
-    if (flow) { card.style.left = card.style.top = ""; hot.scrollIntoView({ block: "center" }); return; }
+    if (flow) { card.style.left = card.style.top = ""; hot?.scrollIntoView({ block: "center" }); return; }
+    if (!hot) { card.style.left = (screen.clientWidth - card.offsetWidth) / 2 + "px"; card.style.top = (screen.clientHeight - card.offsetHeight) / 2 + "px"; card.dataset.side = "center"; return; }
     const z = zoomOf(screen), S = screen.getBoundingClientRect(), r = hot.getBoundingClientRect(), side = STEPS[i].side;
     const x0 = (r.left - S.left) / z, y0 = (r.top - S.top) / z, w = r.width / z, h = r.height / z, cw = card.offsetWidth, ch = card.offsetHeight, W = screen.clientWidth, H = screen.clientHeight;
     let x = side === "right" ? x0 + w + 14 : x0 + Math.min(40, w / 6), y = side === "right" ? y0 + 60 : side === "below" ? y0 + h + 14 : y0 - ch - 14;
@@ -31,9 +34,9 @@ export function startGuide({ zoomOf, force = false } = {}) {
   }
   function show() {
     hot?.classList.remove("guide-hot");
-    const s = STEPS[i]; hot = document.querySelector(s.at); hot.classList.add("guide-hot");
+    const s = STEPS[i]; hot = s.at ? document.querySelector(s.at) : null; hot?.classList.add("guide-hot"); card.classList.toggle("intro", !hot);
     card.innerHTML = `<div class="guide-head"><b>${s.head}</b><span>QUICK TOUR ${i + 1} OF ${STEPS.length}</span></div><p>${s.text}</p>
-      <div class="guide-btns"><button class="guide-skip">SKIP THE TOUR</button><button class="guide-next">${i < STEPS.length - 1 ? "NEXT ▸" : "START USING LUNI ▸"}</button></div>`;
+      <div class="guide-btns"><button class="guide-skip">SKIP THE TOUR</button><button class="guide-next">${s.next || (i < STEPS.length - 1 ? "NEXT ▸" : "START USING LUNI ▸")}</button></div>`;
     card.querySelector(".guide-skip").addEventListener("click", done);
     card.querySelector(".guide-next").addEventListener("click", () => { if (++i < STEPS.length) show(); else done(); });
     place();

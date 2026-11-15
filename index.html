@@ -108,6 +108,7 @@
           <div class="need"><span>EARTH LINK AT LANDING</span><div class="seg" data-req="earthAtLanding"></div></div>
           <div class="need" title="The steepest ground the lander accepts. ANY = slope is not judged. Slope comes from NASA's LOLA elevation maps."><span>GROUND SLOPE AT MOST</span><div class="seg" data-req="maxSlopeDeg"></div><span>°</span></div>
         </div>
+        <button id="needs-more" class="needs-more"></button>
       </section>
 
       <!-- CENTER: the answer -->
@@ -117,16 +118,21 @@
           <div class="scan-body">
             <div class="scan-map"><canvas id="scan-canvas"></canvas></div>
             <div class="scan-side">
-              <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
-              <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>
-              <div id="scan-legend" class="scan-legend"></div>
-              <h3><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
-              <h3><b class="h-t">BEST POINT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <button id="scan-go-best" class="scan-go" disabled>MOVE SITE TO BEST POINT</button>
+              <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
+              <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
+              <button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button>
               <div id="scan-progress"></div>
+              <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
+              <div id="scan-legend" class="scan-legend"></div>
+              <h3><b class="h-t">SCAN SIZE</b> · <b class="h-do">PICK ONE</b></h3><div class="seg" id="scan-radius"></div>
+              <details id="scan-more" class="scan-more">
+                <summary><b class="h-t">MORE MAP CHOICES</b> · <b class="h-do">CLICK TO OPEN</b></summary>
+                <h3><b class="h-t">SHOW</b> · <b class="h-do">PICK ONE</b></h3><div id="scan-metric" class="scan-metric"></div>
+              </details>
+              <h3 class="band" data-band="2"><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
               <div id="scan-engine" class="dimtxt"></div>
               <div id="scan-scale" class="dimtxt"></div>
-              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b> <svg class="lander" viewBox="-10 -10 20 20" width="15" height="15" aria-hidden="true"><path d="M-4.5-7h9l2 6h-13zM-5-1l-4 8M5-1l4 8M-10.5 7h3.5M7 7h3.5M-2-1l-1 3h6l-1-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></h3><div id="scan-here" class="scan-cell" hidden></div>
+              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b></h3><div id="scan-here" class="scan-cell" hidden></div>
               <div id="scan-note" class="credit"></div>
             </div>
           </div>
@@ -264,6 +270,7 @@
     <button class="key g" id="scan-btn" title="Opens and closes the scan for a better spot (A)"><small>SCAN FOR</small>BETTER SPOT</button>
     <button class="key y" id="next-site-btn"><small>SITE</small>NEXT SITE</button>
     <button class="key" id="pin-btn"><small>COMPARE</small>PIN</button>
+    <button class="key" id="tools-btn" title="SIMPLE VIEW shows the few keys and mission needs most people use. ALL TOOLS shows everything."></button>
   </div>
 </div>
 </div>

@@ -747,3 +747,21 @@ h3 .h-do, .scan-head .h-do { font-size: 1.14em; font-weight: 700; }
 .cols.setup-off .setup-tab { left: 0; top: 50%; transform: translateY(-50%); width: 27px; padding: 14px 0; font-size: 15px; border-radius: 0 8px 8px 0; }
 html.flow .setup-tab { display: none; } html.flow .cols.setup-off .col-site { display: flex; } html.flow .cols.setup-off .col-main { padding-left: 0; }
 .col-site h3[data-step] { white-space: nowrap; letter-spacing: .05em; } .col-site h3[data-step] .h-do { letter-spacing: .03em; }
+
+/* 15 Nov, a friend's notes ("a lot going on", "hard to navigate"): SIMPLE VIEW is the default */
+html.simple .key[data-slip], html.simple #next-site-btn, html.simple #pin-btn { display: none; }
+html.simple .col-site .needs:not(.open) .need:nth-child(n+2) { display: none; }
+.needs-more { display: none; margin-top: 6px; width: 100%; text-align: left; font: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: .03em; padding: 4px 9px; cursor: pointer; color: var(--wht); background: #000; border: 1px solid color-mix(in srgb, var(--s3) 60%, #000); border-left: 5px solid var(--s3); }
+.needs-more:hover { background: color-mix(in srgb, var(--s3) 18%, #000); }
+html.simple .needs-more { display: block; }
+.guide.intro { width: 470px; font-size: 16px; } .guide.intro .guide-head b { font-size: 24px; }
+/* the scan: what it is and the answer first, the choices folded away */
+.scan-how { font-size: 13.5px; line-height: 1.4; color: var(--amb); margin-bottom: 8px; } .scan-how b { color: var(--wht); }
+.band[data-band="4"] { --sc: var(--s4); }
+.scan-side .scan-go { margin: 6px 0 4px; padding: 9px 6px; font-family: var(--cond); font-size: 17px; font-weight: 700; letter-spacing: .04em; color: var(--key-ink); background: linear-gradient(180deg, var(--key-a), var(--key-b)); border: 1px solid #000; border-radius: 6px; }
+.scan-side .scan-go:disabled { background: var(--faint); color: var(--dim); }
+.scan-more { margin-top: 10px; border: 1px solid var(--grid0); padding: 5px 8px 7px; } .scan-more summary { cursor: pointer; font-size: 13px; letter-spacing: .06em; color: var(--dim); }
+.scan-more[open] summary .h-do { display: none; }
+.scan-mgroup .seg { flex-wrap: wrap; } .scan-mgroup .seg button { flex: 1 1 46%; }
+.scan-legend.flat { line-height: 1.7; font-size: 13px; }
+html.flow.simple #play-btn { grid-column: span 2; } html.flow.simple #tools-btn { order: 9; grid-column: span 2; } html.flow:not(.simple) #tools-btn { order: 11; grid-column: span 4; }
