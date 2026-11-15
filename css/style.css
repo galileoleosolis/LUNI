@@ -1075,3 +1075,27 @@ html.flow .fs-btn { display: none; }
   background: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, #6fd0ff, #1263f2);
   box-shadow: 0 3px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), 0 0 16px rgba(65,182,255,.6); }
 .scan-stack .seg, .scan-stack .scan-metric { gap: 7px; }
+
+/* ===== LUNI Console design system applied across the app (stage 1: choice buttons and action buttons) ===== */
+:root { --sheen: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.2) 100%);
+  --sheen-hi: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%); }
+/* choices: dark glass; the chosen one glazed, white edge */
+.seg { gap: 3px; }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button, .scan-pick .seg button, .sv-ctl .seg button, .fs-btn {
+  margin-left: 0; color: #eaf4ff; border: 2px solid #05070c; border-radius: 6px; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  background: var(--sheen), linear-gradient(180deg, #2b4f8f, #10224a);
+  box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(124,184,255,.3); }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button:hover, .fs-btn:hover { filter: brightness(1.2); background: var(--sheen), linear-gradient(180deg, #2b4f8f, #10224a); }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button.on:not(#_) { color: var(--on-ink, #fff); border-color: #fff; text-shadow: var(--on-ts, 0 1px 2px rgba(0,0,0,.55));
+  background: var(--sheen-hi), linear-gradient(180deg, var(--on1, #6fd0ff), var(--on2, #1263f2));
+  box-shadow: 0 2px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), 0 0 12px color-mix(in srgb, var(--on1, #41b6ff) 55%, transparent); }
+.col-site .needs .seg button, .en-row .seg button { --on1: #ffd58a; --on2: #e58a00; --on-ink: #1a0f00; --on-ts: none; }
+.mm-layers button.on b, .mm-layers button.on small { color: #fff; }
+.scan-stack button, .scan-stack .seg button { border-width: 3px; border-radius: 9px; }
+.plan-tabs button { border-radius: 8px; } .tabs button { border-radius: 7px; }
+/* actions: the same glaze as the bottom keys, smaller */
+:is(.side-go, .hero-next, .scan-go, .scan-home, .hist-load, .mm-mix-use, .coord-row button, .cmp-btns button.primary, .energy-btn, .tour-btn):not(:disabled):not(#_) {
+  background: var(--sheen-hi), linear-gradient(180deg, var(--b1, #6fd0ff), var(--b2, #1263f2)); border-color: #05070c;
+  box-shadow: 0 3px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.8), inset 0 -3px 6px rgba(0,0,0,.25); }
+:is(.side-go, .hero-next, .scan-go, .scan-home, .hist-load, .mm-mix-use, .coord-row button, .cmp-btns button.primary):not(:disabled) { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+.energy-btn, .tour-btn { --b1: #ffe9a8; --b2: #f2b01e; } .side-go.flash { --b1: #ff9a8c; --b2: #c22a1e; }
