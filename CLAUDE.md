@@ -130,6 +130,11 @@ pre-release (preview page and `next/`), stop, and wait for the user's confirmati
 now"). (3) + (4) + (5): the user asked for these three together on 15 Nov; **built, on the pre-release, waiting for
 the user's confirmation** (see "Layers as built"). **Not started:** (6) stack layers with weights into one combined
 map and send it to the scan; (7) temperature, only if NASA's LRO Diviner data can be fetched and reduced: never invented.
+For (7): the Diviner archive is reachable from this session at
+`https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/` (polar products are in `data_derived_prp/`);
+nothing has been downloaded or read yet.
+Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link within 4 points of the sites' own numbers;
+sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
 Layers as built:
