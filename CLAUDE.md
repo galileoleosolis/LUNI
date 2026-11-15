@@ -198,6 +198,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   to `createMoonMap`, `layerRow` in `js/layers.js`), with a note naming what the coarser layer reads. Presets only;
   the point under the pointer and custom points keep the layer values. `tests/check_site_years.mjs` prints both:
   Nobile 78 / 53, Malapert 74 / 53, Shackleton 79 / 63, the others within about a point, Haworth 0 and never sunlit.
+- **More NASA data** (the user, Sun 15 Nov about 10:30 AM New York: "Can't we do them all" to five ideas, A to E). Each is
+  saved by itself on the pre-release. Done so far:
+  - B. WATER ICE layer (`ice` in `LAYERS`, both polar caps; MOON MAP button, data card row ICE CAN LAST, Best Site
+    Finder choice, "show the water ice layer" in ASK LUNI). `tools/build_ice.py south|north` re-grids the `ice_depth`
+    column of the Diviner Polar Resource Product files already downloaded: the depth at which water ice would be lost
+    at 1 kg per square meter per billion years; 0 = stable at the surface; -999 = deeper than 2.87 m (stored 254,
+    drawn with no color, value 99 in the code). **The file also holds an undocumented code, -1**: measured, every
+    such triangle has a yearly maximum of 101 K or less (0 values: 101 to 131 K), so it is stored as depth 0 and the
+    source text on screen says the label does not describe it. `data/layers/{sp,np}_ice.u8.gz` (value * 0.0125 = m).
+    `tests/check_layers.mjs` checks Haworth's floor (0), the Shackleton ridge (none) and Apollo 11 (no value).
 - Later the same night (the user): the Best Site Finder's map choices are a second button stack, right of the map
   (`.scan-shows`, MAP SHOWS; names in `STACK` in `js/ui-scan.js`, e.g. SUN · MISSION and SUN · ALL YEARS), with a line
   between it and the scrolling side panel; both stacks use one font size. "Best spot is picked by" stays in the

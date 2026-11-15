@@ -19,7 +19,8 @@
    "shadow": "sp_shadow.u8.gz",
    "tavg": "sp_tavg.u8.gz",
    "tmax": "sp_tmax.u8.gz",
-   "slope": "sp_slope.u8.gz"
+   "slope": "sp_slope.u8.gz",
+   "ice": "sp_ice.u8.gz"
   },
   "stats": {
    "sun_mean_pct": 26.3,
@@ -38,6 +39,14 @@
     26.9,
     347.6
    ],
+   "no_data_squares": 0
+  },
+  "ice": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018), column ice_depth",
+   "unit": "value * 0.0125 = meters; 254 = deeper than 2.87 m (not reported by NASA); 255 = no data",
+   "note": "NASA's code -1 (ground whose yearly maximum is 101 K or less; not described in the product label) is stored as 0, at the surface",
+   "share_with_depth_pct": 43.81,
+   "share_at_surface_pct": 6.17,
    "no_data_squares": 0
   }
  },
@@ -96,7 +105,8 @@
    "shadow": "np_shadow.u8.gz",
    "slope": "np_slope.u8.gz",
    "tavg": "np_tavg.u8.gz",
-   "tmax": "np_tmax.u8.gz"
+   "tmax": "np_tmax.u8.gz",
+   "ice": "np_ice.u8.gz"
   },
   "stats": {
    "sun_mean_pct": 26.9,
@@ -115,6 +125,14 @@
     24.3,
     353.7
    ],
+   "no_data_squares": 0
+  },
+  "ice": {
+   "source": "LRO Diviner Polar Resource Product V2.0 (Paige et al., LRO-L-DLRE-5-PRP-V2.0, NASA PDS, 2018), column ice_depth",
+   "unit": "value * 0.0125 = meters; 254 = deeper than 2.87 m (not reported by NASA); 255 = no data",
+   "note": "NASA's code -1 (ground whose yearly maximum is 101 K or less; not described in the product label) is stored as 0, at the surface",
+   "share_with_depth_pct": 46.33,
+   "share_at_surface_pct": 4.16,
    "no_data_squares": 0
   }
  }
