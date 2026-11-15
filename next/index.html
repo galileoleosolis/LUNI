@@ -82,6 +82,7 @@
       <section class="col col-site">
         <h3 data-step="1"><b class="step">1</b><b class="h-t">WHERE</b> · <b class="h-do">PICK A LANDING SITE</b></h3>
         <div id="site-list" class="site-list"></div>
+        <div class="coord-row" title="Type any latitude and longitude on the Moon and press GO. South is negative. Longitude is in degrees east."><b class="h-do">OR ANY POINT</b><input id="lat-input" type="number" step="0.01" min="-90" max="90" placeholder="LAT" aria-label="Latitude, south is negative"><input id="lon-input" type="number" step="0.01" min="-180" max="360" placeholder="LON °E" aria-label="Longitude in degrees east"><button id="coord-go">GO ▸</button></div>
         <div class="globe-wrap">
           <div id="globe" class="globe"></div>
           <div id="globe-tip" class="globe-tip" hidden></div>
@@ -140,7 +141,7 @@
         </div>
         <div id="story" class="story" hidden></div>
         <div class="tiles-head ans-head"><h3 data-step="4"><b class="step">4</b><b class="h-t">THE ANSWER</b> · CAN THIS MISSION LAND HERE<span class="long">, AT THIS TIME</span>?</h3>
-          <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE · MORE</button></span></div>
+          <span class="ans-btns"><button id="proof-btn" class="more-btn" title="How LUNI's answers were checked against NASA and against real landings, and what LUNI does not know">✓ PROOF</button><button id="share-btn" class="more-btn" title="Copies an address that opens LUNI on exactly this site, landing time and mission needs">⧉ COPY LINK</button><button id="more-btn" class="more-btn" title="Pinned options to compare, next landing times, site numbers, OpenSpace, data credits">☰ COMPARE SITES · MORE</button></span></div>
         <div class="answer-row">
         <div id="mission" class="hero">
           <div class="hero-word" id="mission-word"></div>
@@ -162,6 +163,7 @@
               <div class="st" id="sun-state"></div>
               <div class="mini">HEIGHT <b id="sun-el"></b> · DIRECTION <b id="sun-az"></b></div>
               <div class="mini warn" id="sun-eclipse" hidden></div>
+              <div class="mini note-low" id="sun-low" hidden></div>
             </div>
             <div class="cd"><span id="sun-next-label"></span><b id="sun-next"></b><i id="sun-next-date"></i></div>
           </div>
@@ -173,6 +175,7 @@
             <div class="ro-a">
               <div class="st" id="earth-state"></div>
               <div class="mini">HEIGHT <b id="earth-el"></b> · DIRECTION <b id="earth-az"></b></div>
+              <div class="mini note-low" id="earth-low" hidden></div>
             </div>
             <div class="cd"><span id="earth-next-label"></span><b id="earth-next"></b><i id="earth-next-date"></i></div>
           </div>
@@ -194,8 +197,11 @@
 
       <!-- RIGHT: summary + compare -->
       <section class="col col-side" id="more-panel" hidden>
-        <div class="side-head"><b>COMPARE · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
-        <h3><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        <div class="side-head"><b>COMPARE SITES · MORE</b><button id="more-close" title="Close (Esc)">✕ CLOSE</button></div>
+        <h3><b class="h-t">ALL SITES, THIS MISSION</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
+        <div id="rank" class="rank"></div>
+        <p id="rank-note" class="note"></p>
+        <h3 class="gap"><b class="h-t">NEXT LANDING WINDOWS</b> · <b class="h-do">CLICK ONE TO GO THERE</b></h3>
         <div id="windows" class="windows"></div>
         <h3 class="gap"><b class="h-t">COMPARE</b> · OPTIONS YOU PINNED</h3>
         <div id="compare-list" class="compare"></div>
@@ -214,11 +220,6 @@
           <h3 class="gap">THE SITE · FROM NASA'S LOLA ELEVATION DATA</h3>
           <table class="sum" id="brief-lola"></table>
           <p id="site-note" class="note"></p>
-          <h3 class="gap">A CUSTOM POINT · LATITUDE AND LONGITUDE</h3>
-          <div class="fields">
-            <label>LAT<input id="lat-input" type="number" step="0.01" min="-90" max="90"></label>
-            <label>LON °E<input id="lon-input" type="number" step="0.01" min="-180" max="360"></label>
-          </div>
         </details>
         <div id="os-box" class="os-box">
           <h3 class="gap"><b class="h-t">OPENSPACE</b> · 3D VIEW THAT FOLLOWS LUNI</h3>
