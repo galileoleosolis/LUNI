@@ -1019,3 +1019,83 @@ html.flow .en-top { grid-template-columns: 1fr; } html.flow .en-tiles { grid-tem
 .panels-table { width: 100%; border-collapse: collapse; margin: 5px 0; } .panels-table th { text-align: left; font-size: 12.5px; color: var(--dim); font-weight: 600; border-bottom: 1px solid var(--grid0); padding: 2px 6px 2px 0; }
 .panels-table td { padding: 2px 6px 2px 0; color: var(--wht); font-weight: 600; } .panels-table td i { display: inline-block; min-width: 20px; text-align: center; font-style: normal; font-weight: 700; color: #000; background: #ffd23c; }
 .proof-tiles i { font-style: normal; color: var(--wht); }
+
+/* ===== 15 Nov, late afternoon: the finder's reading panel as cards, full screen, NASA band with links ===== */
+.scan-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; align-content: start; align-items: start; padding-left: 16px; overflow-y: auto; }
+.scan-side > * { min-width: 0; }
+.fcard { border: 1px solid var(--grid0); background: var(--fill); padding: 10px 14px 12px; }
+.fcard > h3, .fcard > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 8px; padding: 0 0 7px; border: none; border-bottom: 2px solid var(--grid0); background: none; font-family: var(--cond); font-size: 19px; font-weight: 700; letter-spacing: .06em; color: var(--hi); }
+.fcard > h3 b, .fcard > summary b { color: var(--hi); font-weight: 700; } .fcard > h3 span, .fcard > summary span { font-size: 14px; letter-spacing: .08em; color: var(--dim); }
+.fi { width: 26px; height: 26px; flex: none; fill: currentColor; }
+.fcard.best { border-color: var(--grn); border-width: 2px; background: #04140b; } .fcard.best > h3 { color: var(--grn); border-bottom-color: rgba(33, 224, 122, .45); } .fcard.best > h3 b { color: var(--grn); }
+.fcard .scan-cell { font-size: 14.5px; line-height: 1.5; min-height: 0; } .fcard .scan-cell .dist { font-size: 17px; font-family: var(--cond); letter-spacing: .04em; }
+.fcard #scan-progress { margin-top: 6px; font-size: 14px; font-weight: 600; }
+.fcard .scan-legend { font-size: 13.5px; margin-top: 0; } .fcard .scan-legend b { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; } .fcard .scan-legend i { height: 13px; }
+.fcard .scan-rank { margin-top: 10px; } .fcard .prof-row { font-size: 13.5px; grid-template-columns: minmax(118px, 1.25fr) 52px minmax(0, 1fr) 40px; } .fcard .prof-row span { white-space: normal; }
+.fmore { grid-column: 1 / -1; } .fmore > summary { cursor: pointer; margin-bottom: 0; padding-bottom: 0; border-bottom: none; list-style: none; color: var(--dim); } .fmore > summary b { color: var(--dim); }
+.fmore > summary::-webkit-details-marker { display: none; } .fmore > summary::after { content: "▸ OPEN"; margin-left: auto; font-size: 14px; color: var(--wht); } .fmore[open] > summary::after { content: "▾ CLOSE"; }
+.fmore[open] > summary { margin-bottom: 8px; padding-bottom: 7px; border-bottom: 2px solid var(--grid0); } .fmore .dimtxt, .fmore .credit, .fmore .scan-how { font-size: 13px; line-height: 1.45; margin-top: 6px; }
+html.flow .scan-side { grid-template-columns: 1fr; padding-left: 0; }
+
+.fs-btn { margin-left: 8px; padding: 6px 12px; font: inherit; font-family: var(--cond); font-size: 16px; font-weight: 700; letter-spacing: .06em; color: var(--wht); background: #1a2440; border: 1px solid var(--dim); border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.fs-btn:hover, .fs-btn.on { border-color: var(--hi); color: var(--hi); } .fs-btn.nudge { animation: tab-call 1.6s ease-in-out 4; border-color: var(--hi); }
+html.flow .fs-btn { display: none; }
+
+.data-band { animation: data-wipe 14000ms ease both, data-flash 1500ms linear 1; pointer-events: auto; }
+@keyframes data-wipe { 0% { clip-path: inset(-10px -10px 110% -10px); } 2.5% { clip-path: inset(-10px); } 97% { clip-path: inset(-10px); } 100% { clip-path: inset(-10px -10px 110% -10px); } }
+.data-band a { color: #06122a; text-decoration: none; font-weight: 700; border-bottom: 2px solid #e0261a; cursor: pointer; } .data-band a:hover { background: #ffe14d; } .data-band a u { text-decoration: none; }
+.data-band:hover { animation-play-state: paused; }
+.fcard .prof-row { grid-template-columns: minmax(0, 1.6fr) max-content minmax(34px, .7fr) 42px; gap: 8px; } .fcard .prof-row > * { overflow: visible; text-overflow: clip; }
+.fcard .prof-row b, .fcard .prof-row strong { white-space: nowrap; }
+
+/* Bottom keys: bright glazed look (the user: "glossy bright high quality glazed ceramic or glass"). One sheen over each key's own color. */
+.key { --k1: #a9afbf; --k2: #4c5261; }
+#play-btn, .key.g, .key.y { --k1: #6fd0ff; --k2: #1263f2; } .key.c { --k1: #63f2da; --k2: #0e9482; }
+.key.on, .key.g.on { --k1: #7dffb4; --k2: #10ad5b; } .key.c.on, .key.flash { --k1: #ff9a8c; --k2: #c22a1e; }
+.key, .key.g, .key.y, .key.c, #play-btn, .key.on, .key.g.on, .key.c.on, .key.flash {
+  background: linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.2) 44%, rgba(255,255,255,0) 50%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, var(--k1), var(--k2));
+  border-color: #05070c; box-shadow: 0 5px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), inset 0 -4px 8px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,255,255,.18), 0 0 20px color-mix(in srgb, var(--k1) 45%, transparent);
+  text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+.key:hover { filter: brightness(1.08) saturate(1.1); }
+.key:active, .key.down { box-shadow: 0 1px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.3); }
+.key.on, .key.g.on { text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+
+/* Best Site Finder: bolder choice buttons and bigger headers over them */
+.scan-stack > b { font-size: 18px; letter-spacing: .07em; padding-bottom: 2px; }
+.scan-stack button { border-width: 3px; border-radius: 8px; } .scan-stack .seg { gap: 5px; } .scan-stack .scan-metric { gap: 4px; }
+.scan-stack button.on, .scan-stack .seg button.on { border-color: #fff; }
+#scan-sizes { width: 92px; } #scan-shows { width: 158px; }
+
+/* Finder choice buttons, second pass (the user: they "look cheap"): the same glazed family as the bottom keys, in a dark glass */
+.scan-stack button, .scan-stack .seg button { color: #eaf4ff; border: 3px solid #05070c; border-radius: 9px; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  background: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.2) 100%), linear-gradient(180deg, #2b4f8f, #10224a);
+  box-shadow: 0 3px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px rgba(124,184,255,.35); }
+.scan-stack button:hover { filter: brightness(1.2); }
+.scan-stack button.on, .scan-stack .seg button.on { color: #fff; border-color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, #6fd0ff, #1263f2);
+  box-shadow: 0 3px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), 0 0 16px rgba(65,182,255,.6); }
+.scan-stack .seg, .scan-stack .scan-metric { gap: 7px; }
+
+/* ===== LUNI Console design system applied across the app (stage 1: choice buttons and action buttons) ===== */
+:root { --sheen: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.2) 100%);
+  --sheen-hi: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%); }
+/* choices: dark glass; the chosen one glazed, white edge */
+.seg { gap: 3px; }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button, .scan-pick .seg button, .sv-ctl .seg button, .fs-btn {
+  margin-left: 0; color: #eaf4ff; border: 2px solid #05070c; border-radius: 6px; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  background: var(--sheen), linear-gradient(180deg, #2b4f8f, #10224a);
+  box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(124,184,255,.3); }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button:hover, .fs-btn:hover { filter: brightness(1.2); background: var(--sheen), linear-gradient(180deg, #2b4f8f, #10224a); }
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button.on:not(#_) { color: var(--on-ink, #fff); border-color: #fff; text-shadow: var(--on-ts, 0 1px 2px rgba(0,0,0,.55));
+  background: var(--sheen-hi), linear-gradient(180deg, var(--on1, #6fd0ff), var(--on2, #1263f2));
+  box-shadow: 0 2px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.85), 0 0 12px color-mix(in srgb, var(--on1, #41b6ff) 55%, transparent); }
+.col-site .needs .seg button, .en-row .seg button { --on1: #ffd58a; --on2: #e58a00; --on-ink: #1a0f00; --on-ts: none; }
+.mm-layers button.on b, .mm-layers button.on small { color: #fff; }
+.scan-stack button, .scan-stack .seg button { border-width: 3px; border-radius: 9px; }
+.plan-tabs button { border-radius: 8px; } .tabs button { border-radius: 7px; }
+/* actions: the same glaze as the bottom keys, smaller */
+:is(.side-go, .hero-next, .scan-go, .scan-home, .hist-load, .mm-mix-use, .coord-row button, .cmp-btns button.primary, .energy-btn, .tour-btn):not(:disabled):not(#_) {
+  background: var(--sheen-hi), linear-gradient(180deg, var(--b1, #6fd0ff), var(--b2, #1263f2)); border-color: #05070c;
+  box-shadow: 0 3px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.8), inset 0 -3px 6px rgba(0,0,0,.25); }
+:is(.side-go, .hero-next, .scan-go, .scan-home, .hist-load, .mm-mix-use, .coord-row button, .cmp-btns button.primary):not(:disabled) { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+.energy-btn, .tour-btn { --b1: #ffe9a8; --b2: #f2b01e; } .side-go.flash { --b1: #ff9a8c; --b2: #c22a1e; }

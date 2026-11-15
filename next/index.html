@@ -16,7 +16,7 @@
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
     <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
-    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
+    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><button id="fs-btn" class="fs-btn" title="Use the whole screen: more room for every panel (F11 does the same)">⛶ FULL SCREEN</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
   </div>
 
   <div class="screen">
@@ -118,10 +118,10 @@
           <div class="scan-body">
             <div class="scan-map"><div class="scan-row" id="scan-row"><div class="scan-stack" id="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><div class="scan-stack" id="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric" role="group" aria-label="What the map's colors show"></div></div></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
-              <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
-              <h3 class="band" data-band="4"><b class="h-t">BEST SPOT FOUND ★</b></h3><div id="scan-best" class="scan-cell"></div>
-              <div id="scan-progress"></div>
-              <h3 class="band" data-band="2"><b class="h-t">SOLAR PANELS</b> · <b class="h-do">PLACE THEM AT THE SUNNIEST SPOTS</b></h3>
+              <section class="fcard best"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4 6.1 20.7l1.3-6.6L2.5 9.5l6.6-.8z"/></svg><b>BEST SPOT FOUND</b></h3><div id="scan-best" class="scan-cell"></div><div id="scan-progress"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8" opacity=".45"/><rect x="3" y="13" width="8" height="8" opacity=".45"/><rect x="13" y="13" width="8" height="8"/></svg><b>WHAT THE COLORS MEAN</b><span id="scan-showing"></span></h3><div id="scan-legend" class="scan-legend"></div><div id="scan-rank" class="scan-rank"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2.6"/></svg><b>THIS SPOT’S NUMBERS</b><span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div></section>
+              <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="7" r="3.2"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="currentColor" stroke-width="1.8"/><path d="M9 14h13l-3 8H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14l-2 8M18 14l-2 8" stroke="currentColor" stroke-width="1.4"/></svg><b>SOLAR PANELS</b><span>ON THE SUNNIEST SPOTS</span></h3>
               <div id="scan-panels" class="scan-panels">
                 <button id="panels-open" class="panels-open">☀ PLACE SOLAR PANELS ▸</button>
                 <div id="panels-form" class="panels-form" hidden>
@@ -130,15 +130,14 @@
                   <div class="panels-btns"><button id="panels-go" class="primary">PLACE THEM ▸</button><button id="panels-clear">CLEAR</button></div>
                 </div>
                 <div id="panels-out" class="panels-out"></div>
-              </div>
-              <h3 class="band" data-band="1"><b class="h-t">THE COLORS</b> · <span id="scan-showing"></span></h3>
-              <div id="scan-legend" class="scan-legend"></div>
-              <div id="scan-rank" class="scan-rank"></div>
-              <h3 class="band" data-band="2"><b class="h-t">DATA PROFILE</b> · <span id="scan-prof-of">WHERE YOU ARE NOW</span></h3><div id="scan-hover" class="scan-cell"></div>
-              <div id="scan-engine" class="dimtxt"></div>
-              <div id="scan-scale" class="dimtxt"></div>
-              <h3 hidden><b class="h-t">WHERE YOU ARE NOW</b></h3><div id="scan-here" class="scan-cell" hidden></div>
-              <div id="scan-note" class="credit"></div>
+              </div></section>
+              <details class="fcard fmore"><summary><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10.500v7M12 6.500v1.600" stroke="currentColor" stroke-width="2.6"/></svg><b>ABOUT THIS SCAN</b><span>HOW TO READ IT · HOW IT WAS MADE</span></summary>
+                <div class="scan-how"><b>EACH SQUARE IS A PLACE YOU COULD LAND.</b> ★ IS THE BEST ONE FOUND. <b class="h-do">CLICK ANY SQUARE TO MOVE YOUR SITE THERE</b></div>
+                <div id="scan-engine" class="dimtxt"></div>
+                <div id="scan-scale" class="dimtxt"></div>
+                <div id="scan-here" class="scan-cell" hidden></div>
+                <div id="scan-note" class="credit"></div>
+              </details>
             </div>
           </div>
         </div>
