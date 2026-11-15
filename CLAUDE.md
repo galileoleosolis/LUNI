@@ -180,6 +180,8 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   says SCANNING / YOU ARE AT THE BEST SPOT / NO SPOT HERE MEETS THE NEEDS when it cannot be pressed).
 - Bottom keys (the user: the gray ones "look deactivated" next to ASK LUNI): PLAY, NEXT LANDING WINDOW and BEST SITE
   FINDER are blue, ASK LUNI stays teal, the rest are a lighter gray.
+- The user (Sun 15 Nov, about 1 AM New York): "We will update the published one tomorrow". Do not promote until they
+  say "release it"; the time of the local judging is not known yet (asked, not answered).
 - **Local judging** (told by the user 15 Nov): each team gets 3 minutes to present and 5 minutes of Q&A at the local
   event on Sunday; the global submission (7 slides or a 30-second video) is due about 6 hours after the local event
   ends. A timed talk and a Q&A sheet are in `docs/pitch-3min.md`.
