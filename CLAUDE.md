@@ -152,7 +152,7 @@ Layer accuracy, measured by `tests/check_layers.mjs` on 15 Nov: Earth link withi
 sunlight within 1 point at IM-1 and IM-2 but 16 to 25 points low on the three best-lit ridge presets (said on screen).
 The user never answered what "data profiles" means or whether polar-only coverage is fine; both were built as assumed
 (a card of every layer's value at a point; sunlight / Earth / shadow south of 80S only).
-**Pre-release state (15 Nov, about 06:00 UTC = Sun 1 AM New York): `next/` and the preview page (Version 45) carry
+**Pre-release state (15 Nov, about 05:20 UTC = Sun 12:20 AM New York): `next/` and the preview page (Version 45) carry
 everything below. The public site is still r3 (9f099f4) and needs a new "release it".**
 A friend from a NASA SEES internship (15 Nov): "a lot going on", "hard to navigate", "cut down on some of the
 features or make a more streamlined ui", did not know what to do in the scan, the tutorial "not really" helped. A
