@@ -195,7 +195,7 @@ export function createGlobe(container, { sites, labels, onPickSite, onPickCoord,
       v.copy(t.pos).project(camera);
       const x = (v.x * 0.5 + 0.5) * w, y = (-v.y * 0.5 + 0.5) * h, tw = sel ? 26 + t.site.name.length * 6.2 : 20;
       const clash = placed.some((p) => Math.abs(p.y - y) < 14 && x < p.x + p.w && p.x < x + tw);
-      const show = front && x > 0 && x < w - 16 && y > 6 && y < h - 24 && (sel || !clash);
+      const show = front && x > 0 && x < w - 16 && y > 22 && y < h - 24 && (sel || !clash);
       t.el.style.display = show ? "" : "none";
       if (!show) continue;
       placed.push({ x, y, w: tw });

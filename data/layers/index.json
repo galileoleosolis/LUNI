@@ -2,8 +2,8 @@
  "_about": "South polar map layers computed by tools/build_layers.py from LRO LOLA elevation (ldem_60s_240m, NASA PDS) and NASA NAIF SPICE DE440 positions (data/ephem.bin). North-up south polar stereographic grid, pole in the middle, x toward longitude 90E, y toward longitude 0. Values: sun / earth 0..200 = 0..100 % of the time, shadow 1 = no part of the Sun seen at any checked moment; 255 = outside the region.",
  "sp": {
   "kind": "polar_south",
-  "n": 318,
-  "scale_m": 1920.0,
+  "n": 1268,
+  "scale_m": 480.0,
   "min_lat": -80.0,
   "mast_m": 2.0,
   "directions": 72,
@@ -19,9 +19,9 @@
   },
   "stats": {
    "sun_mean_pct": 26.3,
-   "sun_max_pct": 56.7,
-   "shadow_share_pct": 6.55,
-   "earth_mean_pct": 23.9
+   "sun_max_pct": 63.0,
+   "shadow_share_pct": 6.5,
+   "earth_mean_pct": 23.8
   }
  }
 }

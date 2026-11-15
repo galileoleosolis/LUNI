@@ -33,12 +33,12 @@ export const LAYERS = [
     meaning: "FLAT GROUND IS SAFER TO LAND ON. THE COLORS RUN FROM 0° (GREEN) TO 20° AND MORE (RED): A SCALE FOR THE EYE, NOT A SAFETY LIMIT.",
     source: "WORKED OUT BY LUNI FROM THE NASA LRO LOLA ELEVATION MAPS, ACROSS TWO MAP PIXELS: 480 M NEAR THE SOUTH POLE, 7.6 KM ON THE WHOLE-MOON MAP." },
   { id: "sun", label: "SUNLIGHT", where: "SOUTH POLE", polar: true, lo: 0, hi: 100,
-    color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "SUNLIGHT, 2023–2035", brief: (v) => `${Math.round(v)}%`,
+    color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "SUNLIGHT 2023–35", brief: (v) => `${Math.round(v)}%`,
     ends: ["RARELY SUNLIT = BAD", "MOSTLY SUNLIT = GOOD"], scale: ["0%", "100%"],
-    meaning: "HOW MUCH OF THE TIME A SOLAR PANEL HERE WOULD HAVE THE SUN, COUNTED OVER ALL OF 2023 TO 2035.",
+    meaning: "HOW MUCH OF THE TIME A SOLAR PANEL HERE WOULD HAVE THE SUN, COUNTED OVER ALL OF 2023 TO 2035. ONE MAP SQUARE IS 480 M: THE BEST-LIT RIDGE TOPS ARE NARROWER, SO THEY READ LOWER HERE THAN ON THE MAIN SCREEN (SHACKLETON RIDGE: 63% HERE, 79% THERE).",
     source: "WORKED OUT BY LUNI: THE SUN'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, EVERY 6 HOURS FROM 2023 TO 2035, 2 M ABOVE THE GROUND." },
   { id: "earth", label: "EARTH LINK", where: "SOUTH POLE", polar: true, lo: 0, hi: 100,
-    color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "EARTH LINK, 2023–2035", brief: (v) => `${Math.round(v)}%`,
+    color: (v) => goodColor(v / 100), score: (v) => v / 100, text: (v) => `${Math.round(v)}% OF THE TIME`, card: "EARTH LINK 2023–35", brief: (v) => `${Math.round(v)}%`,
     ends: ["EARTH RARELY IN VIEW = BAD", "EARTH MOSTLY IN VIEW = GOOD"], scale: ["0%", "100%"],
     meaning: "HOW MUCH OF THE TIME EARTH IS ABOVE THE SKYLINE, SO A LANDER CAN TALK TO IT DIRECTLY, COUNTED OVER ALL OF 2023 TO 2035.",
     source: "WORKED OUT BY LUNI: EARTH'S POSITION (NASA NAIF SPICE, DE440) AGAINST THE SKYLINE FROM NASA LRO LOLA ELEVATION, EVERY 6 HOURS FROM 2023 TO 2035." },
@@ -85,8 +85,8 @@ export async function profileAt(lat, lon) {
     const v = L.id === "elev" ? (Number.isFinite(h) ? h : null) : L.id === "slope" ? slope : polarValue(L.id, lat, lon);
     if (v == null) return { id: L.id, label: L.card || L.label, text: null, score: null, rgb: null, note: L.polar ? "SOUTH OF 80°S ONLY" : "NO DATA" };
     const score = L.score ? L.score(v) : null;
-    return { id: L.id, label: L.card || L.label, value: v, text: (L.brief || L.text)(v), score, rgb: L.id === "shadow" ? (v ? SHADOW_RGB : GOOD_RAMP[2]) : L.color(v),
-             share: L.binary ? 1 : clamp01((v - L.lo) / (L.hi - L.lo)), note: L.id === "slope" ? `/ ${base >= 1000 ? (base / 1000).toFixed(1) + " KM" : base + " M"}` : "" };
+    return { id: L.id, label: L.id === "slope" ? `SLOPE OVER ${base >= 1000 ? (base / 1000).toFixed(1) + " KM" : base + " M"}` : L.card || L.label, value: v, text: (L.brief || L.text)(v), score, rgb: L.id === "shadow" ? (v ? SHADOW_RGB : GOOD_RAMP[2]) : L.color(v),
+             share: L.binary ? 1 : clamp01((v - L.lo) / (L.hi - L.lo)), note: "" };
   });
 }
 

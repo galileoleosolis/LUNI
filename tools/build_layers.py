@@ -134,8 +134,16 @@ def count_chunk(args):
 
 
 if __name__ == "__main__":
-    with Pool(4) as pool:
-        SKY = np.stack(pool.map(skyline_dir, range(NDIR)))          # [direction, point]
+    # Both long steps keep their finished parts in tools/dem/, so a run that is cut short picks up where it stopped.
+    work = os.path.join(HERE, "dem", f"layers_{int(GRID_M)}m")
+    os.makedirs(work, exist_ok=True)
+    sky_file = os.path.join(work, "sky.npy")
+    if os.path.exists(sky_file):
+        SKY = np.load(sky_file)
+    else:
+        with Pool(4) as pool:
+            SKY = np.stack(pool.map(skyline_dir, range(NDIR)))      # [direction, point]
+        np.save(sky_file, SKY)
     print(f"skylines done in {time.time() - t_start:.0f} s: {SKY.min():.2f} .. {SKY.max():.2f} deg, mean {SKY.mean():.2f}")
 
     # Local axes of every point in the Moon's own frame (x toward longitude 0, z north), and the two ground
@@ -153,9 +161,14 @@ if __name__ == "__main__":
     eph = np.fromfile(os.path.join(ROOT, "data", "ephem.bin"), dtype="<f4").reshape(-1, 6)
     EPH = eph[::STEP_H // meta["step_hours"]]
     T = EPH.shape[0]
-    bounds = np.linspace(0, T, 4 * 8 + 1).astype(int)
+    bounds = np.linspace(0, T, 4 * 12 + 1).astype(int)
+    chunks = list(zip(bounds[:-1], bounds[1:]))
+    part_file = lambda c: os.path.join(work, f"count_{STEP_H}h_{c[0]}_{c[1]}.npz")
+    todo = [c for c in chunks if not os.path.exists(part_file(c))]
     with Pool(4) as pool:                                            # forked after the arrays exist, so they are shared
-        parts = pool.map(count_chunk, list(zip(bounds[:-1], bounds[1:])))
+        for c, (a, b, d) in zip(todo, pool.imap(count_chunk, todo)):
+            np.savez(part_file(c), sun=a, earth=b, any=d); print(f"  moments {c[0]}..{c[1]} done at {time.time() - t_start:.0f} s", flush=True)
+    parts = [(z["sun"], z["earth"], z["any"]) for z in (np.load(part_file(c)) for c in chunks)]
     sun_n = sum(p[0] for p in parts); earth_n = sum(p[1] for p in parts); any_sun = np.any([p[2] for p in parts], axis=0)
     print(f"{T} moments checked in {time.time() - t_start:.0f} s")
 
