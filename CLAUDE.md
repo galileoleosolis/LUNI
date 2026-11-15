@@ -393,6 +393,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   people at `#test`, which scores six tasks and gives a report to send.
   Claude's own quick score when asked (not blind): Impact 4, Creativity 4, Validity 4, Relevance 5, Presentation 3
   for the deck as it was before the features slide.
+- **TO DO AFTER THE LOCAL PRESENTATION (the user, Sun 15 Nov: "It is with for ... change the two later today after
+  that presentation"): the full name is "Lunar Utility FOR Navigational Intelligence".** The app, `README`,
+  `docs/submission.md`, `docs/pitch-3min.md`, ASK LUNI's "who are you" answer and these notes still say "Lunar
+  Utility Navigational Intelligence" without "for". Change every readable place at once, check, then it needs a
+  "release it". Not started. The deck cover already says it with "for"; its team name was corrected to
+  "Mystic Research" (members: Galileo Solis and Jove Solis, as the user typed them on the cover).
 - **r7 released** on the user's "open the presentation, then release it" (Sun 15 Nov, 1:40 PM New York = 18:40 UTC;
   main b12dd78; GitHub reports the deployment as a success). The full set ran first: all ten Node checks, test sets
   E and D (6/6 each), and the main screen, ENERGY and the finder at six window sizes with no overflow and no page
