@@ -450,6 +450,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Teacher buy-in** (same teacher, about 10:05 PM New York: "the teachers are his battle ... even if they don't
+  consider themselves to be a science teacher"; "trying and failing, staying curious and going back and trying
+  again"). `docs/lesson.md`: a first subsection in the teacher section, YOU DO NOT HAVE TO BE A SCIENCE TEACHER
+  (you are allowed not to know; a NO-GO is not a wrong answer; try it wrong on purpose; let them see you be
+  curious). She also liked the Check strips. **On `main` only until the next release.**
 - **Teacher quote** (pasted by the user about 10 PM New York, from the teacher who gave most of the lesson feedback):
   "It's really incredible, can't wait to see where this goes". Used WITHOUT her name on slide 7 (deck Version 34,
   in the TEACHERS AND STUDENTS point; the slide's lesson address is now galileoleosolis.github.io/LUNI/about) and at
