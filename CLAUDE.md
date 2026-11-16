@@ -450,6 +450,27 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r14 released** on the user's "That's fine, release it" (Sun 15 Nov, about 9:45 PM New York = 02:45 UTC Mon).
+  **r14 is the public version.** Lesson and project page only (answer key, teacher checklist at the top, two colors);
+  no file under `index.html`, `css`, `js`, `data` changed since r12, so the app checks were not rerun. The three
+  lesson notes below that say "on `main` only" are released. To roll back to r13: `tools/release.sh promote c6be158`;
+  to r12: `a50a126`.
+- **Lesson in two colors** (the user, about 9:50 PM New York: "What the teacher needs to do should be in a different
+  color text as well"). On the project page only: `tools/build_about.py` wraps the teacher-first section, IF A PAIR IS
+  STUCK and the TEACHER KEY in `.teacher` (orange `#a34a06` on `#fff3df`) and marks every **Check:** line `.check`;
+  a legend at the top says ORANGE: FOR THE TEACHER, BLUE: WHAT THE CLASS DOES. The builder stops with an error if
+  one of those headings is renamed in `docs/lesson.md`. GitHub's own view of the file cannot show colors.
+  **On `main` only until the next release.**
+- **Lesson order** (same teacher, about 9:45 PM New York: the prep was "3 quarters down"; it should be "up higher
+  or separated", for "a teacher who really struggles with tech"). `docs/lesson.md` now opens with FOR THE TEACHER:
+  DO THESE FIRST: checklists for the day before and just before class, IF THE TECHNOLOGY FAILS, and THE LESSON AT A
+  GLANCE (a timing table); the old "Before class" section is gone. `tools/build_about.py` turns `- [ ]` items into
+  check boxes on the project page. The lesson says Chrome and Edge are the browsers it was tested on (true: the
+  testers' reports), not "any browser". **On `main` only until the next release.**
+- **Lesson answer key** (Sun 15 Nov about 9:35 PM New York; a teacher: "a basic teacher sample key for these
+  questions ... he can't assume the teacher knows the answers"). `docs/lesson.md` now has a QUICK CHECK table of
+  sample answers under START HERE, and in the TEACHER KEY a table of sample answers to every question the lesson
+  asks, plus sample endings for the three worksheet sentences. **On `main` only until the next release.**
 - **r13 released** on the user's "Release everything that hasn't been released yet" (Sun 15 Nov, about 9:30 PM New
   York = 02:30 UTC Mon). **r13 is the public version.** Only the lesson and the project page changed since r12
   (`git diff a50a126` touched no file under `index.html`, `css`, `js`, `data`), so the app checks were not rerun;

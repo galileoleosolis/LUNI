@@ -7,6 +7,50 @@ LUNI (Lunar Utility for Navigational Intelligence) answers one question with rea
 here, at this time?* Students use it the way a mission planner would: pick a place and a time, read the GO or NO-GO,
 find out why, and fix the plan.
 
+## For the teacher: do these first
+
+Everything in this section happens **before students arrive**. It takes about 15 minutes the first time. You do not
+need to know anything about the Moon or about the tool: the sample answers are all in the teacher key at the end.
+
+### The day before
+
+- [ ] **Try the link on a student device**, not only your own: <https://galileoleosolis.github.io/LUNI/>. If it does
+      not load, the school's web filter may be blocking it; ask for `galileoleosolis.github.io` to be allowed.
+- [ ] **Check the devices.** Laptops or Chromebooks, with an internet connection and a current browser. Chrome and
+      Edge are the two it has been tested on. No accounts, nothing to install. Phones are too small for this lesson.
+- [ ] **Press ? TUTORIAL** (top right of the tool) and click through it once yourself. About 5 minutes.
+- [ ] **Read the teacher key** at the end of this page. About 3 minutes.
+- [ ] **Print the worksheet,** one per pair. It is near the end of this page.
+
+### Just before class
+
+- [ ] **Pair the students,** one device per pair. In each pair one student clicks and the other reads the worksheet
+      aloud; they swap for mission two.
+- [ ] **Put the tool on the projector** and press **FULL SCREEN** (top right).
+- [ ] **Open the two videos in other tabs,** if you plan to show them.
+- [ ] **Write the five words to know on the board,** and leave room for the mission-one plan.
+
+### If the technology fails
+
+- **One device will not load it:** move that pair to share with another pair.
+- **Nothing loads:** teach "Start here" from the sketch, show the two NASA videos, and do the worked example and
+  mission one as a whole class from the printed picture of the screen. Students still fill in the worksheet.
+- **A student asks "how do you know this is real?":** press **PROOF** in the tool. Everything on screen is computed
+  from NASA data.
+
+### The lesson at a glance
+
+| Part | Minutes | Who does what |
+|---|---|---|
+| 1. Hook: a real landing that went wrong | 5 | Teacher, on the projector |
+| 2. Guided tour | 10 | Pairs, on their own devices |
+| 3. Worked example | 5 | Teacher leads, students copy onto the worksheet |
+| 4. Mission one: fix a NO-GO | 10 | Pairs, step by step |
+| 5. Mission two: your own landing | 10 | Pairs, on their own |
+| 6. Share out | 5 | Whole class |
+
+The rest of this page is in the order you will use it in class.
+
 ## What students learn
 
 1. Near the Moon's south pole the Sun never climbs high. It circles low along the horizon, so one hill can decide
@@ -32,8 +76,19 @@ Earth, for long enough?
 
 ![Two sketches: on the left the lander sees the Sun and the Earth, a GO; on the right a hill hides the Earth, a NO-GO](figures/lesson-sun-earth-lander.svg)
 
-Ask before moving on: *What is the Sun for? What is the Earth for? What could get in the way?* Every student should
-be able to answer all three.
+### Quick check before moving on
+
+Ask these three questions. Every student should be able to answer all three. Sample answers are given so you do not
+need to know the subject beforehand.
+
+| Ask | A good answer sounds like |
+|---|---|
+| What is the Sun for? | "Power." Sunlight on the lander's solar panels makes its electricity. (It also keeps the equipment warm enough to work.) |
+| What is the Earth for? | "Talking to home." The lander's radio needs a straight, clear line to Earth to send and receive messages. |
+| What could get in the way? | "The ground." A hill, a mountain or the rim of a crater between the lander and the Sun or the Earth. |
+
+If a student says "the Moon needs the Sun to shine" or "the Earth gives it gravity", point back to the sketch: this
+lesson is only about what the **lander** can see from where it stands.
 
 ## Words to know
 
@@ -75,14 +130,6 @@ Show this picture, or point at the same places on the projector. Students only n
 | 9 | Very top | **Other screens**, and the ? TUTORIAL button. |
 
 If the left side (1, 2, 3) is folded away, press the blue **SHOW SITE · TIME · NEEDS** tab on the left edge.
-
-## Before class (5 minutes for the teacher)
-
-1. Open the link and press **FULL SCREEN** (top right).
-2. Press **? TUTORIAL** and click through it once.
-3. Print one worksheet per pair (it is at the end of this page).
-
-Everything on screen is computed from NASA data. If a student asks "how do you know?", press **PROOF**.
 
 ## The lesson
 
@@ -199,6 +246,30 @@ Three sentences to finish:
 
 ## Teacher key
 
+### Sample answers to every question in the lesson
+
+You do not need to know any of this beforehand. Student answers will vary in wording; these show what to listen for.
+
+| Where | Question | A good answer sounds like |
+|---|---|---|
+| Part 1 | What does a lander need from the sky to stay alive? | Sunlight for power, and the Earth in view so its radio can reach home. |
+| Part 3 | Which one is closer to being hidden by a hill, the Sun or the Earth? | The Sun. It is only 2.45° above level; the Earth is 11.19° up. Lower means closer to the skyline. |
+| Part 4, predict | Which of the two is missing, and what would have to change? | The Earth is missing: it is just behind the ground. Either wait until it rises above the skyline, or move to a spot that can see it. |
+| Part 4, explain | The plan became a GO because ... | ... one day later the Earth had risen above the hill, so the radio link works at landing. The Sun was up both times. |
+| Part 5 | Which one thing did you change, and why did it work? | Any one of: a later date (the Sun or Earth came into view), a nearby spot (a higher or better-placed point sees over the hill), or one mission need (for example a shorter mission). The reason must name the Sun or the Earth. |
+| Fast finishers | Why would a mission want to land near a place where it can never get power? | Because water ice can only last where it stays dark and very cold. Ice is worth studying and could be used for water, air and fuel. So missions want to be near the dark crater, but land on sunlit ground beside it. |
+| Part 6 | Which was easier to change, the date or the place? What would that cost a real mission? | No single right answer. Changing the date costs waiting and rescheduling the launch. Changing the place may put the lander farther from what it came to study. |
+
+Sample endings for the three worksheet sentences:
+
+- The Moon's south pole is hard to land on because **the Sun stays very low, so hills and crater rims can block it,
+  and they can block the Earth too.**
+- A lander needs the Sun for **power** and the Earth for **its radio link home.**
+- I fixed my plan by **changing the landing date so the Earth was above the skyline** (or their own change, with
+  the reason).
+
+### Notes on the missions
+
 - **Mission one.** The plan is a **NO-GO**. The reason is **no Earth link at landing**: the Sun is up (about 2.4°
   above level, in the east-northeast) but the Earth is just behind the ground to the northwest. **NEXT LANDING
   WINDOW** moves the landing to **15 NOV 2026, 20:00 UTC**, one day later, when the Earth has risen over the skyline.
@@ -231,6 +302,8 @@ next version: <https://forms.gle/jLzqGs1anesdDzPj8>
 
 Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the one idea students need before they start,
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
-example on the worksheet; a list for pairs who are stuck; and students must write why their plan became a GO.
+example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
+sample answers for every question, so a teacher does not need to know the subject beforehand; and everything the
+teacher does before class moved to the top as a checklist.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.
