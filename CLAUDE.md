@@ -452,9 +452,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
 - **Project page, new order** (the user, about 10:30 PM New York: "Make the timeline more front and center ... and
   then make the demo more front and center as well"). `tools/about-template.html`: top of the page, then THE DEMO
-  (`#demo`: the first slide as a large picture with a gold WATCH THE DEMO button, both linking to `../slides/`),
+  (`#demo`: the first slide as a large picture with a gold SEE THE SLIDES button, both linking to `../slides/`),
   then the version-by-version viewer (`#timeline`), then the project, the award, the lesson, and last THE WEEKEND,
-  IN ORDER as its own section (`#weekend`). The first buttons on the page are WATCH THE DEMO (gold) and OPEN LUNI.
+  IN ORDER as its own section (`#weekend`). The first buttons on the page are SEE THE SLIDES (gold) and OPEN LUNI, and the top row, which stays on screen, has a gold SLIDES button (the user: "Can slides be a button on the about page").
   `about/img/demo-cover.jpg` is a screenshot of slide 1 of `slides/` (retake it if the cover changes:
   `pw/front.js cover` in the scratchpad). Claude read "the demo" as the seven slides. **On the test build
   (`/LUNI/next/about/`) until the next release.**
