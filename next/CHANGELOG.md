@@ -1,10 +1,21 @@
 # LUNI change log
 
-Times are New York time. **Public version: r11.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r12.** The test build (`/next/`) is the same until new work is added.
+
+## r12: What four first-time testers told us
+Sun 15 Nov · 9:00 PM
+**This is the public version.**
+
+- Four people who had never seen LUNI ran the six-task test (three friends, one parent): three scored 6 of 6, one got stuck on the first task.
+- ASK LUNI answers "what do I do next"; during the test it reads out the task.
+- The test's tour has a fifth card about the task bar, and the bar flashes when a new task starts.
+- Best Site Finder: a line under the map says what green means and that squares can be clicked; the data card shows small bars.
+- MISSION HISTORY points to the site list for sites that are not past landings.
+- A line under the verdict: JUDGED BY YOUR MISSION NEEDS, NASA DATA CHECKED AGAINST NASA, SEE THE PROOF.
+- ABOUT button in the top row; the project page has the tester results and a lesson feedback form.
 
 ## r9 to r11: small releases after the award
-Sun 15 Nov · 7:20 PM to 7:45 PM  
-**r11 is the public version.**
+Sun 15 Nov · 7:20 PM to 7:45 PM
 
 - r9: the project page at `/about/` (the project, the Best Use of Data result, the classroom lesson, the timeline).
 - r10: every listed landing site checked against its source. Five match NASA's LRO camera team; Chang'e 4 was about 420 m off and now uses the LRO camera team's position; each site shows what the check found.

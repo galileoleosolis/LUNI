@@ -296,7 +296,7 @@ function showIntro() {
     <p>Thanks for helping. You are testing the tool. The tool is not testing you: if something is hard to find, that is the tool's fault and exactly what we need to know.</p>
     <ul>
       <li>You are a mission planner choosing where and when to land on the Moon.</li>
-      <li>First a <b>one-minute tour</b> of the screen (4 cards). Then <b>${TASKS.length} short tasks</b>, shown one at a time in a bar at the top, with no hints. About 10 minutes in all.</li>
+      <li>First a <b>one-minute tour</b> of the screen (${TOUR.length} cards). Then <b>${TASKS.length} short tasks</b>, shown one at a time in a bar at the top, with no hints. About 10 minutes in all.</li>
       <li>If you get stuck for more than a couple of minutes, press <b>SKIP</b>. That is useful information too.</li>
       <li>At the end you answer 5 quick questions and get a report to copy and send back.</li>
     </ul>
@@ -313,12 +313,14 @@ const TOUR = [
   ["mid", "THE ANSWER IS IN THE MIDDLE", "A big <b>GO</b> or <b>NO-GO</b> with the reason and any warning beside it. Under it: the Sun and the Earth right now, the view from the site, and a chart of the days after landing."],
   ["top", "THREE SCREENS IN THE TOP ROW", "<b>MAIN SCREEN</b> is where you start. <b>MOON MAP</b> shows data as layers on the Moon, with the numbers for any spot. <b>MISSION HISTORY</b> has real landings you can load."],
   ["keys", "SHORTCUTS ARE THE KEYS AT THE BOTTOM", "<b>NEXT LANDING WINDOW</b> jumps to the next time that works. <b>BEST SITE FINDER</b> checks the ground nearby and can move your site. <b>ASK LUNI</b> answers a typed question."],
+  // the last card, so it is the freshest: an outside tester explored for five minutes without noticing the task bar
+  ["task", "YOUR TASK IS IN THE BAR AT THE VERY TOP", "Each task appears in a <b>bar above the screen</b>, one at a time. Do what it asks in the app, then give your answer <b>in that bar</b> and press <b>SUBMIT ANSWER</b>. Lost? Press <b>ASK LUNI</b> and type <b>what do I do next</b>."],
 ];
 function showTour(i = 0, seen = 1) {
   const [zone, title, text] = TOUR[i], last = i === TOUR.length - 1;
   const o = overlay(`
     <h2>ONE-MINUTE TOUR · ${i + 1} OF ${TOUR.length}</h2>
-    <div class="test-map z-${zone}" aria-hidden="true"><i class="m-top">MAIN SCREEN · MOON MAP · MISSION HISTORY</i><i class="m-left">1 SITE<br>2 TIME<br>3 NEEDS</i><i class="m-mid">GO / NO-GO<br>SUN · EARTH<br>CHARTS</i><i class="m-keys">KEYS</i></div>
+    <div class="test-map z-${zone}" aria-hidden="true"><i class="m-task">TASK 1 OF ${TASKS.length} · WHAT TO DO · YOUR ANSWER</i><i class="m-top">MAIN SCREEN · MOON MAP · MISSION HISTORY</i><i class="m-left">1 SITE<br>2 TIME<br>3 NEEDS</i><i class="m-mid">GO / NO-GO<br>SUN · EARTH<br>CHARTS</i><i class="m-keys">KEYS</i></div>
     <p class="test-tour-t">${title}</p><p>${text}</p>
     <div class="test-actions">${i ? '<button class="test-btn" id="test-back">BACK</button>' : ""}<button class="test-btn go" id="test-next">${last ? "START THE TASKS" : "NEXT"}</button><button class="test-btn" id="test-notour">SKIP THE TOUR</button></div>`);
   const begin = (skipped) => {
@@ -345,6 +347,7 @@ function showTask() {
   bar.innerHTML = `<div class="test-q"><b>TASK ${T.task + 1} OF ${TASKS.length}</b> ${t.text}</div>
     <div class="test-ctl">${ctl}<button class="test-btn go" id="test-submit" ${t.type === "done" ? "" : "disabled"}>${t.type === "done" ? "DONE" : "SUBMIT ANSWER"}</button><button class="test-btn" id="test-stuck">SKIP</button></div>`;
   bar.hidden = false;
+  bar.classList.remove("fresh"); void bar.offsetWidth; bar.classList.add("fresh");   // a new task calls for attention for a few seconds
   let answer = null;
   const submit = $("test-submit");
   bar.querySelectorAll(".test-opt").forEach((b) => b.addEventListener("click", () => {

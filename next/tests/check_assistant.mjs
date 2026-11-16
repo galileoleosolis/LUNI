@@ -26,6 +26,8 @@ expect("im-2", [site("im2")]);
 expect("Chang'e 6", [site("ce6")]);
 expect("apollo eleven", [site("apollo11")]);
 expect("take me to Von Kármán", [site("ce4")]);
+for (const q of ["what do I do next", "What should I press next?", "what now", "I am stuck", "where do I start"]) expect(q, [rep("next")]);
+expect("set the time to now", [["set_landing_time", { now: true }]]);
 expect("site number three", [["select_site", { number: 3 }]]);
 expect("next site", [["step_site", { by: 1 }]]);
 expect("previous site", [["step_site", { by: -1 }]]);

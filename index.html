@@ -16,7 +16,7 @@
   <div class="unit-top">
     <span><i class="led"></i>LUNI PLANNING UNIT</span>
     <span class="tabs"><button id="tab-main" class="on" title="The planning screen">MAIN SCREEN</button><button id="tab-moon" title="The Moon made big, with NASA data as layers on it (M)">MOON MAP</button><button id="tab-history" title="Real landings since 2023, compared, and loaded into the main screen with one press (H)">MISSION HISTORY</button></span>
-    <span class="top-right"><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><button id="fs-btn" class="fs-btn" title="Use the whole screen: more room for every panel (F11 does the same)">⛶ FULL SCREEN</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
+    <span class="top-right"><a id="about-link" class="fs-btn about-link" href="about/" target="_blank" rel="noopener" title="The project page: what LUNI is, the Best Use of Data award, a classroom lesson and how it was built">ⓘ ABOUT</a><button id="tour-btn" class="tour-btn" title="A guided tutorial: one part of the screen at a time, in everyday words">? TUTORIAL</button><button id="fs-btn" class="fs-btn" title="Use the whole screen: more room for every panel (F11 does the same)">⛶ FULL SCREEN</button><span id="data-badge" class="demo" hidden>LOADING DATA</span></span>
   </div>
 
   <div class="screen">
@@ -76,7 +76,7 @@
           <div class="hist-row hist-headrow"><div>MISSION</div><div>SUN HEIGHT AT LANDING</div><div>SUNLIGHT LEFT AFTER LANDING</div><div>EARTH AT LANDING</div><div>GROUND SLOPE</div><div>THE 30 DAYS AFTER LANDING · <i class="k-s">■ SUN</i> <i class="k-e">■ EARTH IN VIEW</i> · <i class="k-m">▼ REAL END</i></div><div>WHAT REALLY HAPPENED</div><div></div></div>
           <div id="hist-rows"></div>
         </div>
-        <div class="hist-foot"><span class="hist-sortlab">ORDER:</span><span id="hist-sort" class="seg"></span><span class="dimtxt">NUMBERS AND BARS: LUNI, FROM NASA SPICE AND LOLA DATA. MISSION RECORDS: THE SOURCES LISTED FOR EACH MISSION. LUNI'S DATA COVERS 2023 TO 2035, SO EARLIER LANDINGS (APOLLO, CHANG'E 4) CANNOT BE REPLAYED ON THEIR OWN DATES.</span></div>
+        <div class="hist-foot"><span class="hist-sortlab">ORDER:</span><span id="hist-sort" class="seg"></span><span class="dimtxt"><span class="hist-tip">LOOKING FOR A SITE THAT IS NOT A PAST LANDING? <button id="hist-to-main" class="h-do">ALL 14 SITES ARE ON THE MAIN SCREEN</button></span> NUMBERS AND BARS: LUNI, FROM NASA SPICE AND LOLA. RECORDS: THE SOURCES LISTED FOR EACH MISSION. LUNI COVERS 2023 TO 2035, SO APOLLO AND CHANG'E 4 CANNOT BE REPLAYED ON THEIR OWN DATES.</span></div>
       </div>
       <!-- LEFT: site + date -->
       <button id="setup-tab" class="setup-tab" title="Hide or show the left side: site, landing time and mission needs"></button>
@@ -116,7 +116,7 @@
         <div id="scan" class="scan" hidden>
           <div class="scan-head"><span id="scan-title"></span><span class="scan-head-btns"><button id="scan-close" class="scan-home" title="Close the Best Site Finder (Esc)">◂ BACK TO THE MAIN SCREEN</button></span></div>
           <div class="scan-body">
-            <div class="scan-map"><div class="scan-row" id="scan-row"><div class="scan-stack" id="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><div class="scan-stack" id="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric" role="group" aria-label="What the map's colors show"></div></div></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
+            <div class="scan-map"><div class="scan-row" id="scan-row"><div class="scan-stack" id="scan-sizes"><b>SCAN SIZE</b><div class="seg" id="scan-radius"></div></div><div class="scan-canvas-box"><canvas id="scan-canvas"></canvas></div><div class="scan-stack" id="scan-shows"><b>MAP SHOWS</b><div id="scan-metric" class="scan-metric" role="group" aria-label="What the map's colors show"></div></div></div><div id="scan-hint" class="scan-hint" data-m="needs"><span class="sh-g"><i></i>GREEN = THE MISSION WORKS THERE · </span><b class="h-do">CLICK ANY SQUARE TO MOVE THERE</b></div><button id="scan-go-best" class="scan-go" disabled>MOVE MY SITE TO THE BEST SPOT ▸</button></div>
             <div class="scan-side">
               <section class="fcard best"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4 6.1 20.7l1.3-6.6L2.5 9.5l6.6-.8z"/></svg><b>BEST SPOT FOUND</b></h3><div id="scan-best" class="scan-cell"></div><div id="scan-progress"></div></section>
               <section class="fcard"><h3><svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8" opacity=".45"/><rect x="3" y="13" width="8" height="8" opacity=".45"/><rect x="13" y="13" width="8" height="8"/></svg><b>WHAT THE COLORS MEAN</b><span id="scan-showing"></span></h3><div id="scan-legend" class="scan-legend"></div><div id="scan-rank" class="scan-rank"></div></section>
@@ -161,6 +161,7 @@
           </div>
           <div class="hero-warn" id="mission-warn" hidden></div>
           <div class="hero-fix" id="mission-fix" hidden><span>WAYS TO GET A GO:</span><div id="mission-fix-list" class="hero-fix-list"></div></div>
+          <div class="hero-basis" id="mission-basis" title="GO and NO-GO are LUNI's rule: the mission needs you set in step 3, applied to NASA's positions and terrain. It is a planning tool, not flight software.">JUDGED BY <b>YOUR MISSION NEEDS</b> · NASA DATA, CHECKED AGAINST NASA · <button id="basis-proof" class="h-do">SEE THE PROOF</button></div>
         </div>
           <div class="answer-side">
         <div class="tiles-head"><h3 id="clock-head" data-ico="sunearth">SUN AND EARTH AT THE LANDING TIME</h3><span class="nasa-line">NASA CHECK: <a id="hz-sun" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">SUN ↗</a><a id="hz-earth" class="nasa-check" target="_blank" rel="noopener" title="Opens NASA JPL Horizons' own answer for this site and time. Its azimuth is LUNI's direction and its elevation is LUNI's height.">EARTH ↗</a></span></div>

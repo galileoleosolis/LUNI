@@ -117,6 +117,21 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
   background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
+/* lesson feedback: a banner over the lesson and a large box that opens from it, and once at the end of the lesson */
+.fb-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; padding: 20px 24px; background: var(--panel); border: 2px solid var(--gold); }
+.fb-banner h3 { color: var(--gold); margin-bottom: 6px; } .fb-banner p { max-width: 56ch; }
+.fb { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(2, 6, 14, .82); }
+.fb[hidden] { display: none; }
+.fb-box { width: min(760px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 3px solid var(--gold); box-shadow: 0 30px 120px rgba(0, 0, 0, .7); padding: clamp(22px, 5vw, 48px); display: flex; flex-direction: column; gap: 18px; }
+.fb-box h2 { font-size: clamp(36px, 7vw, 64px); color: var(--gold); }
+.fb-box .lead { max-width: none; }
+.fb-box ul { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.fb-box .btn { font-size: clamp(22px, 4vw, 30px); padding: 18px 26px; text-align: center; }
+.fb-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.fb-row .btn { flex: 1 1 320px; }
+.fb-later { font: 700 17px/1 var(--disp); letter-spacing: .06em; padding: 14px 18px; cursor: pointer; color: var(--fg); background: none; border: 2px solid var(--line); border-radius: 10px; }
+.fb-later:hover { border-color: var(--fg); }
+.fb-box small { color: var(--dim); font-size: 14px; }
 footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--dim); font-size: 15px; }
 footer p { max-width: 80ch; margin-bottom: 8px; }
 
@@ -128,7 +143,7 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   .vhead i { margin-left: 0; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-@media print { .nav, .hero, #project, .award, #timeline, footer { display: none; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
+@media print { .nav, .hero, #project, .award, #timeline, footer, .fb, .fb-banner { display: none !important; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
 </style>
 </head>
 <body>
@@ -186,6 +201,8 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
     <div class="num"><b>99.1%</b><span>Same “never sunlit” answer as NASA’s south pole map. North pole: 98.9%.</span></div>
   </div>
   <p class="dim" style="max-width:76ch">The data is NASA’s, and it is checked. GO or NO-GO is LUNI’s own rule, applied to the mission needs the planner sets, so it is a planning and teaching tool, not flight software. The PROOF button in the app shows every check.</p>
+  <h3 style="margin-top:34px">TESTED WITH PEOPLE</h3>
+  <p style="max-width:76ch">LUNI has a built-in user test: six tasks, a timer and a report. Five rounds inside the team took the score from 2 of 6 to 6 of 6, and the screen was changed after every round. On 15 November four people who had never seen it tried it: three friends and one parent, none of them on the team. Three scored <b style="color:var(--white)">6 of 6</b>, in 8 to 13 minutes. The fourth got stuck on the first task and scored 1 of 6. Ease of use was rated 3, 3, 4 and 5 out of 5, and the common complaint was the same in different words: a lot of buttons, a lot of clutter, a lot of data and options. One asked for a way to ask what to do next, so ASK LUNI now answers that question. <a href="../#test">Take the test yourself</a>.</p>
 </div></section>
 
 <section id="award" class="award"><div class="wrap award-grid">
@@ -208,7 +225,11 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   <p class="label">For teachers and students</p>
   <h2>THE CLASSROOM LESSON</h2>
   <p class="lead">A ready-to-run 45-minute lesson. Students plan their own Moon landing with the same tool, and must end on a GO.</p>
-  <p class="dim">It has not been run in a classroom yet. If you try it, the team would like to hear how it went. Printing this page prints only the lesson.</p>
+  <div class="fb-banner">
+    <div><h3>TRIED IT, OR JUST READ IT? TELL US.</h3><p>The lesson has not been run in a classroom yet. Two minutes of your feedback will shape the next version.</p></div>
+    <button class="btn" id="fb-open">GIVE FEEDBACK ON THE LESSON ▸</button>
+  </div>
+  <p class="dim">Printing this page prints only the lesson.</p>
   <article class="paper"><h3>Plan a Moon landing: a 45-minute lesson with LUNI</h3>
 <p><strong>For:</strong> grades 6 to 9 (works for older students and clubs too). <strong>Needs:</strong> one laptop or Chromebook per pair, a web
 browser, no accounts and no installs. <strong>Tool:</strong> <a href="https://galileoleosolis.github.io/LUNI/">https://galileoleosolis.github.io/LUNI/</a></p>
@@ -343,8 +364,12 @@ the Earth for ... I fixed my plan by ...</em></p>
   the Sun by the Earth on 14 March 2025. Find the eclipse warning on the main screen.</li>
 <li><strong>Ask it:</strong> press <strong>ASK LUNI</strong> and type a question, such as "how is this different from Earth".</li>
 </ul>
+<h4>Tell us how it went</h4>
+<p>This lesson has not been run in a classroom yet. If you read it or tried it, two minutes of feedback helps the
+next version: <a href="https://forms.gle/jLzqGs1anesdDzPj8">https://forms.gle/jLzqGs1anesdDzPj8</a></p>
 <p>Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.</p>
   </article>
+  <div id="lesson-end"></div>
 </div></section>
 
 <section id="timeline"><div class="wrap stack">
@@ -372,17 +397,36 @@ the Earth for ... I fixed my plan by ...</em></p>
     <li><time>Sun 15 Nov · 12:05 PM · 107 saves</time><h4><em>R6</em>NASA data out loud</h4><ul><li>NASA DATA USED band every time something is calculated.</li><li>Best Site Finder: the map holds still after a move, so its points no longer slide.</li><li>One EARTH LINK need instead of two.</li><li>Verdict strip tidied; a NO-GO pulses, and so do the keys that can fix it.</li><li>PROOF opens on four headline numbers.</li><li>ASK LUNI: move to the highest, coldest, flattest spot.</li></ul><button data-v="r6">SEE THIS SCREEN ▲</button></li>
     <li><time>Sun 15 Nov · 1:40 PM · 116 saves</time><h4><em>R7</em>Energy, before and after, solar panels</h4><ul><li>ENERGY: an hour-by-hour power budget with the battery needed.</li><li>BEFORE AND AFTER box when the site or the date moves.</li><li>SOLAR PANELS placed on the sunniest squares near the lander.</li><li>Skyline picture: depth, bigger rays, fixed sizes, no false eclipse.</li><li>Finder: vertical button stacks against the map.</li><li>NASA band in white and red; warnings to the right of the verdict.</li><li>SIMPLE VIEW starts with the left side folded.</li><li>ASK LUNI: coordinates, comparing two sites, energy, temperature.</li></ul><button data-v="r7">SEE THIS SCREEN ▲</button></li>
     <li class="mile"><time>Sun 15 Nov · afternoon</time><h4>Presented, submitted, and an award</h4><ul><li>Submitted for global judging.</li><li>Local judging: three minutes to present, five minutes of questions.</li><li>LUNI wins Best Use of Data.</li></ul></li>
-    <li><time>Sun 15 Nov · 6:33 PM · 136 saves</time><h4><em>R8</em>The LUNI Console look</h4><ul><li>Released after the local judging, where LUNI won Best Use of Data.</li><li>A new look from our own design system: glossy keys, dark glass choice buttons, cards with icons, an icon on every section band.</li><li>The full name with “for”: Lunar Utility for Navigational Intelligence.</li><li>The default Earth-link need is now 25% of the mission, so a plan with almost no Earth link is no longer a GO.</li><li>NASA DATA USED band stays 14 seconds and each source is a link.</li><li>View from the site: shaded ground and craters for depth. FULL SCREEN button.</li><li>Outside the app: a 45-minute classroom lesson, the slide deck, GIFs.</li><li>Later the same evening, three small releases (r9 to r11): the project page, the site coordinates checked against their sources (Chang’e 4 corrected), and a one-minute tour at the start of the user test.</li></ul><button data-v="r8">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sun 15 Nov · 6:33 PM · 136 saves</time><h4><em>R8</em>The LUNI Console look</h4><ul><li>Released after the local judging, where LUNI won Best Use of Data.</li><li>A new look from our own design system: glossy keys, dark glass choice buttons, cards with icons, an icon on every section band.</li><li>The full name with “for”: Lunar Utility for Navigational Intelligence.</li><li>The default Earth-link need is now 25% of the mission, so a plan with almost no Earth link is no longer a GO.</li><li>NASA DATA USED band stays 14 seconds and each source is a link.</li><li>View from the site: shaded ground and craters for depth. FULL SCREEN button.</li><li>Outside the app: a 45-minute classroom lesson, the slide deck, GIFs.</li><li>Later the same evening, four small releases (r9 to r12): the project page, the site coordinates checked against their sources (Chang’e 4 corrected), a one-minute tour at the start of the user test, and fixes from four first-time testers (ASK LUNI answers “what do I do next”, clearer hints in the finder and mission history, a line under the verdict saying what it rests on).</li></ul><button data-v="r8">SEE THIS SCREEN ▲</button></li>
   </ol>
 </div></section>
 
+<div class="fb" id="fb" role="dialog" aria-modal="true" aria-labelledby="fb-title" hidden>
+  <div class="fb-box">
+    <p class="label" style="color:var(--gold)">Lesson feedback</p>
+    <h2 id="fb-title">HOW DID THE LESSON LOOK TO YOU?</h2>
+    <p class="lead">Teachers, students and anyone who read it: tell us what would work in a real class and what would not. It is a short form and it goes straight to the team.</p>
+    <ul>
+      <li>Would you run this lesson? With which grade?</li>
+      <li>What was unclear, too long or missing?</li>
+      <li>If you tried it: what happened?</li>
+    </ul>
+    <div class="fb-row">
+      <a class="btn" id="fb-go" href="https://forms.gle/jLzqGs1anesdDzPj8" target="_blank" rel="noopener">OPEN THE FEEDBACK FORM ▸</a>
+      <button class="fb-later" id="fb-later">NOT NOW</button>
+    </div>
+    <small>The form opens in a new tab (Google Forms). You can come back to it any time with the GIVE FEEDBACK button above the lesson.</small>
+  </div>
+</div>
+
 <footer><div class="wrap">
+  <p>Feedback on the classroom lesson: <a href="https://forms.gle/jLzqGs1anesdDzPj8" target="_blank" rel="noopener">open the short form</a>.</p>
   <p>LUNI was made by team Mystic Research for the NASA Space Apps Challenge 2026. The code was written by an AI assistant (Claude) under the team’s direction. No data, images or video were generated by AI.</p>
   <p>Source code and data builders: <a href="https://github.com/galileoleosolis/LUNI">github.com/galileoleosolis/LUNI</a>. Data: NASA NAIF, the Lunar Reconnaissance Orbiter teams (LOLA, Diviner, LROC) and JPL Horizons.</p>
 </div></footer>
 
 <script>
-const V = [{"id": "a0", "tag": "Draft 1", "name": "First sketch", "when": "Sat 14 Nov · 10:21 AM", "saves": "1 save", "changes": ["A plain page with made-up numbers, to try the idea.", "Called LUNO at this point."], "main": "img/v-a0-main.jpg", "finder": null}, {"id": "a1", "tag": "Draft 2", "name": "The field unit", "when": "Sat 14 Nov · 10:36 AM", "saves": "3 saves", "changes": ["Redesigned as a console inside a rugged field unit.", "3D Moon to pick a site, and a checked list of sites.", "Eight minutes later: real NASA data (SPICE positions, LOLA terrain)."], "main": "img/v-a1-main.jpg", "finder": null}, {"id": "r1", "tag": "r1", "name": "First public version", "when": "Sat 14 Nov · 3:16 PM", "saves": "40 saves", "changes": ["Mission needs, GO / NO-GO, and the landing-window calendar.", "Area scan, with the skylines worked out on the graphics chip.", "Eclipses, and a one-click check against NASA JPL Horizons.", "3D view from the surface.", "ASK LUNO: typed and spoken commands.", "Link to OpenSpace.", "Built-in user test; four rounds of testing changed the layout each time.", "Blue palette, bigger text, the verdict first."], "main": "img/v-r1-main.jpg", "finder": "img/v-r1-finder.jpg"}, {"id": "r2", "tag": "r2", "name": "Renamed LUNI", "when": "Sat 14 Nov · 4:08 PM", "saves": "53 saves", "changes": ["The product becomes LUNI.", "Mission-clock slider with a real handle.", "Headings in three voices: the name, what it is, what you can do.", "Moving the site from the scan is animated and stays in the scan.", "Clear message when the microphone is refused."], "main": "img/v-r2-main.jpg", "finder": null}, {"id": "r3", "tag": "r3", "name": "Proof and the Moon map", "when": "Sat 14 Nov · 10:13 PM", "saves": "75 saves", "changes": ["Two-column layout, brighter palette.", "PROOF panel: three real landings replayed against the mission record.", "Opens on a real landing (IM-2); copy link; first-visit guide; slope need.", "MISSION HISTORY: six real landings since 2023.", "MOON MAP with data layers and a data card for any point.", "Temperature from NASA Diviner, and YOUR MIX of layers.", "3D surface view, second version.", "The scan's best point must meet the needs.", "Less clutter: big icons, one lower chart at a time."], "main": "img/v-r3-main.jpg", "finder": null}, {"id": "r4", "tag": "r4", "name": "Simple view and the tutorial", "when": "Sun 15 Nov · 9:05 AM", "saves": "96 saves", "changes": ["SIMPLE VIEW by default; ALL TOOLS one press away.", "A guided tutorial that lights up one part at a time.", "Whole-Moon layers and the north pole.", "Renamed: BEST SITE FINDER and NEXT LANDING WINDOW.", "The answer as one strip, with Sun and Earth side by side under it.", "Custom coordinates on the main screen; every site ranked with a GO / NO-GO dot.", "OPERATIONS plan beside MISSION PLAN and MISSION WINDOWS.", "Colored step bands, a bigger slider, icons on the ASK LUNI buttons."], "main": "img/v-r4-main.jpg", "finder": null}, {"id": "r5", "tag": "r5", "name": "More NASA data", "when": "Sun 15 Nov · 10:26 AM", "saves": "103 saves", "changes": ["WATER ICE layer from NASA's Diviner polar product.", "DEEP SPACE NETWORK line: which NASA stations can see the Moon.", "The site's data card uses the site's own detailed skyline.", "PROOF: LUNI's polar maps checked against NASA's own (0.99)."], "main": "img/v-r5-main.jpg", "finder": "img/v-r5-finder.jpg"}, {"id": "r6", "tag": "r6", "name": "NASA data out loud", "when": "Sun 15 Nov · 12:05 PM", "saves": "107 saves", "changes": ["NASA DATA USED band every time something is calculated.", "Best Site Finder: the map holds still after a move, so its points no longer slide.", "One EARTH LINK need instead of two.", "Verdict strip tidied; a NO-GO pulses, and so do the keys that can fix it.", "PROOF opens on four headline numbers.", "ASK LUNI: move to the highest, coldest, flattest spot."], "main": "img/v-r6-main.jpg", "finder": "img/v-r6-finder.jpg"}, {"id": "r7", "tag": "r7", "name": "Energy, before and after, solar panels", "when": "Sun 15 Nov · 1:40 PM", "saves": "116 saves", "changes": ["ENERGY: an hour-by-hour power budget with the battery needed.", "BEFORE AND AFTER box when the site or the date moves.", "SOLAR PANELS placed on the sunniest squares near the lander.", "Skyline picture: depth, bigger rays, fixed sizes, no false eclipse.", "Finder: vertical button stacks against the map.", "NASA band in white and red; warnings to the right of the verdict.", "SIMPLE VIEW starts with the left side folded.", "ASK LUNI: coordinates, comparing two sites, energy, temperature."], "main": "img/v-r7-main.jpg", "finder": "img/v-r7-finder.jpg"}, {"id": "r8", "tag": "r8", "name": "The LUNI Console look", "when": "Sun 15 Nov · 6:33 PM", "saves": "136 saves", "changes": ["Released after the local judging, where LUNI won Best Use of Data.", "A new look from our own design system: glossy keys, dark glass choice buttons, cards with icons, an icon on every section band.", "The full name with “for”: Lunar Utility for Navigational Intelligence.", "The default Earth-link need is now 25% of the mission, so a plan with almost no Earth link is no longer a GO.", "NASA DATA USED band stays 14 seconds and each source is a link.", "View from the site: shaded ground and craters for depth. FULL SCREEN button.", "Outside the app: a 45-minute classroom lesson, the slide deck, GIFs.", "Later the same evening, three small releases (r9 to r11): the project page, the site coordinates checked against their sources (Chang’e 4 corrected), and a one-minute tour at the start of the user test."], "main": "img/v-r8-main.jpg", "finder": "img/v-r8-finder.jpg"}];
+const V = [{"id": "a0", "tag": "Draft 1", "name": "First sketch", "when": "Sat 14 Nov · 10:21 AM", "saves": "1 save", "changes": ["A plain page with made-up numbers, to try the idea.", "Called LUNO at this point."], "main": "img/v-a0-main.jpg", "finder": null}, {"id": "a1", "tag": "Draft 2", "name": "The field unit", "when": "Sat 14 Nov · 10:36 AM", "saves": "3 saves", "changes": ["Redesigned as a console inside a rugged field unit.", "3D Moon to pick a site, and a checked list of sites.", "Eight minutes later: real NASA data (SPICE positions, LOLA terrain)."], "main": "img/v-a1-main.jpg", "finder": null}, {"id": "r1", "tag": "r1", "name": "First public version", "when": "Sat 14 Nov · 3:16 PM", "saves": "40 saves", "changes": ["Mission needs, GO / NO-GO, and the landing-window calendar.", "Area scan, with the skylines worked out on the graphics chip.", "Eclipses, and a one-click check against NASA JPL Horizons.", "3D view from the surface.", "ASK LUNO: typed and spoken commands.", "Link to OpenSpace.", "Built-in user test; four rounds of testing changed the layout each time.", "Blue palette, bigger text, the verdict first."], "main": "img/v-r1-main.jpg", "finder": "img/v-r1-finder.jpg"}, {"id": "r2", "tag": "r2", "name": "Renamed LUNI", "when": "Sat 14 Nov · 4:08 PM", "saves": "53 saves", "changes": ["The product becomes LUNI.", "Mission-clock slider with a real handle.", "Headings in three voices: the name, what it is, what you can do.", "Moving the site from the scan is animated and stays in the scan.", "Clear message when the microphone is refused."], "main": "img/v-r2-main.jpg", "finder": null}, {"id": "r3", "tag": "r3", "name": "Proof and the Moon map", "when": "Sat 14 Nov · 10:13 PM", "saves": "75 saves", "changes": ["Two-column layout, brighter palette.", "PROOF panel: three real landings replayed against the mission record.", "Opens on a real landing (IM-2); copy link; first-visit guide; slope need.", "MISSION HISTORY: six real landings since 2023.", "MOON MAP with data layers and a data card for any point.", "Temperature from NASA Diviner, and YOUR MIX of layers.", "3D surface view, second version.", "The scan's best point must meet the needs.", "Less clutter: big icons, one lower chart at a time."], "main": "img/v-r3-main.jpg", "finder": null}, {"id": "r4", "tag": "r4", "name": "Simple view and the tutorial", "when": "Sun 15 Nov · 9:05 AM", "saves": "96 saves", "changes": ["SIMPLE VIEW by default; ALL TOOLS one press away.", "A guided tutorial that lights up one part at a time.", "Whole-Moon layers and the north pole.", "Renamed: BEST SITE FINDER and NEXT LANDING WINDOW.", "The answer as one strip, with Sun and Earth side by side under it.", "Custom coordinates on the main screen; every site ranked with a GO / NO-GO dot.", "OPERATIONS plan beside MISSION PLAN and MISSION WINDOWS.", "Colored step bands, a bigger slider, icons on the ASK LUNI buttons."], "main": "img/v-r4-main.jpg", "finder": null}, {"id": "r5", "tag": "r5", "name": "More NASA data", "when": "Sun 15 Nov · 10:26 AM", "saves": "103 saves", "changes": ["WATER ICE layer from NASA's Diviner polar product.", "DEEP SPACE NETWORK line: which NASA stations can see the Moon.", "The site's data card uses the site's own detailed skyline.", "PROOF: LUNI's polar maps checked against NASA's own (0.99)."], "main": "img/v-r5-main.jpg", "finder": "img/v-r5-finder.jpg"}, {"id": "r6", "tag": "r6", "name": "NASA data out loud", "when": "Sun 15 Nov · 12:05 PM", "saves": "107 saves", "changes": ["NASA DATA USED band every time something is calculated.", "Best Site Finder: the map holds still after a move, so its points no longer slide.", "One EARTH LINK need instead of two.", "Verdict strip tidied; a NO-GO pulses, and so do the keys that can fix it.", "PROOF opens on four headline numbers.", "ASK LUNI: move to the highest, coldest, flattest spot."], "main": "img/v-r6-main.jpg", "finder": "img/v-r6-finder.jpg"}, {"id": "r7", "tag": "r7", "name": "Energy, before and after, solar panels", "when": "Sun 15 Nov · 1:40 PM", "saves": "116 saves", "changes": ["ENERGY: an hour-by-hour power budget with the battery needed.", "BEFORE AND AFTER box when the site or the date moves.", "SOLAR PANELS placed on the sunniest squares near the lander.", "Skyline picture: depth, bigger rays, fixed sizes, no false eclipse.", "Finder: vertical button stacks against the map.", "NASA band in white and red; warnings to the right of the verdict.", "SIMPLE VIEW starts with the left side folded.", "ASK LUNI: coordinates, comparing two sites, energy, temperature."], "main": "img/v-r7-main.jpg", "finder": "img/v-r7-finder.jpg"}, {"id": "r8", "tag": "r8", "name": "The LUNI Console look", "when": "Sun 15 Nov · 6:33 PM", "saves": "136 saves", "changes": ["Released after the local judging, where LUNI won Best Use of Data.", "A new look from our own design system: glossy keys, dark glass choice buttons, cards with icons, an icon on every section band.", "The full name with “for”: Lunar Utility for Navigational Intelligence.", "The default Earth-link need is now 25% of the mission, so a plan with almost no Earth link is no longer a GO.", "NASA DATA USED band stays 14 seconds and each source is a link.", "View from the site: shaded ground and craters for depth. FULL SCREEN button.", "Outside the app: a 45-minute classroom lesson, the slide deck, GIFs.", "Later the same evening, four small releases (r9 to r12): the project page, the site coordinates checked against their sources (Chang’e 4 corrected), a one-minute tour at the start of the user test, and fixes from four first-time testers (ASK LUNI answers “what do I do next”, clearer hints in the finder and mission history, a line under the verdict saying what it rests on)."], "main": "img/v-r8-main.jpg", "finder": "img/v-r8-finder.jpg"}];
 const $ = (id) => document.getElementById(id);
 let at = V.length - 1, view = "main", timer = 0;
 function show(i) {
@@ -402,6 +446,21 @@ $("play").addEventListener("click", () => { if (timer) return stop(); view = "ma
   timer = setInterval(() => { if (at >= V.length - 1) return stop(); show(at + 1); }, 1800); });
 document.querySelectorAll(".tl button[data-v]").forEach((b) => b.addEventListener("click", () => { stop(); view = "main"; show(V.findIndex((v) => v.id === b.dataset.v)); document.querySelector(".viewer").scrollIntoView({ behavior: "smooth", block: "start" }); }));
 show(at);
+
+// lesson feedback box: opened by its button, and once by itself when a reader reaches the end of the lesson
+const fb = $("fb"), seenKey = "luni-lesson-fb";
+const fbShow = () => { fb.hidden = false; $("fb-go").focus(); try { localStorage.setItem(seenKey, "1"); } catch (e) {} };
+const fbHide = () => { fb.hidden = true; };
+$("fb-open").addEventListener("click", fbShow);
+$("fb-later").addEventListener("click", fbHide);
+$("fb-go").addEventListener("click", fbHide);
+fb.addEventListener("click", (e) => { if (e.target === fb) fbHide(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") fbHide(); });
+let fbSeen = false; try { fbSeen = !!localStorage.getItem(seenKey); } catch (e) {}
+if (!fbSeen && "IntersectionObserver" in window && !navigator.webdriver) {
+  const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); fbShow(); } });
+  io.observe($("lesson-end"));
+}
 </script>
 </body>
 </html>

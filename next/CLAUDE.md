@@ -429,6 +429,82 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   - r11: `showTour` / `TOUR` in `js/testmode.js`: START THE TEST leads to a four-card tour (where things are, never
     the answers) before the tasks; the clock starts at the tasks; the report has a line saying whether it was read.
     Runs from now on are not comparable with the earlier no-tour runs. Tester link: `/LUNI/#test`.
+- **BUILT, ON `main` ONLY, NOT PUBLISHED ANYWHERE** (the user, Sun 15 Nov about 7:50 PM New York: "do 2. 3. 4. and no on
+  5. Dont publish any yet just build"; "Wait on phones for now"). Public is r11; `/next/` and the preview page do not
+  have these. Checked: six window sizes, test sets E and D.
+  - ABOUT link in the top row (`#about-link`, `href="about/"`; on the preview page it points at the public address).
+  - A line inside the verdict strip (`#mission-basis`, `.hero-basis`): JUDGED BY YOUR MISSION NEEDS · NASA DATA,
+    CHECKED AGAINST NASA · SEE THE PROOF (`#basis-proof` opens PROOF). Hidden on windows under 560 px tall. It costs
+    about 18 px of skyline (172 px at 1440 x 900 on a NO-GO). `.tight` on `#stage` means a design width under 1500,
+    which is most laptop windows: do not hang "hide when cramped" rules on it.
+  - Best Site Finder data card shows the small colored bars. They were never there before: an older rule hid them
+    in `.scan-cell` when that panel was 250 px wide (Claude had wrongly told the user it removed them by accident).
+  - Refused by the user: opening the left side by default (item 5). On hold: the phone layout (the answer is about
+    two screens down on a phone and the NASA band covers the top row there).
+- **First outside tester** (report sent by the user Sun 15 Nov about 8 PM New York; first time seeing LUNI; do not
+  put the tester's name in the repository). Set E with the new tour (read all 4 cards), window 1536 x 695 (scale
+  0.76, so 12.5 px text is about 9.5 px on that screen): **6/6, 8:06, ease 3/5**, 52 clicks. Used NEXT LANDING WINDOW
+  (the first tester to do so), the date pickers (28 clicks), the Moon map and a click on a finder square. For
+  "Nobile Rim 1" he looked in MISSION HISTORY first, then picked it on the Moon; he never used the site list for it.
+  Most confusing: "a lot of buttons", "Mission History didn't show everything or I couldn't find everything"
+  (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
+  and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
+  and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r12 released** on the user's "Release it" (Sun 15 Nov, about 9:00 PM New York = 02:00 UTC Mon). **r12 is the
+  public version.** The full set ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes, the
+  feedback popup at two widths. It carries everything in the notes below that says "on `main` only" or "not
+  published": the ABOUT link, the line under the verdict, the finder bars and hint, the mission history hint, ASK
+  LUNI's "what do I do next", the test's fifth tour card and flashing task bar, the tester results on the project
+  page and the lesson feedback form. To roll back to r11: `tools/release.sh promote fe77f4a`; to r8: `9bbecc4`.
+- **Lesson feedback form** (the user, Sun 15 Nov about 9 PM New York: "Put this in the website as a form a big popup
+  for feedback ... It's for lesson plan feedback"): the user's Google Form, https://forms.gle/jLzqGs1anesdDzPj8.
+  On the project page (`tools/about-template.html`): a gold banner over the lesson with GIVE FEEDBACK ON THE LESSON
+  (`#fb-open`), a large box (`#fb`) with OPEN THE FEEDBACK FORM (a new tab), which also opens by itself once when a
+  reader reaches the end of the lesson (`#lesson-end`, remembered under `luni-lesson-fb`, never for automated
+  browsers), a footer link, and a "Tell us how it went" section at the end of `docs/lesson.md`. The form is a link,
+  not shown inside the page: Google's hosts are refused from this session, so the short link could not be resolved
+  to the long address an embedded form needs. On `main` only until the next release.
+- **Fourth first-time tester, a friend outside the team** (report sent Sun 15 Nov about 8:50 PM New York; public r11
+  test). Window 2560 x 1271 (scale 1.11): **6/6, 7:36 (the fastest), ease 3/5**, 57 clicks. He saw the task bar at
+  once (first click at 0:05). Used NEXT LANDING WINDOW three times, a verdict-strip fix button once (the first
+  tester to do so) and MOVE MY SITE TO THE BEST SPOT. Most confusing: "the data table and finding the best spot".
+  Liked "the aesthetics as well as the generally navigable interface". Wants "a less intrusive highlights for the
+  buttons, or a different way to be guided towards them" (the pulsing yellow rings): the OPPOSITE of the family
+  tester's wish for more step-by-step highlighting, so neither was built. He rated ease 3 on a large screen, so the
+  earlier "ease follows screen size" reading does not hold.
+  **Totals, 15 Nov: four first-timers, none on the team: three friends (6/6, 1/6, 6/6) and one parent (6/6); ease
+  3, 4, 3, 5.** The user pointed out the parent had never seen LUNI either, so the wording everywhere is "four
+  first-timers (three friends, one parent)": say who they were, do not call the parent "outside" or leave him out.
+  Slide 7 (deck Version 31) and the project page text give all four together.
+- **Third first-time tester, a family member** (report sent Sun 15 Nov about 8:45 PM New York; ran the public r11
+  test, so without the task-bar fixes; count him as a first-timer, NOT as outside the team). Window 2321 x 1309
+  (scale 1.14): **6/6, 13:03, ease 5/5**, 57 clicks. Like the second tester he explored for four minutes before
+  starting task 1 (5:22), then did every task properly; used NEXT LANDING WINDOW twice and the site list 9 times;
+  never used ASK LUNI. Most confusing: "the amount of data and options and the initial lack of familiarity". Liked
+  "the layout that numbers the steps". Wants the areas to select highlighted step by step (colored background,
+  border or animated border): offered to the user, not built.
+  Across the three first-timers ease followed screen size: 5/5 at scale 1.14, 4/5 at 0.81, 3/5 at 0.76.
+  Slide 7 (deck Version 29) and the project page text give all three results together.
+- **What stopped the second outside tester** (his full log arrived about 8:20 PM New York): he never noticed the task
+  bar. He explored for five minutes (ENERGY options, the finder 44 clicks, solar panels), then asked ASK LUNI by
+  VOICE "What do I do next?" and typed "what do i press next": both NOT UNDERSTOOD. He opened MISSION HISTORY once,
+  never pressed LOAD, and answered the rest in seconds. So his 1 of 6 measures the test's framing more than the app.
+  The voice line is the first proof that the microphone works on a real machine (Edge, the public site).
+  Built from it, on `main` only: a fifth tour card, last, YOUR TASK IS IN THE BAR AT THE VERY TOP; the task bar
+  flashes yellow for about 6 s when a task starts (`.test-bar.fresh`); and during a test "what do I do next" reads
+  out the task (`assistantApi.task`, used by `nextText`).
+- **Second outside tester** (partial report and a photo of his review, sent by the user Sun 15 Nov about 8:15 PM New
+  York; the event log was cut off at first). Set E with the tour read, window 1432 x 734:
+  **1/6, 1 skipped, 6:03**. Task 1 took 5:28 and 86 clicks and he never got Blue Ghost 1 loaded from MISSION HISTORY
+  (ended on a custom point, 3-day mission); he then answered or skipped the rest in seconds. His review: ease 4/5,
+  "There is a lot of clutter", liked "the graphics and how everything was mapped out", wants "a button that
+  indicates what to press next or the ai assistant would answer the question what do I do next".
+  Built from it, on `main` only: ASK LUNI answers "what do I do next" / "what now" / "I am stuck" / "where do I
+  start" (`next` topic, `nextText` in `js/assistant.js`; "what now" used to set the landing time to the present).
+  Also from the first tester, on `main` only: `#scan-hint` under the finder map (GREEN = THE MISSION WORKS THERE ·
+  CLICK ANY SQUARE TO MOVE THERE; the green part shows only on the GO map) and `#hist-to-main` in MISSION HISTORY's
+  footer. **Both results are stated together** on slide 7 (deck Version 28) and in the project page text: never
+  quote the 6 of 6 alone.
 - **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
   plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
   `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install

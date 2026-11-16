@@ -112,4 +112,9 @@ the Earth for ... I fixed my plan by ...*
   the Sun by the Earth on 14 March 2025. Find the eclipse warning on the main screen.
 - **Ask it:** press **ASK LUNI** and type a question, such as "how is this different from Earth".
 
+## Tell us how it went
+
+This lesson has not been run in a classroom yet. If you read it or tried it, two minutes of feedback helps the
+next version: <https://forms.gle/jLzqGs1anesdDzPj8>
+
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.

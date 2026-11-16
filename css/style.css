@@ -1144,3 +1144,30 @@ html:not(.flow) :is(.site-list .grp, .site-more, .globe-labels span, .k-hint, .k
 .test-map .m-top { grid-area: top; } .test-map .m-left { grid-area: left; } .test-map .m-mid { grid-area: mid; } .test-map .m-keys { grid-area: keys; border-radius: 8px; }
 .test-map.z-top .m-top, .test-map.z-left .m-left, .test-map.z-mid .m-mid, .test-map.z-keys .m-keys { color: #06122a; background: var(--key-y); border-color: #fff; }
 .test-tour-t { font: 700 21px/1.15 var(--cond); letter-spacing: .05em; color: var(--key-y); margin-bottom: 6px !important; }
+
+/* the line under the verdict: what the answer rests on (the judges: a GO reads as more official than the team's own rule) */
+.hero-basis { flex: 0 0 100%; margin-top: -3px; font-size: 12.5px; letter-spacing: .05em; color: var(--dim); }
+.hero-basis b { color: var(--amb); font-weight: 600; }
+.hero-basis button { background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: var(--wht); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.hero-basis button:hover { color: var(--hi); }
+@media (max-height: 560px) { html:not(.flow) .hero-basis { display: none; } }
+/* ABOUT in the top row */
+a.about-link { display: inline-block; text-decoration: none; margin-left: 0; margin-right: 8px; }
+html.flow a.about-link { font-size: 13px; padding: 5px 10px; }
+/* Best Site Finder: the data card gets its small bars back */
+.scan-side .fcard .scan-cell .prof-row { grid-template-columns: minmax(0, 1.5fr) 40px minmax(0, 1fr) 42px; gap: 8px; } .scan-side .fcard .scan-cell .prof-row i { display: block; }
+
+/* after the first outside tester: say what the squares mean on the map itself, and where the other sites are */
+.scan-hint { flex: none; font-size: 13.5px; letter-spacing: .05em; color: var(--amb); text-align: center; }
+.scan-hint i { display: inline-block; width: 13px; height: 13px; margin-right: 7px; vertical-align: -2px; background: var(--grn); }
+.scan-hint[data-m="other"] .sh-g { display: none; }
+.hist-tip { color: var(--amb); } .hist-tip button { background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: var(--wht); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; } .hist-tip button:hover { color: var(--hi); }
+
+/* the user test: the task bar calls for attention when a task starts, and the tour has a card for it */
+@keyframes task-call { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0); } 50% { box-shadow: 0 0 0 5px var(--key-y), 0 0 26px 6px rgba(255, 209, 102, .7); } }
+.test-bar.fresh { animation: task-call 1.1s ease-in-out 6; border-color: var(--key-y); }
+.test-bar .test-q b { font-size: 1.1em; }
+@media (prefers-reduced-motion: reduce) { .test-bar.fresh { animation: none; box-shadow: 0 0 0 4px var(--key-y); } }
+.test-map { grid-template: "task task" 24px "top top" 26px "left mid" 84px "keys keys" 28px / 30% 1fr; }
+.test-map .m-task { grid-area: task; border-style: dashed; }
+.test-map.z-task .m-task { color: #06122a; background: var(--key-y); border-color: #fff; border-style: solid; }
