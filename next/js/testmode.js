@@ -296,17 +296,38 @@ function showIntro() {
     <p>Thanks for helping. You are testing the tool. The tool is not testing you: if something is hard to find, that is the tool's fault and exactly what we need to know.</p>
     <ul>
       <li>You are a mission planner choosing where and when to land on the Moon.</li>
-      <li>There are <b>${TASKS.length} short tasks</b>, shown one at a time in a bar at the top. No hints. It takes about 10 to 15 minutes.</li>
+      <li>First a <b>one-minute tour</b> of the screen (4 cards). Then <b>${TASKS.length} short tasks</b>, shown one at a time in a bar at the top, with no hints. About 10 minutes in all.</li>
       <li>If you get stuck for more than a couple of minutes, press <b>SKIP</b>. That is useful information too.</li>
       <li>At the end you answer 5 quick questions and get a report to copy and send back.</li>
     </ul>
     <p class="test-small">What is recorded: your clicks and key presses inside this page, how long each task takes, and your answers. It stays in this browser tab. Nothing is sent anywhere unless you copy the report and send it yourself.</p>
     <div class="test-actions"><button class="test-btn go" id="test-start">START THE TEST</button><button class="test-btn" id="test-skip">JUST EXPLORE (NO TEST)</button></div>`);
-  o.querySelector("#test-start").addEventListener("click", () => {
-    T = { phase: "tasks", started: Date.now(), task: 0, taskStart: 0, events: [], results: [], review: null };
-    closeOverlay(); showTask();
-  });
+  o.querySelector("#test-start").addEventListener("click", () => showTour());
   o.querySelector("#test-skip").addEventListener("click", () => { try { sessionStorage.setItem(KEY + "-skip", "1"); } catch {} closeOverlay(); api.onExplore?.(); });
+}
+
+// A one-minute tour before the tasks (the user, 15 Nov: "make the test give a short tutorial first"). It says where things
+// are, never what the answers are. The clock starts when the tasks start.
+const TOUR = [
+  ["left", "WHERE AND WHEN ARE ON THE LEFT", "Three numbered steps: <b>1</b> pick a landing site, <b>2</b> set the landing date and time, <b>3</b> set what the mission needs. Change any of them and the answer updates."],
+  ["mid", "THE ANSWER IS IN THE MIDDLE", "A big <b>GO</b> or <b>NO-GO</b> with the reason and any warning beside it. Under it: the Sun and the Earth right now, the view from the site, and a chart of the days after landing."],
+  ["top", "THREE SCREENS IN THE TOP ROW", "<b>MAIN SCREEN</b> is where you start. <b>MOON MAP</b> shows data as layers on the Moon, with the numbers for any spot. <b>MISSION HISTORY</b> has real landings you can load."],
+  ["keys", "SHORTCUTS ARE THE KEYS AT THE BOTTOM", "<b>NEXT LANDING WINDOW</b> jumps to the next time that works. <b>BEST SITE FINDER</b> checks the ground nearby and can move your site. <b>ASK LUNI</b> answers a typed question."],
+];
+function showTour(i = 0, seen = 1) {
+  const [zone, title, text] = TOUR[i], last = i === TOUR.length - 1;
+  const o = overlay(`
+    <h2>ONE-MINUTE TOUR · ${i + 1} OF ${TOUR.length}</h2>
+    <div class="test-map z-${zone}" aria-hidden="true"><i class="m-top">MAIN SCREEN · MOON MAP · MISSION HISTORY</i><i class="m-left">1 SITE<br>2 TIME<br>3 NEEDS</i><i class="m-mid">GO / NO-GO<br>SUN · EARTH<br>CHARTS</i><i class="m-keys">KEYS</i></div>
+    <p class="test-tour-t">${title}</p><p>${text}</p>
+    <div class="test-actions">${i ? '<button class="test-btn" id="test-back">BACK</button>' : ""}<button class="test-btn go" id="test-next">${last ? "START THE TASKS" : "NEXT"}</button><button class="test-btn" id="test-notour">SKIP THE TOUR</button></div>`);
+  const begin = (skipped) => {
+    T = { phase: "tasks", started: Date.now(), task: 0, taskStart: 0, events: [], results: [], review: null, tour: skipped ? `skipped at card ${i + 1} of ${TOUR.length}` : `read all ${TOUR.length} cards` };
+    closeOverlay(); showTask();
+  };
+  o.querySelector("#test-next").addEventListener("click", () => (last ? begin(false) : showTour(i + 1, Math.max(seen, i + 2))));
+  o.querySelector("#test-back")?.addEventListener("click", () => showTour(i - 1, seen));
+  o.querySelector("#test-notour").addEventListener("click", () => begin(true));
 }
 
 function showTask() {
@@ -389,6 +410,7 @@ export function buildReport(S, env) {
   L.push("=== LUNI FIRST-USE TEST REPORT ===");
   L.push(`Date: ${new Date(S.started).toISOString().slice(0, 16)}Z | Window: ${env.window} | Layout: ${env.layout} | Browser: ${env.browser}`);
   L.push(`Task set: ${SET_NAME}`);
+  if (S.tour) L.push(`One-minute tour before the tasks: ${S.tour}`);
   L.push(`Total time: ${mmss(S.totalSeconds)} | Clicks in the app: ${clicks.length} | Shortcut keys: ${keys.length}`);
   L.push(`Score: ${S.results.filter((r) => r.correct).length}/${S.results.length} correct, ${S.results.filter((r) => r.skipped).length} skipped`);
   L.push("", "TASKS");

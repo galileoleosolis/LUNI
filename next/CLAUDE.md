@@ -413,6 +413,22 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   "for", the 25% Earth-link default and the whole design system batch below. Nothing newer is waiting. To roll back
   to r7: `tools/release.sh promote b12dd78`. **Local judging result: the team won BEST USE OF DATA** (the user: the
   judges "were really impressed with the whole thing").
+- **r9, r10, r11 released** Sun 15 Nov, about 7:20 to 7:45 PM New York (the user: "do 7. also release it", "Do these asap
+  starting with the tester link", "Can you make the test give a short tutorial first"). **r11 is the public version.**
+  To roll back to r8: `tools/release.sh promote 9bbecc4`.
+  - r9 (main 0ab8e91): the project page only; the app's files were identical to r8.
+  - r10 (main 0a0a939): coordinates checked by web search on 15 Nov. `data/sites.json` has a new optional `check`
+    text, shown after the COORDINATE SOURCE link (`js/app.js`). Match NASA's LRO camera team: IM-2 (also the NAIF
+    frame kernel), IM-1, Blue Ghost 1, SLIM, Chang'e 6; Apollo 11 matches NASA's LRO-based table. **Chang'e 4 was
+    changed** to LROC's 45.4562S 177.5885E (it was a Chinese team's figure, about 420 m away); `data/horizons.json`
+    was rebuilt and only `ce4` changed (0.11 deg at most). Chandrayaan-3 keeps the named point; ISRO's first figure
+    is about 350 m away (said on screen). NOT verified, because the hosts are refused from this session
+    (nssdc.gsfc.nasa.gov, planetarynames.wr.usgs.gov, www.lroc.asu.edu): Apollo 15 and 17 (ALSJ values, kept), the
+    USGS entry for Statio Shiv Shakti, and Mazarico 2011's 89.45S 222.69E for the Shackleton ridge point. The three
+    Artemis III points are still LUNI-selected and say so.
+  - r11: `showTour` / `TOUR` in `js/testmode.js`: START THE TEST leads to a four-card tour (where things are, never
+    the answers) before the tasks; the clock starts at the tasks; the report has a line saying whether it was read.
+    Runs from now on are not comparable with the earlier no-tour runs. Tester link: `/LUNI/#test`.
 - **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
   plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
   `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
@@ -589,8 +605,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). r7 (15 Nov, 18:40 UTC, main b12dd78). **r8 (15 Nov, 23:33 UTC, main 9bbecc4) is the current public version.**
-   To roll back to r7: `tools/release.sh promote b12dd78`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). r7 (15 Nov, 18:40 UTC, main b12dd78). r8 (15 Nov, 23:33 UTC, main 9bbecc4). r9 to r11 followed within the hour; **r11 is the current public version.**
+   To roll back to r8: `tools/release.sh promote 9bbecc4`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the

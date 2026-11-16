@@ -1137,3 +1137,10 @@ html:not(.flow) :is(.site-list .grp, .site-more, .globe-labels span, .k-hint, .k
 .mm-side .fcard .prof-row { grid-template-columns: 138px max-content minmax(40px, 1fr) 38px; gap: 6px; font-size: 13px; } .mm-side .fcard .prof-row span { white-space: nowrap; }
 .mm-side .fcard { padding: 7px 10px 8px; margin-bottom: 7px; } .mm-side .fcard > h3 { margin-bottom: 5px; padding-bottom: 4px; }
 .mm-side .fcard .prof-row { grid-template-columns: 138px 42px minmax(0, 1fr) 38px; }
+
+/* the test's one-minute tour: a small map of the screen with one part lit */
+.test-map { display: grid; grid-template: "top top" 26px "left mid" 96px "keys keys" 30px / 30% 1fr; gap: 5px; margin: 4px 0 14px; padding: 8px; background: #232427; border-radius: 10px; }
+.test-map i { display: grid; place-items: center; text-align: center; font: 700 13px/1.25 var(--cond); font-style: normal; letter-spacing: .06em; color: #5d6b85; background: #05080f; border: 2px solid #1c2a47; border-radius: 4px; }
+.test-map .m-top { grid-area: top; } .test-map .m-left { grid-area: left; } .test-map .m-mid { grid-area: mid; } .test-map .m-keys { grid-area: keys; border-radius: 8px; }
+.test-map.z-top .m-top, .test-map.z-left .m-left, .test-map.z-mid .m-mid, .test-map.z-keys .m-keys { color: #06122a; background: var(--key-y); border-color: #fff; }
+.test-tour-t { font: 700 21px/1.15 var(--cond); letter-spacing: .05em; color: var(--key-y); margin-bottom: 6px !important; }
