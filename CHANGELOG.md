@@ -2,9 +2,19 @@
 
 Times are New York time. **Public version: r13.** The test build (`/next/`) is the same until new work is added.
 
+## r13: The classroom lesson, reworked with teachers
+Sun 15 Nov · 9:25 PM  
+**This is the public version.** The app itself is the same as r12.
+
+- Three pieces of feedback from teachers who read the lesson; each said students need the background first.
+- START HERE: the one idea (the Sun is for power, the Earth is for talking to home) with a labeled sketch.
+- Smaller steps with a check after each part; a numbered picture of the screen; five words to know; two NASA videos.
+- A worked example done together, and a worksheet whose first column is already filled in.
+- Students must predict before pressing, and write why their plan became a GO.
+- A list for pairs who are stuck.
+
 ## r12: What four first-time testers told us
 Sun 15 Nov · 9:00 PM
-**This is the public version.**
 
 - Four people who had never seen LUNI ran the six-task test (three friends, one parent): three scored 6 of 6, one got stuck on the first task.
 - ASK LUNI answers "what do I do next"; during the test it reads out the task.
