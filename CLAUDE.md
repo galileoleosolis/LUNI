@@ -402,7 +402,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
 - **SUBMITTED for global judging** (the user, Sun 15 Nov, mid-afternoon New York: "ok its submitted, we can still edit
   this later"). The Project page was filled from `docs/submission.md`: name "LUNI: Lunar Utility for Navigational
   Intelligence", final project link https://galileoleosolis.github.io/LUNI/, the demo link is the user's own
-  PowerPoint on a public share (a fallback PDF of the old deck was in `docs/`; deleted on 15 Nov because its cover showed the names).
+  PowerPoint on a public share (a fallback PDF of the old deck is at `docs/LUNI-deck.pdf`; its cover shows the members' names).
   It can be edited and resubmitted until Sun 11:59 PM New York; only the last saved submission is judged, and it must
   be SUBMITTED again after edits. Rules from the official guide: at most seven slides or the entry is not eligible;
   no likeness of anyone under 18; English; public links with no login.
@@ -452,13 +452,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
 - **NAMES: no member's name anywhere public** (the user, Sun 15 Nov about 11:22 PM New York: one of the two team
   members is under 18, "let's just remove both"). The Space Apps terms: "Recognizable names, voices, and likenesses
-  of persons under the age of 18 should not be included in any submission." Done and **released as r18**: the names
-  line is gone from the first slide (deck Version 37 and `slides/`), `about/img/demo-cover.jpg` was retaken, the old
-  `docs/LUNI-deck.pdf` was deleted (its cover showed them), and these notes no longer spell them. **Never write a
+  of persons under the age of 18 should not be included in any submission." Done on `main` (baa0798): the names
+  line is gone from the first slide (deck Version 37 and `slides/`), `about/img/demo-cover.jpg` was retaken, and
+  these notes no longer spell them. **NOT YET PUBLIC: the release (`tools/release.sh promote`) was refused by this
+  session's permission check at 11:25 PM New York, so the public slides (r17) still show both names until the user
+  says "release it".** Also still to do, on the user's word: delete `docs/LUNI-deck.pdf`, an old picture-only copy of
+  the deck whose cover shows the names (it is served at `/LUNI/docs/LUNI-deck.pdf`). **Never write a
   member's name, or a tester's, in the app, the slides, the project page, the docs, these notes or a commit
   message.** Older commits still contain them (the repository's history was not rewritten; told to the user). The
   team name, Mystic Research, is fine. The user's own PowerPoint copy and the Space Apps team page are theirs to check.
-  To roll back to r17 (not advised: it brings the names back): `tools/release.sh promote 9e1b615`.
 - **After the submission** (the user, Sun 15 Nov about 11:05 PM New York: "lets actually just start now on the
   pre-release. is there anything against updating it or does it have to stay static until judging is over").
   Claude could NOT confirm the 2026 rule: spaceappschallenge.org is on the allowed list, but this session cannot verify
