@@ -450,6 +450,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Fourth first-time tester, a friend outside the team** (report sent Sun 15 Nov about 8:50 PM New York; public r11
+  test). Window 2560 x 1271 (scale 1.11): **6/6, 7:36 (the fastest), ease 3/5**, 57 clicks. He saw the task bar at
+  once (first click at 0:05). Used NEXT LANDING WINDOW three times, a verdict-strip fix button once (the first
+  tester to do so) and MOVE MY SITE TO THE BEST SPOT. Most confusing: "the data table and finding the best spot".
+  Liked "the aesthetics as well as the generally navigable interface". Wants "a less intrusive highlights for the
+  buttons, or a different way to be guided towards them" (the pulsing yellow rings): the OPPOSITE of the family
+  tester's wish for more step-by-step highlighting, so neither was built. He rated ease 3 on a large screen, so the
+  earlier "ease follows screen size" reading does not hold.
+  **Totals, 15 Nov: four first-timers, three outside the team: 6/6, 1/6, 6/6 (outside) and 6/6 (family); ease 3, 4,
+  3, 5.** Slide 7 (deck Version 30) and the project page text give all four together.
 - **Third first-time tester, a family member** (report sent Sun 15 Nov about 8:45 PM New York; ran the public r11
   test, so without the task-bar fixes; count him as a first-timer, NOT as outside the team). Window 2321 x 1309
   (scale 1.14): **6/6, 13:03, ease 5/5**, 57 clicks. Like the second tester he explored for four minutes before
