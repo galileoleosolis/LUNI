@@ -450,6 +450,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r13 released** on the user's "Release everything that hasn't been released yet" (Sun 15 Nov, about 9:30 PM New
+  York = 02:30 UTC Mon). **r13 is the public version.** Only the lesson and the project page changed since r12
+  (`git diff a50a126` touched no file under `index.html`, `css`, `js`, `data`), so the app checks were not rerun;
+  the project page was checked at two widths. The two lesson notes below that say "on `main` only" are released.
+  To roll back to r12: `tools/release.sh promote a50a126`.
 - **Lesson, version 3** (Sun 15 Nov about 9:30 PM New York, on the user's "go go go fix the issues", after two more
   pieces of teacher feedback: the first answer to the Google Form, and a third message). All said the same: students
   need the background first, and may click to a GO without knowing why. Added to `docs/lesson.md`, **on `main` only**:
