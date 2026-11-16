@@ -450,13 +450,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r17 released** on the user's "release it" (Sun 15 Nov, about 10:50 PM New York = 03:50 UTC Mon). **r17 is the public
+  version.** Lesson and project page only (the background section below); the app's files are unchanged since r12.
+  To roll back to r16: `tools/release.sh promote 05f5761`.
 - **Second answer to the lesson form** (pasted by the user about 10:45 PM New York; another reviewer): liked the
   teacher notes, WORDS TO KNOW, the videos, the filled-in worksheet and the numbered screen; asked the lesson to
   "lay out what background you are assuming" (what a lander looks like, how it gets there, whether it leaves, what
   its mission is). Added to `docs/lesson.md`: WHAT THIS LESSON ASSUMES STUDENTS ALREADY KNOW, before START HERE,
   with a four-row table of short answers. Its facts are general or already sourced in `js/stories.js` (a lunar day
   of about 14 Earth days; Chang'e 6's ascent stage lifting off about two days after landing). The images.nasa.gov
-  link was not opened from here. **On `main` only until the next release (public is r16).**
+  link was not opened from here. Released in r17.
 - **r16 released** on the user's "Release it!!!!" (Sun 15 Nov, about 10:40 PM New York = 03:40 UTC Mon). **r16 is the
   public version.** It carries the web slides (`/LUNI/slides/`, the address for the submission's demo link), the
   project page's new order with the SLIDES button, the student reflection and the five-testers line. The app's
