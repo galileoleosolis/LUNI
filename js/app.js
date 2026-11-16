@@ -917,6 +917,7 @@ function moveText(a, b) {
 // Everything the assistant (typed or spoken commands) may read or do. It goes through the same functions as the keys.
 const assistantApi = {
   sites: () => SITES,
+  task: () => { const b = document.getElementById("test-bar"); return b && !b.hidden ? (b.querySelector(".test-q")?.textContent || "").replace(/\s+/g, " ").trim() : ""; },
   needOptions: () => REQ_OPTIONS,
   snapshot() {
     const { samples, terrain } = state.scenario, cur = samples[state.idx], cov = coverage();

@@ -450,8 +450,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **What stopped the second outside tester** (his full log arrived about 8:20 PM New York): he never noticed the task
+  bar. He explored for five minutes (ENERGY options, the finder 44 clicks, solar panels), then asked ASK LUNI by
+  VOICE "What do I do next?" and typed "what do i press next": both NOT UNDERSTOOD. He opened MISSION HISTORY once,
+  never pressed LOAD, and answered the rest in seconds. So his 1 of 6 measures the test's framing more than the app.
+  The voice line is the first proof that the microphone works on a real machine (Edge, the public site).
+  Built from it, on `main` only: a fifth tour card, last, YOUR TASK IS IN THE BAR AT THE VERY TOP; the task bar
+  flashes yellow for about 6 s when a task starts (`.test-bar.fresh`); and during a test "what do I do next" reads
+  out the task (`assistantApi.task`, used by `nextText`).
 - **Second outside tester** (partial report and a photo of his review, sent by the user Sun 15 Nov about 8:15 PM New
-  York; the event log was cut off, so what stopped him is not known). Set E with the tour read, window 1432 x 734:
+  York; the event log was cut off at first). Set E with the tour read, window 1432 x 734:
   **1/6, 1 skipped, 6:03**. Task 1 took 5:28 and 86 clicks and he never got Blue Ghost 1 loaded from MISSION HISTORY
   (ended on a custom point, 3-day mission); he then answered or skipped the rest in seconds. His review: ease 4/5,
   "There is a lot of clutter", liked "the graphics and how everything was mapped out", wants "a button that

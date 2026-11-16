@@ -329,6 +329,8 @@ export function createAssistant(api) {
   const needsText = (s = snap()) => `Mission needs: ${s.req.days} days long; can sit ${s.req.maxDarkH} hours in the dark; Earth link at landing ${s.req.earthAtLanding ? "required" : "not required"}; Earth in view for ${s.req.earthMinPct ? `at least ${s.req.earthMinPct}%` : "any share"} of the mission; ground slope ${s.req.maxSlopeDeg ? `at most ${s.req.maxSlopeDeg}°` : "any"}.`;
   // What to do next, from the plan on screen: one step, named by the button to press.
   function nextText(s = snap()) {
+    const task = api.task?.();          // during the user test the honest answer is the task itself
+    if (task) return `Your task is in the bar at the top of the screen. ${task} Do it in the app, then give your answer in that bar.`;
     if (!s.verdict.ok) return `This plan is a NO-GO. ${optionsText(s)} Or press NEXT LANDING WINDOW to move the date, or BEST SITE FINDER to move the site.`;
     return `This plan is a GO for ${s.siteName}. Next, drag the slider under the chart to walk through the mission, press the yellow ENERGY button to see the power budget, or pick another site in step 1 on the left. To see real landings, press MISSION HISTORY in the top row. Say HELP for what I understand.`;
   }
