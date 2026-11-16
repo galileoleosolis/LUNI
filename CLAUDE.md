@@ -453,11 +453,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
 - **Fifth first-time tester** (report sent Sun 15 Nov about 10:15 PM New York; public r15 test with the five-card
   tour, all read; do not put the tester's name in the repository). Window 1280 x 631 (scale 0.72, the smallest
   screen so far): **6/6, 10:11, ease 5/5**, 72 clicks. "Honestly, nothing" was confusing. Task 3 took 6:02 and 50
-  clicks: she looked for Nobile Rim 1 in MISSION HISTORY, on the Moon map and by voice before finding the site list
+  clicks: they looked for Nobile Rim 1 in MISSION HISTORY, on the Moon map and by voice before finding the site list
   (the first-timer on 15 Nov did the same; in SIMPLE VIEW the site list starts folded away, which the user chose to
-  keep). Her voice command was heard as "where is the landing site Noble Room 1" and NOT UNDERSTOOD: "noble rim" is
-  understood, "room" for "rim" is not (offered to the user, not built). She then used NEXT LANDING WINDOW and the
-  finder. Claude ASSUMED she had never seen LUNI and is a friend or family member; the user was asked to confirm.
+  keep). Their voice command was heard as "where is the landing site Noble Room 1" and NOT UNDERSTOOD: "noble rim" is
+  understood, "room" for "rim" is not (offered to the user, not built). They then used NEXT LANDING WINDOW and the
+  finder. Claude ASSUMED the tester had never seen LUNI and is a friend or family member; the user was asked to confirm.
   **Totals now: five first-timers, four of the five scored 6 of 6; ease 3, 4, 3, 5, 5.** Public wording: "five
   people who had never seen it, friends and family: four of the five scored 6 of 6". Deck slide 7 says so (Version
   36); the project page says so **on `main` only until the next release** (public r15 still says four).
