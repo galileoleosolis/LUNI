@@ -32,8 +32,19 @@ Earth, for long enough?
 
 ![Two sketches: on the left the lander sees the Sun and the Earth, a GO; on the right a hill hides the Earth, a NO-GO](figures/lesson-sun-earth-lander.svg)
 
-Ask before moving on: *What is the Sun for? What is the Earth for? What could get in the way?* Every student should
-be able to answer all three.
+### Quick check before moving on
+
+Ask these three questions. Every student should be able to answer all three. Sample answers are given so you do not
+need to know the subject beforehand.
+
+| Ask | A good answer sounds like |
+|---|---|
+| What is the Sun for? | "Power." Sunlight on the lander's solar panels makes its electricity. (It also keeps the equipment warm enough to work.) |
+| What is the Earth for? | "Talking to home." The lander's radio needs a straight, clear line to Earth to send and receive messages. |
+| What could get in the way? | "The ground." A hill, a mountain or the rim of a crater between the lander and the Sun or the Earth. |
+
+If a student says "the Moon needs the Sun to shine" or "the Earth gives it gravity", point back to the sketch: this
+lesson is only about what the **lander** can see from where it stands.
 
 ## Words to know
 
@@ -199,6 +210,30 @@ Three sentences to finish:
 
 ## Teacher key
 
+### Sample answers to every question in the lesson
+
+You do not need to know any of this beforehand. Student answers will vary in wording; these show what to listen for.
+
+| Where | Question | A good answer sounds like |
+|---|---|---|
+| Part 1 | What does a lander need from the sky to stay alive? | Sunlight for power, and the Earth in view so its radio can reach home. |
+| Part 3 | Which one is closer to being hidden by a hill, the Sun or the Earth? | The Sun. It is only 2.45° above level; the Earth is 11.19° up. Lower means closer to the skyline. |
+| Part 4, predict | Which of the two is missing, and what would have to change? | The Earth is missing: it is just behind the ground. Either wait until it rises above the skyline, or move to a spot that can see it. |
+| Part 4, explain | The plan became a GO because ... | ... one day later the Earth had risen above the hill, so the radio link works at landing. The Sun was up both times. |
+| Part 5 | Which one thing did you change, and why did it work? | Any one of: a later date (the Sun or Earth came into view), a nearby spot (a higher or better-placed point sees over the hill), or one mission need (for example a shorter mission). The reason must name the Sun or the Earth. |
+| Fast finishers | Why would a mission want to land near a place where it can never get power? | Because water ice can only last where it stays dark and very cold. Ice is worth studying and could be used for water, air and fuel. So missions want to be near the dark crater, but land on sunlit ground beside it. |
+| Part 6 | Which was easier to change, the date or the place? What would that cost a real mission? | No single right answer. Changing the date costs waiting and rescheduling the launch. Changing the place may put the lander farther from what it came to study. |
+
+Sample endings for the three worksheet sentences:
+
+- The Moon's south pole is hard to land on because **the Sun stays very low, so hills and crater rims can block it,
+  and they can block the Earth too.**
+- A lander needs the Sun for **power** and the Earth for **its radio link home.**
+- I fixed my plan by **changing the landing date so the Earth was above the skyline** (or their own change, with
+  the reason).
+
+### Notes on the missions
+
 - **Mission one.** The plan is a **NO-GO**. The reason is **no Earth link at landing**: the Sun is up (about 2.4°
   above level, in the east-northeast) but the Earth is just behind the ground to the northwest. **NEXT LANDING
   WINDOW** moves the landing to **15 NOV 2026, 20:00 UTC**, one day later, when the Earth has risen over the skyline.
@@ -231,6 +266,7 @@ next version: <https://forms.gle/jLzqGs1anesdDzPj8>
 
 Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the one idea students need before they start,
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
-example on the worksheet; a list for pairs who are stuck; and students must write why their plan became a GO.
+example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
+sample answers for every question, so a teacher does not need to know the subject beforehand.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.

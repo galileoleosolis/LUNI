@@ -450,6 +450,10 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Lesson answer key** (Sun 15 Nov about 9:35 PM New York; a teacher: "a basic teacher sample key for these
+  questions ... he can't assume the teacher knows the answers"). `docs/lesson.md` now has a QUICK CHECK table of
+  sample answers under START HERE, and in the TEACHER KEY a table of sample answers to every question the lesson
+  asks, plus sample endings for the three worksheet sentences. **On `main` only until the next release.**
 - **r13 released** on the user's "Release everything that hasn't been released yet" (Sun 15 Nov, about 9:30 PM New
   York = 02:30 UTC Mon). **r13 is the public version.** Only the lesson and the project page changed since r12
   (`git diff a50a126` touched no file under `index.html`, `css`, `js`, `data`), so the app checks were not rerun;
