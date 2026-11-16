@@ -450,6 +450,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **RESUBMITTED for global judging** (the user, Sun 15 Nov, shortly after 11 PM New York: "ok its submitted"). The
+  Project page was refilled from `docs/submission.md` (four boxes changed: the summary's last paragraph, the demo
+  link, the testing / lesson / award paragraphs, one line under Site coordinates). **The demo link is now
+  https://galileoleosolis.github.io/LUNI/slides/** and the final project link is the app, with r17 public.
+  Claude did not see the submitted page. The public site is what the judges open, so **do not release anything
+  that changes it without the user's say-so**; a rollback is `tools/release.sh promote <commit>`.
 - **r17 released** on the user's "release it" (Sun 15 Nov, about 10:50 PM New York = 03:50 UTC Mon). **r17 is the public
   version.** Lesson and project page only (the background section below); the app's files are unchanged since r12.
   To roll back to r16: `tools/release.sh promote 05f5761`.
