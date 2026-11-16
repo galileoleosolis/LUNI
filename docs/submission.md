@@ -29,11 +29,15 @@ matches NASA JPL Horizons to 0.0007° and replays real landings next to the publ
 It matters because a launch slip or a few hundred meters can turn a workable landing into a dead lander, and today
 finding that out takes several specialist tools.
 
+LUNI won the Best Use of Data award at our local judging. Five people who had never seen it took its built-in
+six-task test, and four of the five scored 6 of 6. It comes with a 45-minute classroom lesson that teachers reviewed.
+The lesson and the story of how LUNI was built are at https://galileoleosolis.github.io/LUNI/about/
+
 ---
 
 ## Link to Project Demo
 
-[PASTE THE PUBLIC LINK TO THE 7-SLIDE DECK HERE]
+https://galileoleosolis.github.io/LUNI/slides/
 
 ---
 
@@ -115,12 +119,16 @@ student can see why the Moon's south pole is hard: a Sun that stays within a few
 hours, and craters that never see sunlight next to ridges that almost always do. We hope LUNI is useful as a first
 look before detailed analysis, and as a way for anyone to explore real mission conditions.
 
-We tested it with two people and changed the design after each round. The first tester did five rounds; task success
-went from 2 of 6 in the first to 6 of 6 in the fifth. A second tester, after one walk-through, completed 6 of 6 tasks
-in under 6 minutes on the newest screens and rated ease of use 3 of 5. Her main confusion (whether "shadow" meant
-permanent or just dark at that moment) led to a change the same day: the data card now shows "right now" and
-"all years" separately. A third person, a friend from a NASA internship program, said there was too much on screen
-at once; that led to the simple view, the reorganized Best Site Finder and the guided tutorial.
+We tested it with people and changed it after every round. Inside the team, five rounds took the score on LUNI's
+built-in six-task test from 2 of 6 to 6 of 6. Then five people who had never seen LUNI, friends and family, took the
+test: four of the five scored 6 of 6, in 8 to 13 minutes, and what their reports showed was built the same evening.
+
+LUNI also comes with a 45-minute classroom lesson in which students plan their own Moon landing: a worksheet with
+a worked example, an answer key, and a checklist for a teacher who has never taught science. Teachers reviewed it and
+it was rewritten around their feedback. One of them wrote: "It's really incredible, can't wait to see where this
+goes." The lesson is at https://galileoleosolis.github.io/LUNI/about/
+
+At our local judging, LUNI won the Best Use of Data award.
 
 **Tools**
 
