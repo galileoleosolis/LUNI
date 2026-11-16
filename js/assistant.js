@@ -86,7 +86,7 @@ export function normalize(text) {
 
 // Ways people (and speech recognizers) say the preset names.
 const ALIASES = {
-  nobile1: ["nobile rim 1", "nobile rim", "nobile", "noble rim 1", "noble rim", "no bill rim"],
+  nobile1: ["nobile rim 1", "nobile rim", "nobile", "noble rim 1", "noble rim", "no bill rim", "noble room 1", "noble room", "nobile room 1", "nobile room"],
   malapert: ["malapert massif", "malapert", "mala pert", "malaperte", "malapert mountain"],
   haworth: ["haworth crater floor", "haworth crater", "haworth", "hayworth", "crater floor", "shadowed crater"],
   shackleton: ["shackleton connecting ridge", "shackleton ridge", "shackleton", "shackelton", "connecting ridge"],
