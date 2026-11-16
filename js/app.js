@@ -287,6 +287,8 @@ const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HO
 let rank = { key: "", rows: [] };
 // the line under the verdict: what a GO rests on, and the way to the checks
 document.getElementById("basis-proof")?.addEventListener("click", () => document.getElementById("proof-btn")?.click());
+// mission history lists past landings only; an outside tester looked there for a candidate site
+document.getElementById("hist-to-main")?.addEventListener("click", () => { document.getElementById("tab-main")?.click(); setSetup(true); });
 if (window.LUNO_B64) document.getElementById("about-link")?.setAttribute("href", "https://galileoleosolis.github.io/LUNI/about/");   // the preview page has no copy of it
 
 function renderRank() {

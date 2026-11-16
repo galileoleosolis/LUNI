@@ -131,6 +131,7 @@ export function createScanPanel({ getContext, onPick, getSiteYears, fmt }) {
 
   function draw() {
     if (panel.hidden || !st.grid) return;
+    const hint = $("scan-hint"); if (hint) hint.dataset.m = st.metric === "needs" ? "needs" : "other";   // the green / red sentence only fits the GO map
     const n = st.grid.n, row = $("scan-row"), sizes = $("scan-sizes"), shows = $("scan-shows"), flow = document.documentElement.classList.contains("flow");
     // The two button stacks stand against the map's left and right edges and are exactly as tall as the map, so no
     // room is left over between them (the user: "vertical selections", "get rid of empty space").

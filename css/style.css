@@ -1156,3 +1156,9 @@ a.about-link { display: inline-block; text-decoration: none; margin-left: 0; mar
 html.flow a.about-link { font-size: 13px; padding: 5px 10px; }
 /* Best Site Finder: the data card gets its small bars back */
 .scan-side .fcard .scan-cell .prof-row { grid-template-columns: minmax(0, 1.5fr) 40px minmax(0, 1fr) 42px; gap: 8px; } .scan-side .fcard .scan-cell .prof-row i { display: block; }
+
+/* after the first outside tester: say what the squares mean on the map itself, and where the other sites are */
+.scan-hint { flex: none; font-size: 13.5px; letter-spacing: .05em; color: var(--amb); text-align: center; }
+.scan-hint i { display: inline-block; width: 13px; height: 13px; margin-right: 7px; vertical-align: -2px; background: var(--grn); }
+.scan-hint[data-m="other"] .sh-g { display: none; }
+.hist-tip { color: var(--amb); } .hist-tip button { background: none; border: none; padding: 0; font: inherit; font-weight: 700; color: var(--wht); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; } .hist-tip button:hover { color: var(--hi); }
