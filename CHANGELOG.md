@@ -24,7 +24,7 @@ Sun 15 Nov · 9:25 PM · the app itself is the same as r12.
 ## r12: What four first-time testers told us
 Sun 15 Nov · 9:00 PM
 
-- Four people who had never seen LUNI ran the six-task test (three friends, one parent): three scored 6 of 6, one got stuck on the first task.
+- Four people who had never seen LUNI ran the six-task test (three friends, one parent): three of the four scored 6 of 6.
 - ASK LUNI answers "what do I do next"; during the test it reads out the task.
 - The test's tour has a fifth card about the task bar, and the bar flashes when a new task starts.
 - Best Site Finder: a line under the map says what green means and that squares can be clicked; the data card shows small bars.

@@ -450,6 +450,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Tester wording, the user's decision** (about 10 PM New York: "We don't mention about the bad things the testers
+  said"). Public text (slide 7, deck Version 32; the project page; `CHANGELOG.md`) now says only: four first-timers
+  (three friends, one parent), **three of the four scored 6 of 6**, and their reports were built in the same
+  evening. No complaints, no ease ratings, no "1 of 6". Keep "three of the four": never write that "the testers
+  scored 6 of 6", which would be false. The full results stay in these notes. Project page change is **on `main`
+  only until the next release.**
 - **r14 released** on the user's "That's fine, release it" (Sun 15 Nov, about 9:45 PM New York = 02:45 UTC Mon).
   **r14 is the public version.** Lesson and project page only (answer key, teacher checklist at the top, two colors);
   no file under `index.html`, `css`, `js`, `data` changed since r12, so the app checks were not rerun. The three
