@@ -91,6 +91,7 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
 .paper th { color: var(--blue); } .paper th, .paper td { border: 1px solid #c5cfdd; height: 44px; } .paper td:first-child { color: #0a1630; white-space: normal; }
 .paper table { background: #fff; min-width: 560px; }
 .paper code { font-family: var(--mono); font-size: .92em; }
+.paper p:has(> img) { max-width: none; } .paper img { width: 100%; border: 1px solid #c5cfdd; }
 
 /* the timeline */
 .viewer { background: var(--panel); border: 1px solid var(--line); padding: clamp(14px, 3vw, 26px); display: flex; flex-direction: column; gap: 16px; }
@@ -246,97 +247,247 @@ find out why, and fix the plan.</p>
 </ol>
 <p>Connects to NGSS MS-ESS1-1 (a model of the Earth, Sun and Moon system) and MS-ETS1-2 (judging competing solutions
 against criteria and constraints).</p>
+<h4>Words to know</h4>
+<p>Put these five on the board before you start.</p>
+<div class="tscroll"><table>
+<thead>
+<tr>
+<th>Word</th>
+<th>What it means here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Skyline</strong></td>
+<td>The edge of the ground against the sky, all the way round. Hills on it can hide the Sun or the Earth.</td>
+</tr>
+<tr>
+<td><strong>GO / NO-GO</strong></td>
+<td>LUNI's answer. GO: the plan meets the mission's needs. NO-GO: it does not, and LUNI says why.</td>
+</tr>
+<tr>
+<td><strong>Earth link</strong></td>
+<td>A straight, clear line to Earth, so the lander's radio can reach home.</td>
+</tr>
+<tr>
+<td><strong>Landing window</strong></td>
+<td>A stretch of time when landing here would be a GO.</td>
+</tr>
+<tr>
+<td><strong>UTC</strong></td>
+<td>World time, the same everywhere on Earth. Space missions use it so nobody mixes up time zones.</td>
+</tr>
+</tbody>
+</table></div>
+<h4>Watch first (optional, about 5 minutes)</h4>
+<p>Two short NASA videos show the idea before students touch the tool.</p>
+<ul>
+<li><a href="https://science.nasa.gov/resource/shadows-near-the-moons-south-pole/">Shadows near the Moon's South Pole</a> (NASA
+  Science): the Sun stays within about 1.5° of the horizon, so mountains throw very long shadows.</li>
+<li><a href="https://science.nasa.gov/resource/from-apollo-sites-to-the-south-pole/">From Apollo Sites to the South Pole</a> (NASA
+  Science): a year of changing light, from the Apollo sites down to Shackleton crater.</li>
+</ul>
+<h4>The screen in nine numbers</h4>
+<p>Show this picture, or point at the same places on the projector. Students only need 1 to 4 for the first mission.</p>
+<p><img alt="The LUNI screen with nine numbered frames" loading="lazy" src="../docs/figures/lesson-screen-guide.jpg" /></p>
+<div class="tscroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Where</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Left, top</td>
+<td><strong>Where.</strong> Pick a landing site from the list.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Left, middle</td>
+<td><strong>When.</strong> Set the landing day, month, year and hour.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Left, bottom</td>
+<td><strong>Mission needs.</strong> How long the mission lasts, and what it must have.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Middle, top</td>
+<td><strong>The answer.</strong> GO or NO-GO, with the reason.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Under the answer</td>
+<td>The <strong>Sun</strong> (power) and the <strong>Earth</strong> (radio link) at this moment.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Middle</td>
+<td><strong>View from the site.</strong> The skyline, with the Sun and the Earth on it.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Under the view</td>
+<td><strong>The days after landing.</strong> Green shows when there is Sun; drag the slider to move through time.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Bottom</td>
+<td><strong>Shortcut keys.</strong> NEXT LANDING WINDOW and BEST SITE FINDER fix a NO-GO. ASK LUNI answers a typed question.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Very top</td>
+<td><strong>Other screens</strong>, and the ? TUTORIAL button.</td>
+</tr>
+</tbody>
+</table></div>
+<p>If the left side (1, 2, 3) is folded away, press the blue <strong>SHOW SITE · TIME · NEEDS</strong> tab on the left edge.</p>
 <h4>Before class (5 minutes for the teacher)</h4>
-<p>Open the link, press <strong>? TUTORIAL</strong> in the top row and click through it once. Press <strong>FULL SCREEN</strong> for a projector.
-Everything on screen is computed from NASA data; the <strong>PROOF</strong> button shows the checks if a student asks "how do you know?"</p>
+<ol>
+<li>Open the link and press <strong>FULL SCREEN</strong> (top right).</li>
+<li>Press <strong>? TUTORIAL</strong> and click through it once.</li>
+<li>Print one worksheet per pair (it is at the end of this page).</li>
+</ol>
+<p>Everything on screen is computed from NASA data. If a student asks "how do you know?", press <strong>PROOF</strong>.</p>
 <h4>The lesson</h4>
-<h5>1. Hook: a real landing that went wrong (5 minutes)</h5>
-<p>Open <strong>MISSION HISTORY</strong> (top row). Pick <strong>IM-2 Athena</strong>, 6 March 2025, and read its story aloud: it reached the
-south pole region, came to rest on its side inside a crater, could not recharge, and the mission ended the next day.</p>
-<p>Ask: <em>What does a lander need from the sky to stay alive?</em> Collect answers. Steer to: sunlight and a link to Earth.</p>
-<h5>2. Guided tour (10 minutes)</h5>
-<p>Students press <strong>? TUTORIAL</strong> and work through the cards in pairs. Each card dims everything except one part of the
-screen, says what it is and why it matters, and gives a short task to try on the real controls.</p>
-<h5>3. Mission one: fix a NO-GO (10 minutes)</h5>
-<p>Give every pair the same plan:</p>
+<p>Each part is a few short steps. A <strong>Check</strong> line says what every screen should show before you move on.</p>
+<h5>Part 1. Hook: a real landing that went wrong (5 minutes)</h5>
+<ol>
+<li>Press <strong>MISSION HISTORY</strong> at the top (number 9 in the picture).</li>
+<li>Click <strong>IM-2 ATHENA</strong>, 6 March 2025.</li>
+<li>Read its story aloud: it reached the south pole region, came to rest on its side inside a crater, could not
+   recharge, and the mission ended the next day.</li>
+<li>Ask: <em>What does a lander need from the sky to stay alive?</em> Write the answers on the board.</li>
+</ol>
+<p><strong>Check:</strong> the board says <strong>sunlight</strong> (power) and <strong>Earth</strong> (radio link). If not, steer there.</p>
+<h5>Part 2. Guided tour (10 minutes)</h5>
+<ol>
+<li>Students press <strong>MAIN SCREEN</strong>, then <strong>? TUTORIAL</strong>.</li>
+<li>In pairs they work through the cards. Each card dims everything except one part and gives a short task to try.</li>
+<li>Walk the room. Students who finish early go back to the card about the verdict and try its steps again.</li>
+</ol>
+<p><strong>Check:</strong> every pair can point to the big GO or NO-GO word (number 4) and say what it means.</p>
+<h5>Part 3. Worked example, together (5 minutes)</h5>
+<p>Do this one on the projector while students follow on the worksheet's first column.</p>
+<ol>
+<li>Reload the page. LUNI opens on a real landing: <strong>IM-2 Athena, 06 MAR 2025 17:00 UTC</strong>.</li>
+<li>Read number 4 aloud: <strong>GO</strong>. Sunlight lasts 3 days 3 hours longer than needed. Earth is in view 100% of the mission.</li>
+<li>Read number 5: the Sun is <strong>2.45°</strong> above level. The Earth is <strong>11.19°</strong> above level.</li>
+<li>Look at number 6 and find both on the skyline. Ask: <em>which one is closer to being hidden by a hill?</em> (The Sun.)</li>
+</ol>
+<p><strong>Check:</strong> students have copied the example column of the worksheet. They now know where every answer comes from.</p>
+<h5>Part 4. Mission one: fix a NO-GO (10 minutes)</h5>
+<p>Write the plan on the board:</p>
 <blockquote>
 <p><strong>Site:</strong> Nobile Rim 1 (number 01 in the list). <strong>Landing:</strong> 14 NOV 2026, 20:00 UTC. <strong>Mission length:</strong> 10 days.</p>
 </blockquote>
-<p>To set it: open the left side with the blue <strong>SHOW SITE · TIME · NEEDS</strong> tab, click the site, then set the date.</p>
-<p>Students answer on the worksheet:</p>
-<ul>
-<li>What is the verdict? What reason does LUNI give?</li>
-<li>Look at the picture called <strong>VIEW FROM THE SITE</strong>. Where is the Sun? Where is the Earth?</li>
-<li>Press <strong>NEXT LANDING WINDOW</strong>. What changed? How long did the mission have to wait?</li>
-</ul>
-<h5>4. Mission two: your own landing (15 minutes)</h5>
+<ol>
+<li>At number 1, click <strong>01 NOBILE RIM 1</strong>.</li>
+<li>At number 2, set the day to <strong>14</strong>, the month to <strong>NOV</strong>, the year to <strong>2026</strong>, the hour to <strong>20:00 UTC</strong>.</li>
+<li>At number 3, set the mission length to <strong>10</strong>.</li>
+<li>Read number 4. Fill in the verdict and the reason on the worksheet.</li>
+<li>Look at number 6. Find the Sun. Find where the Earth is hiding.</li>
+<li>Press <strong>NEXT LANDING WINDOW</strong> (number 8). Fill in what changed.</li>
+</ol>
+<p><strong>Check:</strong> every screen went from a red <strong>NO-GO</strong> to a green <strong>GO</strong>, and the date moved by one day.</p>
+<h5>Part 5. Mission two: your own landing (10 minutes)</h5>
 <p>Each pair plans its own mission and must end on a <strong>GO</strong>.</p>
 <ol>
-<li>Choose any site from the list, or click any spot on the Moon.</li>
+<li>Choose any site from the list.</li>
 <li>Choose a landing date in 2027.</li>
-<li>If it is a NO-GO, fix it by changing <strong>one thing at a time</strong>: the date (<strong>NEXT LANDING WINDOW</strong>), the place
-   (<strong>BEST SITE FINDER</strong>, then <strong>MOVE MY SITE TO THE BEST SPOT</strong>), or one mission need.</li>
+<li>If it is a NO-GO, change <strong>one thing at a time</strong>: the date (<strong>NEXT LANDING WINDOW</strong>), or the place (<strong>BEST SITE
+   FINDER</strong>, then <strong>MOVE MY SITE TO THE BEST SPOT</strong>), or one mission need.</li>
+<li>Fill in the last column of the worksheet.</li>
 <li>Press <strong>COPY LINK</strong> and paste the link into the class document. The link reopens the exact plan.</li>
 </ol>
+<p><strong>Check:</strong> every pair has a GO on screen and can say which one thing they changed.</p>
 <p>Fast finishers: open <strong>MOON MAP</strong>, pick the <strong>NEVER SUNLIT</strong> layer and find Haworth crater near the south pole. Then
 pick <strong>WATER ICE</strong>. Why would a mission want to land near a place where it can never get power?</p>
-<h5>5. Share out (5 minutes)</h5>
-<p>Two or three pairs open their link on the projector and say what they changed to get a GO. Close with the question:
-<em>Which was easier to change, the date or the place? What would that cost a real mission?</em></p>
+<h5>Part 6. Share out (5 minutes)</h5>
+<ol>
+<li>Two or three pairs open their link on the projector.</li>
+<li>Each says what they changed to get a GO.</li>
+<li>Close with: <em>Which was easier to change, the date or the place? What would that cost a real mission?</em></li>
+</ol>
 <h4>Student worksheet</h4>
+<p>The first column is the worked example from Part 3, already filled in. Use it as the model for the other two.</p>
 <div class="tscroll"><table>
 <thead>
 <tr>
 <th></th>
-<th>Mission one (given plan)</th>
+<th>Example (done together)</th>
+<th>Mission one</th>
 <th>Mission two (your plan)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Site</td>
+<td>IM-2 Athena · Mons Mouton</td>
 <td>Nobile Rim 1</td>
 <td></td>
 </tr>
 <tr>
 <td>Landing date and time (UTC)</td>
+<td>06 MAR 2025 17:00</td>
 <td>14 NOV 2026 20:00</td>
 <td></td>
 </tr>
 <tr>
-<td>Verdict</td>
+<td>Mission length</td>
+<td>10 days</td>
+<td>10 days</td>
+<td></td>
+</tr>
+<tr>
+<td>Verdict (number 4)</td>
+<td>GO</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>LUNI's reason</td>
+<td>Sunlight lasts 3 days 3 hours longer than needed; Earth in view 100%</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
-<td>Sun: in view? How high?</td>
+<td>Sun: in view? How high? (number 5)</td>
+<td>Yes, 2.45°</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
-<td>Earth: in view? How high?</td>
+<td>Earth: in view? How high? (number 5)</td>
+<td>Yes, 11.19°</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>What I changed</td>
+<td>Nothing: it was already a GO</td>
 <td></td>
 <td></td>
 </tr>
 <tr>
 <td>Verdict after the change</td>
+<td>GO</td>
 <td></td>
 <td></td>
 </tr>
 </tbody>
 </table></div>
-<p>Three sentences to finish: <em>The Moon's south pole is hard to land on because ... A lander needs the Sun for ... and
-the Earth for ... I fixed my plan by ...</em></p>
+<p>Three sentences to finish:</p>
+<ul>
+<li>The Moon's south pole is hard to land on because ...</li>
+<li>A lander needs the Sun for ... and the Earth for ...</li>
+<li>I fixed my plan by ...</li>
+</ul>
 <h4>Teacher key</h4>
 <ul>
 <li><strong>Mission one.</strong> The plan is a <strong>NO-GO</strong>. The reason is <strong>no Earth link at landing</strong>: the Sun is up (about 2.4°
@@ -362,11 +513,13 @@ the Earth for ... I fixed my plan by ...</em></p>
   battery lasts the mission.</li>
 <li><strong>History:</strong> in <strong>MISSION HISTORY</strong>, load Blue Ghost Mission 1 (2 March 2025). It worked through a total eclipse of
   the Sun by the Earth on 14 March 2025. Find the eclipse warning on the main screen.</li>
-<li><strong>Ask it:</strong> press <strong>ASK LUNI</strong> and type a question, such as "how is this different from Earth".</li>
+<li><strong>Ask it:</strong> press <strong>ASK LUNI</strong> and type a question, such as "what do I do next" or "how is this different from Earth".</li>
 </ul>
 <h4>Tell us how it went</h4>
 <p>This lesson has not been run in a classroom yet. If you read it or tried it, two minutes of feedback helps the
 next version: <a href="https://forms.gle/jLzqGs1anesdDzPj8">https://forms.gle/jLzqGs1anesdDzPj8</a></p>
+<p>Version 2 (15 Nov 2026), reworked after a teacher's review: smaller steps with a check after each part, a numbered
+picture of the screen, a filled-in example on the worksheet, key words and two NASA videos.</p>
 <p>Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.</p>
   </article>
   <div id="lesson-end"></div>
