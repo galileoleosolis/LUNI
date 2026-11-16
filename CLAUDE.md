@@ -412,7 +412,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes. The public site now has the name with
   "for", the 25% Earth-link default and the whole design system batch below. Nothing newer is waiting. To roll back
   to r7: `tools/release.sh promote b12dd78`. **Local judging result: the team won BEST USE OF DATA** (the user: the
-  judges "were really impressed with the whole thing"). Not yet done: `docs/version-history.html` has no r8 picture.
+  judges "were really impressed with the whole thing").
+- **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
+  plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
+  `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
+  markdown`) fills `tools/about-template.html` with `docs/lesson.md` and the version list inside
+  `docs/version-history.html` (pictures are written to `about/img/v-*.jpg`). Run it again after changing the lesson or
+  adding a release. Team name only on the page; the members' names were left off on purpose (ask before adding).
+  `docs/version-history.html` now has r8 and the award (republish its artifact after changes).
+  The three GIFs in `docs/figures/` were replaced with the r8 look.
 - **Deck, selling pass** (the user, Sun 15 Nov about 7 PM New York, after the award: "we can really up the slide show to
   make it sell the website more"; "you can use your deck"). Deck Version 25, still seven slides: cover (r8 look, award
   line), THE CHALLENGE, ONE ANSWER, PLAN SLIPS? TWO WAYS OUT, ALL SEVEN OBJECTIVES AND MORE, NASA DATA, CHECKED (the
@@ -422,8 +430,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   the finder GIF now starts on the finished map so a still export shows it). Titles are kept short so they do not
   wrap in a fallback font. `docs/lesson.md` is the 45-minute classroom lesson the deck points to (not run by a
   teacher yet: do not claim classroom use). **The submitted demo link is the user's own PowerPoint copy, so the new
-  deck reaches the judges only if the user exports or shares it and updates the submission.** The GIFs in
-  `docs/figures/` still show the older look.
+  deck reaches the judges only if the user exports or shares it and updates the submission.**
 - **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
   Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
   "for comparison". The design system is a private Claude artifact, "LUNI Console"

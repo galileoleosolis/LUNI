@@ -1,7 +1,7 @@
 # Plan a Moon landing: a 45-minute lesson with LUNI
 
 **For:** grades 6 to 9 (works for older students and clubs too). **Needs:** one laptop or Chromebook per pair, a web
-browser, no accounts and no installs. **Tool:** https://galileoleosolis.github.io/LUNI/
+browser, no accounts and no installs. **Tool:** <https://galileoleosolis.github.io/LUNI/>
 
 LUNI (Lunar Utility for Navigational Intelligence) answers one question with real NASA data: *can this mission land
 here, at this time?* Students use it the way a mission planner would: pick a place and a time, read the GO or NO-GO,
