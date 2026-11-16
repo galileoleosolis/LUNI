@@ -1,5 +1,5 @@
 {
- "_about": "Preset landing sites. lat: deg (south negative); lon: deg east (west negative). approx = rough regional point still needing an official source.",
+ "_about": "Preset landing sites. lat: deg (south negative); lon: deg east (west negative). approx = rough regional point still needing an official source. check = what a comparison with the source found (shown after the source link).",
  "sites": [
   {
    "id": "nobile1",
@@ -48,7 +48,8 @@
    "group": "South polar landings",
    "lat": -84.7906,
    "lon": 29.1957,
-   "src": "https://en.wikipedia.org/wiki/IM-2"
+   "src": "https://www.lroc.asu.edu/images/1401",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO CAMERA TEAM AND NASA NAIF"
   },
   {
    "id": "im1",
@@ -57,7 +58,8 @@
    "group": "South polar landings",
    "lat": -80.13,
    "lon": 1.44,
-   "src": "https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf"
+   "src": "https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO CAMERA TEAM"
   },
   {
    "id": "ch3",
@@ -66,7 +68,8 @@
    "group": "South polar landings",
    "lat": -69.373,
    "lon": 32.319,
-   "src": "https://planetarynames.wr.usgs.gov/Feature/16272"
+   "src": "https://planetarynames.wr.usgs.gov/Feature/16272",
+   "check": "THE NAMED POINT (STATIO SHIV SHAKTI). ISRO'S OWN FIRST FIGURE IS ABOUT 350 M AWAY"
   },
   {
    "id": "bg1",
@@ -75,7 +78,8 @@
    "group": "Reference sites",
    "lat": 18.56,
    "lon": 61.81,
-   "src": "https://lroc.im-ldi.com/images/1400"
+   "src": "https://lroc.im-ldi.com/images/1400",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO CAMERA TEAM"
   },
   {
    "id": "slim",
@@ -84,7 +88,8 @@
    "group": "Reference sites",
    "lat": -13.316,
    "lon": 25.251,
-   "src": "https://www.lroc.asu.edu/images/1358"
+   "src": "https://www.lroc.asu.edu/images/1358",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO CAMERA TEAM"
   },
   {
    "id": "ce6",
@@ -93,16 +98,18 @@
    "group": "Reference sites",
    "lat": -41.6385,
    "lon": -153.9852,
-   "src": "https://en.wikipedia.org/wiki/Chang%27e_6"
+   "src": "https://lroc.im-ldi.com/images/1374",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO CAMERA TEAM, GOOD TO ABOUT 30 M"
   },
   {
    "id": "ce4",
    "name": "Chang'e 4 · Von Kármán",
    "tag": "CHINA 2019",
    "group": "Reference sites",
-   "lat": -45.4446,
-   "lon": 177.5991,
-   "src": "https://en.wikipedia.org/wiki/Chang%27e_4"
+   "lat": -45.4562,
+   "lon": 177.5885,
+   "src": "https://www.lroc.asu.edu/posts/1087",
+   "check": "NASA LRO CAMERA TEAM'S POSITION, GOOD TO 13 M"
   },
   {
    "id": "apollo11",
@@ -111,7 +118,8 @@
    "group": "Reference sites",
    "lat": 0.6741,
    "lon": 23.4731,
-   "src": "https://lroc.im-ldi.com/visit/exhibits/1/gallery/8"
+   "src": "https://lroc.im-ldi.com/visit/exhibits/1/gallery/8",
+   "check": "CHECKED 15 NOV 2026: MATCHES NASA'S LRO-BASED TABLE"
   },
   {
    "id": "apollo15",
