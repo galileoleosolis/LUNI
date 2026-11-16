@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUNI · slides</title>
+<meta name="description" content="LUNI, Lunar Utility for Navigational Intelligence: the seven slides of team Mystic Research, NASA Space Apps Challenge 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* the slide base every deck starts from */
+* { margin: 0 }
+html, body { height: 100%; background: #02050B; overflow: hidden }
+body { font: 32px/1.2 sans-serif }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0 }
+#stage > section { width: 1920px !important; height: 1080px !important; overflow: hidden !important; box-sizing: border-box !important; position: absolute; left: 0; top: 0; isolation: isolate }
+#stage > section[hidden] { display: none !important }
+h1 { font-size: 96px; font-weight: 600 } h2 { font-size: 64px; font-weight: 600 } h3 { font-size: 44px; font-weight: 600 }
+p, li, h1, h2, h3, td, th { overflow-wrap: break-word; text-wrap: pretty }
+table { width: 100%; border-collapse: separate; border-spacing: 0; border: solid #0003; border-width: 2px 0 0 2px }
+th, td { padding: .35em .6em; text-align: left; border: solid #0003; border-width: 0 2px 2px 0 }
+
+/* the deck's own styles */
+/* LUNI deck. Two tones (deep navy, cool paper), one blue from the app itself, three typefaces:
+   Barlow Condensed for headings and figures, Barlow for sentences, JetBrains Mono for labels. */
+
+.dark  { background: #070D1A; color: #C9D8EE; }
+.light { background: #EEF1F5; color: #2A3750; }
+
+.slide {
+  box-sizing: border-box;
+  padding: 128px 128px 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 28px;
+  line-height: 1.35;
+}
+.slide-cover { padding: 92px 128px; gap: 0; }
+
+/* headings: one size, one place, on every content slide */
+.title {
+  font-family: 'Barlow Condensed', 'Trebuchet MS', Arial, sans-serif;
+  font-size: 88px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+.dark .title  { color: #F4F8FD; }
+.light .title { color: #0A1630; }
+
+/* small labels */
+.label {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 3px;
+}
+.dark .label  { color: #41B6FF; }
+.light .label { color: #1657D0; }
+
+.text { font-size: 28px; line-height: 1.35; }
+.dark .strong  { color: #F4F8FD; }
+.light .strong { color: #0A1630; }
+
+/* footer band: one row, same place on every content slide */
+.foot-l, .foot-r {
+  position: absolute;
+  bottom: 64px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 24px;
+  line-height: 1.3;
+  letter-spacing: 2px;
+}
+.foot-l { left: 128px; width: 1300px; }
+.foot-r { right: 128px; width: 220px; text-align: right; }
+.dark .foot-l, .dark .foot-r   { color: #7F95B8; }
+.light .foot-l, .light .foot-r { color: #586680; }
+
+/* ---- cover ---- */
+.cover-shot { position: absolute; left: 880px; top: 150px; width: 1040px; height: 930px; object-fit: cover; object-position: left top; }
+.cover-col { width: 700px; display: flex; flex-direction: column; flex: 1; }
+.wordmark {
+  font-family: 'Barlow Condensed', 'Trebuchet MS', Arial, sans-serif;
+  font-size: 240px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 6px;
+  color: #F4F8FD;
+  margin-top: 28px;
+}
+.fullname { font-size: 44px; font-weight: 500; line-height: 1.2; color: #F4F8FD; margin-top: 12px; }
+.cover-line { margin-top: 28px; width: 640px; }
+.spacer { flex: 1; }
+.team-name { font-size: 44px; font-weight: 500; line-height: 1.2; color: #F4F8FD; margin-top: 8px; }
+
+/* ---- the challenge ---- */
+.cols { display: flex; gap: 64px; }
+.statement { width: 800px; font-size: 44px; font-weight: 500; line-height: 1.25; color: #0A1630; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.figure { display: flex; flex-direction: column; gap: 12px; }
+.sky { width: 1664px; height: 228px; object-fit: contain; background: #000205; }
+
+/* ---- the answer ---- */
+.row { display: flex; gap: 64px; flex: 1; }
+.shot-main { width: 1024px; height: 640px; object-fit: contain; }
+.points { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 640px; }
+.point { display: flex; flex-direction: column; gap: 8px; }
+
+/* ---- when the plan slips ---- */
+.pair { display: flex; gap: 64px; }
+.way { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.way-text { height: 114px; }
+.shot-way { width: 780px; height: 424px; object-fit: contain; margin-top: 8px; }
+.shot-energy { width: 576px; height: 130px; object-fit: contain; box-shadow: 0px 16px 60px rgba(65, 182, 255, 0.3); }
+
+/* ---- all seven objectives, with the moving picture of the other features ---- */
+.more-row { display: flex; gap: 56px; }
+.shot-more { width: 992px; height: 620px; object-fit: contain; box-shadow: 0px 24px 90px rgba(65, 182, 255, 0.3); }
+.objs { flex: 1; height: 620px; display: flex; flex-direction: column; justify-content: space-between; }
+.obj { display: flex; flex-direction: column; gap: 2px; }
+
+/* ---- tables ---- */
+.grid { width: 100%; font-family: 'Barlow', Arial, sans-serif; font-size: 28px; }
+.light .grid { color: #2A3750; }
+.light .grid th { color: #1657D0; }
+.light .grid .k { color: #0A1630; }
+.grid-lg { font-size: 30px; }
+.note { width: 1200px; }
+
+/* ---- NASA data ---- */
+.data-row { display: flex; gap: 64px; }
+.data-left { width: 1040px; display: flex; flex-direction: column; gap: 32px; }
+.data-right { width: 560px; display: flex; flex-direction: column; gap: 14px; }
+.shot-moon { width: 560px; height: 520px; object-fit: cover; }
+.light .cap { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.3; letter-spacing: 1px; color: #586680; }
+
+/* ---- proof ---- */
+.proof-body { display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+.num-box { display: flex; flex-direction: column; gap: 14px; }
+.num {
+  font-family: 'Barlow Condensed', 'Trebuchet MS', Arial, sans-serif;
+  font-size: 104px;
+  font-weight: 600;
+  line-height: 1;
+  color: #41B6FF;
+}
+.rule { border-top: 2px solid #24365A; }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+.cell { display: flex; flex-direction: column; gap: 10px; }
+.three-qr { grid-template-columns: 1fr 1fr 1.6fr; }
+.cell-qr { display: flex; gap: 28px; align-items: flex-start; }
+.qr { width: 200px; height: 200px; }
+
+/* ================= the louder pass ================= */
+
+/* the accent slide: the app's blue, full bleed */
+.accent { background: #1657D0; color: #DCE9FF; }
+.accent .title { color: #FFFFFF; }
+.accent .statement { color: #FFFFFF; }
+.accent .label { color: #BFE0FF; }
+.accent .strong { color: #FFFFFF; }
+.accent .foot-l, .accent .foot-r { color: #BFD3F5; }
+
+/* a short bar above every title, and under the name on the cover */
+.bar { position: absolute; left: 128px; top: 84px; width: 112px; height: 12px; }
+.dark .bar { background: #41B6FF; }
+.light .bar { background: #1657D0; }
+.accent .bar { background: #FFFFFF; }
+.cover-bar { width: 176px; height: 14px; background: #41B6FF; margin-top: 22px; }
+
+/* the two words that matter, in the app's own status colors (the word itself always says which) */
+.go { color: #21E07A; }
+.nogo { color: #FF5252; }
+.dark .label-nogo { color: #FF5252; }
+
+/* screenshots lift off the dark slides */
+.cover-shot { box-shadow: 0px 0px 120px rgba(65, 182, 255, 0.34); }
+.shot-main, .shot-way { box-shadow: 0px 24px 90px rgba(65, 182, 255, 0.3); }
+.accent .sky { box-shadow: 0px 24px 60px rgba(3, 14, 46, 0.55); }
+.shot-moon { box-shadow: 0px 20px 50px rgba(10, 22, 48, 0.3); }
+
+/* tables: a solid header band and tinted alternate rows */
+.light .grid .head { background: #1657D0; }
+.light .grid .head th { color: #FFFFFF; }
+.light .grid .alt { background: #DDE5F0; }
+
+/* the four proof figures, each under its own rule */
+.num-box { border-top: 6px solid #41B6FF; padding-top: 22px; }
+.num { font-weight: 700; }
+
+/* arrival: blocks rise in one after another, all within a second */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(32px); }
+}
+.in { animation: rise 520ms both; animation-delay: calc(var(--i) * 130ms); }
+@keyframes wide {
+  from { opacity: 0; transform: scale(0.96); }
+}
+.in-shot { animation: wide 700ms both; animation-delay: 150ms; }
+
+/* ================= the selling pass (after the local award) ================= */
+.award { margin-top: 18px; color: #FFD166; }
+.dark .award { color: #FFD166; }
+
+/* NASA data and its checks on one slide */
+.data-left-w { width: 880px; gap: 28px; }
+.checks { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px 40px; align-content: space-between; }
+.light .num { color: #1657D0; font-size: 92px; }
+.light .num-box { border-top-color: #1657D0; padding-top: 18px; gap: 10px; }
+
+/* who it is for */
+.who-row { display: flex; gap: 64px; }
+.shot-tour { width: 592px; height: 370px; object-fit: cover; box-shadow: 0px 24px 90px rgba(65, 182, 255, 0.3); }
+.who { flex: 1; height: 370px; display: flex; flex-direction: column; justify-content: space-between; }
+
+
+/* the bar under the slide */
+#bar { position: fixed; left: 0; right: 0; bottom: 0; height: 46px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #070D1A; border-top: 1px solid #1D2C48; font: 500 14px/1 'JetBrains Mono', Consolas, monospace; letter-spacing: .08em; color: #9FB4D6 }
+#bar button, #bar a { font: inherit; letter-spacing: inherit; color: #EAF2FF; background: #12213B; border: 1px solid #2C4470; border-radius: 6px;
+  height: 32px; padding: 0 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center }
+#bar button:hover, #bar a:hover { background: #1B56D8; border-color: #7FB2FF }
+#bar button:disabled { opacity: .35; cursor: default; background: #12213B; border-color: #2C4470 }
+#bar a.go { background: #1B56D8; border-color: #7FB2FF }
+#count { min-width: 5.5em; text-align: center }
+#bar .gap { width: 18px }
+@media (max-width: 640px) { #bar .wide { display: none } #bar { gap: 6px } #bar button, #bar a { padding: 0 10px } }
+</style>
+</head>
+<body>
+<div id="stage">
+<section id="cover" class="slide slide-cover dark" data-transition="fade">
+<img class="cover-shot in-shot" src="img/go.png" alt="The LUNI main screen showing a GO verdict for Nobile Rim 1, with the Sun and Earth readouts, the view from the site and the mission plan">
+<div class="cover-col">
+<p class="label">NASA SPACE APPS CHALLENGE 2026</p>
+<p class="label">LUNAR LANDING SITE NAVIGATOR</p>
+<h1 class="wordmark in" style="--i:0">LUNI</h1>
+<div class="cover-bar in" style="--i:1"></div>
+<p class="fullname in" style="--i:2">Lunar Utility for Navigational Intelligence</p>
+<p class="text cover-line in" style="--i:3">Can this mission land here, at this time? A clear <span class="go">GO</span> or <span class="nogo">NO-GO</span> from NASA data, with the reason and the way out. Tested by first-time users, ready for a classroom.</p>
+<div class="spacer"></div>
+<p class="label">TEAM</p>
+<p class="team-name">Mystic Research</p>
+<p class="text">Galileo Solis and Jove Solis</p>
+<p class="label award">BEST USE OF DATA AWARD · LOCAL JUDGING</p>
+</div>
+</section>
+<section id="challenge" class="slide accent" data-transition="fade">
+<div class="bar"></div>
+<h2 class="title">THE CHALLENGE</h2>
+<div class="cols">
+<p class="statement in" style="--i:0">At the Moon’s south pole the Sun only skims the horizon. One hill, or one day of delay, can take away a lander’s power or its link to Earth.</p>
+<div class="col in" style="--i:1">
+<p class="label">FROM THE CHALLENGE STATEMENT</p>
+<p class="text">“…create an intuitive tool or application that lets mission planners, educators, and the public compare landing sites and dates quickly, visualizing Sun and Earth positions relative to the horizon to assess power generation potential and direct-to-Earth communication windows.”</p>
+<p class="text strong">Today that takes several specialist tools: Quickmap, Moon Trek and JPL Horizons.</p>
+</div>
+</div>
+<div class="figure in" style="--i:2">
+<img class="sky" src="img/skyline-25-days.gif" alt="Moving picture of LUNI’s view from the landing site over 25 days: the Sun travels all the way round just above the terrain skyline and dips behind the hills, while the Earth stays low in one place and sinks behind the ground">
+<p class="label">LUNI’S VIEW FROM NOBILE RIM 1 · THE SUN AND THE EARTH OVER 25 DAYS, FROM 15 NOV 2026</p>
+</div>
+<p class="foot-r">02 / 07</p>
+</section>
+<section id="answer" class="slide dark" data-transition="fade">
+<div class="bar"></div>
+<h2 class="title">ONE ANSWER: <span class="go">GO</span> OR <span class="nogo">NO-GO</span></h2>
+<div class="row">
+<img class="shot-main in-shot" src="img/no-go.png" alt="The LUNI main screen: a NO-GO for Nobile Rim 1 on 14 November 2026 because there is no Earth link at landing, with the Sun and Earth readouts, the skyline view and the 30-day mission plan">
+<div class="points">
+<div class="point in" style="--i:1">
+<p class="label">01 · THE VERDICT, AND THE WAY OUT</p>
+<p class="text"><span class="nogo">NO-GO</span> at Nobile Rim 1 on 14 Nov 2026: no Earth link at landing. The fixes are buttons in the same strip, and a line says what the verdict rests on.</p>
+</div>
+<div class="point in" style="--i:2">
+<p class="label">02 · SUN AND EARTH ON THE REAL SKYLINE</p>
+<p class="text">The view from the site, countdowns to sunset and earthrise, and thirty days hour by hour.</p>
+</div>
+<div class="point in" style="--i:3">
+<p class="label">03 · ENERGY, HOUR BY HOUR</p>
+<img class="shot-energy" src="img/energy.png" alt="LUNI’s energy panel: enough energy; a 2 square meter panel gives 817 watts in full Sun and collects 196 kilowatt-hours over the 10-day mission, the lander uses 48, and no battery is needed">
+<p class="text">What the panel collects, what the lander uses, and the battery in between.</p>
+</div>
+</div>
+</div>
+<p class="foot-r">03 / 07</p>
+</section>
+<section id="slips" class="slide dark" data-transition="fade">
+<div class="bar"></div>
+<h2 class="title">PLAN SLIPS? TWO WAYS OUT</h2>
+<div class="pair">
+<div class="way in" style="--i:0">
+<p class="label">KEEP THE DATE, MOVE THE SITE</p>
+<p class="text way-text">Best Site Finder checks the ground around the site: <span class="go">green</span> works, the star is the best spot. It also places solar panels on the sunniest squares.</p>
+<img class="shot-way" src="img/best-site-finder.gif" alt="Moving picture of the Best Site Finder: the finished map with the best spot starred, then the map around Nobile Rim 1 fills in square by square, mostly dark red with a group of green squares; the best spot is starred 2.36 km away, the lander moves there, and a new scan starts around it">
+</div>
+<div class="way in" style="--i:2">
+<p class="label">KEEP THE SITE, MOVE THE DATE</p>
+<p class="text way-text">Next Landing Window jumps to the next time that works. A before-and-after box shows what changed: here a <span class="nogo">NO-GO</span> became a <span class="go">GO</span>.</p>
+<img class="shot-way" src="img/before-and-after.png" alt="LUNI’s before-and-after box: 14 November 2026 was a NO-GO and 15 November is a GO, with sunlight, time without Sun, Earth link and energy for both and the change in each">
+</div>
+</div>
+<p class="foot-r">04 / 07</p>
+</section>
+<section id="objectives" class="slide dark" data-transition="fade">
+<div class="bar"></div>
+<h2 class="title">ALL SEVEN OBJECTIVES, AND MORE</h2>
+<div class="more-row">
+<img class="shot-more in-shot" src="img/more-features.gif" alt="Moving picture of eight more LUNI screens, each with its name: the Moon map with the sunlight layer, the Moon map with the water ice layer, mission history with six real landings, the 3D view from the surface, ASK LUNI answering a typed question, mission windows for 12 months, the operations plan, and the guided tutorial">
+<div class="objs">
+<div class="obj in" style="--i:1"><p class="label">SITES AND COMPARISON</p><p class="text strong">14 sites, any point, side-by-side boxes</p></div>
+<div class="obj in" style="--i:1"><p class="label">DATES AND TIMES</p><p class="text strong">Every good landing day for 12 months</p></div>
+<div class="obj in" style="--i:2"><p class="label">SUN AND EARTH ON THE HORIZON</p><p class="text strong">Real terrain skyline, with countdowns</p></div>
+<div class="obj in" style="--i:2"><p class="label">POWER AND COMMUNICATION</p><p class="text strong">Energy in kWh, Earth link, eclipses</p></div>
+<div class="obj in" style="--i:3"><p class="label">MORE THAN ONE VIEW</p><p class="text strong">Moon map layers, 3D view, OpenSpace link</p></div>
+<div class="obj in" style="--i:3"><p class="label">CHANGE OVER TIME</p><p class="text strong">Operations plan, six real landings</p></div>
+<div class="obj in" style="--i:4"><p class="label">EVERY SKILL LEVEL</p><p class="text strong">Tutorial, classroom lesson, ASK LUNI by voice</p></div>
+</div>
+</div>
+<p class="foot-r">05 / 07</p>
+</section>
+<section id="nasa-data" class="slide light" data-transition="fade">
+<div class="bar"></div>
+<h2 class="title">NASA DATA, CHECKED</h2>
+<div class="data-row">
+<div class="data-left data-left-w">
+<table class="grid">
+<tr class="head"><th style="width:40%">NASA data</th><th style="width:60%">What LUNI uses it for</th></tr>
+<tr><td class="k">NAIF SPICE (DE440)</td><td>Sun and Earth positions, 2023 to 2035</td></tr>
+<tr class="alt"><td class="k">LRO LOLA elevation</td><td>Skylines, slopes, scans, map layers</td></tr>
+<tr><td class="k">LRO Diviner</td><td>Temperature and water-ice stability</td></tr>
+<tr class="alt"><td class="k">NAIF station kernels</td><td>Deep Space Network sites in view</td></tr>
+<tr><td class="k">LRO Wide Angle Camera</td><td>The picture of the Moon</td></tr>
+</table>
+<p class="text strong">The app names its NASA source on screen every time it calculates, with a link. No data is generated by AI.</p>
+<p class="text">Every listed landing site was checked against its source: IM-2, IM-1, Blue Ghost 1, SLIM and Chang’e 6 match NASA’s LRO camera team.</p>
+<p class="text">The data is NASA’s, and it is checked. GO or NO-GO is the planner’s own mission needs applied to it, and the planner can change them.</p>
+</div>
+<div class="checks">
+<div class="num-box in" style="--i:0"><p class="num">0.0007°</p><p class="text">Largest gap from NASA JPL Horizons, over 1,110 Sun and Earth positions.</p></div>
+<div class="num-box in" style="--i:1"><p class="num">347 h</p><p class="text">Daylight LUNI finds for Blue Ghost Mission 1. Firefly reported 346 h.</p></div>
+<div class="num-box in" style="--i:2"><p class="num">0.99</p><p class="text">Match of LUNI’s polar sunlight maps with NASA’s LOLA maps, both poles.</p></div>
+<div class="num-box in" style="--i:3"><p class="num">99.1%</p><p class="text">Same “never sunlit” answer as NASA’s south pole map. North: 98.9%.</p></div>
+</div>
+</div>
+<p class="foot-r">06 / 07</p>
+</section>
+<section id="proof" class="slide dark">
+<div class="bar"></div>
+<h2 class="title">TESTED, AND READY TO TEACH</h2>
+<div class="proof-body">
+<div class="who-row">
+<img class="shot-tour in-shot" src="img/lesson-sketch.png" alt="The sketch that opens LUNI’s classroom lesson: on the left a lander sees the Sun for power and the Earth for its radio link, a GO; on the right a hill hides the Earth, a NO-GO">
+<div class="who">
+<div class="point in" style="--i:1"><p class="label">FIVE FIRST-TIME TESTERS</p><p class="text">Friends and family ran our six-task test cold: <span class="strong">four of the five scored 6 of 6</span>, the fastest in under 8 minutes. What their reports showed was built the same evening.</p></div>
+<div class="point in" style="--i:2"><p class="label">A CLASSROOM LESSON, REVIEWED BY TEACHERS</p><p class="text">45 minutes, a worksheet, an answer key, and a checklist for a teacher who has never taught science. Rewritten around their feedback.</p></div>
+<div class="point in" style="--i:3"><p class="label">ONE OF THOSE TEACHERS</p><p class="text strong">“It’s really incredible, can’t wait to see where this goes.”</p></div>
+</div>
+</div>
+<hr class="rule">
+<div class="three three-qr">
+<div class="cell">
+<p class="label">WHO IT IS FOR</p>
+<p class="text">Mission planners re-checking a slipped launch. Teachers and students. Anyone curious: ASK LUNI answers a typed or spoken question.</p>
+</div>
+<div class="cell">
+<p class="label">USE OF AI</p>
+<p class="text">The code was written by an AI assistant (Claude) under our direction. No data, images or video were generated by AI.</p>
+</div>
+<div class="cell-qr">
+<img class="qr" src="img/qr.png" alt="QR code that opens LUNI at galileoleosolis.github.io/LUNI">
+<div class="cell">
+<p class="label">TRY IT · SCAN THE CODE</p>
+<p class="text strong">galileoleosolis.github.io/LUNI</p>
+<p class="text">Lesson and timeline: /LUNI/about</p>
+</div>
+</div>
+</div>
+</div>
+<p class="foot-r">07 / 07</p>
+</section>
+</div>
+<div id="bar">
+<button id="prev" aria-label="Previous slide">&#9664; BACK</button>
+<span id="count" aria-live="polite">1 / 7</span>
+<button id="next" aria-label="Next slide">NEXT &#9654;</button>
+<span class="gap"></span>
+<button id="full" class="wide">FULL SCREEN</button>
+<a class="wide" href="../about/">PROJECT PAGE</a>
+<a class="go" href="../">OPEN LUNI &#9654;</a>
+</div>
+<script>
+(function () {
+  var stage = document.getElementById("stage"), slides = [].slice.call(stage.children), at = 0;
+  var prev = document.getElementById("prev"), next = document.getElementById("next"), count = document.getElementById("count");
+  function fit() {
+    var w = innerWidth, h = innerHeight - 46, s = Math.min(w / 1920, h / 1080);
+    stage.style.transform = "translate(" + Math.round((w - 1920 * s) / 2) + "px," + Math.round((h - 1080 * s) / 2) + "px) scale(" + s + ")";
+  }
+  function show(i, quiet) {
+    at = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function (s, k) { s.hidden = k !== at; });
+    count.textContent = (at + 1) + " / " + slides.length;
+    prev.disabled = at === 0; next.disabled = at === slides.length - 1;
+    if (!quiet) try { history.replaceState(null, "", "#" + (at + 1)); } catch (e) {}
+  }
+  function fromHash() { var n = parseInt(location.hash.slice(1), 10); show(n >= 1 ? n - 1 : 0, true); }
+  prev.onclick = function () { show(at - 1); };
+  next.onclick = function () { show(at + 1); };
+  stage.onclick = function (e) { show(at + (e.clientX < innerWidth * 0.25 ? -1 : 1)); };
+  addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " || e.key === "Enter") { e.preventDefault(); show(at + 1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") { e.preventDefault(); show(at - 1); }
+    else if (e.key === "Home") show(0);
+    else if (e.key === "End") show(slides.length - 1);
+  });
+  var x0 = null;
+  addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  addEventListener("touchend", function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+  var full = document.getElementById("full");
+  if (!document.documentElement.requestFullscreen) full.hidden = true;
+  full.onclick = function () {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(function () {});
+  };
+  addEventListener("resize", fit);
+  addEventListener("hashchange", fromHash);
+  fit(); fromHash();
+})();
+</script>
+</body>
+</html>

@@ -450,6 +450,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Slides as a web page** (the user, Sun 15 Nov about 10:25 PM New York: in the PowerPoint's web view "the gifs
+  dont work ... make that work or host it somewhere else"). `slides/index.html` + `slides/img/` (8.8 MB): the same
+  seven slides, one at a time, scaled to the window; NEXT / BACK, arrow keys, click, swipe, FULL SCREEN, `#4` opens
+  slide 4; links to the app and the project page; the speaker's script is left out. BUILT, not hand-edited:
+  `python3 tools/build_slides.py <deck folder> <picture folder>` from a copy of the Claude Slides deck's files (in
+  this session: `scratchpad/artifact-files/bc875da5-.../` and `scratchpad/deck/img`); rebuild after changing the
+  deck. Checked at 1440 x 900, 1280 x 631 and 390 x 844: every picture loads, the recordings move, no page errors.
+  **On the test build (`/LUNI/next/slides/`); the address for the submission, `/LUNI/slides/`, exists only after the
+  next release.**
 - **Student reflection** (same teacher, about 10:25 PM New York: "a brief optional student reflection"). In
   `docs/lesson.md`: STUDENT REFLECTION (OPTIONAL, 3 MINUTES) after the worksheet (four prompts: what I got wrong and
   tried next, a surprise, a question I still have, could I explain GO and NO-GO), a row in the timing table, and a
