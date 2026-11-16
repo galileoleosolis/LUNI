@@ -7,6 +7,50 @@ LUNI (Lunar Utility for Navigational Intelligence) answers one question with rea
 here, at this time?* Students use it the way a mission planner would: pick a place and a time, read the GO or NO-GO,
 find out why, and fix the plan.
 
+## For the teacher: do these first
+
+Everything in this section happens **before students arrive**. It takes about 15 minutes the first time. You do not
+need to know anything about the Moon or about the tool: the sample answers are all in the teacher key at the end.
+
+### The day before
+
+- [ ] **Try the link on a student device**, not only your own: <https://galileoleosolis.github.io/LUNI/>. If it does
+      not load, the school's web filter may be blocking it; ask for `galileoleosolis.github.io` to be allowed.
+- [ ] **Check the devices.** Laptops or Chromebooks, with an internet connection and a current browser. Chrome and
+      Edge are the two it has been tested on. No accounts, nothing to install. Phones are too small for this lesson.
+- [ ] **Press ? TUTORIAL** (top right of the tool) and click through it once yourself. About 5 minutes.
+- [ ] **Read the teacher key** at the end of this page. About 3 minutes.
+- [ ] **Print the worksheet,** one per pair. It is near the end of this page.
+
+### Just before class
+
+- [ ] **Pair the students,** one device per pair. In each pair one student clicks and the other reads the worksheet
+      aloud; they swap for mission two.
+- [ ] **Put the tool on the projector** and press **FULL SCREEN** (top right).
+- [ ] **Open the two videos in other tabs,** if you plan to show them.
+- [ ] **Write the five words to know on the board,** and leave room for the mission-one plan.
+
+### If the technology fails
+
+- **One device will not load it:** move that pair to share with another pair.
+- **Nothing loads:** teach "Start here" from the sketch, show the two NASA videos, and do the worked example and
+  mission one as a whole class from the printed picture of the screen. Students still fill in the worksheet.
+- **A student asks "how do you know this is real?":** press **PROOF** in the tool. Everything on screen is computed
+  from NASA data.
+
+### The lesson at a glance
+
+| Part | Minutes | Who does what |
+|---|---|---|
+| 1. Hook: a real landing that went wrong | 5 | Teacher, on the projector |
+| 2. Guided tour | 10 | Pairs, on their own devices |
+| 3. Worked example | 5 | Teacher leads, students copy onto the worksheet |
+| 4. Mission one: fix a NO-GO | 10 | Pairs, step by step |
+| 5. Mission two: your own landing | 10 | Pairs, on their own |
+| 6. Share out | 5 | Whole class |
+
+The rest of this page is in the order you will use it in class.
+
 ## What students learn
 
 1. Near the Moon's south pole the Sun never climbs high. It circles low along the horizon, so one hill can decide
@@ -86,14 +130,6 @@ Show this picture, or point at the same places on the projector. Students only n
 | 9 | Very top | **Other screens**, and the ? TUTORIAL button. |
 
 If the left side (1, 2, 3) is folded away, press the blue **SHOW SITE · TIME · NEEDS** tab on the left edge.
-
-## Before class (5 minutes for the teacher)
-
-1. Open the link and press **FULL SCREEN** (top right).
-2. Press **? TUTORIAL** and click through it once.
-3. Print one worksheet per pair (it is at the end of this page).
-
-Everything on screen is computed from NASA data. If a student asks "how do you know?", press **PROOF**.
 
 ## The lesson
 
@@ -267,6 +303,7 @@ next version: <https://forms.gle/jLzqGs1anesdDzPj8>
 Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the one idea students need before they start,
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
 example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
-sample answers for every question, so a teacher does not need to know the subject beforehand.
+sample answers for every question, so a teacher does not need to know the subject beforehand; and everything the
+teacher does before class moved to the top as a checklist.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.

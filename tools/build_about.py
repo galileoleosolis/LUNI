@@ -15,6 +15,7 @@ lesson = markdown.markdown(md, extensions=["tables"])
 lesson = re.sub(r"<(/?)h3", r"<\1h5", lesson); lesson = re.sub(r"<(/?)h2", r"<\1h4", lesson)
 lesson = lesson.replace("<table>", '<div class="tscroll"><table>').replace("</table>", "</table></div>")
 lesson = lesson.replace('src="figures/', 'loading="lazy" src="../docs/figures/')      # the lesson's pictures live beside it in docs/
+lesson = lesson.replace("<li>[ ] ", '<li class="chk"><span aria-hidden="true">☐</span> ')      # checklist boxes, as GitHub shows them
 lesson_title = html.escape(title.lstrip("# ").strip())
 
 # ---- the timeline -----------------------------------------------------------------------------------------------

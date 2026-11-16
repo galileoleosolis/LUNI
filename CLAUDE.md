@@ -450,6 +450,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Lesson order** (same teacher, about 9:45 PM New York: the prep was "3 quarters down"; it should be "up higher
+  or separated", for "a teacher who really struggles with tech"). `docs/lesson.md` now opens with FOR THE TEACHER:
+  DO THESE FIRST: checklists for the day before and just before class, IF THE TECHNOLOGY FAILS, and THE LESSON AT A
+  GLANCE (a timing table); the old "Before class" section is gone. `tools/build_about.py` turns `- [ ]` items into
+  check boxes on the project page. The lesson says Chrome and Edge are the browsers it was tested on (true: the
+  testers' reports), not "any browser". **On `main` only until the next release.**
 - **Lesson answer key** (Sun 15 Nov about 9:35 PM New York; a teacher: "a basic teacher sample key for these
   questions ... he can't assume the teacher knows the answers"). `docs/lesson.md` now has a QUICK CHECK table of
   sample answers under START HERE, and in the TEACHER KEY a table of sample answers to every question the lesson
