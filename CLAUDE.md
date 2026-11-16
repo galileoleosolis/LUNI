@@ -460,6 +460,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   work on `main` and the test build (`/LUNI/next/`), which the submission does not link to. The user was asked to
   read the Judging & Awards Guide or ask their local lead; no answer yet. Until the user says otherwise:
   `tools/release.sh next` is fine, `promote` is not.
+  The user then sent the **Participant FAQs** as a PDF (dated 13 Nov 2026, 14 pages, read in full): it says nothing
+  about changing a project or a linked site after the deadline. What it does say: submit "according to the ending
+  time of your Local Event"; judging happens after the hackathon; **Global Nominees, Finalists and Honorable
+  Mentions are announced in December 2026 and Global Winners in January 2027**; rules questions not answered in the
+  guides go to the Local Lead or the Contact Us page. The Judging & Awards Guide and the Project Submission Guide
+  have not been read for this question (asked for the same way).
   First change after the submission, on the test build only: ASK LUNI understands "noble room" / "nobile room" as
   Nobile Rim 1 (what a browser heard from a first-time tester); `tests/check_assistant.mjs` 119 checks.
 - **RESUBMITTED for global judging** (the user, Sun 15 Nov, shortly after 11 PM New York: "ok its submitted"). The
