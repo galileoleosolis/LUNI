@@ -213,7 +213,8 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - Shackleton connecting ridge: Mazarico et al. 2011, Icarus 211 (LOLA illumination study).
 - Apollo 15 and 17: Apollo Lunar Surface Journal, https://apollojournals.org/alsj/alsjcoords.html
 - IM-1: https://www.hou.usra.edu/meetings/lpsc2025/pdf/2262.pdf
-- IM-2, Chang'e 4, Chang'e 6: Wikipedia articles for each mission.
+- IM-2, IM-1, Blue Ghost Mission 1, SLIM, Chang'e 4 and Chang'e 6: checked on 15 November 2026 against the positions
+  published by NASA's LRO camera team (LROC); the app says so next to each site.
 - Nobile Rim 1 and Malapert Massif are points LUNI itself picked as the best-lit spot near a rough region center, and
   Haworth is an approximate point on the crater floor; the app labels them as such.
 
