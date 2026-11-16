@@ -12,6 +12,20 @@ find out why, and fix the plan.
 Everything in this section happens **before students arrive**. It takes about 15 minutes the first time. You do not
 need to know anything about the Moon or about the tool: the sample answers are all in the teacher key at the end.
 
+### You do not have to be a science teacher
+
+This lesson is for any teacher. It is not really about the Moon; it is about making a plan, finding out it does not
+work, working out why, and trying again. That is worth teaching in every subject.
+
+- **You are allowed not to know.** When a student asks something you cannot answer, say "I don't know, let's find
+  out", and look at the screen together. That is the lesson working, not the lesson failing.
+- **A NO-GO is not a wrong answer.** It is the tool telling you something. The best moment in this lesson is the red
+  NO-GO in Part 4, because it gives the class a problem to solve.
+- **Try it wrong on purpose.** Before class, pick a site and a date at random and see what happens. Then press NEXT
+  LANDING WINDOW. Five minutes of this and you have done everything the students will do.
+- **Let them see you be curious.** Students notice what you do when you are stuck. Trying,
+  failing, staying curious and going back for another try is the skill here; the Moon is only where it happens.
+
 ### The day before
 
 - [ ] **Try the link on a student device**, not only your own: <https://galileoleosolis.github.io/LUNI/>. If it does
@@ -304,6 +318,6 @@ Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the 
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
 example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
 sample answers for every question, so a teacher does not need to know the subject beforehand; and everything the
-teacher does before class moved to the top as a checklist.
+teacher does before class moved to the top as a checklist, with a note for teachers who do not teach science.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.

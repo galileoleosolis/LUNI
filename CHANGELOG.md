@@ -1,10 +1,17 @@
 # LUNI change log
 
-Times are New York time. **Public version: r14.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r15.** The test build (`/next/`) is the same until new work is added.
+
+## r15: A note to teachers, and a teacher's words
+Sun 15 Nov · 10:05 PM
+**This is the public version.** The app itself is the same as r12.
+
+- The lesson opens with YOU DO NOT HAVE TO BE A SCIENCE TEACHER: you are allowed not to know, a NO-GO is not a wrong answer, try it wrong on purpose, let them see you be curious.
+- A teacher who reviewed the lesson: "It's really incredible, can't wait to see where this goes."
+- The project page gives the first-time testers' result in one line: three of the four scored 6 of 6.
 
 ## r14: The lesson, for a teacher who has never seen it
-Sun 15 Nov · 9:45 PM
-**This is the public version.** The app itself is the same as r12.
+Sun 15 Nov · 9:45 PM · the app itself is the same as r12.
 
 - Everything the teacher does first is at the top, as a checklist: the day before, just before class, and what to do if the technology fails.
 - A table of the six parts with the minutes for each.
@@ -24,7 +31,7 @@ Sun 15 Nov · 9:25 PM · the app itself is the same as r12.
 ## r12: What four first-time testers told us
 Sun 15 Nov · 9:00 PM
 
-- Four people who had never seen LUNI ran the six-task test (three friends, one parent): three scored 6 of 6, one got stuck on the first task.
+- Four people who had never seen LUNI ran the six-task test (three friends, one parent): three of the four scored 6 of 6.
 - ASK LUNI answers "what do I do next"; during the test it reads out the task.
 - The test's tour has a fifth card about the task bar, and the bar flashes when a new task starts.
 - Best Site Finder: a line under the map says what green means and that squares can be clicked; the data card shows small bars.

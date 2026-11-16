@@ -450,6 +450,26 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r15 released** on the user's "Release it, and remake the slides with all the new info" (Sun 15 Nov, about
+  10:05 PM New York = 03:05 UTC Mon). **r15 is the public version.** Lesson and project page only (the note to
+  teachers, the teacher's quote, the tester paragraph in positive wording); the app's files are unchanged since r12.
+  The three notes below that say "on `main` only" are released. To roll back to r14: `tools/release.sh promote 6205fa1`.
+- **Teacher buy-in** (same teacher, about 10:05 PM New York: "the teachers are his battle ... even if they don't
+  consider themselves to be a science teacher"; "trying and failing, staying curious and going back and trying
+  again"). `docs/lesson.md`: a first subsection in the teacher section, YOU DO NOT HAVE TO BE A SCIENCE TEACHER
+  (you are allowed not to know; a NO-GO is not a wrong answer; try it wrong on purpose; let them see you be
+  curious). She also liked the Check strips. **On `main` only until the next release.**
+- **Teacher quote** (pasted by the user about 10 PM New York, from the teacher who gave most of the lesson feedback):
+  "It's really incredible, can't wait to see where this goes". Used WITHOUT her name on slide 7 (deck Version 34,
+  in the TEACHERS AND STUDENTS point; the slide's lesson address is now galileoleosolis.github.io/LUNI/about) and at
+  the top of the lesson section of the project page (`figure.quote`). Claude assumed she is fine with an unnamed
+  quote and told the user so; remove it if she is not. Project page change is **on `main` only until the next release.**
+- **Tester wording, the user's decision** (about 10 PM New York: "We don't mention about the bad things the testers
+  said"). Public text (slide 7, deck Version 32; the project page; `CHANGELOG.md`) now says only: four first-timers
+  (three friends, one parent), **three of the four scored 6 of 6**, and their reports were built in the same
+  evening. No complaints, no ease ratings, no "1 of 6". Keep "three of the four": never write that "the testers
+  scored 6 of 6", which would be false. The full results stay in these notes. Project page change is **on `main`
+  only until the next release.**
 - **r14 released** on the user's "That's fine, release it" (Sun 15 Nov, about 9:45 PM New York = 02:45 UTC Mon).
   **r14 is the public version.** Lesson and project page only (answer key, teacher checklist at the top, two colors);
   no file under `index.html`, `css`, `js`, `data` changed since r12, so the app checks were not rerun. The three
@@ -683,6 +703,10 @@ asked about 2, 4 and 6 on 15 Nov and was told they are for after the deadline (h
 5. The landing site's own data profile from its own skyline, instead of the 480 m layer value.
 6. Replays before 2023 (Apollo, Chang'e 4): needs the position data extended back; the app covers 2023 to 2035.
 7. Windows .exe wrapper (Electron). 8. Earth-campers mode (advised against; keep as a story point).
+9. Education extra (a teacher, 15 Nov; the user: "I think it's fine rn but this is an edu extra"): motivation or
+   reward in the lesson, such as pairs earning tips or support for teamwork. Not built. It must not need the teacher
+   to understand the subject. Cheapest form: no code, a "mission control" points sheet in `docs/lesson.md` (a point
+   for a correct prediction, for a written reason, for helping another pair without clicking; points buy a hint card).
 
 ## Deadline
 Confirmed by the user from their team page: submissions close **Sunday 15 Nov 2026 at 11:59 PM, the user's LOCAL time**.

@@ -130,6 +130,9 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
   background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
+.quote { margin: 0; padding: 4px 0 4px 22px; border-left: 6px solid var(--gold); max-width: 62ch; }
+.quote blockquote { margin: 0; font: 700 clamp(26px, 4vw, 38px)/1.15 var(--disp); letter-spacing: .01em; color: var(--white); }
+.quote figcaption { margin-top: 8px; font: 400 14px/1.4 var(--mono); letter-spacing: .05em; color: var(--dim); text-transform: uppercase; }
 /* lesson feedback: a banner over the lesson and a large box that opens from it, and once at the end of the lesson */
 .fb-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; padding: 20px 24px; background: var(--panel); border: 2px solid var(--gold); }
 .fb-banner h3 { color: var(--gold); margin-bottom: 6px; } .fb-banner p { max-width: 56ch; }
@@ -215,7 +218,7 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   </div>
   <p class="dim" style="max-width:76ch">The data is NASA’s, and it is checked. GO or NO-GO is LUNI’s own rule, applied to the mission needs the planner sets, so it is a planning and teaching tool, not flight software. The PROOF button in the app shows every check.</p>
   <h3 style="margin-top:34px">TESTED WITH PEOPLE</h3>
-  <p style="max-width:76ch">LUNI has a built-in user test: six tasks, a timer and a report. Five rounds inside the team took the score from 2 of 6 to 6 of 6, and the screen was changed after every round. On 15 November four people who had never seen it tried it: three friends and one parent, none of them on the team. Three scored <b style="color:var(--white)">6 of 6</b>, in 8 to 13 minutes. The fourth got stuck on the first task and scored 1 of 6. Ease of use was rated 3, 3, 4 and 5 out of 5, and the common complaint was the same in different words: a lot of buttons, a lot of clutter, a lot of data and options. One asked for a way to ask what to do next, so ASK LUNI now answers that question. <a href="../#test">Take the test yourself</a>.</p>
+  <p style="max-width:76ch">LUNI has a built-in user test: six tasks, a timer and a report. Five rounds inside the team took the score from 2 of 6 to 6 of 6, and the screen was changed after every round. On 15 November four people who had never seen it tried it: three friends and one parent, none of them on the team. Three of the four scored <b style="color:var(--white)">6 of 6</b>, in 8 to 13 minutes. Their reports were turned into changes the same evening: ASK LUNI now answers “what do I do next”, the Best Site Finder says what its colors mean, and the test points to its own task bar. <a href="../#test">Take the test yourself</a>.</p>
 </div></section>
 
 <section id="award" class="award"><div class="wrap award-grid">
@@ -238,6 +241,7 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   <p class="label">For teachers and students</p>
   <h2>THE CLASSROOM LESSON</h2>
   <p class="lead">A ready-to-run 45-minute lesson. Students plan their own Moon landing with the same tool, and must end on a GO.</p>
+  <figure class="quote"><blockquote>“It’s really incredible, can’t wait to see where this goes.”</blockquote><figcaption>A teacher who reviewed the lesson, 15 November 2026. It was rewritten around teachers’ feedback the same evening.</figcaption></figure>
   <div class="fb-banner">
     <div><h3>TRIED IT, OR JUST READ IT? TELL US.</h3><p>The lesson has not been run in a classroom yet. Two minutes of your feedback will shape the next version.</p></div>
     <button class="btn" id="fb-open">GIVE FEEDBACK ON THE LESSON ▸</button>
