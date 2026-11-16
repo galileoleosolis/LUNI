@@ -683,6 +683,10 @@ asked about 2, 4 and 6 on 15 Nov and was told they are for after the deadline (h
 5. The landing site's own data profile from its own skyline, instead of the 480 m layer value.
 6. Replays before 2023 (Apollo, Chang'e 4): needs the position data extended back; the app covers 2023 to 2035.
 7. Windows .exe wrapper (Electron). 8. Earth-campers mode (advised against; keep as a story point).
+9. Education extra (a teacher, 15 Nov; the user: "I think it's fine rn but this is an edu extra"): motivation or
+   reward in the lesson, such as pairs earning tips or support for teamwork. Not built. It must not need the teacher
+   to understand the subject. Cheapest form: no code, a "mission control" points sheet in `docs/lesson.md` (a point
+   for a correct prediction, for a written reason, for helping another pair without clicking; points buy a hint card).
 
 ## Deadline
 Confirmed by the user from their team page: submissions close **Sunday 15 Nov 2026 at 11:59 PM, the user's LOCAL time**.
