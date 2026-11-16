@@ -450,6 +450,14 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Lesson, version 3** (Sun 15 Nov about 9:30 PM New York, on the user's "go go go fix the issues", after two more
+  pieces of teacher feedback: the first answer to the Google Form, and a third message). All said the same: students
+  need the background first, and may click to a GO without knowing why. Added to `docs/lesson.md`, **on `main` only**:
+  START HERE (the one idea: the Sun is for power, the Earth is for talking to home) with a labeled sketch,
+  `docs/figures/lesson-sun-earth-lander.svg` (drawn by hand as SVG; it says on it that it is a sketch, not to scale,
+  not a real lander); "stop and predict" and "the plan became a GO because ..." steps in missions one and two; an IF
+  A PAIR IS STUCK list; and two new worksheet rows (which is missing, why that worked). The form's own title says
+  "LUMI" (told to the user; only they can fix it in Google Forms).
 - **Lesson, version 2, after a teacher's review** (pasted by the user Sun 15 Nov about 9:15 PM New York; the teacher
   read the lesson, did not run it; do not quote her publicly without the user's say-so). She asked for "scaffolding
   and chunking", "a sample or partially completed worksheet with visuals arrows" and "an embedded link to a quick

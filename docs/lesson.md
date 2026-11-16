@@ -18,6 +18,23 @@ find out why, and fix the plan.
 Connects to NGSS MS-ESS1-1 (a model of the Earth, Sun and Moon system) and MS-ETS1-2 (judging competing solutions
 against criteria and constraints).
 
+## Start here: the one idea students need first
+
+Do not open the tool yet. Students need this before anything on screen makes sense.
+
+**A lander on the Moon needs two things from the sky.**
+
+1. **The Sun, for power.** Sunlight on its solar panel makes the electricity that keeps it alive.
+2. **The Earth, for talking to home.** Its radio only works in a straight, clear line to Earth.
+
+If a hill hides either one, the lander is in trouble. That is all LUNI checks: can this spot see the Sun and the
+Earth, for long enough?
+
+![Two sketches: on the left the lander sees the Sun and the Earth, a GO; on the right a hill hides the Earth, a NO-GO](figures/lesson-sun-earth-lander.svg)
+
+Ask before moving on: *What is the Sun for? What is the Earth for? What could get in the way?* Every student should
+be able to answer all three.
+
 ## Words to know
 
 Put these five on the board before you start.
@@ -78,8 +95,11 @@ Each part is a few short steps. A **Check** line says what every screen should s
 3. Read its story aloud: it reached the south pole region, came to rest on its side inside a crater, could not
    recharge, and the mission ended the next day.
 4. Ask: *What does a lander need from the sky to stay alive?* Write the answers on the board.
+5. Show the sketch from "Start here" and say the one idea aloud: the Sun is for power, the Earth is for talking to
+   home.
 
-**Check:** the board says **sunlight** (power) and **Earth** (radio link). If not, steer there.
+**Check:** the board says **sunlight** (power) and **Earth** (radio link), and three different students can each
+say one of them back to you.
 
 ### Part 2. Guided tour (10 minutes)
 
@@ -111,9 +131,13 @@ Write the plan on the board:
 3. At number 3, set the mission length to **10**.
 4. Read number 4. Fill in the verdict and the reason on the worksheet.
 5. Look at number 6. Find the Sun. Find where the Earth is hiding.
-6. Press **NEXT LANDING WINDOW** (number 8). Fill in what changed.
+6. **Stop and predict.** Before pressing anything, each pair writes on the worksheet: *which of the two things is
+   missing, the Sun or the Earth, and what would have to change?*
+7. Press **NEXT LANDING WINDOW** (number 8). Fill in what changed.
+8. Each pair writes one sentence: *the plan became a GO because ...*
 
-**Check:** every screen went from a red **NO-GO** to a green **GO**, and the date moved by one day.
+**Check:** every screen went from a red **NO-GO** to a green **GO**, the date moved by one day, and every pair has
+written why. A GO with no reason written down does not count.
 
 ### Part 5. Mission two: your own landing (10 minutes)
 
@@ -123,10 +147,22 @@ Each pair plans its own mission and must end on a **GO**.
 2. Choose a landing date in 2027.
 3. If it is a NO-GO, change **one thing at a time**: the date (**NEXT LANDING WINDOW**), or the place (**BEST SITE
    FINDER**, then **MOVE MY SITE TO THE BEST SPOT**), or one mission need.
-4. Fill in the last column of the worksheet.
+4. Fill in the last column of the worksheet, including **why the change worked**.
 5. Press **COPY LINK** and paste the link into the class document. The link reopens the exact plan.
 
-**Check:** every pair has a GO on screen and can say which one thing they changed.
+**Check:** every pair has a GO on screen and can say which one thing they changed and why it worked. Clicking until
+the word turns green is not the goal; explaining it is.
+
+### If a pair is stuck
+
+Work down this list. Stop at the first step that gets them moving.
+
+1. **Point to number 4 and read it aloud.** Is it GO or NO-GO? What reason does it give?
+2. **Ask which one is missing.** Look at number 5: a red mark on the icon means that one is not available. Is it
+   the Sun (power) or the Earth (radio link)?
+3. **Go back to the sketch** in "Start here". Which picture is their screen like?
+4. **Let LUNI say it.** Press **ASK LUNI** and type *what do I do next*. It names the button to press.
+5. **Pair them** with a pair that has finished, with one rule: the helpers may point, but may not click.
 
 Fast finishers: open **MOON MAP**, pick the **NEVER SUNLIT** layer and find Haworth crater near the south pole. Then
 pick **WATER ICE**. Why would a mission want to land near a place where it can never get power?
@@ -150,8 +186,10 @@ The first column is the worked example from Part 3, already filled in. Use it as
 | LUNI's reason | Sunlight lasts 3 days 3 hours longer than needed; Earth in view 100% | | |
 | Sun: in view? How high? (number 5) | Yes, 2.45° | | |
 | Earth: in view? How high? (number 5) | Yes, 11.19° | | |
+| Which is missing: Sun or Earth? | Neither | | |
 | What I changed | Nothing: it was already a GO | | |
 | Verdict after the change | GO | | |
+| Why that worked | The Sun and the Earth were both above the skyline for the whole mission | | |
 
 Three sentences to finish:
 
@@ -191,7 +229,8 @@ Three sentences to finish:
 This lesson has not been run in a classroom yet. If you read it or tried it, two minutes of feedback helps the
 next version: <https://forms.gle/jLzqGs1anesdDzPj8>
 
-Version 2 (15 Nov 2026), reworked after a teacher's review: smaller steps with a check after each part, a numbered
-picture of the screen, a filled-in example on the worksheet, key words and two NASA videos.
+Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the one idea students need before they start,
+with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
+example on the worksheet; a list for pairs who are stuck; and students must write why their plan became a GO.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.
