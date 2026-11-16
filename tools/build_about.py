@@ -18,6 +18,19 @@ lesson = lesson.replace('src="figures/', 'loading="lazy" src="../docs/figures/')
 lesson = lesson.replace("<li>[ ] ", '<li class="chk"><span aria-hidden="true">☐</span> ')      # checklist boxes, as GitHub shows them
 lesson_title = html.escape(title.lstrip("# ").strip())
 
+# Everything addressed to the teacher gets its own color (a teacher's review, 15 Nov: "should be in a different color").
+def wrap(text, start, end, cls):
+    a = text.find(start)
+    b = text.find(end, a + 1) if a >= 0 else -1
+    if a < 0 or b < 0:
+        raise SystemExit(f"lesson section not found: {start} .. {end}")
+    return text[:a] + f'<div class="{cls}">' + text[a:b] + "</div>" + text[b:]
+lesson = wrap(lesson, "<h4>For the teacher: do these first</h4>", "<h4>What students learn</h4>", "teacher")
+lesson = wrap(lesson, "<h5>If a pair is stuck</h5>", "<h5>Part 6.", "teacher")
+lesson = wrap(lesson, "<h4>Teacher key</h4>", "<h4>Going further</h4>", "teacher")
+lesson = lesson.replace("<p><strong>Check:</strong>", '<p class="check"><strong>Check:</strong>')
+lesson = '<p class="legend"><span class="lg-t">Orange: for the teacher.</span> <span class="lg-s">Blue: what the class does.</span></p>\n' + lesson
+
 # ---- the timeline -----------------------------------------------------------------------------------------------
 vh = open(os.path.join(ROOT, "docs", "version-history.html"), encoding="utf-8").read()
 a = vh.index("const V = ") + 10; b = vh.index("];", a) + 1

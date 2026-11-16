@@ -450,6 +450,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Lesson in two colors** (the user, about 9:50 PM New York: "What the teacher needs to do should be in a different
+  color text as well"). On the project page only: `tools/build_about.py` wraps the teacher-first section, IF A PAIR IS
+  STUCK and the TEACHER KEY in `.teacher` (orange `#a34a06` on `#fff3df`) and marks every **Check:** line `.check`;
+  a legend at the top says ORANGE: FOR THE TEACHER, BLUE: WHAT THE CLASS DOES. The builder stops with an error if
+  one of those headings is renamed in `docs/lesson.md`. GitHub's own view of the file cannot show colors.
+  **On `main` only until the next release.**
 - **Lesson order** (same teacher, about 9:45 PM New York: the prep was "3 quarters down"; it should be "up higher
   or separated", for "a teacher who really struggles with tech"). `docs/lesson.md` now opens with FOR THE TEACHER:
   DO THESE FIRST: checklists for the day before and just before class, IF THE TECHNOLOGY FAILS, and THE LESSON AT A
