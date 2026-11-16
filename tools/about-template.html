@@ -117,6 +117,21 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
   background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
+/* lesson feedback: a banner over the lesson and a large box that opens from it, and once at the end of the lesson */
+.fb-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; padding: 20px 24px; background: var(--panel); border: 2px solid var(--gold); }
+.fb-banner h3 { color: var(--gold); margin-bottom: 6px; } .fb-banner p { max-width: 56ch; }
+.fb { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(2, 6, 14, .82); }
+.fb[hidden] { display: none; }
+.fb-box { width: min(760px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 3px solid var(--gold); box-shadow: 0 30px 120px rgba(0, 0, 0, .7); padding: clamp(22px, 5vw, 48px); display: flex; flex-direction: column; gap: 18px; }
+.fb-box h2 { font-size: clamp(36px, 7vw, 64px); color: var(--gold); }
+.fb-box .lead { max-width: none; }
+.fb-box ul { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.fb-box .btn { font-size: clamp(22px, 4vw, 30px); padding: 18px 26px; text-align: center; }
+.fb-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.fb-row .btn { flex: 1 1 320px; }
+.fb-later { font: 700 17px/1 var(--disp); letter-spacing: .06em; padding: 14px 18px; cursor: pointer; color: var(--fg); background: none; border: 2px solid var(--line); border-radius: 10px; }
+.fb-later:hover { border-color: var(--fg); }
+.fb-box small { color: var(--dim); font-size: 14px; }
 footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--dim); font-size: 15px; }
 footer p { max-width: 80ch; margin-bottom: 8px; }
 
@@ -128,7 +143,7 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   .vhead i { margin-left: 0; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-@media print { .nav, .hero, #project, .award, #timeline, footer { display: none; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
+@media print { .nav, .hero, #project, .award, #timeline, footer, .fb, .fb-banner { display: none !important; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
 </style>
 </head>
 <body>
@@ -210,10 +225,15 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   <p class="label">For teachers and students</p>
   <h2>THE CLASSROOM LESSON</h2>
   <p class="lead">A ready-to-run 45-minute lesson. Students plan their own Moon landing with the same tool, and must end on a GO.</p>
-  <p class="dim">It has not been run in a classroom yet. If you try it, the team would like to hear how it went. Printing this page prints only the lesson.</p>
+  <div class="fb-banner">
+    <div><h3>TRIED IT, OR JUST READ IT? TELL US.</h3><p>The lesson has not been run in a classroom yet. Two minutes of your feedback will shape the next version.</p></div>
+    <button class="btn" id="fb-open">GIVE FEEDBACK ON THE LESSON ▸</button>
+  </div>
+  <p class="dim">Printing this page prints only the lesson.</p>
   <article class="paper"><h3>{{LESSON_TITLE}}</h3>
 {{LESSON}}
   </article>
+  <div id="lesson-end"></div>
 </div></section>
 
 <section id="timeline"><div class="wrap stack">
@@ -234,7 +254,26 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   </ol>
 </div></section>
 
+<div class="fb" id="fb" role="dialog" aria-modal="true" aria-labelledby="fb-title" hidden>
+  <div class="fb-box">
+    <p class="label" style="color:var(--gold)">Lesson feedback</p>
+    <h2 id="fb-title">HOW DID THE LESSON LOOK TO YOU?</h2>
+    <p class="lead">Teachers, students and anyone who read it: tell us what would work in a real class and what would not. It is a short form and it goes straight to the team.</p>
+    <ul>
+      <li>Would you run this lesson? With which grade?</li>
+      <li>What was unclear, too long or missing?</li>
+      <li>If you tried it: what happened?</li>
+    </ul>
+    <div class="fb-row">
+      <a class="btn" id="fb-go" href="https://forms.gle/jLzqGs1anesdDzPj8" target="_blank" rel="noopener">OPEN THE FEEDBACK FORM ▸</a>
+      <button class="fb-later" id="fb-later">NOT NOW</button>
+    </div>
+    <small>The form opens in a new tab (Google Forms). You can come back to it any time with the GIVE FEEDBACK button above the lesson.</small>
+  </div>
+</div>
+
 <footer><div class="wrap">
+  <p>Feedback on the classroom lesson: <a href="https://forms.gle/jLzqGs1anesdDzPj8" target="_blank" rel="noopener">open the short form</a>.</p>
   <p>LUNI was made by team Mystic Research for the NASA Space Apps Challenge 2026. The code was written by an AI assistant (Claude) under the team’s direction. No data, images or video were generated by AI.</p>
   <p>Source code and data builders: <a href="https://github.com/galileoleosolis/LUNI">github.com/galileoleosolis/LUNI</a>. Data: NASA NAIF, the Lunar Reconnaissance Orbiter teams (LOLA, Diviner, LROC) and JPL Horizons.</p>
 </div></footer>
@@ -260,6 +299,21 @@ $("play").addEventListener("click", () => { if (timer) return stop(); view = "ma
   timer = setInterval(() => { if (at >= V.length - 1) return stop(); show(at + 1); }, 1800); });
 document.querySelectorAll(".tl button[data-v]").forEach((b) => b.addEventListener("click", () => { stop(); view = "main"; show(V.findIndex((v) => v.id === b.dataset.v)); document.querySelector(".viewer").scrollIntoView({ behavior: "smooth", block: "start" }); }));
 show(at);
+
+// lesson feedback box: opened by its button, and once by itself when a reader reaches the end of the lesson
+const fb = $("fb"), seenKey = "luni-lesson-fb";
+const fbShow = () => { fb.hidden = false; $("fb-go").focus(); try { localStorage.setItem(seenKey, "1"); } catch (e) {} };
+const fbHide = () => { fb.hidden = true; };
+$("fb-open").addEventListener("click", fbShow);
+$("fb-later").addEventListener("click", fbHide);
+$("fb-go").addEventListener("click", fbHide);
+fb.addEventListener("click", (e) => { if (e.target === fb) fbHide(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") fbHide(); });
+let fbSeen = false; try { fbSeen = !!localStorage.getItem(seenKey); } catch (e) {}
+if (!fbSeen && "IntersectionObserver" in window && !navigator.webdriver) {
+  const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); fbShow(); } });
+  io.observe($("lesson-end"));
+}
 </script>
 </body>
 </html>

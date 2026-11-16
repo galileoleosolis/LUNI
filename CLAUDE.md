@@ -450,6 +450,14 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Lesson feedback form** (the user, Sun 15 Nov about 9 PM New York: "Put this in the website as a form a big popup
+  for feedback ... It's for lesson plan feedback"): the user's Google Form, https://forms.gle/jLzqGs1anesdDzPj8.
+  On the project page (`tools/about-template.html`): a gold banner over the lesson with GIVE FEEDBACK ON THE LESSON
+  (`#fb-open`), a large box (`#fb`) with OPEN THE FEEDBACK FORM (a new tab), which also opens by itself once when a
+  reader reaches the end of the lesson (`#lesson-end`, remembered under `luni-lesson-fb`, never for automated
+  browsers), a footer link, and a "Tell us how it went" section at the end of `docs/lesson.md`. The form is a link,
+  not shown inside the page: Google's hosts are refused from this session, so the short link could not be resolved
+  to the long address an embedded form needs. On `main` only until the next release.
 - **Fourth first-time tester, a friend outside the team** (report sent Sun 15 Nov about 8:50 PM New York; public r11
   test). Window 2560 x 1271 (scale 1.11): **6/6, 7:36 (the fastest), ease 3/5**, 57 clicks. He saw the task bar at
   once (first click at 0:05). Used NEXT LANDING WINDOW three times, a verdict-strip fix button once (the first
