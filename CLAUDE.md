@@ -458,8 +458,10 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   buttons, or a different way to be guided towards them" (the pulsing yellow rings): the OPPOSITE of the family
   tester's wish for more step-by-step highlighting, so neither was built. He rated ease 3 on a large screen, so the
   earlier "ease follows screen size" reading does not hold.
-  **Totals, 15 Nov: four first-timers, three outside the team: 6/6, 1/6, 6/6 (outside) and 6/6 (family); ease 3, 4,
-  3, 5.** Slide 7 (deck Version 30) and the project page text give all four together.
+  **Totals, 15 Nov: four first-timers, none on the team: three friends (6/6, 1/6, 6/6) and one parent (6/6); ease
+  3, 4, 3, 5.** The user pointed out the parent had never seen LUNI either, so the wording everywhere is "four
+  first-timers (three friends, one parent)": say who they were, do not call the parent "outside" or leave him out.
+  Slide 7 (deck Version 31) and the project page text give all four together.
 - **Third first-time tester, a family member** (report sent Sun 15 Nov about 8:45 PM New York; ran the public r11
   test, so without the task-bar fixes; count him as a first-timer, NOT as outside the team). Window 2321 x 1309
   (scale 1.14): **6/6, 13:03, ease 5/5**, 57 clicks. Like the second tester he explored for four minutes before
