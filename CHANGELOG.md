@@ -1,10 +1,15 @@
 # LUNI change log
 
-Times are New York time. **Public version: r16.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r17.** The test build (`/next/`) is the same until new work is added.
+
+## r17: What students need to know first
+Sun 15 Nov · 10:50 PM
+**This is the public version.** The app itself is the same as r12.
+
+- The lesson says what it assumes students already know (very little), with short answers to four questions about landers: what one is, how it gets to the Moon, whether it leaves, and what its mission is.
 
 ## r16: The slides on the web, and a new front page for the project
-Sun 15 Nov · 10:40 PM
-**This is the public version.** The app itself is the same as r12.
+Sun 15 Nov · 10:40 PM · the app itself is the same as r12.
 
 - The seven slides are a web page (`/slides/`), so the recordings of the app play in any browser, with no download and no sign-in.
 - The project page now starts with the slides and the version-by-version timeline; a SLIDES button stays in the top row.
