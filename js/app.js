@@ -174,7 +174,7 @@ function syncSiteUI() {
   if (s.id === CUSTOM_ID) note.textContent = "CUSTOM POINT";
   else if (s.srcText) note.textContent = s.srcText.toUpperCase();
   else if (s.approx) note.textContent = "APPROXIMATE REGION CENTER — TO BE VERIFIED";
-  else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>`;
+  else if (s.src) note.innerHTML = `${s.tag} · <a href="${s.src}" target="_blank" rel="noopener">COORDINATE SOURCE</a>${s.check ? " · " + s.check : ""}`;
   else note.textContent = s.tag || "";
   renderStory();
 }
