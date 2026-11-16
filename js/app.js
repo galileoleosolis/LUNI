@@ -285,6 +285,10 @@ const calIdx = () => Math.round((state.t0 - state.cal.start) / 3600000 / STEP_HO
 // Every preset for this mission, side by side: GO or NO-GO at the landing time on screen, the number of good landing
 // days in the months the calendar shows, and the next window. Worked out once per (months shown, mission needs).
 let rank = { key: "", rows: [] };
+// the line under the verdict: what a GO rests on, and the way to the checks
+document.getElementById("basis-proof")?.addEventListener("click", () => document.getElementById("proof-btn")?.click());
+if (window.LUNO_B64) document.getElementById("about-link")?.setAttribute("href", "https://galileoleosolis.github.io/LUNI/about/");   // the preview page has no copy of it
+
 function renderRank() {
   const c = state.cal, key = `${+c.start},${c.days},${JSON.stringify(state.req)}`;
   if (rank.key !== key) {

@@ -429,6 +429,18 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   - r11: `showTour` / `TOUR` in `js/testmode.js`: START THE TEST leads to a four-card tour (where things are, never
     the answers) before the tasks; the clock starts at the tasks; the report has a line saying whether it was read.
     Runs from now on are not comparable with the earlier no-tour runs. Tester link: `/LUNI/#test`.
+- **BUILT, ON `main` ONLY, NOT PUBLISHED ANYWHERE** (the user, Sun 15 Nov about 7:50 PM New York: "do 2. 3. 4. and no on
+  5. Dont publish any yet just build"; "Wait on phones for now"). Public is r11; `/next/` and the preview page do not
+  have these. Checked: six window sizes, test sets E and D.
+  - ABOUT link in the top row (`#about-link`, `href="about/"`; on the preview page it points at the public address).
+  - A line inside the verdict strip (`#mission-basis`, `.hero-basis`): JUDGED BY YOUR MISSION NEEDS · NASA DATA,
+    CHECKED AGAINST NASA · SEE THE PROOF (`#basis-proof` opens PROOF). Hidden on windows under 560 px tall. It costs
+    about 18 px of skyline (172 px at 1440 x 900 on a NO-GO). `.tight` on `#stage` means a design width under 1500,
+    which is most laptop windows: do not hang "hide when cramped" rules on it.
+  - Best Site Finder data card shows the small colored bars. They were never there before: an older rule hid them
+    in `.scan-cell` when that panel was 250 px wide (Claude had wrongly told the user it removed them by accident).
+  - Refused by the user: opening the left side by default (item 5). On hold: the phone layout (the answer is about
+    two screens down on a phone and the NASA band covers the top row there).
 - **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
   plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
   `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
