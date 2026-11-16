@@ -450,6 +450,10 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r15 released** on the user's "Release it, and remake the slides with all the new info" (Sun 15 Nov, about
+  10:05 PM New York = 03:05 UTC Mon). **r15 is the public version.** Lesson and project page only (the note to
+  teachers, the teacher's quote, the tester paragraph in positive wording); the app's files are unchanged since r12.
+  The three notes below that say "on `main` only" are released. To roll back to r14: `tools/release.sh promote 6205fa1`.
 - **Teacher buy-in** (same teacher, about 10:05 PM New York: "the teachers are his battle ... even if they don't
   consider themselves to be a science teacher"; "trying and failing, staying curious and going back and trying
   again"). `docs/lesson.md`: a first subsection in the teacher section, YOU DO NOT HAVE TO BE A SCIENCE TEACHER
