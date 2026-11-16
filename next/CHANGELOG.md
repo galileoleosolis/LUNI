@@ -1,9 +1,10 @@
 # LUNI change log
 
-Times are New York time. **Public version: r7.** The test build (`/next/`) is r7 plus the changes listed under "Next".
+Times are New York time. **Public version: r8.** The test build (`/next/`) is the same as r8 until new work is added.
 
-## Next (test build, will be r8): Test build (will be r8)
-Sun 15 Nov · after 2 PM · 126 saves
+## r8: The LUNI Console look
+Sun 15 Nov · 6:33 PM · released after the local judging (Best Use of Data award)  
+**This is the public version.**
 
 - The full name with “for”: Lunar Utility for Navigational Intelligence.
 - The default Earth-link need is now 25% of the mission (was only "at landing"), so a plan with almost no Earth link is no longer a GO.
@@ -11,11 +12,11 @@ Sun 15 Nov · after 2 PM · 126 saves
 - A check or a cross inside the green and red dots in the site list; no text to read under 12.5 px.
 - NASA DATA USED band stays 14 seconds and each source is a link.
 - View from the site: shaded ground and craters for depth. FULL SCREEN button.
-- Outside the app: the slide deck, three GIFs, the talk scripts.
+- Fixed on the way: mission-needs buttons spilling out of the left column, and the Moon map data card losing its bars.
+- Outside the app: the slide deck, GIFs, the talk scripts, the design system page.
 
 ## r7: Energy, before and after, solar panels
-Sun 15 Nov · 1:40 PM · 116 saves  
-**This is the public version.**
+Sun 15 Nov · 1:40 PM · 116 saves
 
 - ENERGY: an hour-by-hour power budget with the battery needed.
 - BEFORE AND AFTER box when the site or the date moves.
