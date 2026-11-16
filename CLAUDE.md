@@ -466,6 +466,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   Mentions are announced in December 2026 and Global Winners in January 2027**; rules questions not answered in the
   guides go to the Local Lead or the Contact Us page. The Judging & Awards Guide and the Project Submission Guide
   have not been read for this question (asked for the same way).
+  The user also pasted the **2026 Participant Terms and Conditions** (updated 7 Aug 2026): nothing about changes
+  after the deadline either. What it does require: every source used must be cited, even open source ("NASA also
+  reserves the right to remove nominations, awards, or winner status from teams that do not cite resources");
+  original content is open source, and with no license named NASA distributes it under Apache 2.0 (the repository
+  has no LICENSE file; the user has not chosen one); and "recognizable names, voices, and likenesses of persons
+  under the age of 18 should not be included in any submission". The slides' cover shows both members' names
+  (the user typed them; the submission guide asks for member names): Claude does not know their ages and asked.
+  `docs/submission.md` gained three reference lines (the slides' two fonts, Pillow and Python-Markdown, the two
+  NASA videos in the lesson); told to the user at 11:20 PM New York to paste before the form closed.
   First change after the submission, on the test build only: ASK LUNI understands "noble room" / "nobile room" as
   Nobile Rim 1 (what a browser heard from a first-time tester); `tests/check_assistant.mjs` 119 checks.
 - **RESUBMITTED for global judging** (the user, Sun 15 Nov, shortly after 11 PM New York: "ok its submitted"). The
