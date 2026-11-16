@@ -450,6 +450,30 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r13 released** on the user's "Release everything that hasn't been released yet" (Sun 15 Nov, about 9:30 PM New
+  York = 02:30 UTC Mon). **r13 is the public version.** Only the lesson and the project page changed since r12
+  (`git diff a50a126` touched no file under `index.html`, `css`, `js`, `data`), so the app checks were not rerun;
+  the project page was checked at two widths. The two lesson notes below that say "on `main` only" are released.
+  To roll back to r12: `tools/release.sh promote a50a126`.
+- **Lesson, version 3** (Sun 15 Nov about 9:30 PM New York, on the user's "go go go fix the issues", after two more
+  pieces of teacher feedback: the first answer to the Google Form, and a third message). All said the same: students
+  need the background first, and may click to a GO without knowing why. Added to `docs/lesson.md`, **on `main` only**:
+  START HERE (the one idea: the Sun is for power, the Earth is for talking to home) with a labeled sketch,
+  `docs/figures/lesson-sun-earth-lander.svg` (drawn by hand as SVG; it says on it that it is a sketch, not to scale,
+  not a real lander); "stop and predict" and "the plan became a GO because ..." steps in missions one and two; an IF
+  A PAIR IS STUCK list; and two new worksheet rows (which is missing, why that worked). The form's own title says
+  "LUMI" (told to the user; only they can fix it in Google Forms).
+- **Lesson, version 2, after a teacher's review** (pasted by the user Sun 15 Nov about 9:15 PM New York; the teacher
+  read the lesson, did not run it; do not quote her publicly without the user's say-so). She asked for "scaffolding
+  and chunking", "a sample or partially completed worksheet with visuals arrows" and "an embedded link to a quick
+  movie or two on the sun and moon". Done in `docs/lesson.md`, **on `main` only until the next release (public is
+  r12)**: five WORDS TO KNOW; WATCH FIRST with two NASA Science videos found by web search
+  (science.nasa.gov/resource/shadows-near-the-moons-south-pole/ and .../from-apollo-sites-to-the-south-pole/; not
+  opened from here); THE SCREEN IN NINE NUMBERS with `docs/figures/lesson-screen-guide.jpg` (the real opening
+  screen with nine gold numbered frames, made by `guide.js` + `annotate.py` in the scratchpad); six parts of short
+  numbered steps, each ending in a **Check** line; a worked example done together (the screen LUNI opens on: IM-2
+  Athena, GO, Sun 2.45 deg, Earth 11.19 deg, read from the app); and a three-column worksheet whose first column is
+  that example filled in. `tools/build_about.py` rewrites the picture's path for the project page.
 - **r12 released** on the user's "Release it" (Sun 15 Nov, about 9:00 PM New York = 02:00 UTC Mon). **r12 is the
   public version.** The full set ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes, the
   feedback popup at two widths. It carries everything in the notes below that says "on `main` only" or "not

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+  <title id="t">What a lander needs from the sky</title>
+  <desc id="d">Two sketches of a lander on the Moon. On the left, the Sun shines on its solar panel for power and the Earth is in view for its radio link, so the plan is a GO. On the right, a hill hides the Earth, the radio link is lost, and the plan is a NO-GO.</desc>
+  <rect width="1200" height="520" fill="#05080f"/>
+
+  <!-- left: GO -->
+  <rect x="20" y="20" width="570" height="430" fill="#070d1a" stroke="#21e07a" stroke-width="4"/>
+  <text x="44" y="70" font-size="40" font-weight="700" fill="#21e07a">GO</text>
+  <text x="130" y="68" font-size="22" fill="#d5e3f7">The lander can see both.</text>
+  <path d="M20 380 Q140 350 260 372 T470 368 T590 376 V450 H20 Z" fill="#6b6f78"/>
+  <circle cx="92" cy="318" r="30" fill="#ffd166"/>
+  <g stroke="#ffd166" stroke-width="4"><path d="M92 272v-18M92 364v18M46 318h-18M138 318h18M60 286l-13-13M124 286l13-13M60 350l-13 13M124 350l13 13"/></g>
+  <circle cx="520" cy="300" r="26" fill="#2f7fe0"/><path d="M506 290q10-12 22-4q8 8-2 16q-12 8-20-12z" fill="#35d6c4"/>
+  <!-- lander -->
+  <g>
+    <rect x="278" y="318" width="64" height="38" fill="#d5e3f7"/>
+    <path d="M286 356l-16 22M334 356l16 22M310 356v22" stroke="#d5e3f7" stroke-width="5"/>
+    <rect x="232" y="296" width="52" height="30" fill="#1263f2" stroke="#fff" stroke-width="2" transform="rotate(-20 258 311)"/>
+    <path d="M342 322l22-18" stroke="#d5e3f7" stroke-width="4"/><path d="M356 292q18 2 18 22z" fill="#d5e3f7"/>
+  </g>
+  <path d="M124 318L236 312" stroke="#ffd166" stroke-width="5"/>
+  <path d="M374 302L492 300" stroke="#35d6c4" stroke-width="5" stroke-dasharray="12 9"/>
+  <text x="44" y="170" font-size="24" font-weight="700" fill="#ffd166">SUN</text>
+  <text x="44" y="196" font-size="20" fill="#ffd166">light on the solar panel</text>
+  <text x="44" y="220" font-size="20" font-weight="700" fill="#ffd166">= POWER</text>
+  <text x="566" y="208" font-size="24" font-weight="700" fill="#35d6c4" text-anchor="end">EARTH</text>
+  <text x="566" y="234" font-size="20" fill="#35d6c4" text-anchor="end">a clear line for the radio</text>
+  <text x="566" y="258" font-size="20" font-weight="700" fill="#35d6c4" text-anchor="end">= TALKING TO HOME</text>
+  <text x="305" y="424" font-size="20" fill="#05080f" text-anchor="middle" font-weight="700">LANDER</text>
+
+  <!-- right: NO-GO -->
+  <rect x="610" y="20" width="570" height="430" fill="#070d1a" stroke="#ff5252" stroke-width="4"/>
+  <text x="634" y="70" font-size="40" font-weight="700" fill="#ff5252">NO-GO</text>
+  <text x="790" y="68" font-size="22" fill="#d5e3f7">A hill hides the Earth.</text>
+  <path d="M610 380 Q730 350 850 372 T1010 366 Q1060 250 1110 300 T1180 330 V450 H610 Z" fill="#6b6f78"/>
+  <circle cx="682" cy="318" r="30" fill="#ffd166"/>
+  <g stroke="#ffd166" stroke-width="4"><path d="M682 272v-18M682 364v18M636 318h-18M728 318h18M650 286l-13-13M714 286l13-13M650 350l-13 13M714 350l13 13"/></g>
+  <circle cx="1140" cy="352" r="26" fill="#2f7fe0" opacity=".35"/>
+  <g>
+    <rect x="868" y="318" width="64" height="38" fill="#d5e3f7"/>
+    <path d="M876 356l-16 22M924 356l16 22M900 356v22" stroke="#d5e3f7" stroke-width="5"/>
+    <rect x="822" y="296" width="52" height="30" fill="#1263f2" stroke="#fff" stroke-width="2" transform="rotate(-20 848 311)"/>
+    <path d="M932 322l22-18" stroke="#d5e3f7" stroke-width="4"/><path d="M946 292q18 2 18 22z" fill="#d5e3f7"/>
+  </g>
+  <path d="M714 318L826 312" stroke="#ffd166" stroke-width="5"/>
+  <path d="M964 304L1034 318" stroke="#35d6c4" stroke-width="5" stroke-dasharray="12 9"/>
+  <path d="M1026 300l26 34M1052 300l-26 34" stroke="#ff5252" stroke-width="7"/>
+  <text x="634" y="170" font-size="24" font-weight="700" fill="#ffd166">SUN</text>
+  <text x="634" y="196" font-size="20" fill="#ffd166">still shining</text>
+  <text x="634" y="220" font-size="20" font-weight="700" fill="#ffd166">= POWER</text>
+  <text x="1156" y="168" font-size="24" font-weight="700" fill="#ff5252" text-anchor="end">EARTH BEHIND THE HILL</text>
+  <text x="1156" y="194" font-size="20" fill="#ff8a8a" text-anchor="end">the radio line is blocked</text>
+  <text x="1156" y="218" font-size="20" font-weight="700" fill="#ff5252" text-anchor="end">= NO LINK</text>
+  <text x="895" y="424" font-size="20" fill="#05080f" text-anchor="middle" font-weight="700">LANDER</text>
+
+  <text x="600" y="492" font-size="20" fill="#8ea6cc" text-anchor="middle">A sketch to explain the idea. Not to scale, and not a picture of a real lander.</text>
+</svg>

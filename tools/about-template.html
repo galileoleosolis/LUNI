@@ -91,6 +91,7 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
 .paper th { color: var(--blue); } .paper th, .paper td { border: 1px solid #c5cfdd; height: 44px; } .paper td:first-child { color: #0a1630; white-space: normal; }
 .paper table { background: #fff; min-width: 560px; }
 .paper code { font-family: var(--mono); font-size: .92em; }
+.paper p:has(> img) { max-width: none; } .paper img { width: 100%; border: 1px solid #c5cfdd; }
 
 /* the timeline */
 .viewer { background: var(--panel); border: 1px solid var(--line); padding: clamp(14px, 3vw, 26px); display: flex; flex-direction: column; gap: 16px; }

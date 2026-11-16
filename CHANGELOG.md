@@ -1,6 +1,6 @@
 # LUNI change log
 
-Times are New York time. **Public version: r12.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r13.** The test build (`/next/`) is the same until new work is added.
 
 ## r12: What four first-time testers told us
 Sun 15 Nov · 9:00 PM

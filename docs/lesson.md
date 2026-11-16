@@ -18,72 +18,184 @@ find out why, and fix the plan.
 Connects to NGSS MS-ESS1-1 (a model of the Earth, Sun and Moon system) and MS-ETS1-2 (judging competing solutions
 against criteria and constraints).
 
+## Start here: the one idea students need first
+
+Do not open the tool yet. Students need this before anything on screen makes sense.
+
+**A lander on the Moon needs two things from the sky.**
+
+1. **The Sun, for power.** Sunlight on its solar panel makes the electricity that keeps it alive.
+2. **The Earth, for talking to home.** Its radio only works in a straight, clear line to Earth.
+
+If a hill hides either one, the lander is in trouble. That is all LUNI checks: can this spot see the Sun and the
+Earth, for long enough?
+
+![Two sketches: on the left the lander sees the Sun and the Earth, a GO; on the right a hill hides the Earth, a NO-GO](figures/lesson-sun-earth-lander.svg)
+
+Ask before moving on: *What is the Sun for? What is the Earth for? What could get in the way?* Every student should
+be able to answer all three.
+
+## Words to know
+
+Put these five on the board before you start.
+
+| Word | What it means here |
+|---|---|
+| **Skyline** | The edge of the ground against the sky, all the way round. Hills on it can hide the Sun or the Earth. |
+| **GO / NO-GO** | LUNI's answer. GO: the plan meets the mission's needs. NO-GO: it does not, and LUNI says why. |
+| **Earth link** | A straight, clear line to Earth, so the lander's radio can reach home. |
+| **Landing window** | A stretch of time when landing here would be a GO. |
+| **UTC** | World time, the same everywhere on Earth. Space missions use it so nobody mixes up time zones. |
+
+## Watch first (optional, about 5 minutes)
+
+Two short NASA videos show the idea before students touch the tool.
+
+- [Shadows near the Moon's South Pole](https://science.nasa.gov/resource/shadows-near-the-moons-south-pole/) (NASA
+  Science): the Sun stays within about 1.5° of the horizon, so mountains throw very long shadows.
+- [From Apollo Sites to the South Pole](https://science.nasa.gov/resource/from-apollo-sites-to-the-south-pole/) (NASA
+  Science): a year of changing light, from the Apollo sites down to Shackleton crater.
+
+## The screen in nine numbers
+
+Show this picture, or point at the same places on the projector. Students only need 1 to 4 for the first mission.
+
+![The LUNI screen with nine numbered frames](figures/lesson-screen-guide.jpg)
+
+| # | Where | What it is for |
+|---|---|---|
+| 1 | Left, top | **Where.** Pick a landing site from the list. |
+| 2 | Left, middle | **When.** Set the landing day, month, year and hour. |
+| 3 | Left, bottom | **Mission needs.** How long the mission lasts, and what it must have. |
+| 4 | Middle, top | **The answer.** GO or NO-GO, with the reason. |
+| 5 | Under the answer | The **Sun** (power) and the **Earth** (radio link) at this moment. |
+| 6 | Middle | **View from the site.** The skyline, with the Sun and the Earth on it. |
+| 7 | Under the view | **The days after landing.** Green shows when there is Sun; drag the slider to move through time. |
+| 8 | Bottom | **Shortcut keys.** NEXT LANDING WINDOW and BEST SITE FINDER fix a NO-GO. ASK LUNI answers a typed question. |
+| 9 | Very top | **Other screens**, and the ? TUTORIAL button. |
+
+If the left side (1, 2, 3) is folded away, press the blue **SHOW SITE · TIME · NEEDS** tab on the left edge.
+
 ## Before class (5 minutes for the teacher)
 
-Open the link, press **? TUTORIAL** in the top row and click through it once. Press **FULL SCREEN** for a projector.
-Everything on screen is computed from NASA data; the **PROOF** button shows the checks if a student asks "how do you know?"
+1. Open the link and press **FULL SCREEN** (top right).
+2. Press **? TUTORIAL** and click through it once.
+3. Print one worksheet per pair (it is at the end of this page).
+
+Everything on screen is computed from NASA data. If a student asks "how do you know?", press **PROOF**.
 
 ## The lesson
 
-### 1. Hook: a real landing that went wrong (5 minutes)
+Each part is a few short steps. A **Check** line says what every screen should show before you move on.
 
-Open **MISSION HISTORY** (top row). Pick **IM-2 Athena**, 6 March 2025, and read its story aloud: it reached the
-south pole region, came to rest on its side inside a crater, could not recharge, and the mission ended the next day.
+### Part 1. Hook: a real landing that went wrong (5 minutes)
 
-Ask: *What does a lander need from the sky to stay alive?* Collect answers. Steer to: sunlight and a link to Earth.
+1. Press **MISSION HISTORY** at the top (number 9 in the picture).
+2. Click **IM-2 ATHENA**, 6 March 2025.
+3. Read its story aloud: it reached the south pole region, came to rest on its side inside a crater, could not
+   recharge, and the mission ended the next day.
+4. Ask: *What does a lander need from the sky to stay alive?* Write the answers on the board.
+5. Show the sketch from "Start here" and say the one idea aloud: the Sun is for power, the Earth is for talking to
+   home.
 
-### 2. Guided tour (10 minutes)
+**Check:** the board says **sunlight** (power) and **Earth** (radio link), and three different students can each
+say one of them back to you.
 
-Students press **? TUTORIAL** and work through the cards in pairs. Each card dims everything except one part of the
-screen, says what it is and why it matters, and gives a short task to try on the real controls.
+### Part 2. Guided tour (10 minutes)
 
-### 3. Mission one: fix a NO-GO (10 minutes)
+1. Students press **MAIN SCREEN**, then **? TUTORIAL**.
+2. In pairs they work through the cards. Each card dims everything except one part and gives a short task to try.
+3. Walk the room. Students who finish early go back to the card about the verdict and try its steps again.
 
-Give every pair the same plan:
+**Check:** every pair can point to the big GO or NO-GO word (number 4) and say what it means.
+
+### Part 3. Worked example, together (5 minutes)
+
+Do this one on the projector while students follow on the worksheet's first column.
+
+1. Reload the page. LUNI opens on a real landing: **IM-2 Athena, 06 MAR 2025 17:00 UTC**.
+2. Read number 4 aloud: **GO**. Sunlight lasts 3 days 3 hours longer than needed. Earth is in view 100% of the mission.
+3. Read number 5: the Sun is **2.45°** above level. The Earth is **11.19°** above level.
+4. Look at number 6 and find both on the skyline. Ask: *which one is closer to being hidden by a hill?* (The Sun.)
+
+**Check:** students have copied the example column of the worksheet. They now know where every answer comes from.
+
+### Part 4. Mission one: fix a NO-GO (10 minutes)
+
+Write the plan on the board:
 
 > **Site:** Nobile Rim 1 (number 01 in the list). **Landing:** 14 NOV 2026, 20:00 UTC. **Mission length:** 10 days.
 
-To set it: open the left side with the blue **SHOW SITE · TIME · NEEDS** tab, click the site, then set the date.
+1. At number 1, click **01 NOBILE RIM 1**.
+2. At number 2, set the day to **14**, the month to **NOV**, the year to **2026**, the hour to **20:00 UTC**.
+3. At number 3, set the mission length to **10**.
+4. Read number 4. Fill in the verdict and the reason on the worksheet.
+5. Look at number 6. Find the Sun. Find where the Earth is hiding.
+6. **Stop and predict.** Before pressing anything, each pair writes on the worksheet: *which of the two things is
+   missing, the Sun or the Earth, and what would have to change?*
+7. Press **NEXT LANDING WINDOW** (number 8). Fill in what changed.
+8. Each pair writes one sentence: *the plan became a GO because ...*
 
-Students answer on the worksheet:
+**Check:** every screen went from a red **NO-GO** to a green **GO**, the date moved by one day, and every pair has
+written why. A GO with no reason written down does not count.
 
-- What is the verdict? What reason does LUNI give?
-- Look at the picture called **VIEW FROM THE SITE**. Where is the Sun? Where is the Earth?
-- Press **NEXT LANDING WINDOW**. What changed? How long did the mission have to wait?
-
-### 4. Mission two: your own landing (15 minutes)
+### Part 5. Mission two: your own landing (10 minutes)
 
 Each pair plans its own mission and must end on a **GO**.
 
-1. Choose any site from the list, or click any spot on the Moon.
+1. Choose any site from the list.
 2. Choose a landing date in 2027.
-3. If it is a NO-GO, fix it by changing **one thing at a time**: the date (**NEXT LANDING WINDOW**), the place
-   (**BEST SITE FINDER**, then **MOVE MY SITE TO THE BEST SPOT**), or one mission need.
-4. Press **COPY LINK** and paste the link into the class document. The link reopens the exact plan.
+3. If it is a NO-GO, change **one thing at a time**: the date (**NEXT LANDING WINDOW**), or the place (**BEST SITE
+   FINDER**, then **MOVE MY SITE TO THE BEST SPOT**), or one mission need.
+4. Fill in the last column of the worksheet, including **why the change worked**.
+5. Press **COPY LINK** and paste the link into the class document. The link reopens the exact plan.
+
+**Check:** every pair has a GO on screen and can say which one thing they changed and why it worked. Clicking until
+the word turns green is not the goal; explaining it is.
+
+### If a pair is stuck
+
+Work down this list. Stop at the first step that gets them moving.
+
+1. **Point to number 4 and read it aloud.** Is it GO or NO-GO? What reason does it give?
+2. **Ask which one is missing.** Look at number 5: a red mark on the icon means that one is not available. Is it
+   the Sun (power) or the Earth (radio link)?
+3. **Go back to the sketch** in "Start here". Which picture is their screen like?
+4. **Let LUNI say it.** Press **ASK LUNI** and type *what do I do next*. It names the button to press.
+5. **Pair them** with a pair that has finished, with one rule: the helpers may point, but may not click.
 
 Fast finishers: open **MOON MAP**, pick the **NEVER SUNLIT** layer and find Haworth crater near the south pole. Then
 pick **WATER ICE**. Why would a mission want to land near a place where it can never get power?
 
-### 5. Share out (5 minutes)
+### Part 6. Share out (5 minutes)
 
-Two or three pairs open their link on the projector and say what they changed to get a GO. Close with the question:
-*Which was easier to change, the date or the place? What would that cost a real mission?*
+1. Two or three pairs open their link on the projector.
+2. Each says what they changed to get a GO.
+3. Close with: *Which was easier to change, the date or the place? What would that cost a real mission?*
 
 ## Student worksheet
 
-| | Mission one (given plan) | Mission two (your plan) |
-|---|---|---|
-| Site | Nobile Rim 1 | |
-| Landing date and time (UTC) | 14 NOV 2026 20:00 | |
-| Verdict | | |
-| LUNI's reason | | |
-| Sun: in view? How high? | | |
-| Earth: in view? How high? | | |
-| What I changed | | |
-| Verdict after the change | | |
+The first column is the worked example from Part 3, already filled in. Use it as the model for the other two.
 
-Three sentences to finish: *The Moon's south pole is hard to land on because ... A lander needs the Sun for ... and
-the Earth for ... I fixed my plan by ...*
+| | Example (done together) | Mission one | Mission two (your plan) |
+|---|---|---|---|
+| Site | IM-2 Athena · Mons Mouton | Nobile Rim 1 | |
+| Landing date and time (UTC) | 06 MAR 2025 17:00 | 14 NOV 2026 20:00 | |
+| Mission length | 10 days | 10 days | |
+| Verdict (number 4) | GO | | |
+| LUNI's reason | Sunlight lasts 3 days 3 hours longer than needed; Earth in view 100% | | |
+| Sun: in view? How high? (number 5) | Yes, 2.45° | | |
+| Earth: in view? How high? (number 5) | Yes, 11.19° | | |
+| Which is missing: Sun or Earth? | Neither | | |
+| What I changed | Nothing: it was already a GO | | |
+| Verdict after the change | GO | | |
+| Why that worked | The Sun and the Earth were both above the skyline for the whole mission | | |
+
+Three sentences to finish:
+
+- The Moon's south pole is hard to land on because ...
+- A lander needs the Sun for ... and the Earth for ...
+- I fixed my plan by ...
 
 ## Teacher key
 
@@ -110,11 +222,15 @@ the Earth for ... I fixed my plan by ...*
   battery lasts the mission.
 - **History:** in **MISSION HISTORY**, load Blue Ghost Mission 1 (2 March 2025). It worked through a total eclipse of
   the Sun by the Earth on 14 March 2025. Find the eclipse warning on the main screen.
-- **Ask it:** press **ASK LUNI** and type a question, such as "how is this different from Earth".
+- **Ask it:** press **ASK LUNI** and type a question, such as "what do I do next" or "how is this different from Earth".
 
 ## Tell us how it went
 
 This lesson has not been run in a classroom yet. If you read it or tried it, two minutes of feedback helps the
 next version: <https://forms.gle/jLzqGs1anesdDzPj8>
+
+Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the one idea students need before they start,
+with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
+example on the worksheet; a list for pairs who are stuck; and students must write why their plan became a GO.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.
