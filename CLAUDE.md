@@ -452,7 +452,9 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
 - **After the submission** (the user, Sun 15 Nov about 11:05 PM New York: "lets actually just start now on the
   pre-release. is there anything against updating it or does it have to stay static until judging is over").
-  Claude could NOT confirm the 2026 rule: spaceappschallenge.org is refused from this session and a web search found
+  Claude could NOT confirm the 2026 rule: spaceappschallenge.org is on the allowed list, but this session cannot verify
+  the certificate the site sends (issued to www.space.apps.nasa.gov, a chain this machine does not trust), so no page
+  loads; do not switch the check off, ask the user to paste the text instead. A web search found
   no rule on changing a linked site after the deadline (older guides only say that the final submission is what is
   judged). Advice given: **keep the public site (the root, r17) frozen until global judging is over**, and do new
   work on `main` and the test build (`/LUNI/next/`), which the submission does not link to. The user was asked to
