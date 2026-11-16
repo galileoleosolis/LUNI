@@ -77,6 +77,25 @@ The rest of this page is in the order you will use it in class.
 Connects to NGSS MS-ESS1-1 (a model of the Earth, Sun and Moon system) and MS-ETS1-2 (judging competing solutions
 against criteria and constraints).
 
+## What this lesson assumes students already know
+
+Very little. Students should know that the Moon goes around the Earth and that the Sun is where light comes from.
+They do **not** need to know anything about Moon missions. The lesson works by itself, and it also fits inside a
+longer unit on space exploration.
+
+If a student asks one of these four things, here is a short answer you can give:
+
+| If a student asks | A short answer |
+|---|---|
+| What is a lander? | A robot spacecraft that sets down on the Moon and stays in one spot. It stands on legs and carries solar panels for power and a radio antenna. The landers in this lesson have no people on board. |
+| How does it get to the Moon? | A rocket launches it from Earth. It flies to the Moon, then fires its own engine to slow down and touch the ground gently. |
+| Does it ever leave? | Most never do. They work until the power runs out or the long, cold lunar night begins (a day on the Moon lasts about 14 Earth days, and so does a night), and they stay there for good. One in LUNI's MISSION HISTORY is different: part of Chang'e 6 lifted off again about two days after landing, carrying samples of Moon rock. |
+| What is its mission? | To carry science instruments, use them, and send what they find back to Earth by radio. That is why it needs the Sun (power for the instruments) and the Earth (somewhere to send the results). |
+
+To show what really happened to six real landers, open **MISSION HISTORY** in LUNI: each one has a short, sourced
+account. The sketch below is only a sketch. For photos of real landers, search NASA's picture library at
+<https://images.nasa.gov> for "lunar lander".
+
 ## Start here: the one idea students need first
 
 Do not open the tool yet. Students need this before anything on screen makes sense.
@@ -335,6 +354,6 @@ Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the 
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
 example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
 sample answers for every question, so a teacher does not need to know the subject beforehand; and everything the
-teacher does before class moved to the top as a checklist, with a note for teachers who do not teach science; and a short optional reflection for students.
+teacher does before class moved to the top as a checklist, with a note for teachers who do not teach science; a short optional reflection for students; and a section on what students need to know beforehand, with short answers to four questions about landers.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.
