@@ -1,10 +1,18 @@
 # LUNI change log
 
-Times are New York time. **Public version: r15.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r16.** The test build (`/next/`) is the same until new work is added.
+
+## r16: The slides on the web, and a new front page for the project
+Sun 15 Nov · 10:40 PM
+**This is the public version.** The app itself is the same as r12.
+
+- The seven slides are a web page (`/slides/`), so the recordings of the app play in any browser, with no download and no sign-in.
+- The project page now starts with the slides and the version-by-version timeline; a SLIDES button stays in the top row.
+- The lesson has a short optional student reflection, with a note for the teacher.
+- A fifth first-time tester: four of the five scored 6 of 6.
 
 ## r15: A note to teachers, and a teacher's words
-Sun 15 Nov · 10:05 PM
-**This is the public version.** The app itself is the same as r12.
+Sun 15 Nov · 10:05 PM · the app itself is the same as r12.
 
 - The lesson opens with YOU DO NOT HAVE TO BE A SCIENCE TEACHER: you are allowed not to know, a NO-GO is not a wrong answer, try it wrong on purpose, let them see you be curious.
 - A teacher who reviewed the lesson: "It's really incredible, can't wait to see where this goes."

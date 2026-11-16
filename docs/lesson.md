@@ -62,6 +62,7 @@ work, working out why, and trying again. That is worth teaching in every subject
 | 4. Mission one: fix a NO-GO | 10 | Pairs, step by step |
 | 5. Mission two: your own landing | 10 | Pairs, on their own |
 | 6. Share out | 5 | Whole class |
+| Optional: student reflection | 3 | Each student alone, as an exit ticket or as homework |
 
 The rest of this page is in the order you will use it in class.
 
@@ -258,6 +259,15 @@ Three sentences to finish:
 - A lander needs the Sun for ... and the Earth for ...
 - I fixed my plan by ...
 
+### Student reflection (optional, 3 minutes)
+
+Each student answers alone. There are no wrong answers here.
+
+1. One thing I got wrong at first, and what I tried next: ...
+2. One thing that surprised me: ...
+3. One question I still have about the Moon, or about landing there: ...
+4. Could I explain GO and NO-GO to a friend? Circle one: **Not yet** · **Almost** · **Yes**
+
 ## Teacher key
 
 ### Sample answers to every question in the lesson
@@ -299,6 +309,13 @@ Sample endings for the three worksheet sentences:
   ground comes from the laser altimeter on NASA's Lunar Reconnaissance Orbiter. GO and NO-GO are LUNI's own rule,
   applied to the mission needs the student sets; it is a planning tool for learning, not flight software.
 
+### The student reflection
+
+It is optional and it is not graded. Question 1 is the one that matters most: a student who writes what went wrong
+and what they tried next has done what the lesson is for. Question 3 gives you questions to open the next class
+with, and you do not need to know the answers: "let's find out" is a fine reply. Question 4 tells you at a glance
+who needs the one idea from START HERE again.
+
 ## Going further
 
 - **Math:** the Earth looks about 3.6 times wider than the Sun from the Moon. Have students find both in VIEW FROM
@@ -318,6 +335,6 @@ Version 3 (15 Nov 2026), reworked after feedback from teachers who read it: the 
 with a labeled sketch; smaller steps with a check after each part; a numbered picture of the screen; a filled-in
 example on the worksheet; a list for pairs who are stuck; students must write why their plan became a GO; and
 sample answers for every question, so a teacher does not need to know the subject beforehand; and everything the
-teacher does before class moved to the top as a checklist, with a note for teachers who do not teach science.
+teacher does before class moved to the top as a checklist, with a note for teachers who do not teach science; and a short optional reflection for students.
 
 Made by team Mystic Research for the NASA Space Apps Challenge 2026. Free to use and adapt in any classroom.
