@@ -450,6 +450,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Teacher quote** (pasted by the user about 10 PM New York, from the teacher who gave most of the lesson feedback):
+  "It's really incredible, can't wait to see where this goes". Used WITHOUT her name on slide 7 (deck Version 34,
+  in the TEACHERS AND STUDENTS point; the slide's lesson address is now galileoleosolis.github.io/LUNI/about) and at
+  the top of the lesson section of the project page (`figure.quote`). Claude assumed she is fine with an unnamed
+  quote and told the user so; remove it if she is not. Project page change is **on `main` only until the next release.**
 - **Tester wording, the user's decision** (about 10 PM New York: "We don't mention about the bad things the testers
   said"). Public text (slide 7, deck Version 32; the project page; `CHANGELOG.md`) now says only: four first-timers
   (three friends, one parent), **three of the four scored 6 of 6**, and their reports were built in the same
