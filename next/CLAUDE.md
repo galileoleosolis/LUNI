@@ -450,6 +450,38 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Slides as a web page** (the user, Sun 15 Nov about 10:25 PM New York: in the PowerPoint's web view "the gifs
+  dont work ... make that work or host it somewhere else"). `slides/index.html` + `slides/img/` (8.8 MB): the same
+  seven slides, one at a time, scaled to the window; NEXT / BACK, arrow keys, click, swipe, FULL SCREEN, `#4` opens
+  slide 4; links to the app and the project page; the speaker's script is left out. BUILT, not hand-edited:
+  `python3 tools/build_slides.py <deck folder> <picture folder>` from a copy of the Claude Slides deck's files (in
+  this session: `scratchpad/artifact-files/bc875da5-.../` and `scratchpad/deck/img`); rebuild after changing the
+  deck. Checked at 1440 x 900, 1280 x 631 and 390 x 844: every picture loads, the recordings move, no page errors.
+  **On the test build (`/LUNI/next/slides/`); the address for the submission, `/LUNI/slides/`, exists only after the
+  next release.**
+- **Student reflection** (same teacher, about 10:25 PM New York: "a brief optional student reflection"). In
+  `docs/lesson.md`: STUDENT REFLECTION (OPTIONAL, 3 MINUTES) after the worksheet (four prompts: what I got wrong and
+  tried next, a surprise, a question I still have, could I explain GO and NO-GO), a row in the timing table, and a
+  note in the TEACHER KEY (not graded). **On `main` only until the next release.**
+- **Fifth first-time tester** (report sent Sun 15 Nov about 10:15 PM New York; public r15 test with the five-card
+  tour, all read; do not put the tester's name in the repository). Window 1280 x 631 (scale 0.72, the smallest
+  screen so far): **6/6, 10:11, ease 5/5**, 72 clicks. "Honestly, nothing" was confusing. Task 3 took 6:02 and 50
+  clicks: they looked for Nobile Rim 1 in MISSION HISTORY, on the Moon map and by voice before finding the site list
+  (the first-timer on 15 Nov did the same; in SIMPLE VIEW the site list starts folded away, which the user chose to
+  keep). Their voice command was heard as "where is the landing site Noble Room 1" and NOT UNDERSTOOD: "noble rim" is
+  understood, "room" for "rim" is not (offered to the user, not built). They then used NEXT LANDING WINDOW and the
+  finder. Claude ASSUMED the tester had never seen LUNI and is a friend or family member; the user was asked to confirm.
+  **Totals now: five first-timers, four of the five scored 6 of 6; ease 3, 4, 3, 5, 5.** Public wording: "five
+  people who had never seen it, friends and family: four of the five scored 6 of 6". Deck slide 7 says so (Version
+  36); the project page says so **on `main` only until the next release** (public r15 still says four).
+- **Deck remade for r15** (Sun 15 Nov, about 10:20 PM New York; deck Version 35, still seven slides). New pictures
+  and GIFs recorded from the r12 / r15 app (the verdict line, the ABOUT link, the finder hint). Cover: "Tested by
+  first-time users, ready for a classroom." Slide 3 names the line under the verdict; slide 5 ends with "Tutorial,
+  classroom lesson, ASK LUNI by voice"; slide 6 says the listed landing sites were checked against their sources.
+  **Slide 7 is now TESTED, AND READY TO TEACH**: the lesson's Sun / Earth / lander sketch, four first-time testers
+  (three of the four scored 6 of 6), the lesson reviewed by teachers, the teacher's quote without her name, then who
+  it is for, use of AI and the QR code. The old slide 7 title was WHO IT IS FOR. The speaker notes carry the new
+  3-minute script. **It reaches the judges only if the user downloads it and swaps it into the submission.**
 - **r15 released** on the user's "Release it, and remake the slides with all the new info" (Sun 15 Nov, about
   10:05 PM New York = 03:05 UTC Mon). **r15 is the public version.** Lesson and project page only (the note to
   teachers, the teacher's quote, the tester paragraph in positive wording); the app's files are unchanged since r12.
