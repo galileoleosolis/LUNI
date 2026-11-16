@@ -450,6 +450,14 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Deck remade for r15** (Sun 15 Nov, about 10:20 PM New York; deck Version 35, still seven slides). New pictures
+  and GIFs recorded from the r12 / r15 app (the verdict line, the ABOUT link, the finder hint). Cover: "Tested by
+  first-time users, ready for a classroom." Slide 3 names the line under the verdict; slide 5 ends with "Tutorial,
+  classroom lesson, ASK LUNI by voice"; slide 6 says the listed landing sites were checked against their sources.
+  **Slide 7 is now TESTED, AND READY TO TEACH**: the lesson's Sun / Earth / lander sketch, four first-time testers
+  (three of the four scored 6 of 6), the lesson reviewed by teachers, the teacher's quote without her name, then who
+  it is for, use of AI and the QR code. The old slide 7 title was WHO IT IS FOR. The speaker notes carry the new
+  3-minute script. **It reaches the judges only if the user downloads it and swaps it into the submission.**
 - **r15 released** on the user's "Release it, and remake the slides with all the new info" (Sun 15 Nov, about
   10:05 PM New York = 03:05 UTC Mon). **r15 is the public version.** Lesson and project page only (the note to
   teachers, the teacher's quote, the tester paragraph in positive wording); the app's files are unchanged since r12.
