@@ -450,6 +450,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Third first-time tester, a family member** (report sent Sun 15 Nov about 8:45 PM New York; ran the public r11
+  test, so without the task-bar fixes; count him as a first-timer, NOT as outside the team). Window 2321 x 1309
+  (scale 1.14): **6/6, 13:03, ease 5/5**, 57 clicks. Like the second tester he explored for four minutes before
+  starting task 1 (5:22), then did every task properly; used NEXT LANDING WINDOW twice and the site list 9 times;
+  never used ASK LUNI. Most confusing: "the amount of data and options and the initial lack of familiarity". Liked
+  "the layout that numbers the steps". Wants the areas to select highlighted step by step (colored background,
+  border or animated border): offered to the user, not built.
+  Across the three first-timers ease followed screen size: 5/5 at scale 1.14, 4/5 at 0.81, 3/5 at 0.76.
+  Slide 7 (deck Version 29) and the project page text give all three results together.
 - **What stopped the second outside tester** (his full log arrived about 8:20 PM New York): he never noticed the task
   bar. He explored for five minutes (ENERGY options, the finder 44 clicks, solar panels), then asked ASK LUNI by
   VOICE "What do I do next?" and typed "what do i press next": both NOT UNDERSTOOD. He opened MISSION HISTORY once,
