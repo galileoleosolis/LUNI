@@ -441,6 +441,15 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
     in `.scan-cell` when that panel was 250 px wide (Claude had wrongly told the user it removed them by accident).
   - Refused by the user: opening the left side by default (item 5). On hold: the phone layout (the answer is about
     two screens down on a phone and the NASA band covers the top row there).
+- **First outside tester** (report sent by the user Sun 15 Nov about 8 PM New York; first time seeing LUNI; do not
+  put the tester's name in the repository). Set E with the new tour (read all 4 cards), window 1536 x 695 (scale
+  0.76, so 12.5 px text is about 9.5 px on that screen): **6/6, 8:06, ease 3/5**, 52 clicks. Used NEXT LANDING WINDOW
+  (the first tester to do so), the date pickers (28 clicks), the Moon map and a click on a finder square. For
+  "Nobile Rim 1" he looked in MISSION HISTORY first, then picked it on the Moon; he never used the site list for it.
+  Most confusing: "a lot of buttons", "Mission History didn't show everything or I couldn't find everything"
+  (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
+  and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
+  and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
 - **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
   plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
   `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
