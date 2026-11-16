@@ -450,6 +450,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r16 released** on the user's "Release it!!!!" (Sun 15 Nov, about 10:40 PM New York = 03:40 UTC Mon). **r16 is the
+  public version.** It carries the web slides (`/LUNI/slides/`, the address for the submission's demo link), the
+  project page's new order with the SLIDES button, the student reflection and the five-testers line. The app's
+  files are unchanged since r12, so the app checks were not rerun. The five notes below that say "on the test
+  build" or "on `main` only" are released. To roll back to r15: `tools/release.sh promote 6874a23`.
 - **Project page, new order** (the user, about 10:30 PM New York: "Make the timeline more front and center ... and
   then make the demo more front and center as well"). `tools/about-template.html`: top of the page, then THE DEMO
   (`#demo`: the first slide as a large picture with a gold SEE THE SLIDES button, both linking to `../slides/`),
