@@ -450,6 +450,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r14 released** on the user's "That's fine, release it" (Sun 15 Nov, about 9:45 PM New York = 02:45 UTC Mon).
+  **r14 is the public version.** Lesson and project page only (answer key, teacher checklist at the top, two colors);
+  no file under `index.html`, `css`, `js`, `data` changed since r12, so the app checks were not rerun. The three
+  lesson notes below that say "on `main` only" are released. To roll back to r13: `tools/release.sh promote c6be158`;
+  to r12: `a50a126`.
 - **Lesson in two colors** (the user, about 9:50 PM New York: "What the teacher needs to do should be in a different
   color text as well"). On the project page only: `tools/build_about.py` wraps the teacher-first section, IF A PAIR IS
   STUCK and the TEACHER KEY in `.teacher` (orange `#a34a06` on `#fff3df`) and marks every **Check:** line `.check`;

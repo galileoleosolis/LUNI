@@ -1,10 +1,18 @@
 # LUNI change log
 
-Times are New York time. **Public version: r13.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r14.** The test build (`/next/`) is the same until new work is added.
+
+## r14: The lesson, for a teacher who has never seen it
+Sun 15 Nov · 9:45 PM
+**This is the public version.** The app itself is the same as r12.
+
+- Everything the teacher does first is at the top, as a checklist: the day before, just before class, and what to do if the technology fails.
+- A table of the six parts with the minutes for each.
+- Sample answers for every question the lesson asks, so a teacher does not need to know the subject.
+- On the project page the teacher's parts are orange and the class's parts are blue.
 
 ## r13: The classroom lesson, reworked with teachers
-Sun 15 Nov · 9:25 PM  
-**This is the public version.** The app itself is the same as r12.
+Sun 15 Nov · 9:25 PM · the app itself is the same as r12.
 
 - Three pieces of feedback from teachers who read the lesson; each said students need the background first.
 - START HERE: the one idea (the Sun is for power, the Earth is for talking to home) with a labeled sketch.
