@@ -40,6 +40,16 @@ section { padding: 72px 0; border-top: 1px solid var(--line); }
   background: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, #6fd0ff, #1263f2);
   box-shadow: 0 4px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.8); text-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .btn:hover { filter: brightness(1.1); } .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #05070c; }
+.btn.gold { color: #1a1200; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 52%), linear-gradient(180deg, #ffe08a, #f2a900); }
+.demo { background: #0b1428; }
+.demo-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 44px; align-items: center; }
+.demo-shot { position: relative; display: block; border: 2px solid var(--gold); box-shadow: 0 0 90px rgba(65, 182, 255, .28); line-height: 0; }
+.demo-shot img { width: 100%; height: auto; display: block; }
+.demo-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 14px; white-space: nowrap;
+  font: 700 clamp(18px, 2.4vw, 28px)/1 var(--disp); letter-spacing: .06em; color: #1a1200; padding: 16px 26px; border-radius: 12px; border: 2px solid #05070c;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 52%), linear-gradient(180deg, #ffe08a, #f2a900); box-shadow: 0 5px 0 #05070c, 0 14px 40px rgba(0, 0, 0, .6); }
+.demo-play i { font-style: normal; }
+.demo-shot:hover .demo-play { filter: brightness(1.08); }
 .btn.quiet { background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); }
 .nav .btn { font-size: 16px; padding: 9px 16px; color: #fff; letter-spacing: .06em; font-family: var(--disp); }
 
@@ -152,20 +162,20 @@ footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--d
 footer p { max-width: 80ch; margin-bottom: 8px; }
 
 @media (max-width: 860px) {
-  .hero-grid, .award-grid, .cols3 { grid-template-columns: 1fr; }
+  .hero-grid, .award-grid, .cols3, .demo-grid { grid-template-columns: 1fr; }
   .nums { grid-template-columns: 1fr 1fr; }
   section { padding: 52px 0; }
   .nav a:not(.btn) { display: none; }
   .vhead i { margin-left: 0; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-@media print { .nav, .hero, #project, .award, #timeline, footer, .fb, .fb-banner { display: none !important; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
+@media print { .nav, .hero, #demo, #project, .award, #timeline, #weekend, footer, .fb, .fb-banner { display: none !important; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
 </style>
 </head>
 <body>
 <nav class="nav"><div class="wrap">
   <b>LUNI</b>
-  <a href="#project">THE PROJECT</a><a href="#award">JUDGING</a><a href="#lesson">LESSON</a><a href="#timeline">TIMELINE</a>
+  <a href="#demo">DEMO</a><a href="#timeline">TIMELINE</a><a href="#project">THE PROJECT</a><a href="#award">JUDGING</a><a href="#lesson">LESSON</a>
   <a class="btn" href="../">OPEN LUNI ▸</a>
 </div></nav>
 
@@ -176,11 +186,41 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
     <div class="bar"></div>
     <p class="full">Lunar Utility for Navigational Intelligence</p>
     <p class="lead">Can this mission land here, at this time? LUNI answers <b class="go">GO</b> or <b class="nogo">NO-GO</b> from NASA data, gives the reason, and offers the way out.</p>
-    <div class="btns"><a class="btn" href="../">OPEN LUNI ▸</a><a class="btn quiet" href="#lesson">THE CLASSROOM LESSON</a></div>
+    <div class="btns"><a class="btn gold" href="../slides/">▶ WATCH THE DEMO</a><a class="btn" href="../">OPEN LUNI ▸</a></div>
+    <div class="btns"><a class="btn quiet" href="#timeline">THE TIMELINE</a><a class="btn quiet" href="#lesson">THE CLASSROOM LESSON</a></div>
     <a class="ribbon" href="#award"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.500l2.900 6.200 6.600.800-4.900 4.600 1.300 6.600L12 17.400 6.100 20.700l1.300-6.600-4.900-4.600 6.600-.800z"/></svg><span>BEST USE OF DATA<br>LOCAL JUDGING · 15 NOV 2026</span></a>
   </div>
   <img class="shot" src="img/hero.jpg" width="1600" height="1000" alt="The LUNI main screen: a GO for Nobile Rim 1 on 15 November 2026, with the Sun and Earth readouts, the view from the site and the 30-day mission plan">
 </div></header>
+
+<section id="demo" class="demo"><div class="wrap demo-grid">
+  <a class="demo-shot" href="../slides/" aria-label="Open the demo: seven slides">
+    <img src="img/demo-cover.jpg" width="1600" height="900" alt="The first slide of the LUNI demo: the name, the team Mystic Research, and the main screen showing a GO">
+    <span class="demo-play"><i>▶</i> WATCH THE DEMO</span>
+  </a>
+  <div class="stack">
+    <p class="label">The demo</p>
+    <h2>SEVEN SLIDES, THREE MINUTES</h2>
+    <p class="lead">The challenge, the answer LUNI gives, what happens when the plan slips, the NASA data behind it, and who tested it.</p>
+    <p class="dim">The recordings on the slides are the real app, and they play in your browser. Nothing to download and no sign-in.</p>
+    <div class="btns"><a class="btn gold" href="../slides/">▶ WATCH THE DEMO</a><a class="btn" href="../">OR TRY LUNI YOURSELF ▸</a></div>
+  </div>
+</div></section>
+
+<section id="timeline"><div class="wrap stack">
+  <p class="label">How it was built</p>
+  <h2>TWO DRAFTS, {{N_RELEASES}} MAIN RELEASES, ONE WEEKEND</h2>
+  <p class="lead">Every picture is the real app at that version. Step through to see what testers’ feedback changed.</p>
+  <div class="viewer" aria-label="Screens, version by version">
+    <div class="vhead"><b id="v-tag"></b><span id="v-name"></span><i id="v-when"></i></div>
+    <img id="v-img" alt="" width="1440" height="900">
+    <div class="ctl"><button id="prev">◀ EARLIER</button><button id="next">LATER ▶</button><button id="play">▶ PLAY THROUGH</button><span class="grow"></span><button id="view-main" class="on">MAIN SCREEN</button><button id="view-finder">BEST SITE FINDER</button></div>
+    <div class="steps" id="steps"></div>
+    <ul id="v-changes"></ul>
+    <p class="cap">Times are New York time. The finder picture exists only for some versions.</p>
+  </div>
+  <p><a class="btn quiet" href="#weekend">THE WHOLE WEEKEND, STEP BY STEP ▾</a></p>
+</div></section>
 
 <section id="project"><div class="wrap stack">
   <p class="label">The project</p>
@@ -253,19 +293,9 @@ footer p { max-width: 80ch; margin-bottom: 8px; }
   <div id="lesson-end"></div>
 </div></section>
 
-<section id="timeline"><div class="wrap stack">
+<section id="weekend"><div class="wrap stack">
   <p class="label">How it was built</p>
-  <h2>TWO DRAFTS, {{N_RELEASES}} MAIN RELEASES, ONE WEEKEND</h2>
-  <p class="lead">Every picture is the real app at that version. Step through to see what testers’ feedback changed.</p>
-  <div class="viewer" aria-label="Screens, version by version">
-    <div class="vhead"><b id="v-tag"></b><span id="v-name"></span><i id="v-when"></i></div>
-    <img id="v-img" alt="" width="1440" height="900">
-    <div class="ctl"><button id="prev">◀ EARLIER</button><button id="next">LATER ▶</button><button id="play">▶ PLAY THROUGH</button><span class="grow"></span><button id="view-main" class="on">MAIN SCREEN</button><button id="view-finder">BEST SITE FINDER</button></div>
-    <div class="steps" id="steps"></div>
-    <ul id="v-changes"></ul>
-    <p class="cap">Times are New York time. The finder picture exists only for some versions.</p>
-  </div>
-  <h3 style="margin-top:30px">THE WEEKEND, IN ORDER</h3>
+  <h2>THE WEEKEND, IN ORDER</h2>
   <ol class="tl">
 {{TIMELINE}}
   </ol>

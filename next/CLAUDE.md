@@ -450,6 +450,14 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Project page, new order** (the user, about 10:30 PM New York: "Make the timeline more front and center ... and
+  then make the demo more front and center as well"). `tools/about-template.html`: top of the page, then THE DEMO
+  (`#demo`: the first slide as a large picture with a gold WATCH THE DEMO button, both linking to `../slides/`),
+  then the version-by-version viewer (`#timeline`), then the project, the award, the lesson, and last THE WEEKEND,
+  IN ORDER as its own section (`#weekend`). The first buttons on the page are WATCH THE DEMO (gold) and OPEN LUNI.
+  `about/img/demo-cover.jpg` is a screenshot of slide 1 of `slides/` (retake it if the cover changes:
+  `pw/front.js cover` in the scratchpad). Claude read "the demo" as the seven slides. **On the test build
+  (`/LUNI/next/about/`) until the next release.**
 - **Slides as a web page** (the user, Sun 15 Nov about 10:25 PM New York: in the PowerPoint's web view "the gifs
   dont work ... make that work or host it somewhere else"). `slides/index.html` + `slides/img/` (8.8 MB): the same
   seven slides, one at a time, scaled to the window; NEXT / BACK, arrow keys, click, swipe, FULL SCREEN, `#4` opens
