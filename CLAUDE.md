@@ -402,7 +402,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
 - **SUBMITTED for global judging** (the user, Sun 15 Nov, mid-afternoon New York: "ok its submitted, we can still edit
   this later"). The Project page was filled from `docs/submission.md`: name "LUNI: Lunar Utility for Navigational
   Intelligence", final project link https://galileoleosolis.github.io/LUNI/, the demo link is the user's own
-  PowerPoint on a public share (a fallback PDF of the old deck is at `docs/LUNI-deck.pdf`; its cover shows the members' names).
+  PowerPoint on a public share (a fallback PDF of the old deck was in `docs/`; deleted in r18 because its cover showed the members' names).
   It can be edited and resubmitted until Sun 11:59 PM New York; only the last saved submission is judged, and it must
   be SUBMITTED again after edits. Rules from the official guide: at most seven slides or the entry is not eligible;
   no likeness of anyone under 18; English; public links with no login.
@@ -454,10 +454,13 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   members is under 18, "let's just remove both"). The Space Apps terms: "Recognizable names, voices, and likenesses
   of persons under the age of 18 should not be included in any submission." Done on `main` (baa0798): the names
   line is gone from the first slide (deck Version 37 and `slides/`), `about/img/demo-cover.jpg` was retaken, and
-  these notes no longer spell them. **NOT YET PUBLIC: the release (`tools/release.sh promote`) was refused by this
-  session's permission check at 11:25 PM New York, so the public slides (r17) still show both names until the user
-  says "release it".** Also still to do, on the user's word: delete `docs/LUNI-deck.pdf`, an old picture-only copy of
-  the deck whose cover shows the names (it is served at `/LUNI/docs/LUNI-deck.pdf`). **Never write a
+  these notes no longer spell them. The first try at releasing was refused by this session's permission check
+  (the user had said to remove the names, not to release); the user then said "Release it too" and **r18 was
+  released at about 11:57 PM New York (04:57 UTC Mon)**. It also deletes `docs/LUNI-deck.pdf`, an old picture-only
+  copy of the deck whose cover showed the names, and it is the first release since r12 that changes an app file:
+  one line in `js/assistant.js` ("noble room" = Nobile Rim 1). Checked before it: `check_assistant` (119) and test
+  set E. To roll back the app only, re-release from a commit that reverts that line; do NOT promote r17 or
+  earlier, which would bring the names back. **Never write a
   member's name, or a tester's, in the app, the slides, the project page, the docs, these notes or a commit
   message.** Older commits still contain them (the repository's history was not rewritten; told to the user). The
   team name, Mystic Research, is fine. The user's own PowerPoint copy and the Space Apps team page are theirs to check.
@@ -467,7 +470,7 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   the certificate the site sends (issued to www.space.apps.nasa.gov, a chain this machine does not trust), so no page
   loads; do not switch the check off, ask the user to paste the text instead. A web search found
   no rule on changing a linked site after the deadline (older guides only say that the final submission is what is
-  judged). Advice given: **keep the public site (the root, r17) frozen until global judging is over**, and do new
+  judged). Advice given: **keep the public site (the root, now r18) frozen until global judging is over**, and do new
   work on `main` and the test build (`/LUNI/next/`), which the submission does not link to. The user was asked to
   read the Judging & Awards Guide or ask their local lead; no answer yet. Until the user says otherwise:
   `tools/release.sh next` is fine, `promote` is not.
