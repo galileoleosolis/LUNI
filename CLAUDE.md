@@ -450,6 +450,18 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Second outside tester** (partial report and a photo of his review, sent by the user Sun 15 Nov about 8:15 PM New
+  York; the event log was cut off, so what stopped him is not known). Set E with the tour read, window 1432 x 734:
+  **1/6, 1 skipped, 6:03**. Task 1 took 5:28 and 86 clicks and he never got Blue Ghost 1 loaded from MISSION HISTORY
+  (ended on a custom point, 3-day mission); he then answered or skipped the rest in seconds. His review: ease 4/5,
+  "There is a lot of clutter", liked "the graphics and how everything was mapped out", wants "a button that
+  indicates what to press next or the ai assistant would answer the question what do I do next".
+  Built from it, on `main` only: ASK LUNI answers "what do I do next" / "what now" / "I am stuck" / "where do I
+  start" (`next` topic, `nextText` in `js/assistant.js`; "what now" used to set the landing time to the present).
+  Also from the first tester, on `main` only: `#scan-hint` under the finder map (GREEN = THE MISSION WORKS THERE ·
+  CLICK ANY SQUARE TO MOVE THERE; the green part shows only on the GO map) and `#hist-to-main` in MISSION HISTORY's
+  footer. **Both results are stated together** on slide 7 (deck Version 28) and in the project page text: never
+  quote the 6 of 6 alone.
 - **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
   plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
   `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
