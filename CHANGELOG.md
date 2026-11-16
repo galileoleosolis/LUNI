@@ -1,10 +1,17 @@
 # LUNI change log
 
-Times are New York time. **Public version: r8.** The test build (`/next/`) is the same as r8 until new work is added.
+Times are New York time. **Public version: r11.** The test build (`/next/`) is the same until new work is added.
+
+## r9 to r11: small releases after the award
+Sun 15 Nov · 7:20 PM to 7:45 PM  
+**r11 is the public version.**
+
+- r9: the project page at `/about/` (the project, the Best Use of Data result, the classroom lesson, the timeline).
+- r10: every listed landing site checked against its source. Five match NASA's LRO camera team; Chang'e 4 was about 420 m off and now uses the LRO camera team's position; each site shows what the check found.
+- r11: the user test opens with a one-minute tour (four cards), and the report says whether it was read.
 
 ## r8: The LUNI Console look
-Sun 15 Nov · 6:33 PM · released after the local judging (Best Use of Data award)  
-**This is the public version.**
+Sun 15 Nov · 6:33 PM · released after the local judging (Best Use of Data award)
 
 - The full name with “for”: Lunar Utility for Navigational Intelligence.
 - The default Earth-link need is now 25% of the mission (was only "at landing"), so a plan with almost no Earth link is no longer a GO.
