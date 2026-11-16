@@ -450,6 +450,12 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **r12 released** on the user's "Release it" (Sun 15 Nov, about 9:00 PM New York = 02:00 UTC Mon). **r12 is the
+  public version.** The full set ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes, the
+  feedback popup at two widths. It carries everything in the notes below that says "on `main` only" or "not
+  published": the ABOUT link, the line under the verdict, the finder bars and hint, the mission history hint, ASK
+  LUNI's "what do I do next", the test's fifth tour card and flashing task bar, the tester results on the project
+  page and the lesson feedback form. To roll back to r11: `tools/release.sh promote fe77f4a`; to r8: `9bbecc4`.
 - **Lesson feedback form** (the user, Sun 15 Nov about 9 PM New York: "Put this in the website as a form a big popup
   for feedback ... It's for lesson plan feedback"): the user's Google Form, https://forms.gle/jLzqGs1anesdDzPj8.
   On the project page (`tools/about-template.html`): a gold banner over the lesson with GIVE FEEDBACK ON THE LESSON
