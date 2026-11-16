@@ -229,4 +229,7 @@ Yes. We used Claude (Anthropic's large language model, through Claude Code) thro
 - IBM Plex Mono and Barlow Condensed fonts (SIL Open Font License), included in the project.
 - OpenSpace (openspaceproject.com), optional link; its openspace-api-js message format.
 - Python, NumPy, SpiceyPy; Node.js; Playwright.
+- Barlow and JetBrains Mono fonts (SIL Open Font License), loaded from Google Fonts by the slides page.
+- Pillow (to assemble the recordings on the slides) and Python-Markdown (to build the project page from the lesson).
+- The classroom lesson links to two NASA Science videos (science.nasa.gov).
 - Claude (Anthropic), through Claude Code: wrote the code (see Use of SI).

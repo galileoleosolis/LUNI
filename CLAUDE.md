@@ -398,11 +398,11 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   `docs/submission.md`, `docs/pitch-3min.md`, ASK LUNI's "who are you" answer and these notes still say "Lunar
   Utility Navigational Intelligence" without "for". Change every readable place at once, check, then it needs a
   "release it". Not started. The deck cover already says it with "for"; its team name was corrected to
-  "Mystic Research" (members: Galileo Solis and Jove Solis, as the user typed them on the cover).
+  "Mystic Research" (the two members' names were on the cover as the user typed them; removed on 15 Nov, see the note on names).
 - **SUBMITTED for global judging** (the user, Sun 15 Nov, mid-afternoon New York: "ok its submitted, we can still edit
   this later"). The Project page was filled from `docs/submission.md`: name "LUNI: Lunar Utility for Navigational
   Intelligence", final project link https://galileoleosolis.github.io/LUNI/, the demo link is the user's own
-  PowerPoint on a public share (a fallback PDF is at `docs/LUNI-deck.pdf`, rendered here with a stand-in font).
+  PowerPoint on a public share (a fallback PDF of the old deck was in `docs/`; deleted in r18 because its cover showed the members' names).
   It can be edited and resubmitted until Sun 11:59 PM New York; only the last saved submission is judged, and it must
   be SUBMITTED again after edits. Rules from the official guide: at most seven slides or the entry is not eligible;
   no likeness of anyone under 18; English; public links with no login.
@@ -450,6 +450,53 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **NAMES: no member's name anywhere public** (the user, Sun 15 Nov about 11:22 PM New York: one of the two team
+  members is under 18, "let's just remove both"). The Space Apps terms: "Recognizable names, voices, and likenesses
+  of persons under the age of 18 should not be included in any submission." Done on `main` (baa0798): the names
+  line is gone from the first slide (deck Version 37 and `slides/`), `about/img/demo-cover.jpg` was retaken, and
+  these notes no longer spell them. The first try at releasing was refused by this session's permission check
+  (the user had said to remove the names, not to release); the user then said "Release it too" and **r18 was
+  released at about 11:57 PM New York (04:57 UTC Mon)**. It also deletes `docs/LUNI-deck.pdf`, an old picture-only
+  copy of the deck whose cover showed the names, and it is the first release since r12 that changes an app file:
+  one line in `js/assistant.js` ("noble room" = Nobile Rim 1). Checked before it: `check_assistant` (119) and test
+  set E. To roll back the app only, re-release from a commit that reverts that line; do NOT promote r17 or
+  earlier, which would bring the names back. **Never write a
+  member's name, or a tester's, in the app, the slides, the project page, the docs, these notes or a commit
+  message.** Older commits still contain them (the repository's history was not rewritten; told to the user). The
+  team name, Mystic Research, is fine. The user's own PowerPoint copy and the Space Apps team page are theirs to check.
+- **After the submission** (the user, Sun 15 Nov about 11:05 PM New York: "lets actually just start now on the
+  pre-release. is there anything against updating it or does it have to stay static until judging is over").
+  Claude could NOT confirm the 2026 rule: spaceappschallenge.org is on the allowed list, but this session cannot verify
+  the certificate the site sends (issued to www.space.apps.nasa.gov, a chain this machine does not trust), so no page
+  loads; do not switch the check off, ask the user to paste the text instead. A web search found
+  no rule on changing a linked site after the deadline (older guides only say that the final submission is what is
+  judged). Advice given: **keep the public site (the root, now r18) frozen until global judging is over**, and do new
+  work on `main` and the test build (`/LUNI/next/`), which the submission does not link to. The user was asked to
+  read the Judging & Awards Guide or ask their local lead; no answer yet. Until the user says otherwise:
+  `tools/release.sh next` is fine, `promote` is not.
+  The user then sent the **Participant FAQs** as a PDF (dated 13 Nov 2026, 14 pages, read in full): it says nothing
+  about changing a project or a linked site after the deadline. What it does say: submit "according to the ending
+  time of your Local Event"; judging happens after the hackathon; **Global Nominees, Finalists and Honorable
+  Mentions are announced in December 2026 and Global Winners in January 2027**; rules questions not answered in the
+  guides go to the Local Lead or the Contact Us page. The Judging & Awards Guide and the Project Submission Guide
+  have not been read for this question (asked for the same way).
+  The user also pasted the **2026 Participant Terms and Conditions** (updated 7 Aug 2026): nothing about changes
+  after the deadline either. What it does require: every source used must be cited, even open source ("NASA also
+  reserves the right to remove nominations, awards, or winner status from teams that do not cite resources");
+  original content is open source, and with no license named NASA distributes it under Apache 2.0 (the repository
+  has no LICENSE file; the user has not chosen one); and "recognizable names, voices, and likenesses of persons
+  under the age of 18 should not be included in any submission". The slides' cover shows both members' names
+  (the user typed them; the submission guide asks for member names): Claude does not know their ages and asked.
+  `docs/submission.md` gained three reference lines (the slides' two fonts, Pillow and Python-Markdown, the two
+  NASA videos in the lesson); told to the user at 11:20 PM New York to paste before the form closed.
+  First change after the submission, on the test build only: ASK LUNI understands "noble room" / "nobile room" as
+  Nobile Rim 1 (what a browser heard from a first-time tester); `tests/check_assistant.mjs` 119 checks.
+- **RESUBMITTED for global judging** (the user, Sun 15 Nov, shortly after 11 PM New York: "ok its submitted"). The
+  Project page was refilled from `docs/submission.md` (four boxes changed: the summary's last paragraph, the demo
+  link, the testing / lesson / award paragraphs, one line under Site coordinates). **The demo link is now
+  https://galileoleosolis.github.io/LUNI/slides/** and the final project link is the app, with r17 public.
+  Claude did not see the submitted page. The public site is what the judges open, so **do not release anything
+  that changes it without the user's say-so**; a rollback is `tools/release.sh promote <commit>`.
 - **r17 released** on the user's "release it" (Sun 15 Nov, about 10:50 PM New York = 03:50 UTC Mon). **r17 is the public
   version.** Lesson and project page only (the background section below); the app's files are unchanged since r12.
   To roll back to r16: `tools/release.sh promote 05f5761`.

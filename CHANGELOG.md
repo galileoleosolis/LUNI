@@ -1,10 +1,17 @@
 # LUNI change log
 
-Times are New York time. **Public version: r17.** The test build (`/next/`) is the same until new work is added.
+Times are New York time. **Public version: r18.** The test build (`/next/`) is the same until new work is added.
+
+## r18: Team name only on the slides
+Sun 15 Nov · 11:57 PM
+**This is the public version.**
+
+- The first slide shows the team name only. The Space Apps terms say names of people under 18 should not be in a submission.
+- An old PDF copy of the slides was removed for the same reason.
+- ASK LUNI understands "Noble Room 1" as Nobile Rim 1, which is how a browser heard one tester.
 
 ## r17: What students need to know first
-Sun 15 Nov · 10:50 PM
-**This is the public version.** The app itself is the same as r12.
+Sun 15 Nov · 10:50 PM · the app itself is the same as r12.
 
 - The lesson says what it assumes students already know (very little), with short answers to four questions about landers: what one is, how it gets to the Moon, whether it leaves, and what its mission is.
 
