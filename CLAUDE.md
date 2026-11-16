@@ -450,6 +450,10 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   (checked at his window size: all six rows are on screen; he was looking for a site that is not a past landing),
   and "the green squares" in the finder. Liked the Moon map and wants more of it. In the deck (slide 7, Version 27)
   and in `tools/about-template.html` (TESTED WITH PEOPLE; on `main` only until the next release).
+- **Student reflection** (same teacher, about 10:25 PM New York: "a brief optional student reflection"). In
+  `docs/lesson.md`: STUDENT REFLECTION (OPTIONAL, 3 MINUTES) after the worksheet (four prompts: what I got wrong and
+  tried next, a surprise, a question I still have, could I explain GO and NO-GO), a row in the timing table, and a
+  note in the TEACHER KEY (not graded). **On `main` only until the next release.**
 - **Fifth first-time tester** (report sent Sun 15 Nov about 10:15 PM New York; public r15 test with the five-card
   tour, all read; do not put the tester's name in the repository). Window 1280 x 631 (scale 0.72, the smallest
   screen so far): **6/6, 10:11, ease 5/5**, 72 clicks. "Honestly, nothing" was confusing. Task 3 took 6:02 and 50
