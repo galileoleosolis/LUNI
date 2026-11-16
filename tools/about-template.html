@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUNI · the project</title>
+<meta name="description" content="LUNI, Lunar Utility for Navigational Intelligence: a NASA Space Apps Challenge 2026 project. What it is, the local judging result, a classroom lesson and how it was built.">
+<style>
+@font-face { font-family: "Barlow Cond"; font-weight: 600; font-display: swap; src: url("../assets/fonts/barlow-condensed-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Cond"; font-weight: 700; font-display: swap; src: url("../assets/fonts/barlow-condensed-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Plex Mono"; font-weight: 400; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Plex Mono"; font-weight: 600; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); }
+:root { --bg: #070d1a; --panel: #0e1830; --line: #24365a; --fg: #d5e3f7; --dim: #8ea6cc; --hi: #41b6ff; --blue: #1657d0; --go: #21e07a; --nogo: #ff5252; --gold: #ffd166; --white: #f4f8fd;
+  --paper: #eef1f5; --ink: #1d2940; --ink-dim: #55637d;
+  --disp: "Barlow Cond", "Arial Narrow", Arial, sans-serif; --mono: "Plex Mono", Consolas, "DejaVu Sans Mono", monospace; --body: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.55 var(--body); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--hi); }
+.wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+.label { font: 600 13.5px/1.3 var(--mono); letter-spacing: .16em; color: var(--hi); text-transform: uppercase; margin: 0; }
+h1, h2, h3 { font-family: var(--disp); font-weight: 700; line-height: 1.05; margin: 0; color: var(--white); text-wrap: balance; }
+h2 { font-size: clamp(38px, 6vw, 60px); letter-spacing: .01em; }
+h3 { font-size: 28px; letter-spacing: .02em; }
+p { margin: 0; }
+.lead { font-size: clamp(19px, 2.4vw, 23px); line-height: 1.45; color: var(--white); max-width: 62ch; }
+.dim { color: var(--dim); }
+section { padding: 72px 0; border-top: 1px solid var(--line); }
+.stack { display: flex; flex-direction: column; gap: 22px; }
+.bar { width: 76px; height: 9px; background: var(--hi); }
+
+/* top row */
+.nav { position: sticky; top: 0; z-index: 5; background: rgba(7, 13, 26, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 6px 22px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+.nav b { font: 700 26px/1 var(--disp); letter-spacing: .08em; color: var(--white); margin-right: auto; }
+.nav a { font: 600 13.5px var(--mono); letter-spacing: .12em; color: var(--fg); text-decoration: none; }
+.nav a:hover { color: var(--hi); }
+.btn { display: inline-block; font: 700 19px/1 var(--disp); letter-spacing: .06em; text-decoration: none; padding: 13px 22px; border-radius: 10px; border: 2px solid #05070c; color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%), linear-gradient(180deg, #6fd0ff, #1263f2);
+  box-shadow: 0 4px 0 #05070c, inset 0 2px 0 rgba(255,255,255,.8); text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.btn:hover { filter: brightness(1.1); } .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #05070c; }
+.btn.quiet { background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); }
+.nav .btn { font-size: 16px; padding: 9px 16px; color: #fff; letter-spacing: .06em; font-family: var(--disp); }
+
+/* hero */
+.hero { border-top: none; padding: 56px 0 72px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 44px; align-items: center; }
+.word { font-size: clamp(96px, 17vw, 190px); letter-spacing: .03em; line-height: .9; margin-top: 14px; }
+.full { font: 600 clamp(22px, 3vw, 30px)/1.2 var(--disp); letter-spacing: .03em; color: var(--white); }
+.go { color: var(--go); } .nogo { color: var(--nogo); }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.ribbon { display: inline-flex; align-items: center; gap: 12px; align-self: flex-start; border: 2px solid var(--gold); color: var(--gold); padding: 9px 16px; font: 600 14px/1.25 var(--mono); letter-spacing: .12em; text-decoration: none; }
+.ribbon svg { width: 22px; height: 22px; flex: none; fill: var(--gold); }
+.shot { border: 1px solid var(--line); box-shadow: 0 24px 90px rgba(65, 182, 255, .25); }
+
+/* the project */
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+.card { display: flex; flex-direction: column; gap: 12px; }
+.card img { border: 1px solid var(--line); aspect-ratio: 16 / 10; object-fit: cover; object-position: top left; width: 100%; background: #000; }
+.cap { font: 400 13.5px/1.4 var(--mono); letter-spacing: .06em; color: var(--dim); text-transform: uppercase; }
+.nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; }
+.num { border-top: 5px solid var(--hi); padding-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.num b { font: 700 clamp(44px, 6vw, 68px)/1 var(--disp); color: var(--hi); }
+.tscroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 16px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 13px var(--mono); letter-spacing: .12em; color: var(--hi); text-transform: uppercase; }
+td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
+
+/* the award */
+.award { background: var(--blue); border-top: none; color: #dce9ff; }
+.award .label { color: #bfe0ff; } .award .bar { background: #fff; }
+.award-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 44px; align-items: center; }
+.award h2 { font-size: clamp(54px, 9vw, 104px); color: #fff; }
+.award .lead { color: #fff; }
+.facts { display: grid; gap: 0; border-top: 2px solid rgba(255,255,255,.35); }
+.facts div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.25); }
+.facts dt, .facts span { font: 600 13px/1.5 var(--mono); letter-spacing: .12em; color: #bfe0ff; text-transform: uppercase; }
+.facts b { color: #fff; font-weight: 600; }
+
+/* the lesson: a sheet of paper a teacher can print */
+.paper { background: var(--paper); color: var(--ink); padding: clamp(22px, 5vw, 56px); border-radius: 4px; }
+.paper h3 { color: #0a1630; font-size: clamp(32px, 5vw, 46px); margin-bottom: 14px; }
+.paper h4 { font: 700 26px/1.1 var(--disp); letter-spacing: .02em; color: var(--blue); margin: 34px 0 10px; padding-top: 14px; border-top: 2px solid #c5cfdd; }
+.paper h5 { font: 700 20px/1.2 var(--disp); letter-spacing: .02em; color: #0a1630; margin: 22px 0 6px; }
+.paper p, .paper li { max-width: 72ch; } .paper p { margin: 10px 0; } .paper li { margin: 5px 0; }
+.paper a { color: var(--blue); } .paper strong { color: #0a1630; }
+.paper blockquote { margin: 14px 0; padding: 12px 18px; background: #fff; border: 2px solid var(--blue); font-weight: 600; }
+.paper blockquote p { margin: 0; }
+.paper th { color: var(--blue); } .paper th, .paper td { border: 1px solid #c5cfdd; height: 44px; } .paper td:first-child { color: #0a1630; white-space: normal; }
+.paper table { background: #fff; min-width: 560px; }
+.paper code { font-family: var(--mono); font-size: .92em; }
+
+/* the timeline */
+.viewer { background: var(--panel); border: 1px solid var(--line); padding: clamp(14px, 3vw, 26px); display: flex; flex-direction: column; gap: 16px; }
+.vhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.vhead b { font: 700 40px/1 var(--disp); color: var(--hi); } .vhead span { font: 700 26px/1.1 var(--disp); color: var(--white); } .vhead i { font: 400 13.5px var(--mono); font-style: normal; letter-spacing: .08em; color: var(--dim); margin-left: auto; }
+#v-img { width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: #000; border: 1px solid var(--line); }
+.ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ctl button, .steps button { font: 700 16px/1 var(--disp); letter-spacing: .06em; padding: 10px 14px; cursor: pointer; color: #eaf4ff; border: 2px solid #05070c; border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
+.ctl button:disabled { opacity: .4; cursor: default; }
+.ctl button.on, .steps button.on { color: #fff; border-color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 52%), linear-gradient(180deg, #6fd0ff, #1263f2); }
+.grow { flex: 1; }
+.steps { display: flex; flex-wrap: wrap; gap: 6px; }
+#v-changes { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.tl { list-style: none; margin: 0; padding: 0 0 0 26px; border-left: 3px solid var(--line); display: grid; gap: 26px; }
+.tl > li { position: relative; }
+.tl > li::before { content: ""; position: absolute; left: -36px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--hi); border: 3px solid var(--bg); }
+.tl > li.mile::before { background: var(--gold); width: 18px; height: 18px; left: -38px; top: 5px; }
+.tl time { display: block; font: 400 13.5px var(--mono); letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+.tl h4 { margin: 2px 0 6px; font: 700 26px/1.1 var(--disp); letter-spacing: .02em; color: var(--white); }
+.tl h4 em { font-style: normal; color: var(--hi); margin-right: 10px; } .tl li.mile h4 { color: var(--gold); }
+.tl ul { margin: 0; padding-left: 20px; color: var(--fg); display: grid; gap: 3px; max-width: 78ch; }
+.tl button { margin-top: 10px; font: 700 15px/1 var(--disp); letter-spacing: .06em; padding: 8px 12px; cursor: pointer; color: #eaf4ff; border: 2px solid #05070c; border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--dim); font-size: 15px; }
+footer p { max-width: 80ch; margin-bottom: 8px; }
+
+@media (max-width: 860px) {
+  .hero-grid, .award-grid, .cols3 { grid-template-columns: 1fr; }
+  .nums { grid-template-columns: 1fr 1fr; }
+  section { padding: 52px 0; }
+  .nav a:not(.btn) { display: none; }
+  .vhead i { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media print { .nav, .hero, #project, .award, #timeline, footer { display: none; } body { background: #fff; } section { padding: 0; border: none; } .paper { padding: 0; } }
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <b>LUNI</b>
+  <a href="#project">THE PROJECT</a><a href="#award">JUDGING</a><a href="#lesson">LESSON</a><a href="#timeline">TIMELINE</a>
+  <a class="btn" href="../">OPEN LUNI ▸</a>
+</div></nav>
+
+<header class="hero"><div class="wrap hero-grid">
+  <div class="stack">
+    <p class="label">NASA Space Apps Challenge 2026 · Lunar Landing Site Navigator</p>
+    <h1 class="word">LUNI</h1>
+    <div class="bar"></div>
+    <p class="full">Lunar Utility for Navigational Intelligence</p>
+    <p class="lead">Can this mission land here, at this time? LUNI answers <b class="go">GO</b> or <b class="nogo">NO-GO</b> from NASA data, gives the reason, and offers the way out.</p>
+    <div class="btns"><a class="btn" href="../">OPEN LUNI ▸</a><a class="btn quiet" href="#lesson">THE CLASSROOM LESSON</a></div>
+    <a class="ribbon" href="#award"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.500l2.900 6.200 6.600.800-4.900 4.600 1.300 6.600L12 17.400 6.100 20.700l1.300-6.600-4.900-4.600 6.600-.800z"/></svg><span>BEST USE OF DATA<br>LOCAL JUDGING · 15 NOV 2026</span></a>
+  </div>
+  <img class="shot" src="img/hero.jpg" width="1600" height="1000" alt="The LUNI main screen: a GO for Nobile Rim 1 on 15 November 2026, with the Sun and Earth readouts, the view from the site and the 30-day mission plan">
+</div></header>
+
+<section id="project"><div class="wrap stack">
+  <p class="label">The project</p>
+  <h2>ONE CLEAR ANSWER FROM NASA DATA</h2>
+  <p class="lead">At the Moon’s south pole the Sun only skims the horizon. One hill, or one day of delay, can take away a lander’s power or its link to Earth.</p>
+  <p class="dim" style="max-width:70ch">The challenge asked for a tool that lets mission planners, educators and the public compare landing sites and dates quickly. Today that takes several specialist tools. LUNI puts it on one screen.</p>
+  <figure style="margin:14px 0 0" class="stack">
+    <img class="shot" src="../docs/figures/luni-skyline-25-days.gif" width="1280" height="195" loading="lazy" alt="Moving picture of LUNI’s view from a south pole site over 25 days: the Sun travels all the way round just above the skyline and dips behind the hills, while the Earth stays low in one place and sinks behind the ground">
+    <figcaption class="cap">LUNI’s view from Nobile Rim 1: the Sun and the Earth over 25 days, from 15 Nov 2026</figcaption>
+  </figure>
+  <div class="cols3" style="margin-top:26px">
+    <div class="card"><img src="img/nogo.jpg" loading="lazy" alt="LUNI showing a NO-GO at Nobile Rim 1 on 14 November 2026 because there is no Earth link at landing, with two buttons that fix it">
+      <h3>ONE ANSWER</h3><p>GO or NO-GO for the place, the time and the mission needs you set, with the reason. On a NO-GO, the fixes are buttons in the same strip.</p></div>
+    <div class="card"><img src="../docs/figures/luni-best-site-finder.gif" loading="lazy" alt="Moving picture of the Best Site Finder: the map around the site fills in square by square, the best spot is starred, and the lander moves there">
+      <h3>TWO WAYS OUT</h3><p>When the plan slips, keep the date and move the site with the Best Site Finder, or keep the site and jump to the next landing window.</p></div>
+    <div class="card"><img src="../docs/figures/luni-more-features.gif" loading="lazy" alt="Moving picture of eight more LUNI screens: the Moon map with sunlight and water ice layers, mission history, the 3D surface view, ASK LUNI, mission windows, the operations plan and the tutorial">
+      <h3>AND MORE</h3><p>Moon map layers, six real landings replayed, a 3D view from the surface, an energy budget, ASK LUNI by typing or voice, and a guided tutorial.</p></div>
+  </div>
+
+  <h3 id="data" style="margin-top:44px">THE NASA DATA BEHIND IT</h3>
+  <div class="tscroll"><table>
+    <tr><th>NASA data</th><th>What LUNI uses it for</th></tr>
+    <tr><td>NAIF SPICE (DE440)</td><td>Where the Sun and the Earth are, 2023 to 2035</td></tr>
+    <tr><td>LRO LOLA elevation</td><td>Skylines, slopes, scans and map layers</td></tr>
+    <tr><td>LRO Diviner</td><td>Temperature, and where water ice could last</td></tr>
+    <tr><td>NAIF station kernels</td><td>Which Deep Space Network sites have the Moon in view</td></tr>
+    <tr><td>LRO Wide Angle Camera</td><td>The picture of the Moon</td></tr>
+  </table></div>
+  <h3 style="margin-top:34px">CHECKED AGAINST NASA</h3>
+  <div class="nums">
+    <div class="num"><b>0.0007°</b><span>Largest gap from NASA JPL Horizons, over 1,110 Sun and Earth positions at 6 sites.</span></div>
+    <div class="num"><b>347 h</b><span>Daylight LUNI finds for Blue Ghost Mission 1 after landing. Firefly reported 346 h.</span></div>
+    <div class="num"><b>0.99</b><span>Match of LUNI’s polar sunlight maps with NASA’s LOLA maps, at both poles.</span></div>
+    <div class="num"><b>99.1%</b><span>Same “never sunlit” answer as NASA’s south pole map. North pole: 98.9%.</span></div>
+  </div>
+  <p class="dim" style="max-width:76ch">The data is NASA’s, and it is checked. GO or NO-GO is LUNI’s own rule, applied to the mission needs the planner sets, so it is a planning and teaching tool, not flight software. The PROOF button in the app shows every check.</p>
+</div></section>
+
+<section id="award" class="award"><div class="wrap award-grid">
+  <div class="stack">
+    <p class="label">Local judging result</p>
+    <div class="bar"></div>
+    <h2>BEST USE OF DATA</h2>
+    <p class="lead">Team Mystic Research presented LUNI at its local NASA Space Apps Challenge event on Sunday 15 November 2026, and LUNI won the award for Best Use of Data.</p>
+  </div>
+  <dl class="facts">
+    <div><span>Award</span><b>Best Use of Data</b></div>
+    <div><span>Team</span><b>Mystic Research</b></div>
+    <div><span>Challenge</span><b>Lunar Landing Site Navigator</b></div>
+    <div><span>Format</span><b>3 minutes to present, 5 minutes of questions</b></div>
+    <div><span>Next</span><b>Submitted for global judging</b></div>
+  </dl>
+</div></section>
+
+<section id="lesson"><div class="wrap stack">
+  <p class="label">For teachers and students</p>
+  <h2>THE CLASSROOM LESSON</h2>
+  <p class="lead">A ready-to-run 45-minute lesson. Students plan their own Moon landing with the same tool, and must end on a GO.</p>
+  <p class="dim">It has not been run in a classroom yet. If you try it, the team would like to hear how it went. Printing this page prints only the lesson.</p>
+  <article class="paper"><h3>{{LESSON_TITLE}}</h3>
+{{LESSON}}
+  </article>
+</div></section>
+
+<section id="timeline"><div class="wrap stack">
+  <p class="label">How it was built</p>
+  <h2>TWO DRAFTS, {{N_RELEASES}} RELEASES, ONE WEEKEND</h2>
+  <p class="lead">Every picture is the real app at that version. Step through to see what testers’ feedback changed.</p>
+  <div class="viewer" aria-label="Screens, version by version">
+    <div class="vhead"><b id="v-tag"></b><span id="v-name"></span><i id="v-when"></i></div>
+    <img id="v-img" alt="" width="1440" height="900">
+    <div class="ctl"><button id="prev">◀ EARLIER</button><button id="next">LATER ▶</button><button id="play">▶ PLAY THROUGH</button><span class="grow"></span><button id="view-main" class="on">MAIN SCREEN</button><button id="view-finder">BEST SITE FINDER</button></div>
+    <div class="steps" id="steps"></div>
+    <ul id="v-changes"></ul>
+    <p class="cap">Times are New York time. The finder picture exists only for some versions.</p>
+  </div>
+  <h3 style="margin-top:30px">THE WEEKEND, IN ORDER</h3>
+  <ol class="tl">
+{{TIMELINE}}
+  </ol>
+</div></section>
+
+<footer><div class="wrap">
+  <p>LUNI was made by team Mystic Research for the NASA Space Apps Challenge 2026. The code was written by an AI assistant (Claude) under the team’s direction. No data, images or video were generated by AI.</p>
+  <p>Source code and data builders: <a href="https://github.com/galileoleosolis/LUNI">github.com/galileoleosolis/LUNI</a>. Data: NASA NAIF, the Lunar Reconnaissance Orbiter teams (LOLA, Diviner, LROC) and JPL Horizons.</p>
+</div></footer>
+
+<script>
+const V = {{VERSIONS}};
+const $ = (id) => document.getElementById(id);
+let at = V.length - 1, view = "main", timer = 0;
+function show(i) {
+  at = Math.max(0, Math.min(V.length - 1, i)); const v = V[at], fin = view === "finder" && v.finder;
+  $("v-tag").textContent = v.tag.toUpperCase(); $("v-name").textContent = v.name; $("v-when").textContent = v.when + " · " + v.saves;
+  $("v-img").src = fin ? v.finder : v.main; $("v-img").alt = "LUNI at " + v.tag + ": " + v.name + (fin ? ", Best Site Finder" : ", main screen");
+  $("v-changes").replaceChildren(...v.changes.map((c) => { const li = document.createElement("li"); li.textContent = c; return li; }));
+  $("prev").disabled = at === 0; $("next").disabled = at === V.length - 1; $("view-finder").disabled = !v.finder;
+  $("view-main").classList.toggle("on", !fin); $("view-finder").classList.toggle("on", !!fin);
+  [...$("steps").children].forEach((b, k) => b.classList.toggle("on", k === at));
+}
+function stop() { clearInterval(timer); timer = 0; $("play").textContent = "▶ PLAY THROUGH"; }
+V.forEach((v, i) => { const b = document.createElement("button"); b.textContent = v.tag.toUpperCase(); b.addEventListener("click", () => { stop(); show(i); }); $("steps").appendChild(b); });
+$("prev").addEventListener("click", () => { stop(); show(at - 1); }); $("next").addEventListener("click", () => { stop(); show(at + 1); });
+$("view-main").addEventListener("click", () => { view = "main"; show(at); }); $("view-finder").addEventListener("click", () => { view = "finder"; show(at); });
+$("play").addEventListener("click", () => { if (timer) return stop(); view = "main"; show(0); $("play").textContent = "■ STOP";
+  timer = setInterval(() => { if (at >= V.length - 1) return stop(); show(at + 1); }, 1800); });
+document.querySelectorAll(".tl button[data-v]").forEach((b) => b.addEventListener("click", () => { stop(); view = "main"; show(V.findIndex((v) => v.id === b.dataset.v)); document.querySelector(".viewer").scrollIntoView({ behavior: "smooth", block: "start" }); }));
+show(at);
+</script>
+</body>
+</html>

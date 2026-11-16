@@ -408,6 +408,29 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   no likeness of anyone under 18; English; public links with no login.
   Talk: `docs/talk/LUNI-talk-{me,brother,full}.pdf` (the brother speaks slides 1, 3, 4; the user 2, 5, 6, 7).
   Still to do later the same day: the "for" in the name across the app (see the note below), then a release.
+- **r8 released** on the user's "release it" (Sun 15 Nov, 6:33 PM New York = 23:33 UTC; main 9bbecc4). The full set
+  ran first: all ten Node checks, test sets E and D (6/6 each), six window sizes. The public site now has the name with
+  "for", the 25% Earth-link default and the whole design system batch below. Nothing newer is waiting. To roll back
+  to r7: `tools/release.sh promote b12dd78`. **Local judging result: the team won BEST USE OF DATA** (the user: the
+  judges "were really impressed with the whole thing").
+- **Project page** (the user, Sun 15 Nov about 7:15 PM New York: "another site for the github that shows the lesson
+  plan, the project, the local judging results ... and the timeline thing"): `about/index.html`, served at
+  `/LUNI/about/` once released. It is BUILT, not hand-edited: `python3 tools/build_about.py` (needs `pip install
+  markdown`) fills `tools/about-template.html` with `docs/lesson.md` and the version list inside
+  `docs/version-history.html` (pictures are written to `about/img/v-*.jpg`). Run it again after changing the lesson or
+  adding a release. Team name only on the page; the members' names were left off on purpose (ask before adding).
+  `docs/version-history.html` now has r8 and the award (republish its artifact after changes).
+  The three GIFs in `docs/figures/` were replaced with the r8 look.
+- **Deck, selling pass** (the user, Sun 15 Nov about 7 PM New York, after the award: "we can really up the slide show to
+  make it sell the website more"; "you can use your deck"). Deck Version 25, still seven slides: cover (r8 look, award
+  line), THE CHALLENGE, ONE ANSWER, PLAN SLIPS? TWO WAYS OUT, ALL SEVEN OBJECTIVES AND MORE, NASA DATA, CHECKED (the
+  data table and the four proof numbers on one slide, plus "the data is NASA's; the GO rule is the planner's own
+  needs"), WHO IT IS FOR (planners, teachers and students with the lesson, anyone curious; testing, AI use, QR).
+  All pictures and the three GIFs were re-recorded from r8 (`gif/make.py` and `pw/deckshots3.js` in the scratchpad;
+  the finder GIF now starts on the finished map so a still export shows it). Titles are kept short so they do not
+  wrap in a fallback font. `docs/lesson.md` is the 45-minute classroom lesson the deck points to (not run by a
+  teacher yet: do not claim classroom use). **The submitted demo link is the user's own PowerPoint copy, so the new
+  deck reaches the judges only if the user exports or shares it and updates the submission.**
 - **Design system batch, ON THE TEST BUILD (`/next/`) and the preview page, NOT released (public is r7)**: the user,
   Sun 15 Nov about 4:45 PM New York, approved a plan to put the waiting batch and the design system on the test build
   "for comparison". The design system is a private Claude artifact, "LUNI Console"
@@ -566,8 +589,8 @@ a sunlit Sun shown with a negative height, clipped labels in the scan's SHOW but
    `promote` ONLY when the user says to release (it changes what the judges see), `promote <commit>` to roll back.
    Releases are numbered in the release branch history (r1 was the first); tags cannot be pushed from this session.
    r2 (14 Nov, 21:08 UTC, main 6c061ff) is the first release under the LUNI name. r3 (15 Nov, about 03:00 UTC,
-   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). **r7 (15 Nov, 18:40 UTC, main b12dd78) is the current public version.**
-   To roll back to r6: `tools/release.sh promote 8c8cb9c`.
+   main 9f099f4). r4 (15 Nov, 14:05 UTC, main 3093d3b). r5 (15 Nov, 15:26 UTC, main 90e2028). r6 (15 Nov, 17:05 UTC, main 8c8cb9c). r7 (15 Nov, 18:40 UTC, main b12dd78). **r8 (15 Nov, 23:33 UTC, main 9bbecc4) is the current public version.**
+   To roll back to r7: `tools/release.sh promote b12dd78`.
 2. Presentation: story, demo video, project page text. Nothing exists yet.
 3. OpenSpace link: built (`js/openspace.js`, CONNECT TO OPENSPACE in the right column) and **confirmed working by the
    user with real OpenSpace on 14 Nov** (LUNI opened from the Pages site, not the preview). Not yet heard: whether the
