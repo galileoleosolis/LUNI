@@ -27,11 +27,21 @@ for v in V:
             name = f"v-{v['id']}-{kind}.jpg"
             open(os.path.join(ROOT, "about", "img", name), "wb").write(base64.b64decode(src.split(",", 1)[1]))
             v[kind] = "img/" + name
+# the weekend in order: every draft and release, with the milestones that are not app versions
+MILE = {None: ("Sat 14 Nov \u00b7 9:00 AM", "The hackathon opens", ["NASA Space Apps Challenge 2026. Team Mystic Research picks the Lunar Landing Site Navigator challenge."]),
+        "r7": ("Sun 15 Nov \u00b7 afternoon", "Presented, submitted, and an award", ["Submitted for global judging.", "Local judging: three minutes to present, five minutes of questions.", "LUNI wins Best Use of Data."])}
+def mile(m): return f'    <li class="mile"><time>{html.escape(m[0])}</time><h4>{html.escape(m[1])}</h4><ul>' + "".join(f"<li>{html.escape(c)}</li>" for c in m[2]) + "</ul></li>"
+rows = [mile(MILE[None])]
+for v in V:
+    rows.append(f'    <li><time>{html.escape(v["when"])} \u00b7 {html.escape(v["saves"])}</time><h4><em>{html.escape(v["tag"].upper())}</em>{html.escape(v["name"])}</h4><ul>'
+                + "".join(f"<li>{html.escape(c)}</li>" for c in v["changes"]) + f'</ul><button data-v="{v["id"]}">SEE THIS SCREEN \u25b2</button></li>')
+    if v["id"] in MILE: rows.append(mile(MILE[v["id"]]))
+timeline = "\n".join(rows)
 versions = json.dumps(V, ensure_ascii=False).replace("</", "<\\/")
 first = V[-1]
 
 page = open(os.path.join(ROOT, "tools", "about-template.html"), encoding="utf-8").read()
-page = (page.replace("{{LESSON_TITLE}}", lesson_title).replace("{{LESSON}}", lesson).replace("{{VERSIONS}}", versions)
+page = (page.replace("{{LESSON_TITLE}}", lesson_title).replace("{{LESSON}}", lesson).replace("{{VERSIONS}}", versions).replace("{{TIMELINE}}", timeline)
         .replace("{{N_RELEASES}}", str(sum(1 for v in V if v["id"].startswith("r")))).replace("{{LATEST}}", first["tag"]))
 open(os.path.join(ROOT, "about", "index.html"), "w", encoding="utf-8").write(page)
 print("about/index.html", len(page), "bytes;", len(V), "versions;", len(os.listdir(os.path.join(ROOT, "about", "img"))), "pictures")

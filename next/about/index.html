@@ -105,6 +105,16 @@ td:first-child { color: var(--white); font-weight: 600; white-space: nowrap; }
 .grow { flex: 1; }
 .steps { display: flex; flex-wrap: wrap; gap: 6px; }
 #v-changes { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.tl { list-style: none; margin: 0; padding: 0 0 0 26px; border-left: 3px solid var(--line); display: grid; gap: 26px; }
+.tl > li { position: relative; }
+.tl > li::before { content: ""; position: absolute; left: -36px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--hi); border: 3px solid var(--bg); }
+.tl > li.mile::before { background: var(--gold); width: 18px; height: 18px; left: -38px; top: 5px; }
+.tl time { display: block; font: 400 13.5px var(--mono); letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+.tl h4 { margin: 2px 0 6px; font: 700 26px/1.1 var(--disp); letter-spacing: .02em; color: var(--white); }
+.tl h4 em { font-style: normal; color: var(--hi); margin-right: 10px; } .tl li.mile h4 { color: var(--gold); }
+.tl ul { margin: 0; padding-left: 20px; color: var(--fg); display: grid; gap: 3px; max-width: 78ch; }
+.tl button { margin-top: 10px; font: 700 15px/1 var(--disp); letter-spacing: .06em; padding: 8px 12px; cursor: pointer; color: #eaf4ff; border: 2px solid #05070c; border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 50%), linear-gradient(180deg, #2b4f8f, #10224a); box-shadow: 0 2px 0 #05070c, inset 0 1px 0 rgba(255,255,255,.4); }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
 footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--dim); font-size: 15px; }
@@ -349,6 +359,21 @@ the Earth for ... I fixed my plan by ...</em></p>
     <ul id="v-changes"></ul>
     <p class="cap">Times are New York time. The finder picture exists only for some versions.</p>
   </div>
+  <h3 style="margin-top:30px">THE WEEKEND, IN ORDER</h3>
+  <ol class="tl">
+    <li class="mile"><time>Sat 14 Nov · 9:00 AM</time><h4>The hackathon opens</h4><ul><li>NASA Space Apps Challenge 2026. Team Mystic Research picks the Lunar Landing Site Navigator challenge.</li></ul></li>
+    <li><time>Sat 14 Nov · 10:21 AM · 1 save</time><h4><em>DRAFT 1</em>First sketch</h4><ul><li>A plain page with made-up numbers, to try the idea.</li><li>Called LUNO at this point.</li></ul><button data-v="a0">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sat 14 Nov · 10:36 AM · 3 saves</time><h4><em>DRAFT 2</em>The field unit</h4><ul><li>Redesigned as a console inside a rugged field unit.</li><li>3D Moon to pick a site, and a checked list of sites.</li><li>Eight minutes later: real NASA data (SPICE positions, LOLA terrain).</li></ul><button data-v="a1">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sat 14 Nov · 3:16 PM · 40 saves</time><h4><em>R1</em>First public version</h4><ul><li>Mission needs, GO / NO-GO, and the landing-window calendar.</li><li>Area scan, with the skylines worked out on the graphics chip.</li><li>Eclipses, and a one-click check against NASA JPL Horizons.</li><li>3D view from the surface.</li><li>ASK LUNO: typed and spoken commands.</li><li>Link to OpenSpace.</li><li>Built-in user test; four rounds of testing changed the layout each time.</li><li>Blue palette, bigger text, the verdict first.</li></ul><button data-v="r1">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sat 14 Nov · 4:08 PM · 53 saves</time><h4><em>R2</em>Renamed LUNI</h4><ul><li>The product becomes LUNI.</li><li>Mission-clock slider with a real handle.</li><li>Headings in three voices: the name, what it is, what you can do.</li><li>Moving the site from the scan is animated and stays in the scan.</li><li>Clear message when the microphone is refused.</li></ul><button data-v="r2">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sat 14 Nov · 10:13 PM · 75 saves</time><h4><em>R3</em>Proof and the Moon map</h4><ul><li>Two-column layout, brighter palette.</li><li>PROOF panel: three real landings replayed against the mission record.</li><li>Opens on a real landing (IM-2); copy link; first-visit guide; slope need.</li><li>MISSION HISTORY: six real landings since 2023.</li><li>MOON MAP with data layers and a data card for any point.</li><li>Temperature from NASA Diviner, and YOUR MIX of layers.</li><li>3D surface view, second version.</li><li>The scan&#x27;s best point must meet the needs.</li><li>Less clutter: big icons, one lower chart at a time.</li></ul><button data-v="r3">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sun 15 Nov · 9:05 AM · 96 saves</time><h4><em>R4</em>Simple view and the tutorial</h4><ul><li>SIMPLE VIEW by default; ALL TOOLS one press away.</li><li>A guided tutorial that lights up one part at a time.</li><li>Whole-Moon layers and the north pole.</li><li>Renamed: BEST SITE FINDER and NEXT LANDING WINDOW.</li><li>The answer as one strip, with Sun and Earth side by side under it.</li><li>Custom coordinates on the main screen; every site ranked with a GO / NO-GO dot.</li><li>OPERATIONS plan beside MISSION PLAN and MISSION WINDOWS.</li><li>Colored step bands, a bigger slider, icons on the ASK LUNI buttons.</li></ul><button data-v="r4">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sun 15 Nov · 10:26 AM · 103 saves</time><h4><em>R5</em>More NASA data</h4><ul><li>WATER ICE layer from NASA&#x27;s Diviner polar product.</li><li>DEEP SPACE NETWORK line: which NASA stations can see the Moon.</li><li>The site&#x27;s data card uses the site&#x27;s own detailed skyline.</li><li>PROOF: LUNI&#x27;s polar maps checked against NASA&#x27;s own (0.99).</li></ul><button data-v="r5">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sun 15 Nov · 12:05 PM · 107 saves</time><h4><em>R6</em>NASA data out loud</h4><ul><li>NASA DATA USED band every time something is calculated.</li><li>Best Site Finder: the map holds still after a move, so its points no longer slide.</li><li>One EARTH LINK need instead of two.</li><li>Verdict strip tidied; a NO-GO pulses, and so do the keys that can fix it.</li><li>PROOF opens on four headline numbers.</li><li>ASK LUNI: move to the highest, coldest, flattest spot.</li></ul><button data-v="r6">SEE THIS SCREEN ▲</button></li>
+    <li><time>Sun 15 Nov · 1:40 PM · 116 saves</time><h4><em>R7</em>Energy, before and after, solar panels</h4><ul><li>ENERGY: an hour-by-hour power budget with the battery needed.</li><li>BEFORE AND AFTER box when the site or the date moves.</li><li>SOLAR PANELS placed on the sunniest squares near the lander.</li><li>Skyline picture: depth, bigger rays, fixed sizes, no false eclipse.</li><li>Finder: vertical button stacks against the map.</li><li>NASA band in white and red; warnings to the right of the verdict.</li><li>SIMPLE VIEW starts with the left side folded.</li><li>ASK LUNI: coordinates, comparing two sites, energy, temperature.</li></ul><button data-v="r7">SEE THIS SCREEN ▲</button></li>
+    <li class="mile"><time>Sun 15 Nov · afternoon</time><h4>Presented, submitted, and an award</h4><ul><li>Submitted for global judging.</li><li>Local judging: three minutes to present, five minutes of questions.</li><li>LUNI wins Best Use of Data.</li></ul></li>
+    <li><time>Sun 15 Nov · 6:33 PM · 136 saves</time><h4><em>R8</em>The LUNI Console look</h4><ul><li>Released after the local judging, where LUNI won Best Use of Data.</li><li>A new look from our own design system: glossy keys, dark glass choice buttons, cards with icons, an icon on every section band.</li><li>The full name with “for”: Lunar Utility for Navigational Intelligence.</li><li>The default Earth-link need is now 25% of the mission, so a plan with almost no Earth link is no longer a GO.</li><li>NASA DATA USED band stays 14 seconds and each source is a link.</li><li>View from the site: shaded ground and craters for depth. FULL SCREEN button.</li><li>Outside the app: a 45-minute classroom lesson, the slide deck, GIFs.</li></ul><button data-v="r8">SEE THIS SCREEN ▲</button></li>
+  </ol>
 </div></section>
 
 <footer><div class="wrap">
@@ -375,6 +400,7 @@ $("prev").addEventListener("click", () => { stop(); show(at - 1); }); $("next").
 $("view-main").addEventListener("click", () => { view = "main"; show(at); }); $("view-finder").addEventListener("click", () => { view = "finder"; show(at); });
 $("play").addEventListener("click", () => { if (timer) return stop(); view = "main"; show(0); $("play").textContent = "■ STOP";
   timer = setInterval(() => { if (at >= V.length - 1) return stop(); show(at + 1); }, 1800); });
+document.querySelectorAll(".tl button[data-v]").forEach((b) => b.addEventListener("click", () => { stop(); view = "main"; show(V.findIndex((v) => v.id === b.dataset.v)); document.querySelector(".viewer").scrollIntoView({ behavior: "smooth", block: "start" }); }));
 show(at);
 </script>
 </body>
