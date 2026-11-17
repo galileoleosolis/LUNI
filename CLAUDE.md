@@ -98,6 +98,11 @@ Run: `python -m http.server 8080` in this folder, open http://localhost:8080 (mu
   download the NASA inputs (about 45 MB and 620 MB; not in git).
 - `tests/` — run with Node 22: `check_ephemeris` (0.0007° vs JPL Horizons), `check_terrain`, `check_mission`,
   `check_scan`, `check_eclipses`, `check_assistant`, `real_missions`.
+- `tests/browser/` — the browser checks run before every release (Playwright; see its README): `sizes.js` (six
+  window sizes), `test-e.js` and `test-d.js` (the six-task tests, 6/6 each), `slides.js`, `about.js check|cover`.
+  Start `python3 -m http.server 8080` first; pictures go to `tests/browser/out/` (not in git).
+- `tools/shots/` — the scripts that record the slides' pictures and recordings and the lesson's numbered screen
+  (`gif-frames.js`, `more-frames.js`, `make_gifs.py`, `deck-shots.js`, `lesson-guide.js`, `annotate_guide.py`).
 
 ## Rules of the road
 - Only real, sourced data in the app. Unsourced notes were removed on purpose; do not re-add figures without a source.
@@ -491,6 +496,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NASA videos in the lesson); told to the user at 11:20 PM New York to paste before the form closed.
   First change after the submission, on the test build only: ASK LUNI understands "noble room" / "nobile room" as
   Nobile Rim 1 (what a browser heard from a first-time tester); `tests/check_assistant.mjs` 119 checks.
+- **The checks now live in the project** (the user, Mon 16 Nov: "Copy those checks", after asking how messy the
+  code is). Until then every browser check and picture-making script was only in this session's scratch folder.
+  Copied with relative folders and a `LUNI_URL` setting: `tests/browser/` (all five were run again from the project
+  and pass) and `tools/shots/` (syntax checked only, NOT run again). Wherever older notes say a script is "in the
+  scratchpad" (`sizes.js`, `testE.js`, `testD.js`, `front.js`, `slides.js`, `gifshots.js`, `more.js`,
+  `deckshots3.js`, `gif/make.py`, `guide.js`, `annotate.py`), use these copies. NOT copied: the builder of the
+  Claude preview page (`mkpreview.py`, which needs the artifact's own file) and one-off scripts. Still true about
+  the code, told to the user: `js/app.js` is 1,238 dense lines and should be split; `css/style.css` grew by
+  appending blocks that override earlier ones; these notes are a diary, not organized documentation. A cleanup
+  pass was offered for after judging, on the test build; not started.
 - **Three interface details, ON THE TEST BUILD ONLY (public stays r18)** (the user, Mon 16 Nov, pasted nine design
   tips from a video and said "Do these on the pre-release" to the three Claude picked). All in one block at the end
   of `css/style.css`: (1) the dark glass choice buttons have see-through borders (`rgba(2, 4, 9, .68)` with

@@ -2,3 +2,5 @@ tools/kernels/*
 !tools/kernels/.gitkeep
 tools/dem/
 __pycache__/
+tests/browser/out/
+tools/shots/out/
