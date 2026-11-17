@@ -368,7 +368,7 @@ input[type=number] { font-size: 14px; }
 .cols { position: relative; }
 .surface { position: absolute; inset: 0; z-index: 8; background: #000; }
 .surface[hidden] { display: none; }
-.surface:fullscreen { inset: 0; width: 100vw; height: 100vh; font-family: var(--mono); color: var(--amb); font-size: 14px; }
+.surface:fullscreen { inset: 0; width: 100vw; height: 100vh; height: 100dvh; font-family: var(--mono); color: var(--amb); font-size: 14px; }
 .sv-canvas { position: absolute; inset: 0; }
 .sv-top { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 16px; padding: 8px 10px; background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,0)); pointer-events: none; font-size: 12px; }
 .sv-top > * { pointer-events: auto; }
@@ -762,7 +762,7 @@ html.flow.simple #play-btn { grid-column: span 2; } html.flow.simple #tools-btn 
 .tour-dim { position: fixed; z-index: 60; background: rgba(0, 0, 0, .82); }
 .tour-ring { position: fixed; z-index: 61; pointer-events: none; border: 3px solid var(--key-y, #ffd23c); border-radius: 6px; box-sizing: border-box; animation: tour-ring 1.3s ease-in-out infinite; }
 @keyframes tour-ring { 50% { border-color: rgba(255, 210, 60, .25); } }
-.tour-card { position: fixed; z-index: 62; width: min(440px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow-y: auto; box-sizing: border-box; background: #05080d; border: 2px solid var(--key-y, #ffd23c); border-radius: 8px;
+.tour-card { position: fixed; z-index: 62; width: min(440px, calc(100vw - 16px)); max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; box-sizing: border-box; background: #05080d; border: 2px solid var(--key-y, #ffd23c); border-radius: 8px;
   box-shadow: 0 12px 50px #000; padding: 12px 16px 14px; color: #e9eef5; font-family: var(--mono); font-size: 15px; line-height: 1.45; }
 .tour-top { display: flex; align-items: center; gap: 10px; font-size: 12.5px; letter-spacing: .08em; color: #9fb0c6; }
 .tour-bar { flex: 1; height: 6px; background: #1b2634; border-radius: 3px; overflow: hidden; } .tour-bar b { display: block; height: 100%; background: var(--key-y, #ffd23c); }
@@ -1171,3 +1171,12 @@ html.flow a.about-link { font-size: 13px; padding: 5px 10px; }
 .test-map { grid-template: "task task" 24px "top top" 26px "left mid" 84px "keys keys" 28px / 30% 1fr; }
 .test-map .m-task { grid-area: task; border-style: dashed; }
 .test-map.z-task .m-task { color: #06122a; background: var(--key-y); border-color: #fff; border-style: solid; }
+
+/* ===== Three interface details (16 Nov, from a list of tips the user sent) ===== */
+/* Borders of the dark glass choice buttons are see-through, so they take on whatever is behind them (a colored band,
+   the blue top strip, a card) instead of cutting a black line into it. The chosen button keeps its solid white edge. */
+:is(.seg, .plan-tabs, .mm-layers, .tabs) button:not(#_), .fs-btn:not(#_), #mm-view button:not(#_) { border-color: rgba(2, 4, 9, .68); background-clip: padding-box; }
+/* Icon lines are as heavy as the text beside them: bold headings get a heavier line than the small option labels. */
+.fi * { stroke-width: 2.4; }
+.comms-mic .ic * { stroke-width: 2.2; }
+.comms-opt .ic * { stroke-width: 1.6; }
