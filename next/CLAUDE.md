@@ -491,6 +491,16 @@ written"; icons wanted on the ASK LUNI buttons ("accessibility menu" = the ASK L
   NASA videos in the lesson); told to the user at 11:20 PM New York to paste before the form closed.
   First change after the submission, on the test build only: ASK LUNI understands "noble room" / "nobile room" as
   Nobile Rim 1 (what a browser heard from a first-time tester); `tests/check_assistant.mjs` 119 checks.
+- **Three interface details, ON THE TEST BUILD ONLY (public stays r18)** (the user, Mon 16 Nov, pasted nine design
+  tips from a video and said "Do these on the pre-release" to the three Claude picked). All in one block at the end
+  of `css/style.css`: (1) the dark glass choice buttons have see-through borders (`rgba(2, 4, 9, .68)` with
+  `background-clip: padding-box`; the chosen button keeps its solid white edge); (2) icon lines match the weight of
+  the text beside them (`.fi *` 2.4, `.comms-mic .ic *` 2.2, `.comms-opt .ic *` 1.6: CSS wins over the
+  `stroke-width` attributes in the markup, so change weights there); (3) `100dvh` after `100vh` for the full-screen
+  3D view and the tutorial card (phones). The difference is small on purpose. Checked: six window sizes, test set
+  E, before / after pictures. Not done, offered: writing the tips into the private design system page (nested
+  corner radius = outer minus padding, see-through borders, OKLCH for color steps, icon weight, dvh, lighter
+  surfaces for depth). Not relevant to LUNI: carousel edge fades, multiply blending for product photos.
 - **RESUBMITTED for global judging** (the user, Sun 15 Nov, shortly after 11 PM New York: "ok its submitted"). The
   Project page was refilled from `docs/submission.md` (four boxes changed: the summary's last paragraph, the demo
   link, the testing / lesson / award paragraphs, one line under Site coordinates). **The demo link is now
